@@ -1,0 +1,405 @@
+/// Service for managing user profiles in the Movie Star application following the ontology structure.
+///
+// Copyright (C) 2025, Software Innovation Institute, ANU.
+//
+// Licensed under the GNU General Public License, Version 3 (the "License").
+//
+// License: https://www.gnu.org/licenses/gpl-3.0.en.html.
+
+library;
+
+import 'package:flutter/material.dart';
+import 'package:solidpod/solidpod.dart';
+import 'package:moviestar/utils/turtle_serializer.dart';
+import 'package:moviestar/utils/is_logged_in.dart';
+import 'package:moviestar/utils/pod_path_helper.dart';
+import 'package:moviestar/services/api_key_service.dart';
+
+/// Service for managing user profiles in the POD following the ontology structure.
+class UserProfileService {
+  /// Widget context for POD operations.
+  final BuildContext _context;
+
+  /// Widget for returning after operations.
+  final Widget _child;
+
+  /// Cache for user profile data.
+  Map<String, dynamic>? _cachedProfile;
+
+  /// Creates a new [UserProfileService] instance.
+  UserProfileService(this._context, this._child);
+
+  /// Gets the current user's web ID.
+  Future<String?> getCurrentUserWebId() async {
+    try {
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) return null;
+
+      // Get the web ID from the POD
+      final webId = await getWebId();
+      return webId;
+    } catch (e) {
+      debugPrint('Failed to get current user web ID: $e');
+      return null;
+    }
+  }
+
+  /// Creates or updates the user profile following the ontology structure.
+  Future<bool> createOrUpdateUserProfile({
+    String? apiKey,
+    String? dobString,
+    String? genderString,
+    List<String>? movieListIds,
+  }) async {
+    try {
+      debugPrint('👤 Creating/updating user profile');
+      
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        debugPrint('❌ User not logged in, cannot create profile');
+        return false;
+      }
+
+      final webId = await getCurrentUserWebId();
+      if (webId == null) {
+        debugPrint('❌ Could not get Web ID for user');
+        return false;
+      }
+
+      debugPrint('🌐 User Web ID: $webId');
+
+      // First, try to load existing profile data to reuse existing resources
+      final existingProfileData = await _loadExistingProfile();
+      
+      // Get API key from secure storage if not provided
+      String? actualApiKey = apiKey;
+      if (actualApiKey == null) {
+        final apiKeyService = ApiKeyService();
+        actualApiKey = await apiKeyService.getApiKey();
+      }
+
+      // Use existing API key ID if available, otherwise create new one
+      String? apiKeyFileId = existingProfileData?['apiKeyId'];
+      if (apiKeyFileId != null) {
+        debugPrint('🔑 Reusing existing API key file ID: $apiKeyFileId');
+      } else if (actualApiKey != null && actualApiKey.isNotEmpty) {
+        apiKeyFileId = await _createApiKeyFile(actualApiKey);
+        debugPrint('🔑 API key file created with ID: $apiKeyFileId');
+      }
+
+      // Merge existing MovieList IDs with any new ones provided
+      final existingMovieListIds = existingProfileData?['movieListIds'] as List<String>? ?? [];
+      final providedMovieListIds = movieListIds ?? [];
+      
+      // Combine and deduplicate MovieList IDs
+      final allMovieListIds = <String>{};
+      allMovieListIds.addAll(existingMovieListIds);
+      allMovieListIds.addAll(providedMovieListIds);
+      final finalMovieListIds = allMovieListIds.toList();
+      
+      if (existingMovieListIds.isNotEmpty && providedMovieListIds.isNotEmpty) {
+        debugPrint('📋 Merging MovieList IDs - Existing: $existingMovieListIds, New: $providedMovieListIds, Final: $finalMovieListIds');
+      } else if (existingMovieListIds.isNotEmpty) {
+        debugPrint('📋 Using existing MovieList IDs: $finalMovieListIds');
+      } else if (providedMovieListIds.isNotEmpty) {
+        debugPrint('📋 Using new MovieList IDs: $finalMovieListIds');
+      }
+
+      // Create the profile TTL content
+      final profileTtl = TurtleSerializer.createUserProfile(
+        webId,
+        apiKey: apiKeyFileId, // Use the API key file ID, not the actual key
+        dobString: dobString,
+        genderString: genderString,
+        movieListIds: finalMovieListIds,
+      );
+
+      debugPrint('📝 Generated profile TTL (first 200 chars): ${profileTtl.substring(0, profileTtl.length > 200 ? 200 : profileTtl.length)}...');
+
+      // Write to POD profile
+      if (!_context.mounted) return false;
+      final result = await writePod(
+        'profile/profile.ttl',
+        profileTtl,
+        _context,
+        _child,
+        encrypted: false,
+      );
+
+      debugPrint('💾 Profile writePod result: $result');
+
+      if (result == SolidFunctionCallStatus.success) {
+        // Update cache
+        _cachedProfile = {
+          'webId': webId,
+          'apiKey': actualApiKey,
+          'apiKeyId': apiKeyFileId, // Store the API key ID for reuse
+          'dob': dobString,
+          'gender': genderString,
+          'movieListIds': finalMovieListIds ?? [],
+        };
+        debugPrint('✅ User profile created/updated successfully');
+        return true;
+      }
+
+      debugPrint('❌ Failed to write profile to POD');
+      return false;
+    } catch (e) {
+      debugPrint('❌ Exception in create/update user profile: $e');
+      return false;
+    }
+  }
+
+  /// Creates an API key file in the POD and returns the generated ID.
+  /// First checks if an API key file with the same value already exists.
+  Future<String?> _createApiKeyFile(String apiKeyValue) async {
+    try {
+      // First, check if an API key file already exists with this value
+      final existingApiKeyId = await _findExistingApiKeyFile(apiKeyValue);
+      if (existingApiKeyId != null) {
+        debugPrint('🔑 Found existing API key file with ID: $existingApiKeyId');
+        return existingApiKeyId;
+      }
+      
+      // Generate a unique ID for the new API key
+      final apiKeyId = TurtleSerializer.generateId();
+      
+      // Create the API key TTL content
+      final apiKeyTtl = TurtleSerializer.createApiKey(apiKeyId, apiKeyValue);
+      
+      debugPrint('🔑 Creating new API key file: keys/ApiKey-$apiKeyId.ttl');
+      debugPrint('📝 Generated API key TTL (first 100 chars): ${apiKeyTtl.substring(0, apiKeyTtl.length > 100 ? 100 : apiKeyTtl.length)}...');
+
+      // Write to POD
+      if (!_context.mounted) return null;
+      final result = await writePod(
+        'keys/ApiKey-$apiKeyId.ttl',
+        apiKeyTtl,
+        _context,
+        _child,
+        encrypted: false,
+      );
+
+      debugPrint('💾 API key writePod result: $result');
+
+      if (result == SolidFunctionCallStatus.success) {
+        debugPrint('✅ API key file created successfully');
+        return apiKeyId;
+      }
+
+      debugPrint('❌ Failed to write API key file to POD');
+      return null;
+    } catch (e) {
+      debugPrint('❌ Exception creating API key file: $e');
+      return null;
+    }
+  }
+
+  /// Finds an existing API key file with the given value.
+  /// Returns the API key ID if found, null otherwise.
+  Future<String?> _findExistingApiKeyFile(String apiKeyValue) async {
+    try {
+      debugPrint('🔍 Checking for existing API key files...');
+      
+      // First check cache for quick lookup
+      if (_cachedProfile != null && _cachedProfile!['apiKeyId'] != null) {
+        final cachedId = _cachedProfile!['apiKeyId'];
+        debugPrint('🔑 Using cached API key ID: $cachedId');
+        return cachedId;
+      }
+      
+      // TODO: In a full implementation, we would scan the keys/ directory
+      // For now, we can check a few common patterns or implement a simple cache
+      // This would require listing directory contents which isn't directly supported
+      // by the current POD API. A proper implementation would:
+      // 1. Maintain an index file of API keys
+      // 2. Or scan the keys directory for existing files
+      // 3. Or store the API key ID in the user profile and read it back
+      
+      debugPrint('❌ No existing API key file found in cache');
+      return null;
+    } catch (e) {
+      debugPrint('❌ Exception finding existing API key file: $e');
+      return null;
+    }
+  }
+
+  /// Loads existing profile data and extracts API key and MovieList references.
+  Future<Map<String, dynamic>?> _loadExistingProfile() async {
+    try {
+      debugPrint('🔍 Attempting to load existing profile...');
+      
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        debugPrint('❌ User not logged in, cannot load profile');
+        return null;
+      }
+
+      if (!_context.mounted) return null;
+      
+      debugPrint('🔍 Reading profile from: profile/profile.ttl');
+      final readPath = await getReadPath('profile/profile.ttl');
+      debugPrint('🔧 Actual read path: $readPath');
+      final result = await readPod(readPath, _context, _child);
+      
+      if (result.isNotEmpty) {
+        debugPrint('✅ Found existing profile, length: ${result.length}');
+        debugPrint('📄 Profile content preview: ${result.substring(0, result.length > 300 ? 300 : result.length)}...');
+        
+        // Parse the TTL content to extract API key and MovieList references
+        // Note: The TTL now uses static prefixes (moviestar-data:) to match ontology structure
+        
+        final apiKeyMatch = RegExp(r'moviestar-data:ApiKey-([a-zA-Z0-9]+)').firstMatch(result);
+        final movieListMatches = RegExp(r'moviestar-data:MovieList-([a-zA-Z0-9]+)').allMatches(result);
+        
+        final extractedData = <String, dynamic>{};
+        
+        if (apiKeyMatch != null) {
+          extractedData['apiKeyId'] = apiKeyMatch.group(1);
+          debugPrint('🔑 Found existing API key reference: ${extractedData['apiKeyId']}');
+        } else {
+          debugPrint('❌ No API key reference found in profile');
+        }
+        
+        if (movieListMatches.isNotEmpty) {
+          extractedData['movieListIds'] = movieListMatches.map((m) => m.group(1)!).toList();
+          debugPrint('📋 Found existing MovieList references: ${extractedData['movieListIds']}');
+        } else {
+          debugPrint('❌ No MovieList references found in profile');
+        }
+        
+        return extractedData;
+      } else {
+        debugPrint('❌ Profile file exists but is empty');
+      }
+      
+      debugPrint('❌ No existing profile found');
+      return null;
+    } catch (e) {
+      debugPrint('❌ Error loading existing profile: $e');
+      return null;
+    }
+  }
+
+  /// Gets the user profile data.
+  Future<Map<String, dynamic>?> getUserProfile() async {
+    try {
+      // First check cache
+      if (_cachedProfile != null) {
+        return _cachedProfile;
+      }
+
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) return null;
+
+      // Try to read profile from POD
+      if (!_context.mounted) return null;
+      try {
+        final readPath = await getReadPath('profile/profile.ttl');
+        final result = await readPod(readPath, _context, _child);
+
+                if (result.isNotEmpty) {
+          // Parse the profile data properly, including MovieList IDs
+          final webId = await getCurrentUserWebId();
+          if (webId != null) {
+            // Extract MovieList IDs from profile TTL
+            final movieListMatches = RegExp(r'moviestar-data:MovieList-([a-zA-Z0-9]+)').allMatches(result);
+            final movieListIds = movieListMatches.map((m) => m.group(1)!).toList();
+            
+            _cachedProfile = {
+              'webId': webId,
+              'apiKey': null,
+              'dob': null,
+              'gender': null,
+              'movieListIds': movieListIds,
+            };
+            debugPrint('📋 Parsed profile with MovieList IDs: $movieListIds');
+            return _cachedProfile;
+          }
+        }
+      } catch (e) {
+        debugPrint('Failed to read profile from POD: $e');
+      }
+
+      return null;
+    } catch (e) {
+      debugPrint('Failed to get user profile: $e');
+      return null;
+    }
+  }
+
+  /// Adds a movie list ID to the user profile.
+  Future<bool> addMovieListToProfile(String movieListId) async {
+    try {
+      final profile = await getUserProfile();
+      if (profile == null) return false;
+
+      final movieListIds = List<String>.from(profile['movieListIds'] ?? []);
+      if (!movieListIds.contains(movieListId)) {
+        movieListIds.add(movieListId);
+        
+        return await createOrUpdateUserProfile(
+          apiKey: profile['apiKey'],
+          dobString: profile['dob'],
+          genderString: profile['gender'],
+          movieListIds: movieListIds,
+        );
+      }
+
+      return true; // Already exists
+    } catch (e) {
+      debugPrint('Failed to add movie list to profile: $e');
+      return false;
+    }
+  }
+
+  /// Removes a movie list ID from the user profile.
+  Future<bool> removeMovieListFromProfile(String movieListId) async {
+    try {
+      final profile = await getUserProfile();
+      if (profile == null) return false;
+
+      final movieListIds = List<String>.from(profile['movieListIds'] ?? []);
+      if (movieListIds.contains(movieListId)) {
+        movieListIds.remove(movieListId);
+        
+        return await createOrUpdateUserProfile(
+          apiKey: profile['apiKey'],
+          dobString: profile['dob'],
+          genderString: profile['gender'],
+          movieListIds: movieListIds,
+        );
+      }
+
+      return true; // Already removed
+    } catch (e) {
+      debugPrint('Failed to remove movie list from profile: $e');
+      return false;
+    }
+  }
+
+  /// Initializes the user profile if it doesn't exist.
+  Future<bool> initializeProfileIfNeeded() async {
+    try {
+      debugPrint('🔄 Initializing user profile if needed');
+      
+      final profile = await getUserProfile();
+      if (profile == null) {
+        debugPrint('👤 No existing profile found, creating new one');
+        // Create a basic profile
+        return await createOrUpdateUserProfile();
+      }
+      
+      debugPrint('✅ User profile already exists');
+      return true;
+    } catch (e) {
+      debugPrint('❌ Failed to initialize profile: $e');
+      return false;
+    }
+  }
+
+  /// Clears the cached profile data.
+  void clearCache() {
+    _cachedProfile = null;
+  }
+} 

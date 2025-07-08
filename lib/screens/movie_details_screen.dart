@@ -178,24 +178,17 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     } else {
       await widget.favoritesService.setPersonalRating(widget.movie, rating);
 
-      // We might want to automatically mark a movie as watched when a rating is
-      // given. We would not expect a rating if the user has not watched a
-      // movie, so this seems like a good (though opinionated)
-      // behaviour. (20250704 gjw)
-
-      if (!_isInWatched) {
-        await widget.favoritesService.addToWatched(widget.movie);
-      }
+      // Auto-add to watched is now handled in PodFavoritesService._createOrUpdateMovieFile()
+      // Remove duplicate logic to avoid race conditions
     }
     setState(() {
       _personalRating = rating;
-      // Update watched status if rating was set.
-
-      if (rating != null && !_isInWatched) {
-        _isInWatched = true;
-      }
+      // Update watched status - this will be updated by the stream from the service
       _ratingSaved = true;
     });
+
+    // Refresh the list status to ensure UI is in sync
+    await _checkListStatus();
 
     // Hide the saved banner after 2 seconds.
 

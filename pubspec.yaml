@@ -43,7 +43,8 @@ dependencies:
   rdflib: ^0.2.12
   rxdart: ^0.28.0
   shared_preferences: ^2.2.2
-  solidpod: ^0.6.7
+  solidpod:
+    path: solidpod
   syncfusion_flutter_pdf: ^30.1.37
   universal_io: ^2.2.2
   url_launcher: ^6.3.1

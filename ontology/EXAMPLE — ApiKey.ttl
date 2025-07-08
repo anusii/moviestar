@@ -1,0 +1,14 @@
+@prefix : <https://sii.anu.edu.au/onto/moviestar#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sdo: <https://schema.org/> .
+@prefix moviestar-data: <https://sii.anu.edu.au/data/moviestar/> .
+@prefix moviestar-onto: <https://sii.anu.edu.au/onto/moviestar#> .
+
+moviestar-data:ApiKey-gU83Tqb7g1A4 rdf:type owl:NamedIndividual ,
+                                                        moviestar-onto:ApiKey ;
+											   sdo:identifier "gU83Tqb7g1A4" ;
+											   moviestar-onto:keyValue "3jknfsd45l543kd86fkfjkl21l634w5lf2334fds8739f0" ;
+											   moviestar-onto:source "TMDB";
+											   rdfs:label "|filePath=moviestar/data/keys/ApiKey-gU83Tqb7g1A4.ttl|" .

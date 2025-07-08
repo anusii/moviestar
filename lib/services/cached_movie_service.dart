@@ -46,7 +46,7 @@ class CachedMovieService {
 
   bool _cachingEnabled;
 
-  /// Whether to use cache-only mode (no network calls).
+  /// Whether to use offline mode (no network calls).
 
   bool _cacheOnlyMode;
 
@@ -70,12 +70,12 @@ class CachedMovieService {
     );
   }
 
-  /// Enables or disables cache-only mode.
+  /// Enables or disables offline mode.
 
   void setCacheOnlyMode(bool cacheOnly) {
     _cacheOnlyMode = cacheOnly;
     developer.log(
-      'Cache-only mode ${cacheOnly ? 'enabled' : 'disabled'}',
+      'Offline mode ${cacheOnly ? 'enabled' : 'disabled'}',
       name: 'CachedMovieService',
     );
   }
@@ -103,12 +103,12 @@ class CachedMovieService {
         // This shouldn't happen with the new UI logic, but handle it gracefully.
 
         developer.log(
-          'Invalid state: Cache-only mode enabled but caching is disabled for ${category.value}',
+          'Invalid state: Offline mode enabled but caching is disabled for ${category.value}',
           name: 'CachedMovieService',
           level: 1000,
         );
         throw Exception(
-          'Cannot use cache-only mode when caching is disabled. Please enable caching first or disable cache-only mode.',
+          'Cannot use offline mode when caching is disabled. Please enable caching first or disable offline mode.',
         );
       }
 
@@ -142,11 +142,11 @@ class CachedMovieService {
       return cacheResult;
     }
 
-    // Cache miss or invalid - check if we're in cache-only mode.
+    // Cache miss or invalid - check if we're in offline mode.
 
     if (_cacheOnlyMode) {
       developer.log(
-        'Cache miss for ${category.value} in cache-only mode, checking for stale cache',
+        'Cache miss for ${category.value} in offline mode, checking for stale cache',
         name: 'CachedMovieService',
       );
 
@@ -155,7 +155,7 @@ class CachedMovieService {
       final staleMovies = await _cacheRepository.getStaleMovies(category);
       if (staleMovies != null && staleMovies.isNotEmpty) {
         developer.log(
-          'Returning stale cache for ${category.value} in cache-only mode (${staleMovies.length} movies)',
+          'Returning stale cache for ${category.value} in offline mode (${staleMovies.length} movies)',
           name: 'CachedMovieService',
         );
         return CacheResult(data: staleMovies, fromCache: true);
@@ -164,12 +164,12 @@ class CachedMovieService {
       // No cache data available at all.
 
       developer.log(
-        'No cache data available for ${category.value} in cache-only mode',
+        'No cache data available for ${category.value} in offline mode',
         name: 'CachedMovieService',
         level: 1000,
       );
       throw Exception(
-        'No cached ${_getCategoryDisplayName(category)} available. Try refreshing data or disable cache-only mode to fetch from network.',
+        'No cached ${_getCategoryDisplayName(category)} available. Try refreshing data or disable offline mode to fetch from network.',
       );
     }
 

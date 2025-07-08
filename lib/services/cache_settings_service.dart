@@ -77,18 +77,18 @@ class CacheSettingsService {
     );
   }
 
-  /// Gets whether cache-only mode is enabled (defaults to false)
+  /// Gets whether offline mode is enabled (defaults to false)
 
   bool get cacheOnlyMode {
     return _prefs?.getBool(_cacheOnlyModeKey) ?? false;
   }
 
-  /// Sets whether cache-only mode is enabled.
+  /// Sets whether offline mode is enabled.
 
   Future<void> setCacheOnlyMode(bool enabled) async {
     await _prefs?.setBool(_cacheOnlyModeKey, enabled);
     developer.log(
-      'Cache-only mode setting changed to: $enabled',
+      'Offline mode setting changed to: $enabled',
       name: 'CacheSettingsService',
     );
   }

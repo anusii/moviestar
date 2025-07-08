@@ -27,15 +27,17 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:moviestar/database/movie_cache_repository.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/screens/search_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/widgets/cache_feedback_widget.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
+import 'package:moviestar/widgets/movie_card.dart';
 
 /// A screen that displays various movie categories and trending content with caching.
 
@@ -59,6 +61,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   final Map<String, ScrollController> _scrollControllers = {};
 
+  /// Track if initial load feedback has been shown.
+
+  bool _hasShownInitialFeedback = false;
+
   @override
   void initState() {
     super.initState();
@@ -76,31 +82,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-  /// Builds a horizontal scrollable row of movies.
+  /// Builds a horizontal scrollable row of movies with cache indicators.
 
   Widget _buildMovieRow(
     String title,
-    AsyncValue<List<Movie>> moviesAsync,
+    AsyncValue<CacheResult<List<Movie>>> moviesAsync,
     String key,
+    CacheCategory category,
   ) {
+    final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Text(
-            title,
-            style: TextStyle(
-              color: Theme.of(context).textTheme.headlineMedium?.color,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.headlineMedium?.color,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              _buildSectionCacheIndicator(moviesAsync, cacheOnlyMode),
+            ],
           ),
         ),
         SizedBox(
           height: 200,
           child: moviesAsync.when(
-            data: (movies) => Scrollbar(
+            data: (cacheResult) => Scrollbar(
               controller: _scrollControllers[key],
               thickness: 6,
               radius: const Radius.circular(3),
@@ -109,12 +125,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 controller: _scrollControllers[key],
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                itemCount: movies.length,
+                itemCount: cacheResult.data.length,
                 itemBuilder: (context, index) {
-                  final movie = movies[index];
+                  final movie = cacheResult.data[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: GestureDetector(
+                    child: MovieCard.poster(
+                      movie: movie,
+                      fromCache: cacheResult.fromCache,
+                      cacheAge: cacheResult.cacheAge,
+                      cacheOnlyMode: cacheOnlyMode,
                       onTap: () {
                         Navigator.push(
                           context,
@@ -126,19 +146,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         );
                       },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: CachedNetworkImage(
-                          imageUrl: movie.posterUrl,
-                          width: 130,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                        ),
-                      ),
                     ),
                   );
                 },
@@ -153,10 +160,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             error: (error, stack) => ErrorDisplayWidget.compact(
               message: 'Failed to load $title',
               onRetry: () {
-                ref.invalidate(popularMoviesProvider);
-                ref.invalidate(nowPlayingMoviesProvider);
-                ref.invalidate(topRatedMoviesProvider);
-                ref.invalidate(upcomingMoviesProvider);
+                ref.invalidate(popularMoviesWithCacheInfoProvider);
+                ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+                ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+                ref.invalidate(upcomingMoviesWithCacheInfoProvider);
               },
             ),
           ),
@@ -165,15 +172,165 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  /// Builds cache indicator for section headers.
+
+  Widget _buildSectionCacheIndicator(
+    AsyncValue<CacheResult<List<Movie>>> moviesAsync,
+    bool cacheOnlyMode,
+  ) {
+    return moviesAsync.when(
+      data: (cacheResult) {
+        if (cacheOnlyMode) {
+          return _buildOfflineModeBadge();
+        }
+
+        if (cacheResult.fromCache && cacheResult.cacheAge != null) {
+          return _buildCacheAgeBadge(cacheResult.cacheAge!);
+        }
+
+        if (cacheResult.fromCache) {
+          return _buildCacheBadge();
+        } else {
+          return _buildNetworkBadge();
+        }
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  /// Builds offline mode badge.
+
+  Widget _buildOfflineModeBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.orange,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.offline_pin, size: 12, color: Colors.white),
+          SizedBox(width: 4),
+          Text(
+            'OFFLINE',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds cache age badge.
+
+  Widget _buildCacheAgeBadge(Duration cacheAge) {
+    final ageText = _formatCacheAge(cacheAge);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.green.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.offline_bolt, size: 12, color: Colors.white),
+          const SizedBox(width: 4),
+          Text(
+            ageText,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds cache badge for fresh cache data.
+
+  Widget _buildCacheBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.green,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.offline_bolt, size: 12, color: Colors.white),
+          SizedBox(width: 4),
+          Text(
+            'CACHED',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds network badge for fresh data.
+
+  Widget _buildNetworkBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.blue.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.wifi, size: 12, color: Colors.white),
+          SizedBox(width: 4),
+          Text(
+            'LIVE',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Formats cache age into human-readable string.
+
+  String _formatCacheAge(Duration age) {
+    if (age.inDays > 0) {
+      return '${age.inDays}d old';
+    } else if (age.inHours > 0) {
+      return '${age.inHours}h old';
+    } else if (age.inMinutes > 0) {
+      return '${age.inMinutes}m old';
+    } else {
+      return 'cached';
+    }
+  }
+
   /// Forces refresh of all movie data.
 
   Future<void> _forceRefresh() async {
     // Invalidate all providers to force refresh.
 
-    ref.invalidate(popularMoviesProvider);
-    ref.invalidate(nowPlayingMoviesProvider);
-    ref.invalidate(topRatedMoviesProvider);
-    ref.invalidate(upcomingMoviesProvider);
+    ref.invalidate(popularMoviesWithCacheInfoProvider);
+    ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+    ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+    ref.invalidate(upcomingMoviesWithCacheInfoProvider);
     ref.invalidate(cacheStatsProvider);
 
     // Force refresh through the cached service.
@@ -182,24 +339,100 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     await cachedService.forceRefreshAll();
   }
 
+  /// Shows cache performance feedback after initial load.
+
+  void _showCachePerformanceFeedback() {
+    if (_hasShownInitialFeedback) return;
+
+    final popularMovies = ref.read(popularMoviesWithCacheInfoProvider);
+    final nowPlayingMovies = ref.read(nowPlayingMoviesWithCacheInfoProvider);
+    final topRatedMovies = ref.read(topRatedMoviesWithCacheInfoProvider);
+    final upcomingMovies = ref.read(upcomingMoviesWithCacheInfoProvider);
+
+    // Check if all categories have loaded.
+
+    final allLoaded = [
+      popularMovies,
+      nowPlayingMovies,
+      topRatedMovies,
+      upcomingMovies,
+    ].every((async) => async.hasValue);
+
+    if (!allLoaded) return;
+
+    // Extract cache results.
+
+    final results = <String, bool>{};
+    popularMovies.whenOrNull(
+      data: (result) => results['Popular'] = result.fromCache,
+    );
+    nowPlayingMovies.whenOrNull(
+      data: (result) => results['Now Playing'] = result.fromCache,
+    );
+    topRatedMovies.whenOrNull(
+      data: (result) => results['Top Rated'] = result.fromCache,
+    );
+    upcomingMovies.whenOrNull(
+      data: (result) => results['Upcoming'] = result.fromCache,
+    );
+
+    if (results.length == 4) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        CacheFeedbackWidget.showCacheStatsSummary(
+          context,
+          categoryResults: results,
+          totalTime: const Duration(milliseconds: 500), // Estimated
+        );
+      });
+      _hasShownInitialFeedback = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final popularMovies = ref.watch(popularMoviesProvider);
-    final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
-    final topRatedMovies = ref.watch(topRatedMoviesProvider);
-    final upcomingMovies = ref.watch(upcomingMoviesProvider);
+    final popularMovies = ref.watch(popularMoviesWithCacheInfoProvider);
+    final nowPlayingMovies = ref.watch(nowPlayingMoviesWithCacheInfoProvider);
+    final topRatedMovies = ref.watch(topRatedMoviesWithCacheInfoProvider);
+    final upcomingMovies = ref.watch(upcomingMoviesWithCacheInfoProvider);
+    final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
+
+    // Show performance feedback after initial load.
+
+    _showCachePerformanceFeedback();
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        title: const Text(
-          'MOVIE STAR',
-          style: TextStyle(
-            color: Colors.red,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+        title: Row(
+          children: [
+            const Text(
+              'MOVIE STAR',
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (cacheOnlyMode) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'OFFLINE',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
         actions: [
           IconButton(
@@ -231,10 +464,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildMovieRow('Popular on Movie Star', popularMovies, 'popular'),
-              _buildMovieRow('Now Playing', nowPlayingMovies, 'nowPlaying'),
-              _buildMovieRow('Top Rated', topRatedMovies, 'topRated'),
-              _buildMovieRow('Upcoming', upcomingMovies, 'upcoming'),
+              _buildMovieRow(
+                'Popular on Movie Star',
+                popularMovies,
+                'popular',
+                CacheCategory.popular,
+              ),
+              _buildMovieRow(
+                'Now Playing',
+                nowPlayingMovies,
+                'nowPlaying',
+                CacheCategory.nowPlaying,
+              ),
+              _buildMovieRow(
+                'Top Rated',
+                topRatedMovies,
+                'topRated',
+                CacheCategory.topRated,
+              ),
+              _buildMovieRow(
+                'Upcoming',
+                upcomingMovies,
+                'upcoming',
+                CacheCategory.upcoming,
+              ),
             ],
           ),
         ),

@@ -1,0 +1,26 @@
+@prefix : <https://sii.anu.edu.au/onto/moviestar#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sdo: <https://schema.org/> .
+@prefix moviestar-data: <https://sii.anu.edu.au/data/moviestar/> .
+@prefix moviestar-onto: <https://sii.anu.edu.au/onto/moviestar#> .
+
+<https://pods.solidcommunity.au/john_doe/profile/card#me> rdf:type owl:NamedIndividual ,
+                                                                moviestar-onto:User ;
+                                                       moviestar-onto:hasMovieList moviestar-data:MovieList-u67djeTn94d5, moviestar-data:MovieList-4Kliq48Jflm7 ;
+                                                       moviestar-onto:hasApiKey moviestar-data:ApiKey-gU83Tqb7g1A4;
+                                                       moviestar-onto:DOB "1995-05-07"^^xsd:date ;
+                                                       moviestar-onto:gender "Male" ;
+                                                       moviestar-onto:webID "https://pods.solidcommunity.au/john_doe/profile/card#me"^^xsd:anyURI ;
+                                                       rdfs:label "|webID=https://pods.solidcommunity.au/john_doe/profile/card#me|" .
+													   
+moviestar-data:MovieList-u67djeTn94d5 rdf:type owl:NamedIndividual ,
+                                                          moviestar-onto:MovieList ;
+                                                 moviestar-onto:filePath "moviestar/data/MovieList-u67djeTn94d5.ttl" ;
+                                                 rdfs:label "|filePath=moviestar/data/MovieList-u67djeTn94d5.ttl|" .
+												 
+moviestar-data:MovieList-4Kliq48Jflm7 rdf:type owl:NamedIndividual ,
+                                                          moviestar-onto:MovieList ;
+                                                 moviestar-onto:filePath "moviestar/data/MovieList-4Kliq48Jflm7.ttl" ;
+                                                 rdfs:label "|filePath=moviestar/data/MovieList-4Kliq48Jflm7.ttl|" .

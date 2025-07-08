@@ -32,11 +32,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:moviestar/database/movie_cache_repository.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/screens/to_watch_screen.dart';
-import 'package:moviestar/screens/watched_screen.dart';
 import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
+import 'package:moviestar/widgets/cache_feedback_widget.dart';
 import 'package:moviestar/widgets/theme_toggle_button.dart';
 
 /// A screen that displays and manages user settings.
@@ -151,15 +150,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 This will remove any cached movie data. Since caching is disabled, this won't affect your ability to load movies from the network.''';
       confirmButtonText = 'Clear';
     } else if (cacheOnlyMode) {
-      // Cache-only mode is enabled - this will break the app!
+      // Offline mode is enabled - this will break the app!
 
-      dialogTitle = '⚠️ Clear Cache in Cache-Only Mode';
+      dialogTitle = '⚠️ Clear Cache in Offline Mode';
       dialogContent = '''
-WARNING: You have Cache-Only Mode enabled, which means no network calls are allowed.
+WARNING: You have Offline Mode enabled, which means no network calls are allowed.
 
 Clearing the cache now will leave you with no movie data and no way to fetch new data!
 
-Recommended: Disable Cache-Only Mode first, then clear cache.''';
+Recommended: Disable Offline Mode first, then clear cache.''';
       confirmButtonText = 'Clear Anyway';
     } else {
       // Normal case - caching enabled but can fallback to network.
@@ -179,20 +178,20 @@ This will remove all cached movie data. Fresh data will be downloaded from the n
         TextButton(
           onPressed: () {
             Navigator.of(context).pop(false);
-            // Automatically disable cache-only mode.
+            // Automatically disable offline mode.
             ref.read(cacheOnlyModeProvider.notifier).setCacheOnlyMode(false);
             // Show feedback.
 
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text(
-                  'Cache-Only Mode disabled. You can now clear cache safely.',
+                  'Offline Mode disabled. You can now clear cache safely.',
                 ),
                 backgroundColor: Colors.blue,
               ),
             );
           },
-          child: const Text('Disable Cache-Only Mode'),
+          child: const Text('Disable Offline Mode'),
         ),
       ],
       TextButton(
@@ -223,7 +222,7 @@ This will remove all cached movie data. Fresh data will be downloaded from the n
           const SnackBar(
             content: Text(
               '''
-Cache cleared! You're now in Cache-Only Mode with no cached data. Consider disabling Cache-Only Mode to load fresh data.''',
+Cache cleared! You're now in Offline Mode with no cached data. Consider disabling Offline Mode to load fresh data.''',
             ),
             backgroundColor: Colors.orange,
             duration: Duration(seconds: 5),
@@ -240,16 +239,16 @@ Cache cleared! You're now in Cache-Only Mode with no cached data. Consider disab
     bool cacheOnlyMode,
   ) async {
     if (cacheOnlyMode) {
-      // In cache-only mode, force refresh would require network calls.
+      // In offline mode, force refresh would require network calls.
 
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('⚠️ Force Refresh in Cache-Only Mode'),
+          title: const Text('⚠️ Force Refresh in Offline Mode'),
           content: const Text('''
-Force refresh requires downloading fresh data from the network, but you have Cache-Only Mode enabled.
+Force refresh requires downloading fresh data from the network, but you have Offline Mode enabled.
 
-Do you want to temporarily disable Cache-Only Mode and refresh all data?'''),
+Do you want to temporarily disable Offline Mode and refresh all data?'''),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -257,21 +256,21 @@ Do you want to temporarily disable Cache-Only Mode and refresh all data?'''),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Disable Cache-Only & Refresh'),
+              child: const Text('Disable Offline Mode & Refresh'),
             ),
           ],
         ),
       );
 
       if (confirmed == true) {
-        // Disable cache-only mode temporarily
+        // Disable offline mode temporarily
         ref.read(cacheOnlyModeProvider.notifier).setCacheOnlyMode(false);
 
         // Show feedback
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Cache-Only Mode disabled. Refreshing all data...'),
+              content: Text('Offline Mode disabled. Refreshing all data...'),
               backgroundColor: Colors.blue,
             ),
           );
@@ -729,26 +728,6 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
             ),
           ]),
           _buildSection('Account', [
-            _buildListTile('To Watch', Icons.favorite, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ToWatchScreen(
-                    favoritesService: widget.favoritesService,
-                  ),
-                ),
-              );
-            }),
-            _buildListTile('Watched', Icons.history, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => WatchedScreen(
-                    favoritesService: widget.favoritesService,
-                  ),
-                ),
-              );
-            }),
             _buildListTile('Help & Support', Icons.help_outline, () {
               // TODO: Navigate to Help & Support.
             }),
@@ -795,7 +774,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
             }
           },
         ),
-        _buildCacheOnlyModeTile(cachingEnabled, cacheOnlyMode),
+        _buildOfflineModeTile(cachingEnabled, cacheOnlyMode),
 
         // Cache Statistics.
         cacheStatsAsync.when(
@@ -927,12 +906,12 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
     }
   }
 
-  /// Builds the cache-only mode tile with proper enabled/disabled state.
+  /// Builds the offline mode tile with proper enabled/disabled state.
 
-  Widget _buildCacheOnlyModeTile(bool cachingEnabled, bool cacheOnlyMode) {
+  Widget _buildOfflineModeTile(bool cachingEnabled, bool cacheOnlyMode) {
     return SwitchListTile(
       title: Text(
-        'Cache-Only Mode',
+        'Offline Mode',
         style: cachingEnabled
             ? Theme.of(context).textTheme.bodyLarge
             : Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -942,9 +921,9 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
       subtitle: Text(
         cachingEnabled
             ? (cacheOnlyMode
-                ? 'Using only cached data (no network calls)'
-                : 'Allow network calls when cache is empty')
-            : 'Enable caching first to use cache-only mode',
+                ? 'Browse movies offline using cached data only'
+                : 'Allow network access when cache is empty')
+            : 'Enable caching first to use offline mode',
         style: cachingEnabled
             ? Theme.of(context).textTheme.bodyMedium
             : Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -955,6 +934,15 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
       onChanged: cachingEnabled
           ? (value) {
               ref.read(cacheOnlyModeProvider.notifier).setCacheOnlyMode(value);
+
+              // Show feedback about the mode change.
+
+              if (mounted) {
+                CacheFeedbackWidget.showOfflineModeNotification(
+                  context,
+                  isEnabled: value,
+                );
+              }
             }
           : null,
       activeColor: Theme.of(context).colorScheme.primary,

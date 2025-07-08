@@ -27,15 +27,16 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moviestar/database/movie_cache_repository.dart';
+import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
+import 'package:moviestar/widgets/movie_card.dart';
 
 /// A screen that displays upcoming movies and their release dates with caching.
 
@@ -60,7 +61,7 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
   Future<void> _forceRefresh() async {
     // Invalidate the provider to force refresh.
 
-    ref.invalidate(upcomingMoviesProvider);
+    ref.invalidate(upcomingMoviesWithCacheInfoProvider);
 
     // Force refresh through the cached service.
 
@@ -70,15 +71,22 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final upcomingMoviesAsync = ref.watch(upcomingMoviesProvider);
+    final upcomingMoviesAsync = ref.watch(upcomingMoviesWithCacheInfoProvider);
+    final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        title: Text(
-          'Coming Soon',
-          style: Theme.of(context).appBarTheme.titleTextStyle,
+        title: Row(
+          children: [
+            Text(
+              'Coming Soon',
+              style: Theme.of(context).appBarTheme.titleTextStyle,
+            ),
+            const SizedBox(width: 8),
+            _buildCacheIndicator(upcomingMoviesAsync, cacheOnlyMode),
+          ],
         ),
         actions: [
           IconButton(
@@ -91,30 +99,16 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
       body: RefreshIndicator(
         onRefresh: _forceRefresh,
         child: upcomingMoviesAsync.when(
-          data: (movies) => ListView.builder(
-            itemCount: movies.length,
+          data: (cacheResult) => ListView.builder(
+            itemCount: cacheResult.data.length,
             itemBuilder: (context, index) {
-              final movie = movies[index];
-              return ListTile(
-                leading: ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: CachedNetworkImage(
-                    imageUrl: movie.posterUrl,
-                    width: 50,
-                    height: 75,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                  ),
-                ),
-                title: Text(
-                  movie.title,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                subtitle: Text(
+              final movie = cacheResult.data[index];
+              return MovieCard.listItem(
+                movie: movie,
+                fromCache: cacheResult.fromCache,
+                cacheAge: cacheResult.cacheAge,
+                cacheOnlyMode: cacheOnlyMode,
+                customSubtitle: Text(
                   'Release Date: ${DateFormatUtil.formatNumeric(movie.releaseDate)}',
                   style: const TextStyle(color: Colors.grey),
                 ),
@@ -139,6 +133,71 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  /// Builds cache indicator for the app bar.
+
+  Widget _buildCacheIndicator(
+    AsyncValue<CacheResult<List<Movie>>> upcomingMoviesAsync,
+    bool cacheOnlyMode,
+  ) {
+    return upcomingMoviesAsync.when(
+      data: (cacheResult) {
+        if (cacheOnlyMode) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.orange,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.offline_pin, size: 12, color: Colors.white),
+                SizedBox(width: 4),
+                Text(
+                  'OFFLINE',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final color = cacheResult.fromCache ? Colors.green : Colors.blue;
+        final icon = cacheResult.fromCache ? Icons.offline_bolt : Icons.wifi;
+        final text = cacheResult.fromCache ? 'CACHED' : 'LIVE';
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.8),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 12, color: Colors.white),
+              const SizedBox(width: 4),
+              Text(
+                text,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

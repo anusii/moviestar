@@ -1,0 +1,25 @@
+@prefix : <https://sii.anu.edu.au/onto/moviestar#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sdo: <https://schema.org/> .
+@prefix moviestar-data: <https://sii.anu.edu.au/data/moviestar/> .
+@prefix moviestar-onto: <https://sii.anu.edu.au/onto/moviestar#> .
+
+moviestar-data:MovieList-u67djeTn94d5 rdf:type owl:NamedIndividual ,
+                                                        moviestar-onto:MovieList ;
+                                               moviestar-onto:hasMovie moviestar-data:movie-5fc3b7da690126, moviestar-data:movie-0gr3b7d4260172 ;
+											   sdo:identifier "u67djeTn94d5" ;
+											   sdo:name "watched" ;
+											   sdo:description "List of movies you watched";
+											   rdfs:label "|filePath=moviestar/data/MovieList-u67djeTn94d5.ttl|" .
+
+moviestar-data:Movie-5fc3b7da690126 rdf:type owl:NamedIndividual ,
+                                                          sdo:Movie ;
+                                                 moviestar-onto:filePath "moviestar/data/movies/Movie-5fc3b7da690126.ttl" ;
+                                                 rdfs:label "|filePath=moviestar/data/movies/Movie-5fc3b7da690126.ttl|" .
+
+moviestar-data:Movie-0gr3b7d4260172 rdf:type owl:NamedIndividual ,
+                                                          sdo:Movie ;
+                                                 moviestar-onto:filePath "moviestar/data/movies/Movie-0gr3b7d4260172.ttl" ;
+                                                 rdfs:label "|filePath=moviestar/data/movies/Movie-0gr3b7d4260172.ttl|" .

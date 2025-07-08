@@ -36,7 +36,9 @@ class ApiKeyService extends ChangeNotifier {
     iOptions: const IOSOptions(
       accessibility: KeychainAccessibility.first_unlock_this_device,
     ),
-    mOptions: const MacOsOptions(groupId: 'com.togaware.moviestar'),
+    mOptions: const MacOsOptions(
+      synchronizable: false,
+    ),
   );
 
   ApiKeyService();

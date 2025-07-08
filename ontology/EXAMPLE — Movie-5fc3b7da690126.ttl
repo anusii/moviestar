@@ -1,0 +1,20 @@
+@prefix : <https://sii.anu.edu.au/onto/moviestar#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sdo: <https://schema.org/> .
+@prefix moviestar-data: <https://sii.anu.edu.au/data/moviestar/> .
+@prefix moviestar-onto: <https://sii.anu.edu.au/onto/moviestar#> .
+
+moviestar-data:movie-785b0c2260e45d rdf:type owl:NamedIndividual ,
+                                                        sdo:Movie ;
+                                               sdo:identifier "12345678"^^xsd:positiveInteger ;
+											   sdo:name "Don't Look Up" ;
+											   sdo:description "Two low-level astronomers must go on a giant media tour to warn humankind of an approaching comet that will destroy planet Earth." ;
+											   sdo:image "https://url.to.image"^^xsd:anyURI ;
+											   sdo:thumbnailUrl "https://url.to.thumbnail"^^xsd:anyURI ;
+											   sdo:aggregateRating "7.2"^^xsd:double ;
+											   sdo:datePublished "2024-10-30"^^xsd:date ;
+											   sdo:genre "sci-fi,commedy,drama" ;
+											   sdo:contentRating "6.5"^^xsd:double ;
+											   sdo:comment "Good watch. Funny. Storyline could have been better" .

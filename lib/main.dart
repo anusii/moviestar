@@ -1,6 +1,6 @@
 /// Main entry point for the Movie Star application.
 ///
-// Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
+// Time-stamp: <Thursday 2025-07-03 09:41:28 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang
+/// Authors: Kevin Wang, Graham Williams
 
 library;
 
@@ -29,6 +29,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/providers/theme_provider.dart';
@@ -36,6 +37,8 @@ import 'package:moviestar/screens/coming_soon_screen.dart';
 import 'package:moviestar/screens/downloads_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
+import 'package:moviestar/screens/to_watch_screen.dart';
+import 'package:moviestar/screens/watched_screen.dart';
 import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/cache_settings_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
@@ -45,6 +48,7 @@ import 'package:moviestar/services/movie_service.dart';
 import 'package:moviestar/theme/app_theme.dart';
 import 'package:moviestar/utils/create_solid_login.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
+import 'package:moviestar/utils/is_desktop.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/widgets/floating_theme_toggle.dart';
 
@@ -55,6 +59,39 @@ void main() async {
   // Initialise cache settings service early.
 
   await CacheSettingsService.instance.initialize();
+
+  if (isDesktop) {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    await windowManager.ensureInitialized();
+
+    WindowOptions windowOptions = const WindowOptions(
+      // Setting [alwaysOnTop] here will ensure the app starts on top of other
+      // apps on the desktop so that it is visible. We later turn it of as we
+      // don't want to force it always on top.
+
+      alwaysOnTop: true,
+
+      // The size is overridden in the first instance by linux/my_application.cc
+      // but setting it here then does have effect when Restarting the app.
+
+      // Windows has 1280x720 by default in windows/runner/main.cpp line 29 so
+      // best not to override it here since under windows the 950x600 is too
+      // small.
+
+      //size: Size(750, 873),
+
+      // The [title] is used for the window manager's window title.
+
+      title: 'Movie Star - Manage and share ratings through private PODs',
+    );
+
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+      await windowManager.setAlwaysOnTop(false);
+    });
+  }
 
   runApp(
     ProviderScope(
@@ -161,6 +198,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   void _buildScreens() {
     _screens = [
       HomeScreen(favoritesService: _favoritesService),
+      ToWatchScreen(
+        favoritesService: _favoritesService,
+      ),
+      WatchedScreen(
+        favoritesService: _favoritesService,
+      ),
       ComingSoonScreen(favoritesService: _favoritesService),
       const DownloadsScreen(),
       const FileService(),
@@ -237,6 +280,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.favorite), label: 'To Watch'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Watched'),
           BottomNavigationBarItem(
             icon: Icon(Icons.upcoming),
             label: 'Coming Soon',

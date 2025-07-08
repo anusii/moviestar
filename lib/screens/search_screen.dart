@@ -1,6 +1,6 @@
-/// Moviestar - Manage and share ratings through private PODs
+/// Screen for searching and discovering movies in the Movie Star application.
 ///
-// Time-stamp: <Friday 2025-07-04 14:54:11 +1000 Graham Williams>
+// Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -37,15 +37,12 @@ import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/movie_service.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 
-/// A screen for searching and discovering movies.
+/// A screen that allows users to search for movies.
 
 class SearchScreen extends StatefulWidget {
   /// Service for managing favorite movies.
 
   final FavoritesService favoritesService;
-
-  /// Service for managing favorite movies.
-
   final MovieService movieService;
 
   /// Creates a new [SearchScreen] widget.
@@ -60,30 +57,30 @@ class SearchScreen extends StatefulWidget {
   State<SearchScreen> createState() => _SearchScreenState();
 }
 
-/// State class for the search screen.
+// State class for the search screen.
 
 class _SearchScreenState extends State<SearchScreen> {
-  /// Controller for the search text field.
+  // Controller for the search text field.
 
   final TextEditingController _searchController = TextEditingController();
 
-  /// Loading state indicator.
+  // Loading state indicator.
 
   bool _isLoading = false;
 
-  /// Error message if any.
+  // Error message if any.
 
   String? _error;
 
-  /// Comprehensive search results categorized by search type.
+  // Comprehensive search results categorised by search type.
 
   Map<String, List<Movie>> _searchResults = {};
 
-  /// Timer for debouncing search requests.
+  // Timer for debouncing search requests.
 
   Timer? _debounceTimer;
 
-  /// Duration to wait before executing search after user stops typing.
+  // Duration to wait before executing search after user stops typing.
 
   static const Duration _debounceDuration = Duration(milliseconds: 500);
 
@@ -103,7 +100,7 @@ class _SearchScreenState extends State<SearchScreen> {
     super.dispose();
   }
 
-  /// Called when search text changes.
+  // Called when search text changes.
 
   void _onSearchChanged() {
     // Cancel previous timer if it exists.
@@ -117,7 +114,7 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
-  /// Searches for movies based on the provided query.
+  // Searches for movies based on the provided query.
 
   Future<void> _searchMovies(String query) async {
     if (query.isEmpty) {
@@ -141,9 +138,8 @@ class _SearchScreenState extends State<SearchScreen> {
     });
 
     try {
-      final results = await widget.movieService.searchMoviesComprehensive(
-        query,
-      );
+      final results =
+          await widget.movieService.searchMoviesComprehensive(query);
 
       // Only update state if this search is still relevant.
 
@@ -154,7 +150,8 @@ class _SearchScreenState extends State<SearchScreen> {
         });
       }
     } catch (e) {
-      // Only update state if this search is still relevant
+      // Only update state if this search is still relevant.
+
       if (_searchController.text == query) {
         setState(() {
           _error = e.toString();
@@ -164,7 +161,7 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  /// Builds a section of search results for a specific category.
+  // Builds a section of search results for a specific category.
 
   Widget _buildResultsSection(String category, List<Movie> movies) {
     if (movies.isEmpty) return const SizedBox.shrink();
@@ -197,11 +194,8 @@ class _SearchScreenState extends State<SearchScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              Icon(
-                categoryIcon,
-                color: Theme.of(context).colorScheme.primary,
-                size: 20,
-              ),
+              Icon(categoryIcon,
+                  color: Theme.of(context).colorScheme.primary, size: 20),
               const SizedBox(width: 8),
               Text(
                 categoryTitle,
@@ -243,24 +237,24 @@ class _SearchScreenState extends State<SearchScreen> {
                   width: 50,
                   height: 75,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
               title: Text(
                 movie.title,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+                style:
+                    TextStyle(color: Theme.of(context).colorScheme.onSurface),
               ),
               subtitle: Text(
                 '⭐ ${movie.voteAverage.toStringAsFixed(1)}',
                 style: TextStyle(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.6)),
               ),
               onTap: () {
                 Navigator.push(
@@ -291,19 +285,18 @@ class _SearchScreenState extends State<SearchScreen> {
           decoration: InputDecoration(
             hintText: 'Search by title, actor, or genre...',
             hintStyle: TextStyle(
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.6)),
             border: InputBorder.none,
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
-                    icon: Icon(
-                      Icons.clear,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
+                    icon: Icon(Icons.clear,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.6)),
                     onPressed: () {
                       _searchController.clear();
                     },
@@ -336,13 +329,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.search,
-                            size: 64,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.4),
-                          ),
+                          Icon(Icons.search,
+                              size: 64,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.4)),
                           const SizedBox(height: 16),
                           Text(
                             _searchController.text.isEmpty
@@ -351,9 +343,10 @@ class _SearchScreenState extends State<SearchScreen> {
                                     ? 'Type at least 2 characters'
                                     : 'No results found',
                             style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.6),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.6),
                               fontSize: 18,
                             ),
                           ),
@@ -361,10 +354,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           Text(
                             'Find movies by title, actor, or genre',
                             style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.4),
-                            ),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.4)),
                           ),
                         ],
                       ),
@@ -374,25 +367,18 @@ class _SearchScreenState extends State<SearchScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildResultsSection(
-                            'title',
-                            _searchResults['title'] ?? [],
-                          ),
+                              'title', _searchResults['title'] ?? []),
                           _buildResultsSection(
-                            'actor',
-                            _searchResults['actor'] ?? [],
-                          ),
+                              'actor', _searchResults['actor'] ?? []),
                           _buildResultsSection(
-                            'genre',
-                            _searchResults['genre'] ?? [],
-                          ),
+                              'genre', _searchResults['genre'] ?? []),
                         ],
                       ),
                     ),
     );
   }
 
-  /// Check if all search result categories are empty.
-
+  // Check if all search result categories are empty.
   bool _hasNoResults() {
     return (_searchResults['title']?.isEmpty ?? true) &&
         (_searchResults['actor']?.isEmpty ?? true) &&

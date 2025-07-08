@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang, Graham Williams, Ashely Tang
+/// Authors: Kevin Wang, Graham Williams, Ashley Tang
 
 library;
 

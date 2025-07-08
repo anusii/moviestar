@@ -204,8 +204,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         actions: [
           Padding(
-            padding:
-                const EdgeInsets.only(right: 60.0), // Space for debug banner
+            // Space for debug banner.
+
+            padding: const EdgeInsets.only(right: 60.0),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [

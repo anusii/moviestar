@@ -379,6 +379,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   // Check if all search result categories are empty.
+
   bool _hasNoResults() {
     return (_searchResults['title']?.isEmpty ?? true) &&
         (_searchResults['actor']?.isEmpty ?? true) &&

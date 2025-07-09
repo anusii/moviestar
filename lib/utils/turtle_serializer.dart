@@ -680,7 +680,7 @@ class TurtleSerializer {
 
     if (movies != null && movies.isNotEmpty) {
       final movieRefs = movies
-          .map((movie) => moviestarDataNS.withAttr('Movie-${movie.id}'))
+          .map((movie) => moviestarDataNS.withAttr('movie-${movie.id}'))
           .toList();
       triples[movieListResource]![hasMovie] = movieRefs;
 
@@ -688,7 +688,7 @@ class TurtleSerializer {
       // According to ontology, MovieList only contains references with filePath.
 
       for (final movie in movies) {
-        final movieResource = moviestarDataNS.withAttr('Movie-${movie.id}');
+        final movieResource = moviestarDataNS.withAttr('movie-${movie.id}');
         triples[movieResource] = {
           rdfType: [owlNS.withAttr('NamedIndividual'), movieType],
           filePath: Literal('moviestar/data/movies/Movie-${movie.id}.ttl'),
@@ -711,7 +711,7 @@ class TurtleSerializer {
 
     // Create the movie resource with all movie metadata.
 
-    final movieResource = moviestarDataNS.withAttr('Movie-${movie.id}');
+    final movieResource = moviestarDataNS.withAttr('movie-${movie.id}');
     triples[movieResource] = {
       rdfType: [owlNS.withAttr('NamedIndividual'), movieType],
       identifier:
@@ -841,10 +841,10 @@ class TurtleSerializer {
 
                 for (final movieRef in values) {
                   final movieRefStr = movieRef.toString();
-                  // Extract movie ID from resource URI like "Movie-12345" (capital M).
+                  // Extract movie ID from resource URI like "movie-12345" (lowercase).
 
                   final movieIdMatch =
-                      RegExp(r'Movie-(\d+)').firstMatch(movieRefStr);
+                      RegExp(r'movie-(\d+)').firstMatch(movieRefStr);
                   if (movieIdMatch != null) {
                     movieResourceIds.add(movieIdMatch.group(1)!);
                   }

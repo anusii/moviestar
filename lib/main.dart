@@ -238,16 +238,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 _isLoadingFolders = false;
               });
             }
-            debugPrint('App folders initialised.');
 
             // Initialize user profile following the ontology structure
             try {
               // The PodFavoritesService already initializes the profile and MovieLists
               // through its initialization process, so we don't need to do it here again
-              debugPrint(
-                  'User profile and MovieLists initialized via POD services.');
             } catch (e) {
-              debugPrint('Failed to initialize user profile: $e');
+              debugPrint('❌ Failed to initialize user profile: $e');
             }
 
             // Now reload POD data since folders are ready.
@@ -261,8 +258,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           });
         }
       }
-    } else {
-      debugPrint('User not logged in. Skipping App folder initialisation.');
     }
   }
 

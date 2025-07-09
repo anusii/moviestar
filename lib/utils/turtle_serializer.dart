@@ -11,6 +11,7 @@ library;
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:rdflib/rdflib.dart';
 // ignore: implementation_imports
 import 'package:solidpod/src/solid/utils/rdf.dart'
@@ -794,8 +795,6 @@ class TurtleSerializer {
 
   static Map<String, dynamic>? movieListFromTurtle(String ttlContent) {
     try {
-      print('🔍 Parsing MovieList TTL content...');
-
       // Parse using proper RDF
       final triples = turtleToTripleMap(ttlContent);
 
@@ -817,8 +816,6 @@ class TurtleSerializer {
             type == 'https://sii.anu.edu.au/onto/moviestar#MovieList');
 
         if (isMovieList) {
-          print('📋 Found MovieList resource: $subject');
-
           // Extract MovieList metadata
           for (final predicate in predicates.keys) {
             final values = predicates[predicate]!;
@@ -842,8 +839,6 @@ class TurtleSerializer {
                       RegExp(r'Movie-(\d+)').firstMatch(movieRefStr);
                   if (movieIdMatch != null) {
                     movieResourceIds.add(movieIdMatch.group(1)!);
-                    print(
-                        '🎬 Found movie reference: Movie-${movieIdMatch.group(1)}');
                   }
                 }
               }
@@ -872,14 +867,10 @@ class TurtleSerializer {
             genreIds: [],
           );
           movies.add(movie);
-          print('🎬 Created movie reference: ${movie.title} (ID: ${movie.id})');
         } catch (e) {
-          print('❌ Failed to parse movie ID $movieId: $e');
+          debugPrint('❌ Failed to parse movie ID $movieId: $e');
         }
       }
-
-      print(
-          '✅ MovieList parsed - ID: $listId, Name: $listName, Movies: ${movies.length}');
 
       return {
         'id': listId,
@@ -889,7 +880,7 @@ class TurtleSerializer {
         'movies': movies,
       };
     } catch (e) {
-      print('❌ Error parsing MovieList from TTL: $e');
+      debugPrint('❌ Error parsing MovieList from TTL: $e');
       return null;
     }
   }
@@ -1026,8 +1017,6 @@ class TurtleSerializer {
       return null;
     } catch (e) {
       // Don't log parsing errors - they're often due to expected empty/missing files
-      // debugPrint('Error parsing movie with user data from TTL: $e');
-
       return null;
     }
   }
@@ -1042,13 +1031,6 @@ class TurtleSerializer {
   /// Fixes UTF-8 encoding corruption that converts normal characters to mangled ones.
   /// This handles cases where ASCII apostrophes become "â" due to encoding issues.
   static String _sanitizeForTtl(String input) {
-    // Enhanced debug logging to catch UTF-8 corruption
-    final hasCorruption = input.contains('â');
-    if (hasCorruption) {
-      print('🚨 FOUND CORRUPTION: Input contains "â" character');
-      print('🔧 Full input text: "$input"');
-    }
-
     final result = input
         // Fix UTF-8 corruption issues (primary fixes)
         .replaceAll('â', "'") // Fix corrupted apostrophe (main issue)
@@ -1090,13 +1072,6 @@ class TurtleSerializer {
         .replaceAll('ï', 'i') // Replace accented i
         .replaceAll('ì', 'i') // Replace accented i
         .replaceAll('í', 'i'); // Replace accented i
-
-    // Debug: Log if any changes were made
-    if (result != input) {
-      print('🔧 Sanitization applied: "brotherâs" → "brother\'s"');
-      print(
-          '🔧 Result length: ${result.length}, Input length: ${input.length}');
-    }
 
     return result;
   }

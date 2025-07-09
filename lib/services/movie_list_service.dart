@@ -1,39 +1,64 @@
 /// Service for managing MovieList entities in the Movie Star application following the ontology structure.
 ///
-// Copyright (C) 2025, Software Innovation Institute, ANU.
+// Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
+///
+/// Copyright (C) 2025, Software Innovation Institute, ANU.
+///
+/// Licensed under the GNU General Public License, Version 3 (the "License").
+///
+/// License: https://www.gnu.org/licenses/gpl-3.0.en.html.
 //
-// Licensed under the GNU General Public License, Version 3 (the "License").
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
-// License: https://www.gnu.org/licenses/gpl-3.0.en.html.
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+// details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <https://www.gnu.org/licenses/>.
+///
+/// Authors: Ashley Tang
 
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:solidpod/solidpod.dart';
-import 'package:moviestar/utils/turtle_serializer.dart';
-import 'package:moviestar/utils/is_logged_in.dart';
-import 'package:moviestar/utils/pod_path_helper.dart';
+
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/user_profile_service.dart';
+import 'package:moviestar/utils/is_logged_in.dart';
+import 'package:moviestar/utils/turtle_serializer.dart';
 
 /// Service for managing MovieList entities in the POD following the ontology structure.
+
 class MovieListService {
-  /// Widget context for POD operations.
+  // Widget context for POD operations.
+
   final BuildContext _context;
 
-  /// Widget for returning after operations.
+  // Widget for returning after operations.
+
   final Widget _child;
 
-  /// User profile service for updating user profile connections.
+  // User profile service for updating user profile connections.
+
   final UserProfileService _userProfileService;
 
-  /// Cache for movie lists.
+  // Cache for movie lists.
+
   final Map<String, Map<String, dynamic>> _movieListCache = {};
 
   /// Creates a new [MovieListService] instance.
+
   MovieListService(this._context, this._child, this._userProfileService);
 
   /// Creates a new MovieList with the given name and movies.
+
   Future<String?> createMovieList(String listName,
       {List<Movie>? movies, String? description}) async {
     try {
@@ -43,10 +68,12 @@ class MovieListService {
         return null;
       }
 
-      // Generate unique ID for the movie list
+      // Generate unique ID for the movie list.
+
       final movieListId = TurtleSerializer.generateId();
 
-      // Create the MovieList TTL content
+      // Create the MovieList TTL content.
+
       final movieListTtl = TurtleSerializer.createMovieList(
         movieListId,
         listName,
@@ -54,10 +81,11 @@ class MovieListService {
         description: description,
       );
 
-      // Write to POD
+      // Write to POD.
+
       if (!_context.mounted) return null;
       final result = await writePod(
-        'user_lists/MovieList-$movieListId.ttl', // Use correct user_lists directory
+        'user_lists/MovieList-$movieListId.ttl',
         movieListTtl,
         _context,
         _child,
@@ -65,7 +93,8 @@ class MovieListService {
       );
 
       if (result == SolidFunctionCallStatus.success) {
-        // Update cache
+        // Update cache.
+
         _movieListCache[movieListId] = {
           'id': movieListId,
           'name': listName,
@@ -74,7 +103,8 @@ class MovieListService {
               'moviestar/data/user_lists/MovieList-$movieListId.ttl', // Use correct user_lists path
         };
 
-        // Add to user profile
+        // Add to user profile.
+
         final profileUpdated =
             await _userProfileService.addMovieListToProfile(movieListId);
         if (!profileUpdated) {
@@ -93,10 +123,12 @@ class MovieListService {
   }
 
   /// Gets a MovieList by ID.
+
   Future<Map<String, dynamic>?> getMovieList(String movieListId,
       {bool forceRefresh = false}) async {
     try {
-      // Force refresh bypasses cache
+      // Force refresh bypasses cache.
+
       if (!forceRefresh && _movieListCache.containsKey(movieListId)) {
         return _movieListCache[movieListId];
       }
@@ -104,10 +136,12 @@ class MovieListService {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) return null;
 
-      // Try to read from POD
+      // Try to read from POD.
+
       if (!_context.mounted) return null;
       try {
-        // Read directly without getReadPath to avoid double path prefix
+        // Read directly without getReadPath to avoid double path prefix.
+
         if (!_context.mounted) return null;
         final result = await readPod(
             'moviestar/data/user_lists/MovieList-$movieListId.ttl',
@@ -115,11 +149,13 @@ class MovieListService {
             _child);
 
         if (result.isNotEmpty) {
-          // Parse the MovieList data using TurtleSerializer
+          // Parse the MovieList data using TurtleSerializer.
+
           final movieListData = TurtleSerializer.movieListFromTurtle(result);
 
           if (movieListData != null) {
-            // Update cache with parsed data
+            // Update cache with parsed data.
+
             _movieListCache[movieListId] = movieListData;
             return movieListData;
           } else {
@@ -140,11 +176,13 @@ class MovieListService {
   }
 
   /// Forces a refresh of a specific MovieList from POD.
+
   Future<Map<String, dynamic>?> refreshMovieList(String movieListId) async {
     return await getMovieList(movieListId, forceRefresh: true);
   }
 
   /// Adds a movie to a MovieList.
+
   Future<bool> addMovieToList(String movieListId, Movie movie) async {
     try {
       final movieList = await getMovieList(movieListId);
@@ -155,15 +193,17 @@ class MovieListService {
 
       final currentMovies = List<Movie>.from(movieList['movies'] ?? []);
 
-      // Check if movie is already in the list
+      // Check if movie is already in the list.
+
       final existingIndex = currentMovies.indexWhere((m) => m.id == movie.id);
       if (existingIndex >= 0) {
-        return true; // Already exists
+        return true;
       }
 
       currentMovies.add(movie);
 
-      // Update the MovieList
+      // Update the MovieList.
+
       final updatedTtl = TurtleSerializer.createMovieList(
         movieListId,
         movieList['name'],
@@ -172,7 +212,7 @@ class MovieListService {
 
       if (!_context.mounted) return false;
       final result = await writePod(
-        'user_lists/MovieList-$movieListId.ttl', // Use correct user_lists directory
+        'user_lists/MovieList-$movieListId.ttl',
         updatedTtl,
         _context,
         _child,
@@ -180,7 +220,8 @@ class MovieListService {
       );
 
       if (result == SolidFunctionCallStatus.success) {
-        // Update cache with new data
+        // Update cache with new data.
+
         _movieListCache[movieListId] = {
           'id': movieListId,
           'name': movieList['name'],
@@ -199,6 +240,7 @@ class MovieListService {
   }
 
   /// Removes a movie from a MovieList.
+
   Future<bool> removeMovieFromList(String movieListId, Movie movie) async {
     try {
       final movieList = await getMovieList(movieListId);
@@ -206,16 +248,19 @@ class MovieListService {
 
       final currentMovies = List<Movie>.from(movieList['movies'] ?? []);
 
-      // Check if movie exists before trying to remove
+      // Check if movie exists before trying to remove.
+
       final existingIndex = currentMovies.indexWhere((m) => m.id == movie.id);
       if (existingIndex < 0) {
-        return true; // Nothing to remove, consider success
+        return true;
       }
 
-      // Remove the movie
+      // Remove the movie.
+
       currentMovies.removeWhere((m) => m.id == movie.id);
 
-      // Update the MovieList
+      // Update the MovieList.
+
       final updatedTtl = TurtleSerializer.createMovieList(
         movieListId,
         movieList['name'],
@@ -224,7 +269,7 @@ class MovieListService {
 
       if (!_context.mounted) return false;
       final result = await writePod(
-        'user_lists/MovieList-$movieListId.ttl', // Use correct user_lists directory
+        'user_lists/MovieList-$movieListId.ttl',
         updatedTtl,
         _context,
         _child,
@@ -232,7 +277,8 @@ class MovieListService {
       );
 
       if (result == SolidFunctionCallStatus.success) {
-        // Update cache with new data
+        // Update cache with new data.
+
         _movieListCache[movieListId] = {
           'id': movieListId,
           'name': movieList['name'],
@@ -250,7 +296,8 @@ class MovieListService {
     }
   }
 
-  /// Gets or creates a standard MovieList (e.g., "to_watch", "watched").
+  /// Gets or creates a standard MovieList (e.g. "to_watch", "watched").
+
   Future<String?> getOrCreateStandardMovieList(String listType) async {
     try {
       final profile = await _userProfileService.getUserProfile();
@@ -267,23 +314,27 @@ class MovieListService {
               word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1))
           .join(' ');
 
-      // Check if a standard list of this type already exists in the user profile
+      // Check if a standard list of this type already exists in the user profile.
+
       final existingMovieListIds =
           profile['movieListIds'] as List<String>? ?? [];
 
       for (final movieListId in existingMovieListIds) {
-        // Try to read the existing MovieList to check its name/type
+        // Try to read the existing MovieList to check its name/type.
+
         try {
           if (!_context.mounted) continue;
-          // Read directly without getReadPath to avoid double path prefix
+          // Read directly without getReadPath to avoid double path prefix.
+
           final result = await readPod(
               'moviestar/data/user_lists/MovieList-$movieListId.ttl',
               _context,
               _child);
 
           if (result.isNotEmpty) {
-            // Robust check: look for the specific sdo:name pattern in TTL
-            // Check for both quoted strings and the expected list type descriptions
+            // Robust check: look for the specific sdo:name pattern in TTL.
+            // Check for both quoted strings and the expected list type descriptions.
+
             final namePattern = RegExp(r'sdo:name\s+"([^"]+)"');
             final descPattern = RegExp(r'sdo:description\s+"([^"]+)"');
 
@@ -293,7 +344,8 @@ class MovieListService {
             if (nameMatch != null) {
               final foundName = nameMatch.group(1)!.trim();
 
-              // Direct name match
+              // Direct name match.
+
               if (foundName == displayName) {
                 return movieListId;
               }
@@ -302,7 +354,8 @@ class MovieListService {
             if (descMatch != null) {
               final foundDesc = descMatch.group(1)!.trim();
 
-              // Check description patterns for different list types
+              // Check description patterns for different list types.
+
               final isToWatchList = foundDesc.contains('want to watch') ||
                   foundDesc.contains('to watch');
               final isWatchedList = foundDesc.contains('have watched') ||
@@ -322,7 +375,8 @@ class MovieListService {
         }
       }
 
-      // Generate appropriate description for standard lists
+      // Generate appropriate description for standard lists.
+
       String description;
       switch (listType) {
         case 'to_watch':
@@ -338,7 +392,8 @@ class MovieListService {
           description = 'List of movies: $displayName';
       }
 
-      // No existing list found, create a new one
+      // No existing list found, create a new one.
+
       final listId = await createMovieList(
         displayName,
         movies: [],
@@ -357,26 +412,29 @@ class MovieListService {
   }
 
   /// Deletes a MovieList.
+
   Future<bool> deleteMovieList(String movieListId) async {
     try {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) return false;
 
-      // Remove from user profile first
+      // Remove from user profile first.
+
       try {
         await _userProfileService.removeMovieListFromProfile(movieListId);
       } catch (e) {
         debugPrint('❌ Failed to remove movie list from profile: $e');
-        // Continue with deletion even if profile update fails
+        // Continue with deletion even if profile update fails.
       }
 
-      // Delete from POD
+      // Delete from POD.
+
       if (!_context.mounted) return false;
 
-      await deleteFile(
-          'moviestar/data/user_lists/MovieList-$movieListId.ttl'); // Use correct user_lists path
+      await deleteFile('moviestar/data/user_lists/MovieList-$movieListId.ttl');
 
-      // Remove from cache
+      // Remove from cache.
+
       _movieListCache.remove(movieListId);
       return true;
     } catch (e) {
@@ -386,6 +444,7 @@ class MovieListService {
   }
 
   /// Clears the cache.
+
   void clearCache() {
     _movieListCache.clear();
   }

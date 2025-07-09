@@ -239,14 +239,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               });
             }
 
-            // Initialize user profile following the ontology structure
-            try {
-              // The PodFavoritesService already initializes the profile and MovieLists
-              // through its initialization process, so we don't need to do it here again
-            } catch (e) {
-              debugPrint('❌ Failed to initialize user profile: $e');
-            }
-
             // Now reload POD data since folders are ready.
 
             await _favoritesServiceManager.reloadPodDataAfterInit();

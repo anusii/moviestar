@@ -179,15 +179,16 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
       await widget.favoritesService.setPersonalRating(widget.movie, rating);
 
       // Auto-add to watched is now handled in PodFavoritesService._createOrUpdateMovieFile()
-      // Remove duplicate logic to avoid race conditions
     }
     setState(() {
       _personalRating = rating;
-      // Update watched status - this will be updated by the stream from the service
+      // Update watched status - this will be updated by the stream from the service.
+
       _ratingSaved = true;
     });
 
-    // Refresh the list status to ensure UI is in sync
+    // Refresh the list status to ensure UI is in sync.
+
     await _checkListStatus();
 
     // Hide the saved banner after 2 seconds.

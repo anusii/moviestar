@@ -227,7 +227,7 @@ class FavoritesService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Checks if a movie file exists (i.e., user has interacted with this movie).
+  /// Checks if a movie file exists (i.e. user has interacted with this movie).
   /// For local storage, this checks if the user has either a rating or comment.
 
   Future<bool> hasMovieFile(Movie movie) async {

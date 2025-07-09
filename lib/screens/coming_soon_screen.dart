@@ -32,6 +32,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moviestar/database/movie_cache_repository.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
+import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
@@ -89,10 +90,37 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _forceRefresh,
-            tooltip: 'Refresh upcoming movies',
+          Padding(
+            padding: const EdgeInsets.only(right: 60.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: _forceRefresh,
+                  tooltip: 'Refresh upcoming movies',
+                ),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final themeMode = ref.watch(themeModeProvider);
+                    final isDarkMode = themeMode == ThemeMode.dark;
+                    return IconButton(
+                      icon: Icon(
+                        isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                      ),
+                      onPressed: () async {
+                        await ref
+                            .read(themeModeProvider.notifier)
+                            .toggleTheme();
+                      },
+                      tooltip: isDarkMode
+                          ? 'Switch to light mode'
+                          : 'Switch to dark mode',
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),

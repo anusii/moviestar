@@ -1,6 +1,6 @@
-/// Main entry point for the Movie Star application.
+/// Moviestar - Manage and share ratings through private PODs
 ///
-// Time-stamp: <Thursday 2025-07-03 09:41:28 +1000 Graham Williams>
+// Time-stamp: <Friday 2025-07-04 14:55:56 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang, Graham Williams
+/// Authors: Kevin Wang, Graham Williams, Ashley Tang
 
 library;
 
@@ -50,7 +50,8 @@ import 'package:moviestar/utils/create_solid_login.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_desktop.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
-import 'package:moviestar/widgets/floating_theme_toggle.dart';
+
+/// Main entry point for the Movie Star application.
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -263,11 +264,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           _isLoadingFolders
               ? const Center(child: CircularProgressIndicator())
               : _screens[_selectedIndex],
-
-          // Theme toggle positioned to be visible near debug banner.
-          // Hide when on Settings page (index 4) since it has its own theme toggle.
-          if (_selectedIndex != 4)
-            const FloatingThemeToggle(right: 70, top: 16),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

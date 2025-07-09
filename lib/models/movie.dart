@@ -1,6 +1,6 @@
 /// Data model representing a movie in the Movie Star application.
 ///
-// Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
+// Time-stamp: <Friday 2025-07-04 14:39:11 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang
+/// Authors: Kevin Wang, Ashley Tang
 
 library;
 
@@ -77,14 +77,32 @@ class Movie {
   /// Creates a [Movie] instance from a JSON map.
 
   factory Movie.fromJson(Map<String, dynamic> json) {
+    // Helper function to safely parse release date.
+
+    DateTime parseReleaseDate(dynamic dateValue) {
+      if (dateValue == null || dateValue.toString().isEmpty) {
+        // Default to current date if no release date.
+
+        return DateTime.now();
+      }
+
+      try {
+        return DateTime.parse(dateValue.toString());
+      } catch (e) {
+        // If parsing fails, return current date as fallback.
+
+        return DateTime.now();
+      }
+    }
+
     return Movie(
-      id: json['id'],
-      title: json['title'],
-      overview: json['overview'],
+      id: json['id'] ?? 0,
+      title: json['title'] ?? 'Unknown Title',
+      overview: json['overview'] ?? '',
       posterUrl: TmdbImageUtil.getPosterUrl(json['poster_path'] ?? ''),
       backdropUrl: TmdbImageUtil.getBackdropUrl(json['backdrop_path'] ?? ''),
-      voteAverage: (json['vote_average'] as num).toDouble(),
-      releaseDate: DateTime.parse(json['release_date']),
+      voteAverage: (json['vote_average'] as num?)?.toDouble() ?? 0.0,
+      releaseDate: parseReleaseDate(json['release_date']),
       genreIds: List<int>.from(json['genre_ids'] ?? []),
     );
   }

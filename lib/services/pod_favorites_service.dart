@@ -34,13 +34,13 @@ import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/constants/paths.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/services/movie_list_service.dart';
+import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
-import 'package:moviestar/constants/paths.dart';
 
 /// A POD-based service class that manages the user's movie lists in Solid POD.
 

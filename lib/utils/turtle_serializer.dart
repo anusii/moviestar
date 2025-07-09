@@ -28,6 +28,7 @@ library;
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+
 import 'package:rdflib/rdflib.dart';
 // ignore: implementation_imports
 import 'package:solidpod/src/solid/utils/rdf.dart'
@@ -777,7 +778,7 @@ class TurtleSerializer {
       identifier: Literal(apiKeyId),
       keyValue: Literal(apiKeyValue),
       TurtleSerializer.source: Literal(source),
-      rdfsLabel: Literal('|filePath=keys/ApiKey-$apiKeyId.ttl|'),
+      rdfsLabel: Literal('|filePath=moviestar/data/keys/ApiKey-$apiKeyId.ttl|'),
     };
 
     // Use ontology-compliant namespace bindings.

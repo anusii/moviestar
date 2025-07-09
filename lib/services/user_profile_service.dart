@@ -138,7 +138,7 @@ class UserProfileService {
           'apiKeyId': apiKeyFileId,
           'dob': dobString,
           'gender': genderString,
-          'movieListIds': finalMovieListIds ?? [],
+          'movieListIds': finalMovieListIds,
         };
         return true;
       }
@@ -234,6 +234,7 @@ class UserProfileService {
       if (!_context.mounted) return null;
 
       final readPath = await getReadPath('profile/profile.ttl');
+      if (!_context.mounted) return null;
       final result = await readPod(readPath, _context, _child);
 
       if (result.isNotEmpty) {

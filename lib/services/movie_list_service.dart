@@ -34,10 +34,11 @@ class MovieListService {
   MovieListService(this._context, this._child, this._userProfileService);
 
   /// Creates a new MovieList with the given name and movies.
-  Future<String?> createMovieList(String listName, {List<Movie>? movies, String? description}) async {
+  Future<String?> createMovieList(String listName,
+      {List<Movie>? movies, String? description}) async {
     try {
       debugPrint('📝 Creating movie list: $listName');
-      
+
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
         debugPrint('❌ User not logged in, cannot create movie list');
@@ -47,7 +48,7 @@ class MovieListService {
       // Generate unique ID for the movie list
       final movieListId = TurtleSerializer.generateId();
       debugPrint('🆔 Generated movie list ID: $movieListId');
-      
+
       // Create the MovieList TTL content
       final movieListTtl = TurtleSerializer.createMovieList(
         movieListId,
@@ -56,12 +57,13 @@ class MovieListService {
         description: description,
       );
 
-      debugPrint('📝 Generated movie list TTL (first 200 chars): ${movieListTtl.substring(0, movieListTtl.length > 200 ? 200 : movieListTtl.length)}...');
+      debugPrint(
+          '📝 Generated movie list TTL (first 200 chars): ${movieListTtl.substring(0, movieListTtl.length > 200 ? 200 : movieListTtl.length)}...');
 
       // Write to POD
       if (!_context.mounted) return null;
       final result = await writePod(
-        'user_lists/MovieList-$movieListId.ttl',  // Use correct user_lists directory
+        'user_lists/MovieList-$movieListId.ttl', // Use correct user_lists directory
         movieListTtl,
         _context,
         _child,
@@ -76,13 +78,15 @@ class MovieListService {
           'id': movieListId,
           'name': listName,
           'movies': movies ?? [],
-          'filePath': 'moviestar/data/user_lists/MovieList-$movieListId.ttl',  // Use correct user_lists path
+          'filePath':
+              'moviestar/data/user_lists/MovieList-$movieListId.ttl', // Use correct user_lists path
         };
 
         debugPrint('✅ Movie list created successfully: $listName');
 
         // Add to user profile
-        final profileUpdated = await _userProfileService.addMovieListToProfile(movieListId);
+        final profileUpdated =
+            await _userProfileService.addMovieListToProfile(movieListId);
         if (!profileUpdated) {
           debugPrint('❌ Failed to add movie list to user profile');
         } else {
@@ -101,7 +105,8 @@ class MovieListService {
   }
 
   /// Gets a MovieList by ID.
-  Future<Map<String, dynamic>?> getMovieList(String movieListId, {bool forceRefresh = false}) async {
+  Future<Map<String, dynamic>?> getMovieList(String movieListId,
+      {bool forceRefresh = false}) async {
     try {
       // Force refresh bypasses cache
       if (!forceRefresh && _movieListCache.containsKey(movieListId)) {
@@ -117,16 +122,20 @@ class MovieListService {
       try {
         // Read directly without getReadPath to avoid double path prefix
         if (!_context.mounted) return null;
-        final result = await readPod('moviestar/data/user_lists/MovieList-$movieListId.ttl', _context, _child);
+        final result = await readPod(
+            'moviestar/data/user_lists/MovieList-$movieListId.ttl',
+            _context,
+            _child);
 
         if (result.isNotEmpty) {
           // Parse the MovieList data using TurtleSerializer
           final movieListData = TurtleSerializer.movieListFromTurtle(result);
-          
+
           if (movieListData != null) {
             // Update cache with parsed data
             _movieListCache[movieListId] = movieListData;
-            debugPrint('✅ MovieList loaded from POD: ${movieListData['name']}, Movies: ${movieListData['movies']?.length ?? 0}');
+            debugPrint(
+                '✅ MovieList loaded from POD: ${movieListData['name']}, Movies: ${movieListData['movies']?.length ?? 0}');
             return movieListData;
           } else {
             debugPrint('❌ Failed to parse MovieList TTL content');
@@ -163,7 +172,7 @@ class MovieListService {
 
       final currentMovies = List<Movie>.from(movieList['movies'] ?? []);
       debugPrint('📋 Current MovieList has ${currentMovies.length} movies');
-      
+
       // Check if movie is already in the list
       final existingIndex = currentMovies.indexWhere((m) => m.id == movie.id);
       if (existingIndex >= 0) {
@@ -172,7 +181,8 @@ class MovieListService {
       }
 
       currentMovies.add(movie);
-      debugPrint('➕ Added ${movie.title}, MovieList now has ${currentMovies.length} movies');
+      debugPrint(
+          '➕ Added ${movie.title}, MovieList now has ${currentMovies.length} movies');
 
       // Update the MovieList
       final updatedTtl = TurtleSerializer.createMovieList(
@@ -183,7 +193,7 @@ class MovieListService {
 
       if (!_context.mounted) return false;
       final result = await writePod(
-        'user_lists/MovieList-$movieListId.ttl',  // Use correct user_lists directory
+        'user_lists/MovieList-$movieListId.ttl', // Use correct user_lists directory
         updatedTtl,
         _context,
         _child,
@@ -219,17 +229,19 @@ class MovieListService {
       if (movieList == null) return false;
 
       final currentMovies = List<Movie>.from(movieList['movies'] ?? []);
-      
+
       // Check if movie exists before trying to remove
       final existingIndex = currentMovies.indexWhere((m) => m.id == movie.id);
       if (existingIndex < 0) {
-        debugPrint('ℹ️ Movie ${movie.title} not in list $movieListId - nothing to remove');
+        debugPrint(
+            'ℹ️ Movie ${movie.title} not in list $movieListId - nothing to remove');
         return true; // Nothing to remove, consider success
       }
 
       // Remove the movie
       currentMovies.removeWhere((m) => m.id == movie.id);
-      debugPrint('🗑️ Removed ${movie.title} from MovieList, now has ${currentMovies.length} movies');
+      debugPrint(
+          '🗑️ Removed ${movie.title} from MovieList, now has ${currentMovies.length} movies');
 
       // Update the MovieList
       final updatedTtl = TurtleSerializer.createMovieList(
@@ -240,7 +252,7 @@ class MovieListService {
 
       if (!_context.mounted) return false;
       final result = await writePod(
-        'user_lists/MovieList-$movieListId.ttl',  // Use correct user_lists directory
+        'user_lists/MovieList-$movieListId.ttl', // Use correct user_lists directory
         updatedTtl,
         _context,
         _child,
@@ -271,76 +283,91 @@ class MovieListService {
   Future<String?> getOrCreateStandardMovieList(String listType) async {
     try {
       debugPrint('🎬 Getting/creating standard movie list: $listType');
-      
+
       final profile = await _userProfileService.getUserProfile();
       if (profile == null) {
-        debugPrint('❌ No user profile found, cannot create standard movie list');
+        debugPrint(
+            '❌ No user profile found, cannot create standard movie list');
         return null;
       }
 
-      final displayName = listType.replaceAll('_', ' ').split(' ').map((word) => 
-        word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1)
-      ).join(' ');
+      final displayName = listType
+          .replaceAll('_', ' ')
+          .split(' ')
+          .map((word) =>
+              word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1))
+          .join(' ');
 
       // Check if a standard list of this type already exists in the user profile
-      final existingMovieListIds = profile['movieListIds'] as List<String>? ?? [];
-      
+      final existingMovieListIds =
+          profile['movieListIds'] as List<String>? ?? [];
+
       for (final movieListId in existingMovieListIds) {
         debugPrint('🔍 Checking existing MovieList: $movieListId');
-        
+
         // Try to read the existing MovieList to check its name/type
         try {
           if (!_context.mounted) continue;
           // Read directly without getReadPath to avoid double path prefix
-          final result = await readPod('moviestar/data/user_lists/MovieList-$movieListId.ttl', _context, _child);
-          
+          final result = await readPod(
+              'moviestar/data/user_lists/MovieList-$movieListId.ttl',
+              _context,
+              _child);
+
           if (result.isNotEmpty) {
             // Robust check: look for the specific sdo:name pattern in TTL
             // Check for both quoted strings and the expected list type descriptions
             final namePattern = RegExp(r'sdo:name\s+"([^"]+)"');
             final descPattern = RegExp(r'sdo:description\s+"([^"]+)"');
-            
+
             final nameMatch = namePattern.firstMatch(result);
             final descMatch = descPattern.firstMatch(result);
-            
+
             if (nameMatch != null) {
               final foundName = nameMatch.group(1)!.trim();
-              debugPrint('🔍 Found MovieList name: "$foundName", looking for: "$displayName"');
-              
+              debugPrint(
+                  '🔍 Found MovieList name: "$foundName", looking for: "$displayName"');
+
               // Direct name match
               if (foundName == displayName) {
-                debugPrint('✅ Found existing standard movie list by name: $listType -> $movieListId');
+                debugPrint(
+                    '✅ Found existing standard movie list by name: $listType -> $movieListId');
                 return movieListId;
               }
             }
-            
+
             if (descMatch != null) {
               final foundDesc = descMatch.group(1)!.trim();
               debugPrint('🔍 Found MovieList description: "$foundDesc"');
-              
+
               // Check description patterns for different list types
-              final isToWatchList = foundDesc.contains('want to watch') || foundDesc.contains('to watch');
-              final isWatchedList = foundDesc.contains('have watched') || foundDesc.contains('you watched');
+              final isToWatchList = foundDesc.contains('want to watch') ||
+                  foundDesc.contains('to watch');
+              final isWatchedList = foundDesc.contains('have watched') ||
+                  foundDesc.contains('you watched');
               final isFavoritesList = foundDesc.contains('favorite');
-              
+
               if ((listType == 'to_watch' && isToWatchList) ||
                   (listType == 'watched' && isWatchedList) ||
                   (listType == 'favorites' && isFavoritesList)) {
-                debugPrint('✅ Found existing standard movie list by description: $listType -> $movieListId');
+                debugPrint(
+                    '✅ Found existing standard movie list by description: $listType -> $movieListId');
                 return movieListId;
               }
             }
-            
-            debugPrint('❌ MovieList $movieListId does not match $listType (name: "${nameMatch?.group(1)}", desc: "${descMatch?.group(1)}")');
+
+            debugPrint(
+                '❌ MovieList $movieListId does not match $listType (name: "${nameMatch?.group(1)}", desc: "${descMatch?.group(1)}")');
           }
         } catch (e) {
           debugPrint('❌ Error checking existing MovieList $movieListId: $e');
           continue;
         }
       }
-      
-      debugPrint('📝 Creating new standard list with display name: $displayName');
-      
+
+      debugPrint(
+          '📝 Creating new standard list with display name: $displayName');
+
       // Generate appropriate description for standard lists
       String description;
       switch (listType) {
@@ -356,7 +383,7 @@ class MovieListService {
         default:
           description = 'List of movies: $displayName';
       }
-      
+
       // No existing list found, create a new one
       final listId = await createMovieList(
         displayName,
@@ -393,9 +420,10 @@ class MovieListService {
 
       // Delete from POD
       if (!_context.mounted) return false;
-      
-      await deleteFile('moviestar/data/user_lists/MovieList-$movieListId.ttl');  // Use correct user_lists path
-      
+
+      await deleteFile(
+          'moviestar/data/user_lists/MovieList-$movieListId.ttl'); // Use correct user_lists path
+
       // Remove from cache
       _movieListCache.remove(movieListId);
       return true;
@@ -409,4 +437,4 @@ class MovieListService {
   void clearCache() {
     _movieListCache.clear();
   }
-} 
+}

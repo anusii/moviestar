@@ -35,14 +35,15 @@ class MovieListService {
   MovieListService(this._context, this._child, this._userProfileService);
 
   /// Creates a new MovieList with the given name and movies.
-  Future<String?> createMovieList(String listName, {List<Movie>? movies}) async {
+  Future<String?> createMovieList(String listName,
+      {List<Movie>? movies}) async {
     try {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) return null;
 
       // Generate unique ID for the movie list
       final movieListId = TurtleSerializer.generateId();
-      
+
       // Create the MovieList TTL content
       final movieListTtl = TurtleSerializer.createMovieList(
         movieListId,
@@ -100,7 +101,8 @@ class MovieListService {
       // Try to read from POD
       if (!_context.mounted) return null;
       try {
-        final result = await readPod('user_lists/MovieList-$movieListId.ttl', _context, _child);
+        final result = await readPod(
+            'user_lists/MovieList-$movieListId.ttl', _context, _child);
 
         if (result.isNotEmpty) {
           // Parse the MovieList data (simplified for now)
@@ -133,7 +135,7 @@ class MovieListService {
       if (movieList == null) return false;
 
       final currentMovies = List<Movie>.from(movieList['movies'] ?? []);
-      
+
       // Check if movie is already in the list
       final existingIndex = currentMovies.indexWhere((m) => m.id == movie.id);
       if (existingIndex >= 0) {
@@ -183,7 +185,7 @@ class MovieListService {
       if (movieList == null) return false;
 
       final currentMovies = List<Movie>.from(movieList['movies'] ?? []);
-      
+
       // Remove the movie
       final removedCount = currentMovies.removeWhere((m) => m.id == movie.id);
       if (removedCount == 0) {
@@ -232,12 +234,15 @@ class MovieListService {
 
       // For now, we'll create a simple mapping based on list type
       // In the future, we could check if a list with this type already exists
-      
+
       // Create the standard list
       final listId = await createMovieList(
-        listType.replaceAll('_', ' ').split(' ').map((word) => 
-          word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1)
-        ).join(' '),
+        listType
+            .replaceAll('_', ' ')
+            .split(' ')
+            .map((word) =>
+                word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1))
+            .join(' '),
         movies: [],
       );
 
@@ -264,9 +269,9 @@ class MovieListService {
 
       // Delete from POD
       if (!_context.mounted) return false;
-      
+
       await deleteFile('user_lists/MovieList-$movieListId.ttl');
-      
+
       // Remove from cache
       _movieListCache.remove(movieListId);
       return true;
@@ -280,4 +285,4 @@ class MovieListService {
   void clearCache() {
     _movieListCache.clear();
   }
-} 
+}

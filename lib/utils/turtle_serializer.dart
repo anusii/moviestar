@@ -22,9 +22,11 @@ import 'package:moviestar/models/movie.dart';
 
 class TurtleSerializer {
   // Define namespaces based on the ontology design.
-  
-  static final moviestarOntoNS = Namespace(ns: 'https://sii.anu.edu.au/onto/moviestar#');
-  static final moviestarDataNS = Namespace(ns: 'https://sii.anu.edu.au/data/moviestar/');
+
+  static final moviestarOntoNS =
+      Namespace(ns: 'https://sii.anu.edu.au/onto/moviestar#');
+  static final moviestarDataNS =
+      Namespace(ns: 'https://sii.anu.edu.au/data/moviestar/');
   static final movieNS = Namespace(ns: 'http://schema.org/');
   static final xsdNS = Namespace(ns: 'http://www.w3.org/2001/XMLSchema#');
   static final rdfsNS = Namespace(ns: 'http://www.w3.org/2000/01/rdf-schema#');
@@ -63,8 +65,9 @@ class TurtleSerializer {
   static final aggregateRating = movieNS.withAttr('aggregateRating');
   static final datePublished = movieNS.withAttr('datePublished');
   static final genre = movieNS.withAttr('genre');
-  static final contentRating = movieNS.withAttr('contentRating');  // Changed to sdo: prefix
-  static final comment = movieNS.withAttr('comment');  // Changed to sdo: prefix
+  static final contentRating =
+      movieNS.withAttr('contentRating'); // Changed to sdo: prefix
+  static final comment = movieNS.withAttr('comment'); // Changed to sdo: prefix
   static final keyValue = moviestarOntoNS.withAttr('keyValue');
   static final source = moviestarOntoNS.withAttr('source');
 
@@ -98,7 +101,7 @@ class TurtleSerializer {
     return {
       'moviestar-onto': moviestarOntoNS,
       'moviestar-data': moviestarDataNS,
-      'sdo': movieNS,  // schema.org uses 'sdo' prefix in ontology
+      'sdo': movieNS, // schema.org uses 'sdo' prefix in ontology
     };
   }
 
@@ -580,7 +583,8 @@ class TurtleSerializer {
 
   /// Creates a user profile in TTL format following the ontology structure.
 
-  static String createUserProfile(String userWebId, {
+  static String createUserProfile(
+    String userWebId, {
     String? apiKey,
     String? dobString,
     String? genderString,
@@ -600,14 +604,14 @@ class TurtleSerializer {
     // Add API key if provided.
 
     if (apiKey != null && apiKey.isNotEmpty) {
-      triples[userResource]![hasApiKey] = 
+      triples[userResource]![hasApiKey] =
           moviestarDataNS.withAttr('ApiKey-${generateId()}');
     }
 
     // Add DOB if provided.
 
     if (dobString != null && dobString.isNotEmpty) {
-      triples[userResource]![dob] = 
+      triples[userResource]![dob] =
           Literal(dobString, datatype: xsdNS.withAttr('date'));
     }
 
@@ -632,7 +636,9 @@ class TurtleSerializer {
 
   /// Creates a MovieList in TTL format following the ontology structure.
 
-  static String createMovieList(String movieListId, String listName, {
+  static String createMovieList(
+    String movieListId,
+    String listName, {
     List<Movie>? movies,
     String? description,
   }) {
@@ -640,20 +646,27 @@ class TurtleSerializer {
 
     // Create the MovieList resource.
 
-    final movieListResource = moviestarDataNS.withAttr('MovieList-$movieListId');
+    final movieListResource =
+        moviestarDataNS.withAttr('MovieList-$movieListId');
     triples[movieListResource] = {
       rdfType: [owlNS.withAttr('NamedIndividual'), movieListType],
-      TurtleSerializer.identifier: Literal(movieListId),  // sdo:identifier to match ontology
-      TurtleSerializer.name: Literal(_escapeAndSanitizeString(listName)),  // sdo:name to match ontology
-      TurtleSerializer.description: Literal(_escapeAndSanitizeString(description ?? 'List of movies: $listName')),  // sdo:description to match ontology
-      rdfsLabel: Literal('|filePath=moviestar/data/MovieList-$movieListId.ttl|'),
+      TurtleSerializer.identifier:
+          Literal(movieListId), // sdo:identifier to match ontology
+      TurtleSerializer.name: Literal(
+          _escapeAndSanitizeString(listName)), // sdo:name to match ontology
+      TurtleSerializer.description: Literal(_escapeAndSanitizeString(
+          description ??
+              'List of movies: $listName')), // sdo:description to match ontology
+      rdfsLabel:
+          Literal('|filePath=moviestar/data/MovieList-$movieListId.ttl|'),
     };
 
     // Add movie references (not full movie data) if provided.
 
     if (movies != null && movies.isNotEmpty) {
       final movieRefs = movies
-          .map((movie) => moviestarDataNS.withAttr('Movie-${movie.id}'))  // Capital M to match ontology
+          .map((movie) => moviestarDataNS
+              .withAttr('Movie-${movie.id}')) // Capital M to match ontology
           .toList();
       triples[movieListResource]![hasMovie] = movieRefs;
 
@@ -661,11 +674,14 @@ class TurtleSerializer {
       // According to ontology, MovieList only contains references with filePath
 
       for (final movie in movies) {
-        final movieResource = moviestarDataNS.withAttr('Movie-${movie.id}');  // Capital M
+        final movieResource =
+            moviestarDataNS.withAttr('Movie-${movie.id}'); // Capital M
         triples[movieResource] = {
           rdfType: [owlNS.withAttr('NamedIndividual'), movieType],
-          filePath: Literal('moviestar/data/movies/Movie-${movie.id}.ttl'),  // Correct path structure
-          rdfsLabel: Literal('|filePath=moviestar/data/movies/Movie-${movie.id}.ttl|'),
+          filePath: Literal(
+              'moviestar/data/movies/Movie-${movie.id}.ttl'), // Correct path structure
+          rdfsLabel:
+              Literal('|filePath=moviestar/data/movies/Movie-${movie.id}.ttl|'),
         };
       }
     }
@@ -677,24 +693,28 @@ class TurtleSerializer {
   /// Updates a single movie with user's personal rating and comment following the ontology structure.
 
   static String movieWithUserDataToTurtleOntology(
-    Movie movie, double? rating, String? comment) {
-    
-
-    
+      Movie movie, double? rating, String? comment) {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
     // Create the movie resource with all movie metadata.
 
-    final movieResource = moviestarDataNS.withAttr('Movie-${movie.id}');  // Capital M to match ontology
+    final movieResource = moviestarDataNS
+        .withAttr('Movie-${movie.id}'); // Capital M to match ontology
     triples[movieResource] = {
       rdfType: [owlNS.withAttr('NamedIndividual'), movieType],
-      identifier: Literal('${movie.id}', datatype: xsdNS.withAttr('positiveInteger')),  // Use positiveInteger like ontology
+      identifier: Literal('${movie.id}',
+          datatype: xsdNS.withAttr(
+              'positiveInteger')), // Use positiveInteger like ontology
       name: Literal(_escapeAndSanitizeString(movie.title)),
       description: Literal(_escapeAndSanitizeString(movie.overview)),
-      image: Literal(_escapeAndSanitizeString(movie.posterUrl), datatype: xsdNS.withAttr('anyURI')),
-      thumbnailUrl: Literal(_escapeAndSanitizeString(movie.backdropUrl), datatype: xsdNS.withAttr('anyURI')),
-      aggregateRating: Literal('${movie.voteAverage}', datatype: xsdNS.withAttr('double')),
-      datePublished: Literal(movie.releaseDate.toIso8601String(), datatype: xsdNS.withAttr('date')),
+      image: Literal(_escapeAndSanitizeString(movie.posterUrl),
+          datatype: xsdNS.withAttr('anyURI')),
+      thumbnailUrl: Literal(_escapeAndSanitizeString(movie.backdropUrl),
+          datatype: xsdNS.withAttr('anyURI')),
+      aggregateRating:
+          Literal('${movie.voteAverage}', datatype: xsdNS.withAttr('double')),
+      datePublished: Literal(movie.releaseDate.toIso8601String(),
+          datatype: xsdNS.withAttr('date')),
       genre: Literal(movie.genreIds.join(',')),
       rdfsLabel: Literal('|name=${_escapeAndSanitizeString(movie.title)}|'),
     };
@@ -702,25 +722,29 @@ class TurtleSerializer {
     // Add user's personal rating if it exists.
 
     if (rating != null) {
-      triples[movieResource]![contentRating] = Literal('$rating', datatype: xsdNS.withAttr('double'));
+      triples[movieResource]![contentRating] =
+          Literal('$rating', datatype: xsdNS.withAttr('double'));
     }
 
     // Add user's personal comment if it exists.
 
     if (comment != null && comment.isNotEmpty) {
-      triples[movieResource]![TurtleSerializer.comment] = Literal(_escapeAndSanitizeString(comment));
+      triples[movieResource]![TurtleSerializer.comment] =
+          Literal(_escapeAndSanitizeString(comment));
     }
 
     // Add JSON backup for compatibility.
     // Sanitize movie data before JSON encoding to avoid UTF-8 byte length issues.
     final sanitizedMovieData = movie.toJson();
     if (sanitizedMovieData['title'] != null) {
-      sanitizedMovieData['title'] = _sanitizeForTtl(sanitizedMovieData['title']);
+      sanitizedMovieData['title'] =
+          _sanitizeForTtl(sanitizedMovieData['title']);
     }
     if (sanitizedMovieData['overview'] != null) {
-      sanitizedMovieData['overview'] = _sanitizeForTtl(sanitizedMovieData['overview']);
+      sanitizedMovieData['overview'] =
+          _sanitizeForTtl(sanitizedMovieData['overview']);
     }
-    
+
     final movieJson = jsonEncode(sanitizedMovieData);
     final userDataJson = jsonEncode({
       'rating': rating,
@@ -728,7 +752,8 @@ class TurtleSerializer {
     });
 
     // Use ontology-compliant namespace bindings.
-    final ttlContent = tripleMapToTurtle(triples, bindNamespaces: _getOntologyNamespaces());
+    final ttlContent =
+        tripleMapToTurtle(triples, bindNamespaces: _getOntologyNamespaces());
     final withJsonBackup =
         '$ttlContent\n\n# JSON_MOVIE_DATA: $movieJson\n# JSON_USER_DATA: $userDataJson';
 
@@ -736,7 +761,9 @@ class TurtleSerializer {
   }
 
   /// Creates an API key file in TTL format following the ontology structure.
-  static String createApiKey(String apiKeyId, String apiKeyValue, {
+  static String createApiKey(
+    String apiKeyId,
+    String apiKeyValue, {
     String source = 'TMDB',
   }) {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
@@ -758,20 +785,20 @@ class TurtleSerializer {
   /// Generates a unique ID for resources.
 
   static String generateId() {
-    return DateTime.now().millisecondsSinceEpoch.toString() + 
-           (1000 + (DateTime.now().microsecond % 9000)).toString();
+    return DateTime.now().millisecondsSinceEpoch.toString() +
+        (1000 + (DateTime.now().microsecond % 9000)).toString();
   }
 
   /// Parses a MovieList from TTL content and extracts movies.
   /// Returns a map containing movieList metadata and movies list.
-  
+
   static Map<String, dynamic>? movieListFromTurtle(String ttlContent) {
     try {
       print('🔍 Parsing MovieList TTL content...');
-      
+
       // Parse using proper RDF
       final triples = turtleToTripleMap(ttlContent);
-      
+
       String? listId;
       String? listName;
       String? description;
@@ -781,7 +808,8 @@ class TurtleSerializer {
       // Find MovieList resource and extract movie references
       for (final subject in triples.keys) {
         final predicates = triples[subject]!;
-        final typeValues = predicates['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] ?? [];
+        final typeValues =
+            predicates['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] ?? [];
 
         // Check for MovieList
         final isMovieList = typeValues.any((type) =>
@@ -790,13 +818,13 @@ class TurtleSerializer {
 
         if (isMovieList) {
           print('📋 Found MovieList resource: $subject');
-          
+
           // Extract MovieList metadata
           for (final predicate in predicates.keys) {
             final values = predicates[predicate]!;
             if (values.isNotEmpty) {
               final value = values.first.toString();
-              
+
               if (predicate.contains('identifier')) {
                 listId = value;
               } else if (predicate.contains('name')) {
@@ -810,10 +838,12 @@ class TurtleSerializer {
                 for (final movieRef in values) {
                   final movieRefStr = movieRef.toString();
                   // Extract movie ID from resource URI like "Movie-12345" (capital M)
-                  final movieIdMatch = RegExp(r'Movie-(\d+)').firstMatch(movieRefStr);
+                  final movieIdMatch =
+                      RegExp(r'Movie-(\d+)').firstMatch(movieRefStr);
                   if (movieIdMatch != null) {
                     movieResourceIds.add(movieIdMatch.group(1)!);
-                    print('🎬 Found movie reference: Movie-${movieIdMatch.group(1)}');
+                    print(
+                        '🎬 Found movie reference: Movie-${movieIdMatch.group(1)}');
                   }
                 }
               }
@@ -832,7 +862,8 @@ class TurtleSerializer {
           // The full movie data should be loaded separately when needed
           final movie = Movie(
             id: int.parse(movieId),
-            title: 'Movie $movieId', // Placeholder - real title loaded from movie file
+            title:
+                'Movie $movieId', // Placeholder - real title loaded from movie file
             overview: '',
             posterUrl: '',
             backdropUrl: '',
@@ -847,7 +878,8 @@ class TurtleSerializer {
         }
       }
 
-      print('✅ MovieList parsed - ID: $listId, Name: $listName, Movies: ${movies.length}');
+      print(
+          '✅ MovieList parsed - ID: $listId, Name: $listName, Movies: ${movies.length}');
 
       return {
         'id': listId,
@@ -924,19 +956,20 @@ class TurtleSerializer {
 
         if (isMovie && movie == null) {
           movie = _extractMovieFromTriples(predicates);
-          
+
           // Also check for rating and comment in the same movie resource (new ontology format)
           if (rating == null) {
             final contentRatingKey = predicates.keys.firstWhere(
               (key) => key.toString().contains('contentRating'),
               orElse: () => '',
             );
-            if (contentRatingKey.isNotEmpty && predicates[contentRatingKey]!.isNotEmpty) {
+            if (contentRatingKey.isNotEmpty &&
+                predicates[contentRatingKey]!.isNotEmpty) {
               final rawValue = predicates[contentRatingKey]!.first.toString();
               rating = double.tryParse(rawValue);
             }
           }
-          
+
           if (comment == null) {
             final commentKey = predicates.keys.firstWhere(
               (key) => key.toString().contains('comment'),
@@ -1015,55 +1048,56 @@ class TurtleSerializer {
       print('🚨 FOUND CORRUPTION: Input contains "â" character');
       print('🔧 Full input text: "$input"');
     }
-    
+
     final result = input
         // Fix UTF-8 corruption issues (primary fixes)
-        .replaceAll('â', "'")     // Fix corrupted apostrophe (main issue)
-        .replaceAll('â€™', "'")   // Fix another common apostrophe corruption
-        .replaceAll('â€œ', '"')   // Fix corrupted opening quote
+        .replaceAll('â', "'") // Fix corrupted apostrophe (main issue)
+        .replaceAll('â€™', "'") // Fix another common apostrophe corruption
+        .replaceAll('â€œ', '"') // Fix corrupted opening quote
         .replaceAll('â€\u009d', '"') // Fix corrupted closing quote
-        .replaceAll('â€"', '-')   // Fix corrupted em dash
+        .replaceAll('â€"', '-') // Fix corrupted em dash
         .replaceAll('â€¦', '...') // Fix corrupted ellipsis
-        
+
         // Fix remaining curly quotes to ASCII equivalents
-        .replaceAll('"', '"')     // Replace curly quotes with straight quotes
-        .replaceAll('"', '"')     // Replace curly quotes with straight quotes
+        .replaceAll('"', '"') // Replace curly quotes with straight quotes
+        .replaceAll('"', '"') // Replace curly quotes with straight quotes
         .replaceAll(''', "'")     // Replace curly single quotes
-        .replaceAll(''', "'")     // Replace curly single quotes
-        .replaceAll('–', '-')     // Replace em dashes with hyphens
-        .replaceAll('—', '-')     // Replace em dashes with hyphens
-        .replaceAll('…', '...')   // Replace ellipsis with dots
-        
+        .replaceAll(''', "'") // Replace curly single quotes
+        .replaceAll('–', '-') // Replace em dashes with hyphens
+        .replaceAll('—', '-') // Replace em dashes with hyphens
+        .replaceAll('…', '...') // Replace ellipsis with dots
+
         // Fix accented characters to ASCII equivalents
-        .replaceAll('é', 'e')     // Replace accented e
-        .replaceAll('è', 'e')     // Replace accented e
-        .replaceAll('ê', 'e')     // Replace accented e
-        .replaceAll('à', 'a')     // Replace accented a
-        .replaceAll('á', 'a')     // Replace accented a
-        .replaceAll('ã', 'a')     // Replace accented a
-        .replaceAll('å', 'a')     // Replace accented a
-        .replaceAll('ç', 'c')     // Replace accented c
-        .replaceAll('ñ', 'n')     // Replace accented n
-        .replaceAll('ü', 'u')     // Replace accented u
-        .replaceAll('û', 'u')     // Replace accented u
-        .replaceAll('ù', 'u')     // Replace accented u
-        .replaceAll('ú', 'u')     // Replace accented u
-        .replaceAll('ö', 'o')     // Replace accented o
-        .replaceAll('ô', 'o')     // Replace accented o
-        .replaceAll('ò', 'o')     // Replace accented o
-        .replaceAll('ó', 'o')     // Replace accented o
-        .replaceAll('ä', 'a')     // Replace accented a
-        .replaceAll('î', 'i')     // Replace accented i
-        .replaceAll('ï', 'i')     // Replace accented i
-        .replaceAll('ì', 'i')     // Replace accented i
-        .replaceAll('í', 'i');    // Replace accented i
-    
+        .replaceAll('é', 'e') // Replace accented e
+        .replaceAll('è', 'e') // Replace accented e
+        .replaceAll('ê', 'e') // Replace accented e
+        .replaceAll('à', 'a') // Replace accented a
+        .replaceAll('á', 'a') // Replace accented a
+        .replaceAll('ã', 'a') // Replace accented a
+        .replaceAll('å', 'a') // Replace accented a
+        .replaceAll('ç', 'c') // Replace accented c
+        .replaceAll('ñ', 'n') // Replace accented n
+        .replaceAll('ü', 'u') // Replace accented u
+        .replaceAll('û', 'u') // Replace accented u
+        .replaceAll('ù', 'u') // Replace accented u
+        .replaceAll('ú', 'u') // Replace accented u
+        .replaceAll('ö', 'o') // Replace accented o
+        .replaceAll('ô', 'o') // Replace accented o
+        .replaceAll('ò', 'o') // Replace accented o
+        .replaceAll('ó', 'o') // Replace accented o
+        .replaceAll('ä', 'a') // Replace accented a
+        .replaceAll('î', 'i') // Replace accented i
+        .replaceAll('ï', 'i') // Replace accented i
+        .replaceAll('ì', 'i') // Replace accented i
+        .replaceAll('í', 'i'); // Replace accented i
+
     // Debug: Log if any changes were made
     if (result != input) {
       print('🔧 Sanitization applied: "brotherâs" → "brother\'s"');
-      print('🔧 Result length: ${result.length}, Input length: ${input.length}');
+      print(
+          '🔧 Result length: ${result.length}, Input length: ${input.length}');
     }
-    
+
     return result;
   }
 

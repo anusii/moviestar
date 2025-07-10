@@ -31,6 +31,7 @@ import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
+import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
@@ -48,12 +49,16 @@ class MovieDetailsScreen extends StatefulWidget {
 
   final FavoritesService favoritesService;
 
+  /// Optional shared movie data (rating, comments) for when viewing shared movies
+  final Map<String, dynamic>? sharedMovieData;
+
   /// Creates a new [MovieDetailsScreen] widget.
 
   const MovieDetailsScreen({
     super.key,
     required this.movie,
     required this.favoritesService,
+    this.sharedMovieData,
   });
 
   @override
@@ -115,6 +120,10 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
   bool _hasMovieFile = false;
 
+  // Indicates whether this is a shared movie (read-only view).
+
+  bool get _isSharedMovie => widget.sharedMovieData != null;
+
   @override
   void initState() {
     super.initState();
@@ -170,6 +179,19 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   }
 
   Future<void> _loadPersonalRating() async {
+    // If this is a shared movie, use the shared rating data.
+
+    if (widget.sharedMovieData != null) {
+      final sharedRating = widget.sharedMovieData!['rating'] as double?;
+      setState(() {
+        _personalRating = sharedRating;
+        _isLoadingRating = false;
+      });
+      return;
+    }
+
+    // Otherwise, load from user's own POD data.
+
     final rating = await widget.favoritesService.getPersonalRating(
       widget.movie,
     );
@@ -180,6 +202,12 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   }
 
   Future<void> _updateRating(double? rating) async {
+    // Don't allow rating updates for shared movies.
+
+    if (_isSharedMovie) {
+      return;
+    }
+
     if (rating == null) {
       await widget.favoritesService.removePersonalRating(widget.movie);
     } else {
@@ -215,6 +243,20 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   }
 
   Future<void> _loadPersonalComments() async {
+    // If this is a shared movie, use the shared comments data.
+
+    if (widget.sharedMovieData != null) {
+      final sharedComments = widget.sharedMovieData!['comments'] as String?;
+      setState(() {
+        _personalComments = sharedComments;
+        _commentsController.text = sharedComments ?? '';
+        _isLoadingComments = false;
+      });
+      return;
+    }
+
+    // Otherwise, load from user's own POD data.
+
     final comments = await widget.favoritesService.getMovieComments(
       widget.movie,
     );
@@ -226,6 +268,12 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   }
 
   Future<void> _updateComments(String? comments) async {
+    // Don't allow comment updates for shared movies.
+
+    if (_isSharedMovie) {
+      return;
+    }
+
     if (comments == null || comments.trim().isEmpty) {
       await widget.favoritesService.removeMovieComments(widget.movie);
     } else {
@@ -304,38 +352,93 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     });
   }
 
-  /// Shows the sharing dialog.
+  // Shares the movie file using GrantPermissionUi.
 
-  void _showSharingDialog() {
+  Future<void> _shareMovie() async {
+    try {
+      // Check if user has POD storage enabled and is using the adapter.
+
+      if (widget.favoritesService is! FavoritesServiceAdapter) {
+        _showErrorDialog('POD storage is required for sharing');
+        return;
+      }
+
+      final adapter = widget.favoritesService as FavoritesServiceAdapter;
+
+      // Check if POD storage is enabled.
+
+      if (!adapter.isPodStorageEnabled) {
+        _showErrorDialog('POD storage must be enabled to share movies');
+        return;
+      }
+
+      // Check if the movie file exists (user has rated or commented).
+
+      final hasFile = await widget.favoritesService.hasMovieFile(widget.movie);
+      if (!hasFile) {
+        _showErrorDialog(
+          'No movie file to share. Please rate or comment on this movie first.',
+        );
+        return;
+      }
+
+      // Get the movie file path using the service method and make it relative.
+
+      final fullPath = adapter.getMovieFilePath(widget.movie);
+      final movieFilePath = fullPath?.replaceFirst('moviestar/data/', '') ??
+          'movies/Movie-${widget.movie.id}.ttl';
+
+      // Navigate directly to GrantPermissionUi with improved theming and pre-selected options.
+
+      if (!mounted) return;
+
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Theme(
+            data: Theme.of(context),
+            child: GrantPermissionUi(
+              fileName: movieFilePath,
+              title: 'Share "${widget.movie.title}"',
+              accessModeList: const ['read'],
+              recipientList: const ['indi'],
+              showAppBar: true,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              child: widget,
+            ),
+          ),
+        ),
+      );
+
+      // Movie sharing is now tracked through POD permission logs automatically.
+      // No need for manual recording.
+    } catch (e) {
+      _showErrorDialog('Error sharing movie: $e');
+    }
+  }
+
+  // Shows an error dialog with the given message.
+
+  void _showErrorDialog(String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: const Text(
-          'Share Movie',
-          style: TextStyle(color: Colors.white),
+        backgroundColor: Theme.of(context).colorScheme.errorContainer,
+        title: Text(
+          'Cannot Share Movie',
+          style:
+              TextStyle(color: Theme.of(context).colorScheme.onErrorContainer),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Share "${widget.movie.title}" and your review',
-              style: const TextStyle(color: Colors.white),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Sharing functionality will be implemented in future updates.',
-              style: TextStyle(color: Colors.grey),
-            ),
-          ],
+        content: Text(
+          message,
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Close',
-              style: TextStyle(color: Colors.blue),
+            child: Text(
+              'OK',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
             ),
           ),
         ],
@@ -346,13 +449,13 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
-            backgroundColor: Colors.black,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             flexibleSpace: FlexibleSpaceBar(
               background: CachedNetworkImage(
                 imageUrl: widget.movie.backdropUrl,
@@ -375,8 +478,8 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                       Expanded(
                         child: Text(
                           widget.movie.title,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
@@ -389,7 +492,9 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                               _isInToWatch
                                   ? Icons.bookmark
                                   : Icons.bookmark_border,
-                              color: _isInToWatch ? Colors.blue : Colors.white,
+                              color: _isInToWatch
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.onSurface,
                             ),
                             onPressed: _toggleToWatch,
                             tooltip: _isInToWatch
@@ -401,7 +506,9 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                               _isInWatched
                                   ? Icons.check_circle
                                   : Icons.check_circle_outline,
-                              color: _isInWatched ? Colors.green : Colors.white,
+                              color: _isInWatched
+                                  ? Theme.of(context).colorScheme.tertiary
+                                  : Theme.of(context).colorScheme.onSurface,
                             ),
                             onPressed: _toggleWatched,
                             tooltip: _isInWatched
@@ -419,13 +526,16 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
 **Share this movie and my review**
 
-Share your rating and comments for this movie with others.
+Share your rating and comments for this movie with friends via their WebID.
+Your shared movies will appear in their "Shared with Me" tab.
 
                               ''',
                               child: IconButton(
-                                icon: const Icon(Icons.share,
-                                    color: Colors.white),
-                                onPressed: _showSharingDialog,
+                                icon: Icon(Icons.share,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
+                                onPressed: _shareMovie,
                               ),
                             ),
                         ],
@@ -435,26 +545,43 @@ Share your rating and comments for this movie with others.
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 20),
+                      Icon(
+                        Icons.star,
+                        color: _isSharedMovie && _personalRating != null
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.amber,
+                        size: 20,
+                      ),
                       const SizedBox(width: 4),
                       Text(
-                        widget.movie.voteAverage.toStringAsFixed(1),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        _isSharedMovie && _personalRating != null
+                            ? _personalRating!.toStringAsFixed(1)
+                            : widget.movie.voteAverage.toStringAsFixed(1),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 16,
                         ),
                       ),
+                      if (_isSharedMovie && _personalRating != null)
+                        Text(
+                          ' (shared)',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
                       const SizedBox(width: 16),
-                      const Icon(
+                      Icon(
                         Icons.calendar_today,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         size: 20,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         DateFormatUtil.formatShort(widget.movie.releaseDate),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 16,
                         ),
                       ),
@@ -462,13 +589,47 @@ Share your rating and comments for this movie with others.
                   ),
                   const SizedBox(height: 16),
 
+                  // Shared Movie Indicator.
+
+                  if (_isSharedMovie)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                            color: Theme.of(context).colorScheme.primary,
+                            width: 1),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.share,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            'This movie was shared by ${widget.sharedMovieData!['sharedBy'] ?? 'someone'}',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
                   // Personal Rating Section,
                   Row(
                     children: [
-                      const Text(
-                        'Your Rating',
+                      Text(
+                        _isSharedMovie ? 'Shared Rating' : 'Your Rating',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -481,13 +642,13 @@ Share your rating and comments for this movie with others.
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.green,
+                            color: Theme.of(context).colorScheme.tertiary,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Text(
+                          child: Text(
                             'SAVED',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onTertiary,
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                             ),
@@ -501,41 +662,106 @@ Share your rating and comments for this movie with others.
                       : Row(
                           children: [
                             Expanded(
-                              child: Slider(
-                                value: _personalRating ?? 0,
-                                min: 0,
-                                max: 10,
-                                divisions: 100,
-                                label: _personalRating?.toStringAsFixed(1) ??
-                                    '0.0',
-                                onChanged: (value) => _updateRating(value),
+                              child: SliderTheme(
+                                data: SliderTheme.of(context).copyWith(
+                                  // Track colors.
+
+                                  activeTrackColor: _isSharedMovie
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.amber,
+                                  inactiveTrackColor:
+                                      Theme.of(context).colorScheme.outline,
+                                  disabledActiveTrackColor: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withValues(alpha: 0.7),
+                                  disabledInactiveTrackColor:
+                                      Theme.of(context).colorScheme.outline,
+
+                                  // Thumb colors.
+
+                                  thumbColor: _isSharedMovie
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.amber,
+                                  disabledThumbColor:
+                                      Theme.of(context).colorScheme.primary,
+
+                                  // Track height.
+
+                                  trackHeight: 4.0,
+
+                                  // Thumb size.
+
+                                  thumbShape: const RoundSliderThumbShape(
+                                      enabledThumbRadius: 8.0),
+
+                                  // Overlay (when pressed).
+
+                                  overlayColor: (_isSharedMovie
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Colors.amber)
+                                      .withValues(alpha: 0.2),
+
+                                  // Value indicator (tooltip).
+
+                                  valueIndicatorColor: _isSharedMovie
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.amber,
+                                  valueIndicatorTextStyle: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                child: Slider(
+                                  value: _personalRating ?? 0,
+                                  min: 0,
+                                  max: 10,
+                                  divisions: 100,
+                                  label: _personalRating?.toStringAsFixed(1) ??
+                                      '0.0',
+                                  onChanged: _isSharedMovie
+                                      ? null
+                                      : (value) => _updateRating(value),
+                                ),
                               ),
                             ),
-                            IconButton(
-                              icon:
-                                  const Icon(Icons.clear, color: Colors.white),
-                              onPressed: _personalRating == null
-                                  ? null
-                                  : () => _updateRating(null),
-                              tooltip: 'Clear rating',
-                            ),
+                            if (!_isSharedMovie)
+                              IconButton(
+                                icon: Icon(Icons.clear,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
+                                onPressed: _personalRating == null
+                                    ? null
+                                    : () => _updateRating(null),
+                                tooltip: 'Clear rating',
+                              ),
                           ],
                         ),
                   Text(
                     _personalRating == null
-                        ? 'No rating yet'
-                        : 'Your rating: ${_personalRating!.toStringAsFixed(1)}/10',
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                        ? (_isSharedMovie
+                            ? 'No rating shared'
+                            : 'No rating yet')
+                        : (_isSharedMovie
+                            ? 'Shared rating: ${_personalRating!.toStringAsFixed(1)}/10'
+                            : 'Your rating: ${_personalRating!.toStringAsFixed(1)}/10'),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 16),
                   ),
                   const SizedBox(height: 16),
 
                   // Personal Comments Section
                   Row(
                     children: [
-                      const Text(
-                        'My Comments',
+                      Text(
+                        _isSharedMovie ? 'Shared Comments' : 'My Comments',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -548,13 +774,13 @@ Share your rating and comments for this movie with others.
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.orange,
+                            color: Theme.of(context).colorScheme.secondary,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Text(
+                          child: Text(
                             'UNSAVED',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSecondary,
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                             ),
@@ -568,13 +794,13 @@ Share your rating and comments for this movie with others.
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.green,
+                            color: Theme.of(context).colorScheme.tertiary,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Text(
+                          child: Text(
                             'SAVED',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onTertiary,
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                             ),
@@ -590,78 +816,105 @@ Share your rating and comments for this movie with others.
                           children: [
                             TextField(
                               controller: _commentsController,
-                              style: const TextStyle(color: Colors.white),
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
                               maxLines: 4,
+                              readOnly: _isSharedMovie,
                               decoration: InputDecoration(
-                                hintText:
-                                    'Add your thoughts about this movie...',
-                                hintStyle: const TextStyle(color: Colors.grey),
+                                hintText: _isSharedMovie
+                                    ? 'No comments shared...'
+                                    : 'Add your thoughts about this movie...',
+                                hintStyle: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant),
                                 filled: true,
-                                fillColor: Colors.grey[900],
+                                fillColor: _isSharedMovie
+                                    ? Theme.of(context)
+                                        .colorScheme
+                                        .surfaceContainerHigh
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .surfaceContainer,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   borderSide: BorderSide.none,
                                 ),
                               ),
-                              onChanged: (value) {
-                                // Mark as modified when user types.
+                              onChanged: _isSharedMovie
+                                  ? null
+                                  : (value) {
+                                      // Mark as modified when user types.
 
-                                setState(() {
-                                  _commentsModified = true;
-                                  _commentsSaved = false;
-                                });
-                                // Cancel the saved timer since user is editing again.
+                                      setState(() {
+                                        _commentsModified = true;
+                                        _commentsSaved = false;
+                                      });
+                                      // Cancel the saved timer since user is editing again.
 
-                                _commentsSavedTimer?.cancel();
-                              },
-                              onSubmitted: (value) {
-                                // Save when user presses Enter (if modified).
+                                      _commentsSavedTimer?.cancel();
+                                    },
+                              onSubmitted: _isSharedMovie
+                                  ? null
+                                  : (value) {
+                                      // Save when user presses Enter (if modified).
 
-                                if (_commentsModified) {
-                                  _saveComments();
-                                }
-                              },
+                                      if (_commentsModified) {
+                                        _saveComments();
+                                      }
+                                    },
                             ),
                             const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                if (_commentsModified)
-                                  ElevatedButton.icon(
-                                    icon: const Icon(Icons.save, size: 18),
-                                    label: const Text('Save Comments'),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue,
-                                      foregroundColor: Colors.white,
+                            if (!_isSharedMovie)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  if (_commentsModified)
+                                    ElevatedButton.icon(
+                                      icon: const Icon(Icons.save, size: 18),
+                                      label: const Text('Save Comments'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        foregroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimary,
+                                      ),
+                                      onPressed: _saveComments,
                                     ),
-                                    onPressed: _saveComments,
-                                  ),
-                                if (_commentsModified &&
-                                    (_personalComments != null &&
-                                        _personalComments!.isNotEmpty))
-                                  const SizedBox(width: 8),
-                                if (_personalComments != null &&
-                                    _personalComments!.isNotEmpty)
-                                  TextButton.icon(
-                                    icon: const Icon(
-                                      Icons.clear,
-                                      color: Colors.white,
+                                  if (_commentsModified &&
+                                      (_personalComments != null &&
+                                          _personalComments!.isNotEmpty))
+                                    const SizedBox(width: 8),
+                                  if (_personalComments != null &&
+                                      _personalComments!.isNotEmpty)
+                                    TextButton.icon(
+                                      icon: Icon(
+                                        Icons.clear,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                      ),
+                                      label: Text(
+                                        'Clear Comments',
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface),
+                                      ),
+                                      onPressed: _clearComments,
                                     ),
-                                    label: const Text(
-                                      'Clear Comments',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    onPressed: _clearComments,
-                                  ),
-                              ],
-                            ),
+                                ],
+                              ),
                           ],
                         ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Overview',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -669,8 +922,8 @@ Share your rating and comments for this movie with others.
                   const SizedBox(height: 8),
                   Text(
                     widget.movie.overview,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       height: 1.5,
                     ),

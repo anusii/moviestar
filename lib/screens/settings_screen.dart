@@ -28,9 +28,11 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:solidpod/solidpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:moviestar/database/movie_cache_repository.dart';
+import 'package:moviestar/main.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
@@ -731,8 +733,10 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
             _buildListTile('Help & Support', Icons.help_outline, () {
               // TODO: Navigate to Help & Support.
             }),
-            _buildListTile('Sign Out', Icons.logout, () {
-              // TODO: Implement sign out.
+            _buildListTile('Sign Out', Icons.logout, () async {
+              // Show logout confirmation dialog and handle logout.
+
+              await logoutPopup(context, const MyApp());
             }, isDestructive: true),
           ]),
         ],

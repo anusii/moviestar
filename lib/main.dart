@@ -34,9 +34,9 @@ import 'package:window_manager/window_manager.dart';
 import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
-import 'package:moviestar/screens/downloads_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
+import 'package:moviestar/screens/shared_movies_screen.dart';
 import 'package:moviestar/screens/to_watch_screen.dart';
 import 'package:moviestar/screens/watched_screen.dart';
 import 'package:moviestar/services/api_key_service.dart';
@@ -205,7 +205,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         favoritesService: _favoritesService,
       ),
       ComingSoonScreen(favoritesService: _favoritesService),
-      const DownloadsScreen(),
+      const SharedMoviesScreen(),
       const FileService(),
       SettingsScreen(
         favoritesService: _favoritesService,
@@ -263,8 +263,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               : _screens[_selectedIndex],
 
           // Theme toggle positioned to be visible near debug banner.
-          // Hide when on Settings page (index 4) since it has its own theme toggle.
-          if (_selectedIndex != 4)
+          // Hide when on Settings page (index 6) since it has its own theme toggle.
+
+          if (_selectedIndex != 6)
             const FloatingThemeToggle(right: 70, top: 16),
         ],
       ),
@@ -286,8 +287,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             label: 'Coming Soon',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.download),
-            label: 'Downloads',
+            icon: Icon(Icons.movie_outlined),
+            label: 'My Movies',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.folder), label: 'Files'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Settings'),

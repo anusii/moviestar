@@ -624,7 +624,7 @@ class TurtleSerializer {
 
     if (apiKey != null && apiKey.isNotEmpty) {
       triples[userResource]![hasApiKey] =
-          moviestarDataNS.withAttr('ApiKey-${generateId()}');
+          moviestarDataNS.withAttr('ApiKey-$apiKey');
     }
 
     // Add DOB if provided.

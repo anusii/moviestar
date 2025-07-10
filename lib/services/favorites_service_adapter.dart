@@ -94,6 +94,15 @@ class FavoritesServiceAdapter extends FavoritesService {
       _manager.removeMovieComments(movie);
 
   @override
+  Future<bool> hasMovieFile(Movie movie) => _manager.hasMovieFile(movie);
+
+  @override
+  String? getMovieFilePath(Movie movie) => _manager.getMovieFilePath(movie);
+
+  /// Checks if POD storage is currently enabled.
+  bool get isPodStorageEnabled => _manager.isPodStorageEnabled;
+
+  @override
   void dispose() {
     // Don't dispose the manager as other components may still be using it.
 

@@ -100,6 +100,7 @@ class FavoritesServiceAdapter extends FavoritesService {
   String? getMovieFilePath(Movie movie) => _manager.getMovieFilePath(movie);
 
   /// Checks if POD storage is currently enabled.
+
   bool get isPodStorageEnabled => _manager.isPodStorageEnabled;
 
   @override

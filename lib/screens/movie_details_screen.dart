@@ -416,9 +416,11 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                                   .isPodStorageEnabled)
                             MarkdownTooltip(
                               message: '''
+
 **Share this movie and my review**
 
 Share your rating and comments for this movie with others.
+
                               ''',
                               child: IconButton(
                                 icon: const Icon(Icons.share,

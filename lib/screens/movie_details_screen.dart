@@ -49,7 +49,8 @@ class MovieDetailsScreen extends StatefulWidget {
 
   final FavoritesService favoritesService;
 
-  /// Optional shared movie data (rating, comments) for when viewing shared movies
+  /// Optional shared movie data (rating, comments) for when viewing shared movies.
+
   final Map<String, dynamic>? sharedMovieData;
 
   /// Creates a new [MovieDetailsScreen] widget.

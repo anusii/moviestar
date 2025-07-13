@@ -69,6 +69,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _scrollControllers['toWatch'] = ScrollController();
+    _scrollControllers['watched'] = ScrollController();
     _scrollControllers['popular'] = ScrollController();
     _scrollControllers['nowPlaying'] = ScrollController();
     _scrollControllers['topRated'] = ScrollController();
@@ -494,6 +496,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildMovieRow(
+                'To Watch',
+                popularMovies,
+                'toWatch',
+                CacheCategory.popular,
+              ),
+              _buildMovieRow(
+                'Watched',
+                popularMovies,
+                'watched',
+                CacheCategory.popular,
+              ),
               _buildMovieRow(
                 'Popular on Movie Star',
                 popularMovies,

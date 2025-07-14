@@ -1,6 +1,6 @@
-/// Main home screen of the Movie Star application, displaying featured and trending movies.
+/// Moviestar - Manage and share ratings through private PODs
 ///
-// Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
+// Time-stamp: <Tuesday 2025-07-15 07:12:49 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -40,7 +40,8 @@ import 'package:moviestar/widgets/cache_feedback_widget.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
-/// A screen that displays various movie categories and trending content with caching.
+/// Main home screen of the Movie Star application, displaying featured and
+/// trending movies.
 
 class HomeScreen extends ConsumerStatefulWidget {
   /// Service for managing favorite movies.
@@ -55,14 +56,14 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-/// State class for the home screen.
+// State class for the home screen.
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  /// Map of scroll controllers for different movie categories.
+  // Map of scroll controllers for different movie categories.
 
   final Map<String, ScrollController> _scrollControllers = {};
 
-  /// Track if initial load feedback has been shown.
+  // Track if initial load feedback has been shown.
 
   bool _hasShownInitialFeedback = false;
 
@@ -85,7 +86,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-  /// Builds the to-watch movies row using FavoritesServiceAdapter stream.
+  // Builds the to-watch movies row using FavoritesServiceAdapter stream.
 
   Widget _buildToWatchMovieRow() {
     final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
@@ -134,7 +135,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Builds the content for to-watch movies based on stream state.
+  // Builds the content for to-watch movies based on stream state.
 
   Widget _buildToWatchMovieContent(
     AsyncSnapshot<List<Movie>> snapshot,
@@ -209,7 +210,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Builds the watched movies row using FavoritesServiceAdapter stream.
+  // Builds the watched movies row using FavoritesServiceAdapter stream.
 
   Widget _buildWatchedMovieRow() {
     final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
@@ -257,7 +258,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Builds the content for watched movies based on stream state.
+  // Builds the content for watched movies based on stream state.
 
   Widget _buildWatchedMovieContent(
     AsyncSnapshot<List<Movie>> snapshot,
@@ -332,7 +333,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Builds a horizontal scrollable row of movies with cache indicators.
+  // Builds a horizontal scrollable row of movies with cache indicators.
 
   Widget _buildMovieRow(
     String title,
@@ -422,7 +423,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Builds cache indicator for section headers.
+  // Builds cache indicator for section headers.
 
   Widget _buildSectionCacheIndicator(
     AsyncValue<CacheResult<List<Movie>>> moviesAsync,
@@ -449,7 +450,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Builds offline mode badge.
+  // Builds offline mode badge.
 
   Widget _buildOfflineModeBadge() {
     return Container(
@@ -476,7 +477,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Builds cache age badge.
+  // Builds cache age badge.
 
   Widget _buildCacheAgeBadge(Duration cacheAge) {
     final ageText = _formatCacheAge(cacheAge);
@@ -504,7 +505,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Builds cache badge for fresh cache data.
+  // Builds cache badge for fresh cache data.
 
   Widget _buildCacheBadge() {
     return Container(
@@ -531,7 +532,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Builds network badge for fresh data.
+  // Builds network badge for fresh data.
 
   Widget _buildNetworkBadge() {
     return Container(
@@ -558,7 +559,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Formats cache age into human-readable string.
+  // Formats cache age into human-readable string.
 
   String _formatCacheAge(Duration age) {
     if (age.inDays > 0) {
@@ -572,7 +573,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
-  /// Forces refresh of all movie data.
+  // Forces refresh of all movie data.
 
   Future<void> _forceRefresh() async {
     // Invalidate all providers to force refresh.
@@ -589,7 +590,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     await cachedService.forceRefreshAll();
   }
 
-  /// Shows cache performance feedback after initial load.
+  // Shows cache performance feedback after initial load.
 
   void _showCachePerformanceFeedback() {
     if (_hasShownInitialFeedback) return;

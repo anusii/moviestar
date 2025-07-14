@@ -85,6 +85,129 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
+  /// Builds the to-watch movies row using FavoritesServiceAdapter stream.
+  
+  Widget _buildToWatchMovieRow() {
+    final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
+    
+    return StreamBuilder<List<Movie>>(
+      stream: widget.favoritesService.toWatchMovies,
+      builder: (context, snapshot) {
+        final cacheResult = CacheResult(
+          data: snapshot.data ?? [],
+          fromCache: false, // User favorites data is not cached like API data.
+          cacheAge: null,
+          cachedAt: null,
+        );
+        
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'To Watch',
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.headlineMedium?.color,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  // No cache indicator for user data.
+
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 200,
+              child: _buildToWatchMovieContent(snapshot, cacheResult, cacheOnlyMode),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
+  /// Builds the content for to-watch movies based on stream state.
+  
+  Widget _buildToWatchMovieContent(
+    AsyncSnapshot<List<Movie>> snapshot,
+    CacheResult<List<Movie>> cacheResult,
+    bool cacheOnlyMode,
+  ) {
+    if (snapshot.hasError) {
+      return ErrorDisplayWidget.compact(
+        message: 'Failed to load To Watch',
+        onRetry: () {
+          // No specific retry action for user data.
+        },
+      );
+    }
+    
+    if (!snapshot.hasData) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    
+    final movies = cacheResult.data;
+    if (movies.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Text(
+            'No movies in your to-watch list yet',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
+      );
+    }
+    
+    return Scrollbar(
+      controller: _scrollControllers['toWatch'],
+      thickness: 6,
+      radius: const Radius.circular(3),
+      thumbVisibility: true,
+      child: ListView.builder(
+        controller: _scrollControllers['toWatch'],
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        itemCount: movies.length,
+        itemBuilder: (context, index) {
+          final movie = movies[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: MovieCard.poster(
+              movie: movie,
+              fromCache: cacheResult.fromCache,
+              cacheAge: cacheResult.cacheAge,
+              cacheOnlyMode: cacheOnlyMode,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MovieDetailsScreen(
+                      movie: movie,
+                      favoritesService: widget.favoritesService,
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   /// Builds the watched movies row using FavoritesServiceAdapter stream.
   
   Widget _buildWatchedMovieRow() {
@@ -618,12 +741,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildMovieRow(
-                'To Watch',
-                popularMovies,
-                'toWatch',
-                CacheCategory.popular,
-              ),
+              _buildToWatchMovieRow(),
               _buildWatchedMovieRow(),
               _buildMovieRow(
                 'Popular on Movie Star',

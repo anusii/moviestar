@@ -86,10 +86,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   /// Builds the to-watch movies row using FavoritesServiceAdapter stream.
-  
+
   Widget _buildToWatchMovieRow() {
     final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
-    
+
     return StreamBuilder<List<Movie>>(
       stream: widget.favoritesService.toWatchMovies,
       builder: (context, snapshot) {
@@ -99,7 +99,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           cacheAge: null,
           cachedAt: null,
         );
-        
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -111,7 +111,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Text(
                       'To Watch',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.headlineMedium?.color,
+                        color:
+                            Theme.of(context).textTheme.headlineMedium?.color,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -119,22 +120,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
 
                   // No cache indicator for user data.
-
                 ],
               ),
             ),
             SizedBox(
               height: 200,
-              child: _buildToWatchMovieContent(snapshot, cacheResult, cacheOnlyMode),
+              child: _buildToWatchMovieContent(
+                  snapshot, cacheResult, cacheOnlyMode),
             ),
           ],
         );
       },
     );
   }
-  
+
   /// Builds the content for to-watch movies based on stream state.
-  
+
   Widget _buildToWatchMovieContent(
     AsyncSnapshot<List<Movie>> snapshot,
     CacheResult<List<Movie>> cacheResult,
@@ -148,7 +149,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         },
       );
     }
-    
+
     if (!snapshot.hasData) {
       return const Center(
         child: Padding(
@@ -157,7 +158,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       );
     }
-    
+
     final movies = cacheResult.data;
     if (movies.isEmpty) {
       return const Center(
@@ -170,7 +171,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       );
     }
-    
+
     return Scrollbar(
       controller: _scrollControllers['toWatch'],
       thickness: 6,
@@ -209,10 +210,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   /// Builds the watched movies row using FavoritesServiceAdapter stream.
-  
+
   Widget _buildWatchedMovieRow() {
     final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
-    
+
     return StreamBuilder<List<Movie>>(
       stream: widget.favoritesService.watchedMovies,
       builder: (context, snapshot) {
@@ -222,7 +223,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           cacheAge: null,
           cachedAt: null,
         );
-        
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -234,29 +235,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Text(
                       'Watched',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.headlineMedium?.color,
+                        color:
+                            Theme.of(context).textTheme.headlineMedium?.color,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                   // No cache indicator for user data.
-
                 ],
               ),
             ),
             SizedBox(
               height: 200,
-              child: _buildWatchedMovieContent(snapshot, cacheResult, cacheOnlyMode),
+              child: _buildWatchedMovieContent(
+                  snapshot, cacheResult, cacheOnlyMode),
             ),
           ],
         );
       },
     );
   }
-  
+
   /// Builds the content for watched movies based on stream state.
-  
+
   Widget _buildWatchedMovieContent(
     AsyncSnapshot<List<Movie>> snapshot,
     CacheResult<List<Movie>> cacheResult,
@@ -270,7 +272,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         },
       );
     }
-    
+
     if (!snapshot.hasData) {
       return const Center(
         child: Padding(
@@ -279,7 +281,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       );
     }
-    
+
     final movies = cacheResult.data;
     if (movies.isEmpty) {
       return const Center(
@@ -292,7 +294,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       );
     }
-    
+
     return Scrollbar(
       controller: _scrollControllers['watched'],
       thickness: 6,

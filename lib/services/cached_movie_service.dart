@@ -86,6 +86,15 @@ class CachedMovieService {
     CacheCategory category,
     Future<List<Movie>> Function() networkCall,
   ) async {
+    // Prevent user data categories from being cached here.
+    
+    if (category == CacheCategory.toWatch || category == CacheCategory.watched) {
+      throw UnsupportedError(
+        '${category.value} movies are user data and should not be cached via CachedMovieService. '
+        'Use FavoritesService instead.',
+      );
+    }
+    
     developer.log(
       'Getting movies for ${category.value} - cachingEnabled: $_cachingEnabled, cacheOnlyMode: $_cacheOnlyMode',
       name: 'CachedMovieService',
@@ -330,6 +339,16 @@ class CachedMovieService {
 
     final List<Movie> movies;
     switch (category) {
+      case CacheCategory.toWatch:
+        throw UnsupportedError(
+          'To Watch movies are user data and should not be cached via CachedMovieService. '
+          'Use FavoritesService instead.',
+        );
+      case CacheCategory.watched:
+        throw UnsupportedError(
+          'Watched movies are user data and should not be cached via CachedMovieService. '
+          'Use FavoritesService instead.',
+        );
       case CacheCategory.popular:
         movies = await _movieService.getPopularMovies();
       case CacheCategory.nowPlaying:
@@ -437,6 +456,10 @@ class CachedMovieService {
 
   String _getCategoryDisplayName(CacheCategory category) {
     switch (category) {
+      case CacheCategory.toWatch:
+        return 'To Watch';
+      case CacheCategory.watched:
+        return 'Watched';
       case CacheCategory.popular:
         return 'popular movies';
       case CacheCategory.nowPlaying:

@@ -85,6 +85,128 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
+  /// Builds the watched movies row using FavoritesServiceAdapter stream.
+  
+  Widget _buildWatchedMovieRow() {
+    final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
+    
+    return StreamBuilder<List<Movie>>(
+      stream: widget.favoritesService.watchedMovies,
+      builder: (context, snapshot) {
+        final cacheResult = CacheResult(
+          data: snapshot.data ?? [],
+          fromCache: false, // User favorites data is not cached like API data.
+          cacheAge: null,
+          cachedAt: null,
+        );
+        
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Watched',
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.headlineMedium?.color,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  // No cache indicator for user data.
+
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 200,
+              child: _buildWatchedMovieContent(snapshot, cacheResult, cacheOnlyMode),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
+  /// Builds the content for watched movies based on stream state.
+  
+  Widget _buildWatchedMovieContent(
+    AsyncSnapshot<List<Movie>> snapshot,
+    CacheResult<List<Movie>> cacheResult,
+    bool cacheOnlyMode,
+  ) {
+    if (snapshot.hasError) {
+      return ErrorDisplayWidget.compact(
+        message: 'Failed to load Watched',
+        onRetry: () {
+          // No specific retry action for user data.
+        },
+      );
+    }
+    
+    if (!snapshot.hasData) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    
+    final movies = cacheResult.data;
+    if (movies.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Text(
+            'No watched movies yet',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
+      );
+    }
+    
+    return Scrollbar(
+      controller: _scrollControllers['watched'],
+      thickness: 6,
+      radius: const Radius.circular(3),
+      thumbVisibility: true,
+      child: ListView.builder(
+        controller: _scrollControllers['watched'],
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        itemCount: movies.length,
+        itemBuilder: (context, index) {
+          final movie = movies[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: MovieCard.poster(
+              movie: movie,
+              fromCache: cacheResult.fromCache,
+              cacheAge: cacheResult.cacheAge,
+              cacheOnlyMode: cacheOnlyMode,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MovieDetailsScreen(
+                      movie: movie,
+                      favoritesService: widget.favoritesService,
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   /// Builds a horizontal scrollable row of movies with cache indicators.
 
   Widget _buildMovieRow(
@@ -502,12 +624,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 'toWatch',
                 CacheCategory.popular,
               ),
-              _buildMovieRow(
-                'Watched',
-                popularMovies,
-                'watched',
-                CacheCategory.popular,
-              ),
+              _buildWatchedMovieRow(),
               _buildMovieRow(
                 'Popular on Movie Star',
                 popularMovies,

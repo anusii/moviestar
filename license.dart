@@ -1,4 +1,4 @@
-/// Moviestar - Manage and share ratings through private PODs
+/// Moviestar - Manage and share ratings through private PODs.
 ///
 // Time-stamp: <Friday 2025-07-04 14:53:04 +1000 Graham Williams>
 ///

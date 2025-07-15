@@ -1,6 +1,6 @@
 /// Moviestar - Manage and share ratings through private PODs
 ///
-// Time-stamp: <Friday 2025-07-04 14:55:56 +1000 Graham Williams>
+// Time-stamp: <Wednesday 2025-07-16 09:35:21 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -61,6 +61,12 @@ void main() async {
 
   await CacheSettingsService.instance.initialize();
 
+  // Globally remove [debugPrint] messages.
+
+  // debugPrint = (String? message, {int? wrapWidth}) {
+  //   null;
+  // };
+
   if (isDesktop) {
     WidgetsFlutterBinding.ensureInitialized();
 
@@ -97,15 +103,17 @@ void main() async {
   runApp(
     ProviderScope(
       overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
-      child: const MyApp(),
+      child: const MovieStar(),
     ),
   );
 }
 
 /// The root widget of the Movie Star application.
-class MyApp extends ConsumerWidget {
-  /// Creates a new [MyApp] widget.
-  const MyApp({super.key});
+
+class MovieStar extends ConsumerWidget {
+  /// Creates a new [MovieStar] widget.
+
+  const MovieStar({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

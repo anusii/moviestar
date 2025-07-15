@@ -138,7 +138,7 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
                 cacheOnlyMode: cacheOnlyMode,
                 customSubtitle: Text(
                   'Release Date: ${DateFormatUtil.formatNumeric(movie.releaseDate)}',
-                  style: const TextStyle(color: Colors.grey),
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 onTap: () {
                   Navigator.push(

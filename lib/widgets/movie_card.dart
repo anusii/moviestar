@@ -204,7 +204,7 @@ class MovieCard extends StatelessWidget {
             child: customSubtitle ??
                 Text(
                   '⭐ ${movie.voteAverage.toStringAsFixed(1)}',
-                  style: const TextStyle(color: Colors.grey),
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
           ),
           if (fromCache == true && cacheAge != null)
@@ -292,12 +292,12 @@ class MovieCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
       decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.2),
+        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         ageText,
-        style: const TextStyle(fontSize: 10, color: Colors.grey),
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 10),
       ),
     );
   }

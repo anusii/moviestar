@@ -63,10 +63,10 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.download_done,
                     size: 64,
-                    color: Colors.grey,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -82,7 +82,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                     label: const Text('Find Movies to Download'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                 ],
@@ -104,11 +104,11 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                   ),
                   title: Text(
                     movie.title,
-                    style: const TextStyle(color: Colors.white),
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   subtitle: Text(
                     '${movie.releaseDate.year}',
-                    style: const TextStyle(color: Colors.grey),
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),

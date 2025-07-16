@@ -150,26 +150,26 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
         context: context,
         barrierDismissible: false,
         builder: (context) => AlertDialog(
-          backgroundColor: Colors.grey[900],
-          title: const Text(
+          backgroundColor: Theme.of(context).cardTheme.color,
+          title: Text(
             'API Key Required',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(context).textTheme.headlineMedium,
           ),
-          content: const Column(
+          content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'To use MovieStar, you need to set up a MovieDB API key.',
-                style: TextStyle(color: Colors.white),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Text(
                 'You can get your free API key from The Movie Database (TMDB) website.',
-                style: TextStyle(color: Colors.white70, fontSize: 13),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(fontSize: 13),
               ),
             ],
           ),
@@ -178,7 +178,9 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              style: TextButton.styleFrom(foregroundColor: Colors.grey),
+              style: TextButton.styleFrom(
+                  foregroundColor:
+                      Theme.of(context).textTheme.bodyMedium?.color),
               child: const Text('Later'),
             ),
             ElevatedButton(
@@ -189,7 +191,7 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
               ),
               child: const Text('Set Up Now'),
             ),

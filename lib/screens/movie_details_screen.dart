@@ -198,13 +198,28 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
-            backgroundColor: Colors.black,
+            backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+            iconTheme: const IconThemeData(
+              color: Colors.white,
+              size: 24,
+            ),
+            leading: Container(
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.6),
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
             flexibleSpace: FlexibleSpaceBar(
               background: CachedNetworkImage(
                 imageUrl: widget.movie.backdropUrl,
@@ -227,11 +242,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                       Expanded(
                         child: Text(
                           widget.movie.title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.displaySmall,
                         ),
                       ),
                       Row(
@@ -241,7 +252,9 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                               _isInToWatch
                                   ? Icons.bookmark
                                   : Icons.bookmark_border,
-                              color: _isInToWatch ? Colors.blue : Colors.white,
+                              color: _isInToWatch
+                                  ? Colors.blue
+                                  : Theme.of(context).iconTheme.color,
                             ),
                             onPressed: _toggleToWatch,
                             tooltip: _isInToWatch
@@ -253,7 +266,9 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                               _isInWatched
                                   ? Icons.check_circle
                                   : Icons.check_circle_outline,
-                              color: _isInWatched ? Colors.green : Colors.white,
+                              color: _isInWatched
+                                  ? Colors.green
+                                  : Theme.of(context).iconTheme.color,
                             ),
                             onPressed: _toggleWatched,
                             tooltip: _isInWatched
@@ -271,37 +286,27 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                       const SizedBox(width: 4),
                       Text(
                         widget.movie.voteAverage.toStringAsFixed(1),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       const SizedBox(width: 16),
-                      const Icon(
+                      Icon(
                         Icons.calendar_today,
-                        color: Colors.white,
+                        color: Theme.of(context).iconTheme.color,
                         size: 20,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         DateFormatUtil.formatShort(widget.movie.releaseDate),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
 
                   // Personal Rating Section,
-                  const Text(
+                  Text(
                     'Your Rating',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const SizedBox(height: 8),
                   _isLoadingRating
@@ -320,8 +325,8 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                               ),
                             ),
                             IconButton(
-                              icon:
-                                  const Icon(Icons.clear, color: Colors.white),
+                              icon: Icon(Icons.clear,
+                                  color: Theme.of(context).iconTheme.color),
                               onPressed: _personalRating == null
                                   ? null
                                   : () => _updateRating(null),
@@ -333,18 +338,14 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                     _personalRating == null
                         ? 'No rating yet'
                         : 'Your rating: ${_personalRating!.toStringAsFixed(1)}/10',
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 16),
 
                   // Personal Comments Section
-                  const Text(
+                  Text(
                     'My Comments',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const SizedBox(height: 8),
                   _isLoadingComments
@@ -354,14 +355,18 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                           children: [
                             TextField(
                               controller: _commentsController,
-                              style: const TextStyle(color: Colors.white),
+                              style: Theme.of(context).textTheme.bodyLarge,
                               maxLines: 4,
                               decoration: InputDecoration(
                                 hintText:
                                     'Add your thoughts about this movie...',
-                                hintStyle: const TextStyle(color: Colors.grey),
+                                hintStyle: Theme.of(context)
+                                    .inputDecorationTheme
+                                    .hintStyle,
                                 filled: true,
-                                fillColor: Colors.grey[900],
+                                fillColor: Theme.of(context)
+                                    .inputDecorationTheme
+                                    .fillColor,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   borderSide: BorderSide.none,
@@ -376,13 +381,15 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   TextButton.icon(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.clear,
-                                      color: Colors.white,
+                                      color: Theme.of(context).iconTheme.color,
                                     ),
-                                    label: const Text(
+                                    label: Text(
                                       'Clear Comments',
-                                      style: TextStyle(color: Colors.white),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelLarge,
                                     ),
                                     onPressed: () {
                                       _commentsController.clear();
@@ -394,22 +401,17 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                           ],
                         ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Overview',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     widget.movie.overview,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      height: 1.5,
-                    ),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(height: 1.5),
                   ),
                 ],
               ),

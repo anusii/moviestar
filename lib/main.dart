@@ -54,7 +54,12 @@ import 'package:moviestar/utils/is_logged_in.dart';
 /// Main entry point for the Movie Star application.
 
 void main() async {
+  // This is the main entry point for the app. The [async] is required because
+  // we asynchronously [await] the window manager below. Often, `main()` will
+  // include only [runApp].
+
   WidgetsFlutterBinding.ensureInitialized();
+
   final prefs = await SharedPreferences.getInstance();
 
   // Initialise cache settings service early.
@@ -67,38 +72,39 @@ void main() async {
   //   null;
   // };
 
-  if (isDesktop) {
-    WidgetsFlutterBinding.ensureInitialized();
+  // Ensure Flutter bindings are initialized for async operations
 
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (isDesktop) {
     await windowManager.ensureInitialized();
 
-    WindowOptions windowOptions = const WindowOptions(
+    const windowOptions = WindowOptions(
+      // Set various desktop window options here.
+
       // Setting [alwaysOnTop] here will ensure the app starts on top of other
-      // apps on the desktop so that it is visible. We later turn it of as we
-      // don't want to force it always on top.
+      // apps on the desktop so that it is visible (otherwise, with GNOME on
+      // Ubuntu the app is often lost below other windows on startup).
+      // We later turn it off as we don't want to force it always on top.
 
       alwaysOnTop: true,
-
-      // The size is overridden in the first instance by linux/my_application.cc
-      // but setting it here then does have effect when Restarting the app.
-
-      // Windows has 1280x720 by default in windows/runner/main.cpp line 29 so
-      // best not to override it here since under windows the 950x600 is too
-      // small.
-
-      //size: Size(750, 873),
 
       // The [title] is used for the window manager's window title.
 
       title: 'Movie Star - Manage and share ratings through private PODs',
     );
 
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
+    // Once the window manager is ready we reconfigure it a little.
+
+    await windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
       await windowManager.focus();
       await windowManager.setAlwaysOnTop(false);
     });
   }
+
+  // The runApp() function takes the given Widget and makes it the root of the
+  // widget tree.
 
   runApp(
     ProviderScope(
@@ -107,6 +113,12 @@ void main() async {
     ),
   );
 }
+
+// The main widget could be in a separate file, but handy having it in main and
+// the file is not too large (TO BE FIXED). The widget essentially orchestrates the building
+// of other widgets. Generically we set up to build a `Home()` widget containing
+// the App. For SolidPod we wrap the `Home()` widget within the `SolidLogin()`
+// widget so we start with a login screen, though this is optional.
 
 /// The root widget of the Movie Star application.
 

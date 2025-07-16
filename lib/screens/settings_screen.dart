@@ -881,6 +881,10 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
 
   String _getCategoryDisplayName(CacheCategory category) {
     switch (category) {
+      case CacheCategory.toWatch:
+        return 'To Watch';
+      case CacheCategory.watched:
+        return 'Watched';
       case CacheCategory.popular:
         return 'Popular Movies';
       case CacheCategory.nowPlaying:

@@ -31,6 +31,14 @@ import 'package:moviestar/models/movie.dart';
 /// Categories available for movie caching.
 
 enum CacheCategory {
+  /// To watch movies.
+
+  toWatch('to_watch'),
+
+  /// Watched movies.
+
+  watched('watched'),
+
   /// Popular movies from TMDB.
 
   popular('popular'),
@@ -81,6 +89,10 @@ class CacheConfig {
 
   static Duration getTtlForCategory(CacheCategory category) {
     switch (category) {
+      case CacheCategory.toWatch:
+        return popularTtl;
+      case CacheCategory.watched:
+        return popularTtl;
       case CacheCategory.popular:
         return popularTtl;
       case CacheCategory.nowPlaying:

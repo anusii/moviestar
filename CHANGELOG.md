@@ -22,6 +22,9 @@ Windows
 
 ## 0.1 First stable release
 
++ Bug fix light/dark mode [0.0.8 20250716 atangster]
++ Add WATCHED and TOWATCHED to home page [0.0.7 20250716 zheyxu]
++ Add titles for desktop app [0.0.6 20250716 gjw]
 + Add support for caching downloaded movie data [0.0.5 20250703 atangster]
 + ICON: Crop and lighten [0.0.4 20250626 gjw]
 + CHANGELOG: Initialise [0.0.3 20250626 gjw]

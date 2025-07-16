@@ -20,6 +20,9 @@ Windows
 [**zip**](https://solidcommunity.au/installers/moviestar-dev-windows.zip) or
 [**inno**](https://solidcommunity.au/installers/moviestar-dev-windows-inno.exe).
 
+Coding documentation is available from [solid community
+au](https://solidcommunity.au/docs/moviestar)
+
 ## 0.1 First stable release
 
 + Bug fix light/dark mode [0.0.8 20250716 atangster]

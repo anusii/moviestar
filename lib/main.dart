@@ -257,7 +257,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 _isLoadingFolders = false;
               });
             }
-            debugPrint('App folders initialised.');
+
             // Now reload POD data since folders are ready.
 
             await _favoritesServiceManager.reloadPodDataAfterInit();
@@ -269,8 +269,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           });
         }
       }
-    } else {
-      debugPrint('User not logged in. Skipping App folder initialisation.');
     }
   }
 

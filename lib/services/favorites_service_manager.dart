@@ -246,6 +246,33 @@ class FavoritesServiceManager extends ChangeNotifier {
     }
   }
 
+  /// Checks if a movie file exists (i.e. user has interacted with this movie).
+  /// This is only relevant for POD storage.
+
+  Future<bool> hasMovieFile(Movie movie) async {
+    if (_isPodStorageEnabled && _podService != null) {
+      return _podService!.hasMovieFile(movie);
+    }
+    // For local storage, check if either rating or comment exists.
+
+    final hasRating = await getPersonalRating(movie) != null;
+    final hasComment = await getMovieComments(movie) != null &&
+        (await getMovieComments(movie))!.isNotEmpty;
+    return hasRating || hasComment;
+  }
+
+  /// Gets the file path for a movie file (used for sharing).
+  /// This is only relevant for POD storage.
+
+  String? getMovieFilePath(Movie movie) {
+    if (_isPodStorageEnabled && _podService != null) {
+      return _podService!.getMovieFilePath(movie);
+    }
+    // Local storage doesn't have shareable file paths.
+
+    return null;
+  }
+
   /// Enables POD storage and migrates data.
 
   Future<bool> enablePodStorage() async {

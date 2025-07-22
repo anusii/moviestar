@@ -25,6 +25,8 @@
 
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -87,6 +89,26 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
   bool _isLoadingComments = true;
 
+  /// Indicates whether comments have been modified but not saved.
+
+  bool _commentsModified = false;
+
+  /// Indicates whether rating was just saved (shows temporary banner).
+
+  bool _ratingSaved = false;
+
+  /// Indicates whether comments were just saved (shows temporary banner).
+
+  bool _commentsSaved = false;
+
+  /// Timer for hiding the rating saved banner.
+
+  Timer? _ratingSavedTimer;
+
+  /// Timer for hiding the comments saved banner.
+
+  Timer? _commentsSavedTimer;
+
   @override
   void initState() {
     super.initState();
@@ -98,6 +120,8 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   @override
   void dispose() {
     _commentsController.dispose();
+    _ratingSavedTimer?.cancel();
+    _commentsSavedTimer?.cancel();
     super.dispose();
   }
 
@@ -154,21 +178,27 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     } else {
       await widget.favoritesService.setPersonalRating(widget.movie, rating);
 
-      // We might want to automatically mark a movie as watched when a rating is
-      // given. We would not expect a rating if the user has not watched a
-      // movie, so this seems like a good (though opinionated)
-      // behaviour. (20250704 gjw)
-
-      if (!_isInWatched) {
-        await widget.favoritesService.addToWatched(widget.movie);
-      }
+      // Auto-add to watched is now handled in PodFavoritesService._createOrUpdateMovieFile()
     }
     setState(() {
       _personalRating = rating;
-      // Update watched status if rating was set.
+      // Update watched status - this will be updated by the stream from the service.
 
-      if (rating != null && !_isInWatched) {
-        _isInWatched = true;
+      _ratingSaved = true;
+    });
+
+    // Refresh the list status to ensure UI is in sync.
+
+    await _checkListStatus();
+
+    // Hide the saved banner after 2 seconds.
+
+    _ratingSavedTimer?.cancel();
+    _ratingSavedTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _ratingSaved = false;
+        });
       }
     });
   }
@@ -192,6 +222,53 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     }
     setState(() {
       _personalComments = comments;
+      // Reset modified flag after saving.
+
+      _commentsModified = false;
+    });
+  }
+
+  /// Saves the current comments without automatic triggers.
+
+  Future<void> _saveComments() async {
+    final currentText = _commentsController.text.trim();
+    await _updateComments(currentText.isEmpty ? null : currentText);
+
+    setState(() {
+      _commentsSaved = true;
+    });
+
+    // Hide the saved banner after 2 seconds.
+
+    _commentsSavedTimer?.cancel();
+    _commentsSavedTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _commentsSaved = false;
+        });
+      }
+    });
+  }
+
+  /// Clears the current comments and shows success banner.
+
+  Future<void> _clearComments() async {
+    _commentsController.clear();
+    await _updateComments(null);
+
+    setState(() {
+      _commentsSaved = true;
+    });
+
+    // Hide the saved banner after 2 seconds.
+
+    _commentsSavedTimer?.cancel();
+    _commentsSavedTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _commentsSaved = false;
+        });
+      }
     });
   }
 
@@ -304,9 +381,37 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                   const SizedBox(height: 16),
 
                   // Personal Rating Section,
-                  Text(
-                    'Your Rating',
-                    style: Theme.of(context).textTheme.headlineMedium,
+                  Row(
+                    children: [
+                      const Text(
+                        'Your Rating',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (_ratingSaved)
+                        Container(
+                          margin: const EdgeInsets.only(left: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Text(
+                            'SAVED',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   _isLoadingRating
@@ -343,9 +448,57 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                   const SizedBox(height: 16),
 
                   // Personal Comments Section
-                  Text(
-                    'My Comments',
-                    style: Theme.of(context).textTheme.headlineMedium,
+                  Row(
+                    children: [
+                      const Text(
+                        'My Comments',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (_commentsModified)
+                        Container(
+                          margin: const EdgeInsets.only(left: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.orange,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Text(
+                            'UNSAVED',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      if (_commentsSaved)
+                        Container(
+                          margin: const EdgeInsets.only(left: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Text(
+                            'SAVED',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   _isLoadingComments
@@ -372,14 +525,45 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                                   borderSide: BorderSide.none,
                                 ),
                               ),
-                              onChanged: (value) => _updateComments(value),
+                              onChanged: (value) {
+                                // Mark as modified when user types.
+
+                                setState(() {
+                                  _commentsModified = true;
+                                  _commentsSaved = false;
+                                });
+                                // Cancel the saved timer since user is editing again.
+
+                                _commentsSavedTimer?.cancel();
+                              },
+                              onSubmitted: (value) {
+                                // Save when user presses Enter (if modified).
+
+                                if (_commentsModified) {
+                                  _saveComments();
+                                }
+                              },
                             ),
                             const SizedBox(height: 8),
-                            if (_personalComments != null &&
-                                _personalComments!.isNotEmpty)
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                if (_commentsModified)
+                                  ElevatedButton.icon(
+                                    icon: const Icon(Icons.save, size: 18),
+                                    label: const Text('Save Comments'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      foregroundColor: Colors.white,
+                                    ),
+                                    onPressed: _saveComments,
+                                  ),
+                                if (_commentsModified &&
+                                    (_personalComments != null &&
+                                        _personalComments!.isNotEmpty))
+                                  const SizedBox(width: 8),
+                                if (_personalComments != null &&
+                                    _personalComments!.isNotEmpty)
                                   TextButton.icon(
                                     icon: Icon(
                                       Icons.clear,
@@ -391,13 +575,10 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                                           .textTheme
                                           .labelLarge,
                                     ),
-                                    onPressed: () {
-                                      _commentsController.clear();
-                                      _updateComments(null);
-                                    },
+                                    onPressed: _clearComments,
                                   ),
-                                ],
-                              ),
+                              ],
+                            ),
                           ],
                         ),
                   const SizedBox(height: 16),

@@ -227,6 +227,23 @@ class FavoritesService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Checks if a movie file exists (i.e. user has interacted with this movie).
+  /// For local storage, this checks if the user has either a rating or comment.
+
+  Future<bool> hasMovieFile(Movie movie) async {
+    final hasRating = await getPersonalRating(movie) != null;
+    final hasComment = await getMovieComments(movie) != null &&
+        (await getMovieComments(movie))!.isNotEmpty;
+    return hasRating || hasComment;
+  }
+
+  /// Gets the file path for a movie file (used for sharing).
+  /// Local storage doesn't have shareable file paths, so this returns null.
+
+  String? getMovieFilePath(Movie movie) {
+    return null; // Local storage doesn't support file sharing
+  }
+
   /// Disposes the stream controllers.
 
   @override

@@ -59,15 +59,53 @@ Future<void> initialiseAppFolders({
       'profile',
     ];
 
-    // Check current resources.
+    // Check current resources, handling encryption key errors gracefully.
 
     final dirUrl = await getDirUrl(basePath);
-    final resources = await getResourcesInContainer(dirUrl);
+    List<String> existingFolders = [];
+
+    // Try multiple times with increasing delays to handle transient encryption issues.
+
+    for (int attempt = 1; attempt <= 3; attempt++) {
+      try {
+        final resources = await getResourcesInContainer(dirUrl);
+        existingFolders = resources.subDirs;
+        // Success - exit retry loop.
+
+        break;
+      } catch (e) {
+        // Handle encryption key conflicts gracefully.
+
+        if (e.toString().contains('Duplicated encryption key')) {
+          debugPrint(
+              'Encryption key conflict detected (attempt $attempt/3) - this is caused by orphaned encryption keys from deleted files');
+
+          if (attempt < 3) {
+            // Wait with exponential backoff before retrying.
+
+            await Future.delayed(Duration(milliseconds: 500 * attempt));
+            debugPrint('Retrying resource scan...');
+            continue;
+          } else {
+            debugPrint(
+                'Max retries reached - continuing with empty folder list');
+            // Continue with empty list - we'll try to create all folders.
+
+            existingFolders = [];
+            break;
+          }
+        } else {
+          // Re-throw other errors.
+
+          rethrow;
+        }
+      }
+    }
 
     // Create each missing folder.
 
     for (final folder in requiredFolders) {
-      if (!resources.subDirs.contains(folder)) {
+      if (!existingFolders.contains(folder)) {
         if (!context.mounted) return;
 
         final result = await createAppFolder(

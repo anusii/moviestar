@@ -20,6 +20,7 @@ REMOVE
 !integration_test/data/*.json
 solidpod
 import_order_lint
+pubspec.yaml.*
 
 installers/*.apk
 installers/*.exe
@@ -36,7 +37,10 @@ tools/chromedriver/
 *Generated*
 *#*
 
+########################################################################
+# From https://github.com/flutter/flutter/blob/master/.gitignore
 # See https://www.dartlang.org/guides/libraries/private-files
+########################################################################
 
 # Files and directories created by pub
 .dart_tool/
@@ -66,8 +70,12 @@ doc/api/
 .flutter-plugins
 .flutter-plugins-dependencies
 
+#-----------------------------------------------------------------------
 # Miscellaneous
+#-----------------------------------------------------------------------
+
 *.class
+*.lock
 *.log
 *.pyc
 *.swp
@@ -85,15 +93,26 @@ migrate_working_dir/
 /solidpod/
 /solid_auth/
 
+#-----------------------------------------------------------------------
 # IntelliJ related
+#-----------------------------------------------------------------------
+
 *.iml
 *.ipr
 *.iws
 .idea/
 
+#-----------------------------------------------------------------------
+# Visual Studio Code related
+#
 # The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
+# VS Code which you may wish to be included in version control, so that line
+# can be commented out as it is by default.
+#-----------------------------------------------------------------------
+
+.classpath
+.project
+.settings/
 .vscode/
 
 # Mac
@@ -151,16 +170,27 @@ Pods/
 DerivedData/
 .build/
 
+#-----------------------------------------------------------------------
 # Flutter/Dart/Pub related
+#-----------------------------------------------------------------------
+
+# Directory created by dartdoc. If you don't generate documentation
+# locally you can remove this line.
+
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
+**/generated_plugin_registrant.dart
+.packages
 .pub-cache/
 .pub/
-/build/
-/installers/build/
+build/
+flutter_*.png
+linked_*.ds
+unlinked.ds
+unlinked_spec.ds
 
 # Symbolication related
 app.*.symbols

@@ -34,7 +34,6 @@ import 'package:window_manager/window_manager.dart';
 import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
-import 'package:moviestar/screens/downloads_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/screens/to_watch_screen.dart';
@@ -226,7 +225,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         favoritesService: _favoritesService,
       ),
       ComingSoonScreen(favoritesService: _favoritesService),
-      const DownloadsScreen(),
       const FileService(),
       SettingsScreen(
         favoritesService: _favoritesService,
@@ -302,10 +300,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.upcoming),
             label: 'Coming Soon',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.download),
-            label: 'Downloads',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.folder), label: 'Files'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Settings'),

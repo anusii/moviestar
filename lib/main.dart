@@ -50,7 +50,6 @@ import 'package:moviestar/utils/create_solid_login.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_desktop.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
-import 'package:moviestar/widgets/floating_theme_toggle.dart';
 
 /// Main entry point for the Movie Star application.
 
@@ -283,12 +282,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           _isLoadingFolders
               ? const Center(child: CircularProgressIndicator())
               : _screens[_selectedIndex],
-
-          // Theme toggle positioned to be visible near debug banner.
-          // Hide when on Settings page (index 6) since it has its own theme toggle.
-
-          if (_selectedIndex != 6)
-            const FloatingThemeToggle(right: 70, top: 16),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

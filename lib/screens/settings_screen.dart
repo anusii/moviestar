@@ -34,6 +34,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:moviestar/database/movie_cache_repository.dart';
 import 'package:moviestar/main.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
+import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
@@ -741,7 +742,14 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
             _buildListTile('Sign Out', Icons.logout, () async {
               // Show logout confirmation dialog and handle logout.
 
-              await logoutPopup(context, const MyApp());
+              final prefs = ref.read(sharedPreferencesProvider);
+              await logoutPopup(
+                  context,
+                  SolidLogin(
+                      child: MyHomePage(
+                    title: 'Movie Star Home Page',
+                    prefs: prefs,
+                  )));
             }, isDestructive: true),
           ]),
         ],

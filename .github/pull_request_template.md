@@ -1,12 +1,8 @@
 # Pull Request Details
 
-## What issue does this PR address
+## What Issue does this PR address
 
-- [Description]
-
-## Associated Issue
-
-- This PR relates to issue #
+- #
 
 ## Type of Change
 

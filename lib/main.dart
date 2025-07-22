@@ -1,6 +1,6 @@
-/// Main entry point for the Movie Star application.
+/// Moviestar - Manage and share ratings through private PODs
 ///
-// Time-stamp: <Thursday 2025-07-03 09:41:28 +1000 Graham Williams>
+// Time-stamp: <Wednesday 2025-07-16 09:35:21 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang, Graham Williams
+/// Authors: Kevin Wang, Graham Williams, Ashley Tang
 
 library;
 
@@ -34,7 +34,6 @@ import 'package:window_manager/window_manager.dart';
 import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
-import 'package:moviestar/screens/downloads_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/screens/to_watch_screen.dart';
@@ -50,61 +49,82 @@ import 'package:moviestar/utils/create_solid_login.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_desktop.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
-import 'package:moviestar/widgets/floating_theme_toggle.dart';
+
+/// Main entry point for the Movie Star application.
 
 void main() async {
+  // This is the main entry point for the app. The [async] is required because
+  // we asynchronously [await] the window manager below. Often, `main()` will
+  // include only [runApp].
+
   WidgetsFlutterBinding.ensureInitialized();
+
   final prefs = await SharedPreferences.getInstance();
 
   // Initialise cache settings service early.
 
   await CacheSettingsService.instance.initialize();
 
-  if (isDesktop) {
-    WidgetsFlutterBinding.ensureInitialized();
+  // Globally remove [debugPrint] messages.
 
+  // debugPrint = (String? message, {int? wrapWidth}) {
+  //   null;
+  // };
+
+  // Ensure Flutter bindings are initialized for async operations
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (isDesktop) {
     await windowManager.ensureInitialized();
 
-    WindowOptions windowOptions = const WindowOptions(
+    const windowOptions = WindowOptions(
+      // Set various desktop window options here.
+
       // Setting [alwaysOnTop] here will ensure the app starts on top of other
-      // apps on the desktop so that it is visible. We later turn it of as we
-      // don't want to force it always on top.
+      // apps on the desktop so that it is visible (otherwise, with GNOME on
+      // Ubuntu the app is often lost below other windows on startup).
+      // We later turn it off as we don't want to force it always on top.
 
       alwaysOnTop: true,
-
-      // The size is overridden in the first instance by linux/my_application.cc
-      // but setting it here then does have effect when Restarting the app.
-
-      // Windows has 1280x720 by default in windows/runner/main.cpp line 29 so
-      // best not to override it here since under windows the 950x600 is too
-      // small.
-
-      //size: Size(750, 873),
 
       // The [title] is used for the window manager's window title.
 
       title: 'Movie Star - Manage and share ratings through private PODs',
     );
 
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
+    // Once the window manager is ready we reconfigure it a little.
+
+    await windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
       await windowManager.focus();
       await windowManager.setAlwaysOnTop(false);
     });
   }
 
+  // The runApp() function takes the given Widget and makes it the root of the
+  // widget tree.
+
   runApp(
     ProviderScope(
       overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
-      child: const MyApp(),
+      child: const MovieStar(),
     ),
   );
 }
 
+// The main widget could be in a separate file, but handy having it in main and
+// the file is not too large (TO BE FIXED). The widget essentially orchestrates the building
+// of other widgets. Generically we set up to build a `Home()` widget containing
+// the App. For SolidPod we wrap the `Home()` widget within the `SolidLogin()`
+// widget so we start with a login screen, though this is optional.
+
 /// The root widget of the Movie Star application.
-class MyApp extends ConsumerWidget {
-  /// Creates a new [MyApp] widget.
-  const MyApp({super.key});
+
+class MovieStar extends ConsumerWidget {
+  /// Creates a new [MovieStar] widget.
+
+  const MovieStar({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -205,7 +225,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         favoritesService: _favoritesService,
       ),
       ComingSoonScreen(favoritesService: _favoritesService),
-      const DownloadsScreen(),
       const FileService(),
       SettingsScreen(
         favoritesService: _favoritesService,
@@ -261,11 +280,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           _isLoadingFolders
               ? const Center(child: CircularProgressIndicator())
               : _screens[_selectedIndex],
-
-          // Theme toggle positioned to be visible near debug banner.
-          // Hide when on Settings page (index 4) since it has its own theme toggle.
-          if (_selectedIndex != 4)
-            const FloatingThemeToggle(right: 70, top: 16),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -284,10 +298,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.upcoming),
             label: 'Coming Soon',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.download),
-            label: 'Downloads',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.folder), label: 'Files'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Settings'),

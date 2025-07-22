@@ -518,10 +518,12 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
           Center(
             child: Stack(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 50,
-                  backgroundColor: Colors.grey,
-                  child: Icon(Icons.person, size: 50, color: Colors.white),
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  child: Icon(Icons.person,
+                      size: 50,
+                      color: Theme.of(context).colorScheme.onSecondary),
                 ),
                 Positioned(
                   bottom: 0,
@@ -532,10 +534,10 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                       color: Colors.red,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.edit,
                       size: 20,
-                      color: Colors.white,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
                 ),
@@ -551,17 +553,20 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'MovieDB API Key',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
                       Expanded(
-                        child: const Text(
+                        child: Text(
                           'Required to fetch movie data and images',
-                          style: TextStyle(color: Colors.grey, fontSize: 12),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(fontSize: 12),
                         ),
                       ),
                       if (widget.fromApiKeyPrompt)
@@ -646,7 +651,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     ),
                     child: const Text('Save API Key'),
                   ),
@@ -827,7 +832,11 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodySmall
-                                          ?.copyWith(color: Colors.grey),
+                                          ?.copyWith(
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.color),
                                     ),
                                   ],
                                 ),
@@ -881,6 +890,10 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
 
   String _getCategoryDisplayName(CacheCategory category) {
     switch (category) {
+      case CacheCategory.toWatch:
+        return 'To Watch';
+      case CacheCategory.watched:
+        return 'Watched';
       case CacheCategory.popular:
         return 'Popular Movies';
       case CacheCategory.nowPlaying:

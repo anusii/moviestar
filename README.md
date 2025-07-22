@@ -1,3 +1,13 @@
+# Movie Star &mdash; Encrypted Movie Preferences in your Data Vault
+
+**An ANU Software Innovation Institute demonstrator for your Data Vault**.
+
+*Authors: Kevin Wang, Ashley Tang, Zheyuan Xu, Graham Williams*
+
+*[ANU Software Innovation Institute](https://sii.anu.edu.au)*
+
+*License: GNU GPL V3*
+
 [![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
 
@@ -21,7 +31,10 @@ Download the latest version:
 [zip](https://solidcommunity.au/installers/moviestar-dev-windows.zip) or
 [inno](https://solidcommunity.au/installers/moviestar-dev-windows-inno.exe).
 
-# Movie Star Personal Data Wallet
+Coding documentation is available from [solid community
+au](https://solidcommunity.au/docs/moviestar)
+
+## Introduction
 
 A personal movies (and TV series) database and recommender.
 

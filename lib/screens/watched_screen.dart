@@ -59,10 +59,11 @@ class _WatchedScreenState extends State<WatchedScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Text('Watched', style: TextStyle(color: Colors.white)),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        title: Text('Watched',
+            style: Theme.of(context).appBarTheme.titleTextStyle),
       ),
       body: Column(
         children: [
@@ -82,7 +83,10 @@ class _WatchedScreenState extends State<WatchedScreen> {
                   return Center(
                     child: Text(
                       'Error: ${snapshot.error}',
-                      style: const TextStyle(color: Colors.red),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(color: Colors.red),
                     ),
                   );
                 }
@@ -94,10 +98,10 @@ class _WatchedScreenState extends State<WatchedScreen> {
                 final movies = sortMovies(snapshot.data!, _sortCriteria);
 
                 if (movies.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text(
                       'Your watched list is empty',
-                      style: TextStyle(color: Colors.grey),
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   );
                 }
@@ -123,11 +127,11 @@ class _WatchedScreenState extends State<WatchedScreen> {
                       ),
                       title: Text(
                         movie.title,
-                        style: const TextStyle(color: Colors.white),
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       subtitle: Text(
                         '⭐ ${movie.voteAverage.toStringAsFixed(1)}',
-                        style: const TextStyle(color: Colors.grey),
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       trailing: IconButton(
                         icon: const Icon(

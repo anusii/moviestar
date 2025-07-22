@@ -21,9 +21,11 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang
+/// Authors: Kevin Wang, Ashley Tang
 
 library;
+
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 
@@ -55,39 +57,78 @@ class SearchScreen extends StatefulWidget {
   State<SearchScreen> createState() => _SearchScreenState();
 }
 
-/// State class for the search screen.
+// State class for the search screen.
 
 class _SearchScreenState extends State<SearchScreen> {
-  /// Controller for the search text field.
+  // Controller for the search text field.
 
   final TextEditingController _searchController = TextEditingController();
 
-  /// Loading state indicator.
+  // Loading state indicator.
 
   bool _isLoading = false;
 
-  /// Error message if any.
+  // Error message if any.
 
   String? _error;
 
-  /// List of movies matching the search query.
+  // Comprehensive search results categorised by search type.
 
-  List<Movie> _searchResults = [];
+  Map<String, List<Movie>> _searchResults = {};
+
+  // Timer for debouncing search requests.
+
+  Timer? _debounceTimer;
+
+  // Duration to wait before executing search after user stops typing.
+
+  static const Duration _debounceDuration = Duration(milliseconds: 500);
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen to text changes for dynamic search.
+
+    _searchController.addListener(_onSearchChanged);
+  }
 
   @override
   void dispose() {
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
+    _debounceTimer?.cancel();
     super.dispose();
   }
 
-  /// Searches for movies based on the provided query.
+  // Called when search text changes.
+
+  void _onSearchChanged() {
+    // Cancel previous timer if it exists.
+
+    _debounceTimer?.cancel();
+
+    // Start new timer for debouncing.
+
+    _debounceTimer = Timer(_debounceDuration, () {
+      _searchMovies(_searchController.text);
+    });
+  }
+
+  // Searches for movies based on the provided query.
 
   Future<void> _searchMovies(String query) async {
     if (query.isEmpty) {
       setState(() {
-        _searchResults = [];
+        _searchResults = {};
         _error = null;
+        _isLoading = false;
       });
+      return;
+    }
+
+    // Don't search if query is too short.
+
+    if (query.length < 2) {
       return;
     }
 
@@ -97,17 +138,141 @@ class _SearchScreenState extends State<SearchScreen> {
     });
 
     try {
-      final results = await widget.movieService.searchMovies(query);
-      setState(() {
-        _searchResults = results;
-        _isLoading = false;
-      });
+      final results =
+          await widget.movieService.searchMoviesComprehensive(query);
+
+      // Only update state if this search is still relevant.
+
+      if (_searchController.text == query) {
+        setState(() {
+          _searchResults = results;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _error = e.toString();
-        _isLoading = false;
-      });
+      // Only update state if this search is still relevant.
+
+      if (_searchController.text == query) {
+        setState(() {
+          _error = e.toString();
+          _isLoading = false;
+        });
+      }
     }
+  }
+
+  // Builds a section of search results for a specific category.
+
+  Widget _buildResultsSection(String category, List<Movie> movies) {
+    if (movies.isEmpty) return const SizedBox.shrink();
+
+    String categoryTitle;
+    IconData categoryIcon;
+
+    switch (category) {
+      case 'title':
+        categoryTitle = 'By Title';
+        categoryIcon = Icons.movie;
+        break;
+      case 'actor':
+        categoryTitle = 'By Actor';
+        categoryIcon = Icons.person;
+        break;
+      case 'genre':
+        categoryTitle = 'By Genre';
+        categoryIcon = Icons.category;
+        break;
+      default:
+        categoryTitle = category;
+        categoryIcon = Icons.search;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Icon(categoryIcon,
+                  color: Theme.of(context).colorScheme.primary, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                categoryTitle,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${movies.length}',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: movies.length,
+          itemBuilder: (context, index) {
+            final movie = movies[index];
+            return ListTile(
+              leading: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: CachedNetworkImage(
+                  imageUrl: movie.posterUrl,
+                  width: 50,
+                  height: 75,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                ),
+              ),
+              title: Text(
+                movie.title,
+                style:
+                    TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              ),
+              subtitle: Text(
+                '⭐ ${movie.voteAverage.toStringAsFixed(1)}',
+                style: TextStyle(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.6)),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MovieDetailsScreen(
+                      movie: movie,
+                      favoritesService: widget.favoritesService,
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
   }
 
   @override
@@ -116,13 +281,40 @@ class _SearchScreenState extends State<SearchScreen> {
       appBar: AppBar(
         title: TextField(
           controller: _searchController,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            hintText: 'Search movies...',
-            hintStyle: TextStyle(color: Colors.grey),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          decoration: InputDecoration(
+            hintText: 'Search by title, actor, or genre...',
+            hintStyle: TextStyle(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.6)),
             border: InputBorder.none,
+            suffixIcon: _searchController.text.isNotEmpty
+                ? IconButton(
+                    icon: Icon(Icons.clear,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.6)),
+                    onPressed: () {
+                      _searchController.clear();
+                    },
+                  )
+                : null,
           ),
-          onSubmitted: _searchMovies,
+          onChanged: (value) {
+            // Dynamic search is handled by the listener.
+            // This rebuild is just to show/hide the clear button.
+
+            setState(() {});
+          },
+          onSubmitted: (value) {
+            // Immediate search when user presses Enter.
+
+            _debounceTimer?.cancel();
+            _searchMovies(value);
+          },
         ),
       ),
       body: _isLoading
@@ -132,54 +324,65 @@ class _SearchScreenState extends State<SearchScreen> {
                   message: 'Search failed: $_error',
                   onRetry: () => _searchMovies(_searchController.text),
                 )
-              : _searchResults.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'Search for movies to get started',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount: _searchResults.length,
-                      itemBuilder: (context, index) {
-                        final movie = _searchResults[index];
-                        return ListTile(
-                          leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: CachedNetworkImage(
-                              imageUrl: movie.posterUrl,
-                              width: 50,
-                              height: 75,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
+              : _searchResults.isEmpty || _hasNoResults()
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.search,
+                              size: 64,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.4)),
+                          const SizedBox(height: 16),
+                          Text(
+                            _searchController.text.isEmpty
+                                ? 'Search for movies'
+                                : _searchController.text.length < 2
+                                    ? 'Type at least 2 characters'
+                                    : 'No results found',
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.6),
+                              fontSize: 18,
                             ),
                           ),
-                          title: Text(
-                            movie.title,
-                            style: const TextStyle(color: Colors.white),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Find movies by title, actor, or genre',
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.4)),
                           ),
-                          subtitle: Text(
-                            '⭐ ${movie.voteAverage.toStringAsFixed(1)}',
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => MovieDetailsScreen(
-                                  movie: movie,
-                                  favoritesService: widget.favoritesService,
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
+                        ],
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildResultsSection(
+                              'title', _searchResults['title'] ?? []),
+                          _buildResultsSection(
+                              'actor', _searchResults['actor'] ?? []),
+                          _buildResultsSection(
+                              'genre', _searchResults['genre'] ?? []),
+                        ],
+                      ),
                     ),
     );
+  }
+
+  // Check if all search result categories are empty.
+
+  bool _hasNoResults() {
+    return (_searchResults['title']?.isEmpty ?? true) &&
+        (_searchResults['actor']?.isEmpty ?? true) &&
+        (_searchResults['genre']?.isEmpty ?? true);
   }
 }

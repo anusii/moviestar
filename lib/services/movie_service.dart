@@ -21,12 +21,13 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang
+/// Authors: Kevin Wang, Ashley Tang
 
 library;
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/api_key_service.dart';
+import 'package:moviestar/services/movie_search_service.dart';
 import 'package:moviestar/utils/network_client.dart';
 
 /// A service class that handles movie-related API requests.
@@ -39,6 +40,10 @@ class MovieService {
   /// Network client for making HTTP requests.
 
   NetworkClient? _client;
+
+  /// Service for movie search operations.
+
+  MovieSearchService? _searchService;
 
   /// Service for managing the API key.
 
@@ -55,6 +60,7 @@ class MovieService {
   Future<void> _initializeClient() async {
     final apiKey = await _apiKeyService.getApiKey();
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
+    _searchService = MovieSearchService(_client!);
   }
 
   /// Updates the API key and recreates the network client.
@@ -64,6 +70,7 @@ class MovieService {
     // Reset to null to force recreation.
 
     _client = null;
+    _searchService = null;
     await _initializeClient();
   }
 
@@ -111,8 +118,29 @@ class MovieService {
 
   Future<List<Movie>> searchMovies(String query) async {
     await _ensureClientInitialized();
-    final results = await _client!.getJsonList('search/movie?query=$query');
-    return results.map((movie) => Movie.fromJson(movie)).toList();
+    return await _searchService!.searchMovies(query);
+  }
+
+  /// Searches for movies by actor/person name.
+
+  Future<List<Movie>> searchMoviesByActor(String actorName) async {
+    await _ensureClientInitialized();
+    return await _searchService!.searchMoviesByActor(actorName);
+  }
+
+  /// Searches for movies by genre name.
+
+  Future<List<Movie>> searchMoviesByGenre(String genreName) async {
+    await _ensureClientInitialized();
+    return await _searchService!.searchMoviesByGenre(genreName);
+  }
+
+  /// Comprehensive search that searches by title, actor, and genre.
+
+  Future<Map<String, List<Movie>>> searchMoviesComprehensive(
+      String query) async {
+    await _ensureClientInitialized();
+    return await _searchService!.searchMoviesComprehensive(query);
   }
 
   /// Gets detailed information about a specific movie.
@@ -130,5 +158,6 @@ class MovieService {
     // Reset to null after disposal.
 
     _client = null;
+    _searchService = null;
   }
 }

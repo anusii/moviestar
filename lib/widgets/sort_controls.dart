@@ -56,17 +56,17 @@ class SortControls extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Colors.grey[900],
+      color: Theme.of(context).appBarTheme.backgroundColor,
       child: Row(
         children: [
-          const Text('Sort by:', style: TextStyle(color: Colors.white)),
+          Text('Sort by:', style: Theme.of(context).textTheme.bodyLarge),
           const SizedBox(width: 8),
           DropdownButton<MovieSortCriteria>(
             value: selectedCriteria,
-            dropdownColor: Colors.grey[900],
+            dropdownColor: Theme.of(context).cardTheme.color,
             underline: const SizedBox(),
-            icon: const Icon(Icons.sort, color: Colors.white),
-            style: const TextStyle(color: Colors.white),
+            icon: Icon(Icons.sort, color: Theme.of(context).iconTheme.color),
+            style: Theme.of(context).textTheme.bodyLarge,
             onChanged: (MovieSortCriteria? newValue) {
               if (newValue != null) {
                 onSortChanged(newValue);

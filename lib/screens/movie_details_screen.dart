@@ -30,9 +30,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:markdown_tooltip/markdown_tooltip.dart';
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 
 /// A screen that displays detailed information about a selected movie.
@@ -109,12 +111,17 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
   Timer? _commentsSavedTimer;
 
+  /// Indicates whether the movie has a shareable file (rating or comment).
+
+  bool _hasMovieFile = false;
+
   @override
   void initState() {
     super.initState();
     _checkListStatus();
     _loadPersonalRating();
     _loadPersonalComments();
+    _checkMovieFile();
   }
 
   @override
@@ -191,6 +198,10 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
     await _checkListStatus();
 
+    // Check movie file status to update share button visibility.
+
+    await _checkMovieFile();
+
     // Hide the saved banner after 2 seconds.
 
     _ratingSavedTimer?.cancel();
@@ -226,6 +237,10 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
       _commentsModified = false;
     });
+
+    // Check movie file status to update share button visibility.
+
+    await _checkMovieFile();
   }
 
   /// Saves the current comments without automatic triggers.
@@ -237,6 +252,10 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     setState(() {
       _commentsSaved = true;
     });
+
+    // Check movie file status to update share button visibility.
+
+    await _checkMovieFile();
 
     // Hide the saved banner after 2 seconds.
 
@@ -260,6 +279,10 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
       _commentsSaved = true;
     });
 
+    // Check movie file status to update share button visibility.
+
+    await _checkMovieFile();
+
     // Hide the saved banner after 2 seconds.
 
     _commentsSavedTimer?.cancel();
@@ -270,6 +293,54 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
         });
       }
     });
+  }
+
+  /// Checks if the current movie has a file (user has rated or commented).
+
+  Future<void> _checkMovieFile() async {
+    final hasFile = await widget.favoritesService.hasMovieFile(widget.movie);
+    setState(() {
+      _hasMovieFile = hasFile;
+    });
+  }
+
+  /// Shows the sharing dialog.
+
+  void _showSharingDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: const Text(
+          'Share Movie',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Share "${widget.movie.title}" and your review',
+              style: const TextStyle(color: Colors.white),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Sharing functionality will be implemented in future updates.',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Close',
+              style: TextStyle(color: Colors.blue),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -352,6 +423,26 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                                 ? 'Remove from Watched'
                                 : 'Add to Watched',
                           ),
+                          if (_hasMovieFile &&
+                              widget.favoritesService
+                                  is FavoritesServiceAdapter &&
+                              (widget.favoritesService
+                                      as FavoritesServiceAdapter)
+                                  .isPodStorageEnabled)
+                            MarkdownTooltip(
+                              message: '''
+
+**Share this movie and my review**
+
+Share your rating and comments for this movie with others.
+
+                              ''',
+                              child: IconButton(
+                                icon: const Icon(Icons.share,
+                                    color: Colors.white),
+                                onPressed: _showSharingDialog,
+                              ),
+                            ),
                         ],
                       ),
                     ],

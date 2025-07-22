@@ -193,15 +193,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               cacheAge: cacheResult.cacheAge,
               cacheOnlyMode: cacheOnlyMode,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MovieDetailsScreen(
-                      movie: movie,
-                      favoritesService: widget.favoritesService,
+                // Check if widget is still mounted before navigation.
+
+                if (mounted) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MovieDetailsScreen(
+                        movie: movie,
+                        favoritesService: widget.favoritesService,
+                      ),
                     ),
-                  ),
-                );
+                  );
+                }
               },
             ),
           );
@@ -316,15 +320,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               cacheAge: cacheResult.cacheAge,
               cacheOnlyMode: cacheOnlyMode,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MovieDetailsScreen(
-                      movie: movie,
-                      favoritesService: widget.favoritesService,
+                // Check if widget is still mounted before navigation
+                if (mounted) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MovieDetailsScreen(
+                        movie: movie,
+                        favoritesService: widget.favoritesService,
+                      ),
                     ),
-                  ),
-                );
+                  );
+                }
               },
             ),
           );
@@ -387,15 +394,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       cacheAge: cacheResult.cacheAge,
                       cacheOnlyMode: cacheOnlyMode,
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MovieDetailsScreen(
-                              movie: movie,
-                              favoritesService: widget.favoritesService,
+                        // Check if widget is still mounted before navigation.
+
+                        if (mounted) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MovieDetailsScreen(
+                                movie: movie,
+                                favoritesService: widget.favoritesService,
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        }
                       },
                     ),
                   );
@@ -411,10 +422,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             error: (error, stack) => ErrorDisplayWidget.compact(
               message: 'Failed to load $title',
               onRetry: () {
-                ref.invalidate(popularMoviesWithCacheInfoProvider);
-                ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
-                ref.invalidate(topRatedMoviesWithCacheInfoProvider);
-                ref.invalidate(upcomingMoviesWithCacheInfoProvider);
+                // Check if widget is still mounted before invalidating providers.
+
+                if (mounted) {
+                  ref.invalidate(popularMoviesWithCacheInfoProvider);
+                  ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+                  ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+                  ref.invalidate(upcomingMoviesWithCacheInfoProvider);
+                }
               },
             ),
           ),
@@ -576,6 +591,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   // Forces refresh of all movie data.
 
   Future<void> _forceRefresh() async {
+    // Check if widget is still mounted before starting refresh.
+
+    if (!mounted) return;
+
     // Invalidate all providers to force refresh.
 
     ref.invalidate(popularMoviesWithCacheInfoProvider);
@@ -586,14 +605,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     // Force refresh through the cached service.
 
-    final cachedService = ref.read(configuredCachedMovieServiceProvider);
-    await cachedService.forceRefreshAll();
+    try {
+      final cachedService = ref.read(configuredCachedMovieServiceProvider);
+      await cachedService.forceRefreshAll();
+    } catch (e) {
+      // Handle error gracefully without causing setState after dispose.
+
+      if (mounted) {
+        debugPrint('Error during force refresh: $e');
+      }
+    }
   }
 
   // Shows cache performance feedback after initial load.
 
   void _showCachePerformanceFeedback() {
     if (_hasShownInitialFeedback) return;
+
+    // Check if widget is still mounted before proceeding.
+
+    if (!mounted) return;
 
     final popularMovies = ref.read(popularMoviesWithCacheInfoProvider);
     final nowPlayingMovies = ref.read(nowPlayingMoviesWithCacheInfoProvider);
@@ -629,11 +660,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     if (results.length == 4) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        CacheFeedbackWidget.showCacheStatsSummary(
-          context,
-          categoryResults: results,
-          totalTime: const Duration(milliseconds: 500), // Estimated
-        );
+        // Check if widget is still mounted before showing feedback.
+
+        if (mounted) {
+          CacheFeedbackWidget.showCacheStatsSummary(
+            context,
+            categoryResults: results,
+            totalTime: const Duration(milliseconds: 500),
+          );
+        }
       });
       _hasShownInitialFeedback = true;
     }
@@ -701,16 +736,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () {
-                    final movieService = ref.read(movieServiceProvider);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SearchScreen(
-                          favoritesService: widget.favoritesService,
-                          movieService: movieService,
+                    // Check if widget is still mounted before navigation.
+
+                    if (mounted) {
+                      final movieService = ref.read(movieServiceProvider);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SearchScreen(
+                            favoritesService: widget.favoritesService,
+                            movieService: movieService,
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    }
                   },
                 ),
                 Consumer(

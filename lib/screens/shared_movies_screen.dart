@@ -28,7 +28,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:solidpod/solidpod.dart';
-// ignore: implementation_imports
 import 'package:solidpod/src/solid/api/common_permission.dart';
 
 import 'package:moviestar/widgets/list_shared_movies.dart';

@@ -30,7 +30,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import 'package:rdflib/rdflib.dart';
-// ignore: implementation_imports
 import 'package:solidpod/src/solid/utils/rdf.dart'
     show tripleMapToTurtle, turtleToTripleMap;
 

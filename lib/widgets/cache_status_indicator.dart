@@ -29,7 +29,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:moviestar/database/movie_cache_repository.dart';
+import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';

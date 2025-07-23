@@ -1,4 +1,4 @@
-/// Hive database provider for the Movie Star application.
+/// Hive cache service provider for the Movie Star application.
 ///
 // Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
 ///
@@ -29,13 +29,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moviestar/services/hive_movie_cache_service.dart';
 
-/// Provider for the main application cache service using Hive.
+/// Provider for the Hive movie cache service.
 ///
 /// This creates a singleton instance of HiveMovieCacheService that can be accessed
 /// throughout the application. The service will be automatically initialised
-/// and disposed when the provider is disposed.
+/// when first accessed and disposed when the provider is disposed.
 
-final cacheServiceProvider = Provider<HiveMovieCacheService>((ref) {
+final hiveCacheServiceProvider = Provider<HiveMovieCacheService>((ref) {
   final service = HiveMovieCacheService();
 
   // Ensure the service is disposed when the provider is disposed.
@@ -47,7 +47,18 @@ final cacheServiceProvider = Provider<HiveMovieCacheService>((ref) {
   return service;
 });
 
-/// Legacy provider name for backward compatibility.
-/// This maintains compatibility with existing code that references databaseProvider.
+/// Provider for accessing the Hive cache service as a FutureProvider.
+/// This ensures the service is fully initialised before use.
 
-final databaseProvider = cacheServiceProvider;
+final hiveCacheServiceFutureProvider = FutureProvider<HiveMovieCacheService>((ref) async {
+  final service = HiveMovieCacheService();
+  await service.initialize();
+  
+  // Ensure the service is disposed when the provider is disposed.
+  
+  ref.onDispose(() {
+    service.dispose();
+  });
+  
+  return service;
+}); 

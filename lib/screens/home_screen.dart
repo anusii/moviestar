@@ -29,13 +29,14 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:moviestar/database/movie_cache_repository.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/screens/search_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/services/favorites_service_adapter.dart';
+import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 import 'package:moviestar/widgets/movie_card.dart';
@@ -94,11 +95,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return StreamBuilder<List<Movie>>(
       stream: widget.favoritesService.toWatchMovies,
       builder: (context, snapshot) {
+        // Check if the service is a FavoritesServiceAdapter with caching.
+
+        final isCached = widget.favoritesService is FavoritesServiceAdapter;
+        Map<String, dynamic>? cacheStats;
+        
+        if (isCached) {
+          final adapter = widget.favoritesService as FavoritesServiceAdapter;
+          cacheStats = adapter.getCacheStats();
+        }
+        
+        final toWatchStats = cacheStats?['toWatch'];
+        final fromCache = toWatchStats?['valid'] ?? false;
+        final cacheAge = toWatchStats?['age'] != null 
+            ? Duration(minutes: toWatchStats['age']) 
+            : null;
+        
         final cacheResult = CacheResult(
           data: snapshot.data ?? [],
-          fromCache: false, // User favorites data is not cached like API data.
-          cacheAge: null,
-          cachedAt: null,
+          fromCache: fromCache,
+          cacheAge: cacheAge,
+          cachedAt: cacheAge != null ? DateTime.now().subtract(cacheAge) : null,
         );
 
         return Column(
@@ -119,8 +136,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                   ),
+                  // Show cache indicator for user data if cached.
 
-                  // No cache indicator for user data.
+                  if (fromCache && cacheAge != null)
+                    _buildCacheAgeBadge(cacheAge),
                 ],
               ),
             ),
@@ -222,11 +241,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return StreamBuilder<List<Movie>>(
       stream: widget.favoritesService.watchedMovies,
       builder: (context, snapshot) {
+        // Check if the service is a FavoritesServiceAdapter with caching.
+
+        final isCached = widget.favoritesService is FavoritesServiceAdapter;
+        Map<String, dynamic>? cacheStats;
+        
+        if (isCached) {
+          final adapter = widget.favoritesService as FavoritesServiceAdapter;
+          cacheStats = adapter.getCacheStats();
+        }
+        
+        final watchedStats = cacheStats?['watched'];
+        final fromCache = watchedStats?['valid'] ?? false;
+        final cacheAge = watchedStats?['age'] != null 
+            ? Duration(minutes: watchedStats['age']) 
+            : null;
+        
         final cacheResult = CacheResult(
           data: snapshot.data ?? [],
-          fromCache: false, // User favorites data is not cached like API data.
-          cacheAge: null,
-          cachedAt: null,
+          fromCache: fromCache,
+          cacheAge: cacheAge,
+          cachedAt: cacheAge != null ? DateTime.now().subtract(cacheAge) : null,
         );
 
         return Column(
@@ -247,7 +282,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                   ),
-                  // No cache indicator for user data.
+                  // Show cache indicator for user data if cached.
+                  
+                  if (fromCache && cacheAge != null)
+                    _buildCacheAgeBadge(cacheAge),
                 ],
               ),
             ),

@@ -31,13 +31,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solidpod/solidpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:moviestar/database/movie_cache_repository.dart';
 import 'package:moviestar/my_home_page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
+import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 import 'package:moviestar/widgets/theme_toggle_button.dart';
 
@@ -840,7 +840,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                                       ).textTheme.bodyMedium,
                                     ),
                                     Text(
-                                      'Updated ${_getTimeAgo(stat.age)} ago',
+                                      'Updated ${_getTimeAgo(stat['age'] as Duration)} ago',
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodySmall
@@ -855,18 +855,18 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                                 Row(
                                   children: [
                                     Icon(
-                                      stat.isValid
+                                      (stat['isValid'] as bool)
                                           ? Icons.check_circle
                                           : Icons.schedule,
                                       size: 16,
-                                      color: stat.isValid
+                                      color: (stat['isValid'] as bool)
                                           ? Colors.green
                                           : Colors.orange,
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      stat.isValid
-                                          ? '${stat.movieCount} movies'
+                                      (stat['isValid'] as bool)
+                                          ? '${stat['movieCount']} movies'
                                           : 'Expired',
                                       style: Theme.of(
                                         context,

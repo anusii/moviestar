@@ -1,6 +1,6 @@
 /// Screen for managing user settings and preferences.
 ///
-// Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
+// Time-stamp: <Wednesday 2025-07-23 16:57:43 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -32,7 +32,7 @@ import 'package:solidpod/solidpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:moviestar/database/movie_cache_repository.dart';
-import 'package:moviestar/main.dart';
+import 'package:moviestar/my_home_page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/services/api_key_service.dart';

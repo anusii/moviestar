@@ -1,6 +1,6 @@
 /// Create Solid Login Widget.
 //
-// Time-stamp: <Thursday 2025-05-20 10:52:11 +1000 Graham Williams>
+// Time-stamp: <Wednesday 2025-07-23 16:57:13 +1000 Graham Williams>
 //
 /// Copyright (C) 2025, Software Innovation Institute, ANU
 ///
@@ -31,7 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart';
 
-import 'package:moviestar/main.dart';
+import 'package:moviestar/my_home_page.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/favorites_service.dart';

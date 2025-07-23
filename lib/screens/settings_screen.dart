@@ -38,6 +38,7 @@ import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
+import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 import 'package:moviestar/widgets/theme_toggle_button.dart';
 
@@ -473,11 +474,9 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
     _apiKeyController = TextEditingController();
     _loadApiKey();
 
-    // Initialise POD storage state from service manager.
+    // Initialise POD storage state - enable by default if user is logged in.
 
-    if (widget.favoritesServiceManager != null) {
-      _podStorageEnabled = widget.favoritesServiceManager!.isPodStorageEnabled;
-    }
+    _initializePodStorageState();
 
     // If navigated from API key prompt, scroll to the API key section and focus the field.
 
@@ -487,6 +486,47 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _apiKeyFocusNode.requestFocus();
       });
+    }
+  }
+
+  /// Initialises POD storage state, enabling by default for logged-in users.
+
+  Future<void> _initializePodStorageState() async {
+    if (widget.favoritesServiceManager != null) {
+      // Check if user is logged in.
+
+      final loggedIn = await isLoggedIn();
+
+      // If user is logged in and POD storage is not explicitly disabled,
+      // enable it by default.
+
+      if (loggedIn && !widget.favoritesServiceManager!.isPodStorageEnabled) {
+        // Enable POD storage silently for logged-in users.
+
+        setState(() {
+          _podStorageEnabled = true;
+        });
+
+        // Try to enable POD storage in the background.
+
+        try {
+          await widget.favoritesServiceManager!.enablePodStorage();
+        } catch (e) {
+          // If enabling fails, revert to current state.
+
+          if (mounted) {
+            setState(() {
+              _podStorageEnabled =
+                  widget.favoritesServiceManager!.isPodStorageEnabled;
+            });
+          }
+        }
+      } else {
+        // Use current state from service manager.
+
+        _podStorageEnabled =
+            widget.favoritesServiceManager!.isPodStorageEnabled;
+      }
     }
   }
 

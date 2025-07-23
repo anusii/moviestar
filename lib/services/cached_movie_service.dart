@@ -38,7 +38,7 @@ class CachedMovieService {
   final MovieService _movieService;
 
   /// Service for managing cached movie data.
-  
+
   final HiveMovieCacheService _cacheService;
 
   /// Whether caching is enabled.
@@ -79,7 +79,7 @@ class CachedMovieService {
   }
 
   /// Gets movies with caching strategy.
-  
+
   Future<CacheResult<List<Movie>>> _getMoviesWithCache(
     CacheCategory category,
     Future<List<Movie>> Function() networkCall,
@@ -100,7 +100,7 @@ class CachedMovieService {
     );
 
     // If offline mode is enabled, try cache first.
-    
+
     if (_cacheOnlyMode) {
       final staleMovies = await _cacheService.getStaleMovies(category);
       if (staleMovies != null && staleMovies.isNotEmpty) {
@@ -122,7 +122,7 @@ class CachedMovieService {
     }
 
     // If caching is disabled, make network call only.
-    
+
     if (!_cachingEnabled) {
       developer.log(
         'Caching disabled: Making network call for ${category.value}',
@@ -142,7 +142,7 @@ class CachedMovieService {
     }
 
     // Check if we have valid cached data.
-    
+
     final isValid = await _cacheService.isCacheValid(category);
     if (isValid) {
       final cacheResult = await _cacheService.getMoviesWithCacheInfo(category);
@@ -157,7 +157,7 @@ class CachedMovieService {
     }
 
     // Try network call with cache fallback.
-    
+
     try {
       developer.log(
         'Making network call for ${category.value}',
@@ -166,7 +166,7 @@ class CachedMovieService {
       final movies = await networkCall();
 
       // Cache the fresh data.
-      
+
       await _cacheService.cacheMoviesForCategory(category, movies);
 
       developer.log(
@@ -183,7 +183,7 @@ class CachedMovieService {
       );
 
       // Fallback to stale cache if available.
-      
+
       final staleMovies = await _cacheService.getStaleMovies(category);
       if (staleMovies != null && staleMovies.isNotEmpty) {
         developer.log(
@@ -194,13 +194,13 @@ class CachedMovieService {
       }
 
       // No cache available, rethrow the network error.
-      
+
       rethrow;
     }
   }
 
   /// Get popular movies with caching.
-  
+
   Future<List<Movie>> getPopularMovies() async {
     final result = await _getMoviesWithCache(
       CacheCategory.popular,
@@ -210,7 +210,7 @@ class CachedMovieService {
   }
 
   /// Get now playing movies with caching.
-  
+
   Future<List<Movie>> getNowPlayingMovies() async {
     final result = await _getMoviesWithCache(
       CacheCategory.nowPlaying,
@@ -220,7 +220,7 @@ class CachedMovieService {
   }
 
   /// Get top rated movies with caching.
-  
+
   Future<List<Movie>> getTopRatedMovies() async {
     final result = await _getMoviesWithCache(
       CacheCategory.topRated,
@@ -230,7 +230,7 @@ class CachedMovieService {
   }
 
   /// Get upcoming movies with caching.
-  
+
   Future<List<Movie>> getUpcomingMovies() async {
     final result = await _getMoviesWithCache(
       CacheCategory.upcoming,
@@ -240,7 +240,7 @@ class CachedMovieService {
   }
 
   /// Get popular movies with cache information.
-  
+
   Future<CacheResult<List<Movie>>> getPopularMoviesWithCacheInfo() async {
     return _getMoviesWithCache(
       CacheCategory.popular,
@@ -249,7 +249,7 @@ class CachedMovieService {
   }
 
   /// Get now playing movies with cache information.
-  
+
   Future<CacheResult<List<Movie>>> getNowPlayingMoviesWithCacheInfo() async {
     return _getMoviesWithCache(
       CacheCategory.nowPlaying,
@@ -258,7 +258,7 @@ class CachedMovieService {
   }
 
   /// Get top rated movies with cache information.
-  
+
   Future<CacheResult<List<Movie>>> getTopRatedMoviesWithCacheInfo() async {
     return _getMoviesWithCache(
       CacheCategory.topRated,
@@ -267,7 +267,7 @@ class CachedMovieService {
   }
 
   /// Get upcoming movies with cache information.
-  
+
   Future<CacheResult<List<Movie>>> getUpcomingMoviesWithCacheInfo() async {
     return _getMoviesWithCache(
       CacheCategory.upcoming,
@@ -304,12 +304,12 @@ class CachedMovieService {
     );
 
     // Clear existing cache.
-    
+
     await _cacheService.clearCacheForCategory(category);
 
     // Fetch fresh data.
-    
-    final List<Movie> movies; 
+
+    final List<Movie> movies;
     switch (category) {
       case CacheCategory.toWatch:
         throw UnsupportedError(
@@ -332,7 +332,7 @@ class CachedMovieService {
     }
 
     // Cache the fresh data.
-    
+
     await _cacheService.cacheMoviesForCategory(category, movies);
 
     developer.log(
@@ -355,11 +355,12 @@ class CachedMovieService {
 
     for (final category in CacheCategory.values) {
       // Skip user data categories.
-      
-      if (category == CacheCategory.toWatch || category == CacheCategory.watched) {
+
+      if (category == CacheCategory.toWatch ||
+          category == CacheCategory.watched) {
         continue;
       }
-      
+
       try {
         results[category] = await forceRefresh(category);
       } catch (e) {
@@ -375,23 +376,24 @@ class CachedMovieService {
   }
 
   /// Gets cache metadata for all categories.
-  
+
   Future<Map<CacheCategory, Map<String, dynamic>>> getCacheStats() async {
     final stats = <CacheCategory, Map<String, dynamic>>{};
-    
+
     for (final category in CacheCategory.values) {
       final metadata = await _cacheService.getCacheMetadata(category);
       if (metadata != null) {
         stats[category] = metadata;
       }
     }
-    
+
     return stats;
   }
 
   /// Gets cache metadata for a specific category.
-  
-  Future<Map<String, dynamic>?> getCacheStatsForCategory(CacheCategory category) async {
+
+  Future<Map<String, dynamic>?> getCacheStatsForCategory(
+      CacheCategory category) async {
     return await _cacheService.getCacheMetadata(category);
   }
 

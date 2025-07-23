@@ -56,9 +56,9 @@ void main() async {
   // Initialise Hive for local movie caching.
 
   await Hive.initFlutter();
-  
+
   // Register Hive type adapters.
-  
+
   Hive.registerAdapter(MovieAdapter());
 
   // Globally remove [debugPrint] messages.

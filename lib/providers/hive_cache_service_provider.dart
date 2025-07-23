@@ -39,7 +39,7 @@ final hiveCacheServiceProvider = Provider<HiveMovieCacheService>((ref) {
   final service = HiveMovieCacheService();
 
   // Ensure the service is disposed when the provider is disposed.
-  
+
   ref.onDispose(() {
     service.dispose();
   });
@@ -50,15 +50,16 @@ final hiveCacheServiceProvider = Provider<HiveMovieCacheService>((ref) {
 /// Provider for accessing the Hive cache service as a FutureProvider.
 /// This ensures the service is fully initialised before use.
 
-final hiveCacheServiceFutureProvider = FutureProvider<HiveMovieCacheService>((ref) async {
+final hiveCacheServiceFutureProvider =
+    FutureProvider<HiveMovieCacheService>((ref) async {
   final service = HiveMovieCacheService();
   await service.initialize();
-  
+
   // Ensure the service is disposed when the provider is disposed.
-  
+
   ref.onDispose(() {
     service.dispose();
   });
-  
+
   return service;
-}); 
+});

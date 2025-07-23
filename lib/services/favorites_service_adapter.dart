@@ -36,19 +36,19 @@ import 'package:moviestar/services/favorites_service_manager.dart';
 
 class FavoritesServiceAdapter extends FavoritesService {
   final FavoritesServiceManager _manager;
-  
+
   /// Cache for to-watch movies.
-  
+
   List<Movie>? _cachedToWatch;
   DateTime? _toWatchCacheTime;
-  
+
   /// Cache for watched movies.
-  
+
   List<Movie>? _cachedWatched;
   DateTime? _watchedCacheTime;
-  
+
   /// TTL (time to live) for user data cache (5 minutes for frequent updates).
-  
+
   static const Duration _userDataTtl = Duration(minutes: 5);
 
   FavoritesServiceAdapter(this._manager) : super(_manager.prefs);
@@ -62,44 +62,44 @@ class FavoritesServiceAdapter extends FavoritesService {
   @override
   Future<List<Movie>> getToWatch() async {
     // Check if cache is valid.
-    
-    if (_cachedToWatch != null && 
-        _toWatchCacheTime != null && 
+
+    if (_cachedToWatch != null &&
+        _toWatchCacheTime != null &&
         DateTime.now().difference(_toWatchCacheTime!) < _userDataTtl) {
       return List.from(_cachedToWatch!);
     }
-    
+
     // Cache miss or expired - fetch from manager.
-    
+
     final movies = await _manager.getToWatch();
-    
+
     // Update cache.
-    
+
     _cachedToWatch = List.from(movies);
     _toWatchCacheTime = DateTime.now();
-    
+
     return movies;
   }
 
   @override
   Future<List<Movie>> getWatched() async {
     // Check if cache is valid.
-    
-    if (_cachedWatched != null && 
-        _watchedCacheTime != null && 
+
+    if (_cachedWatched != null &&
+        _watchedCacheTime != null &&
         DateTime.now().difference(_watchedCacheTime!) < _userDataTtl) {
       return List.from(_cachedWatched!);
     }
-    
+
     // Cache miss or expired - fetch from manager.
-    
+
     final movies = await _manager.getWatched();
-    
+
     // Update cache.
-    
+
     _cachedWatched = List.from(movies);
     _watchedCacheTime = DateTime.now();
-    
+
     return movies;
   }
 
@@ -126,16 +126,16 @@ class FavoritesServiceAdapter extends FavoritesService {
     await _manager.removeFromWatched(movie);
     _invalidateWatchedCache();
   }
-  
+
   /// Invalidate to-watch cache to force refresh.
-  
+
   void _invalidateToWatchCache() {
     _cachedToWatch = null;
     _toWatchCacheTime = null;
   }
-  
+
   /// Invalidate watched cache to force refresh.
-  
+
   void _invalidateWatchedCache() {
     _cachedWatched = null;
     _watchedCacheTime = null;
@@ -176,58 +176,58 @@ class FavoritesServiceAdapter extends FavoritesService {
 
   @override
   String? getMovieFilePath(Movie movie) => _manager.getMovieFilePath(movie);
-  
+
   /// Get cache statistics for debugging.
-  
+
   Map<String, dynamic> getCacheStats() {
     final now = DateTime.now();
     return {
       'toWatch': {
         'cached': _cachedToWatch != null,
         'count': _cachedToWatch?.length ?? 0,
-        'age': _toWatchCacheTime != null 
-            ? now.difference(_toWatchCacheTime!).inMinutes 
+        'age': _toWatchCacheTime != null
+            ? now.difference(_toWatchCacheTime!).inMinutes
             : null,
-        'valid': _cachedToWatch != null && 
-                 _toWatchCacheTime != null && 
-                 now.difference(_toWatchCacheTime!) < _userDataTtl,
+        'valid': _cachedToWatch != null &&
+            _toWatchCacheTime != null &&
+            now.difference(_toWatchCacheTime!) < _userDataTtl,
       },
       'watched': {
         'cached': _cachedWatched != null,
         'count': _cachedWatched?.length ?? 0,
-        'age': _watchedCacheTime != null 
-            ? now.difference(_watchedCacheTime!).inMinutes 
+        'age': _watchedCacheTime != null
+            ? now.difference(_watchedCacheTime!).inMinutes
             : null,
-        'valid': _cachedWatched != null && 
-                 _watchedCacheTime != null && 
-                 now.difference(_watchedCacheTime!) < _userDataTtl,
+        'valid': _cachedWatched != null &&
+            _watchedCacheTime != null &&
+            now.difference(_watchedCacheTime!) < _userDataTtl,
       },
     };
   }
-  
+
   /// Force refresh to-watch cache.
-  
+
   Future<List<Movie>> forceRefreshToWatch() async {
     _invalidateToWatchCache();
     return getToWatch();
   }
-  
+
   /// Force refresh watched cache.
-  
+
   Future<List<Movie>> forceRefreshWatched() async {
     _invalidateWatchedCache();
     return getWatched();
   }
-  
+
   /// Clear all caches.
-  
+
   void clearAllCaches() {
     _invalidateToWatchCache();
     _invalidateWatchedCache();
   }
-  
+
   /// Clear all caches (no stream controllers to dispose).
-  
+
   void disposeCache() {
     clearAllCaches();
   }

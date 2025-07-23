@@ -35,23 +35,23 @@ import 'package:moviestar/services/movie_service.dart';
 
 class HiveCachedMovieService {
   /// The underlying movie service for API calls.
-  
+
   final MovieService _movieService;
 
   /// Service for managing cached movie data.
-  
+
   final HiveMovieCacheService _cacheService;
 
   /// Whether caching is enabled.
-  
+
   bool _cachingEnabled;
 
   /// Whether to use offline mode (no network calls).
-  
+
   bool _cacheOnlyMode;
 
   /// Creates a new HiveCachedMovieService instance.
-  
+
   HiveCachedMovieService(
     this._movieService,
     this._cacheService, {
@@ -61,7 +61,7 @@ class HiveCachedMovieService {
         _cacheOnlyMode = cacheOnlyMode;
 
   /// Enables or disables caching.
-  
+
   void setCachingEnabled(bool enabled) {
     _cachingEnabled = enabled;
     developer.log(
@@ -71,7 +71,7 @@ class HiveCachedMovieService {
   }
 
   /// Enables or disables offline mode.
-  
+
   void setCacheOnlyMode(bool cacheOnly) {
     _cacheOnlyMode = cacheOnly;
     developer.log(
@@ -81,7 +81,7 @@ class HiveCachedMovieService {
   }
 
   /// Gets movies with caching strategy.
-  
+
   Future<CacheResult<List<Movie>>> _getMoviesWithCache(
     CacheCategory category,
     Future<List<Movie>> Function() networkCall,
@@ -92,7 +92,7 @@ class HiveCachedMovieService {
     );
 
     // If offline mode is enabled, try cache first.
-    
+
     if (_cacheOnlyMode) {
       final staleMovies = await _cacheService.getStaleMovies(category);
       if (staleMovies != null && staleMovies.isNotEmpty) {
@@ -111,7 +111,7 @@ class HiveCachedMovieService {
     }
 
     // If caching is disabled, make network call only.
-    
+
     if (!_cachingEnabled) {
       developer.log(
         'Caching disabled: Making network call for ${category.value}',
@@ -130,7 +130,7 @@ class HiveCachedMovieService {
     }
 
     // Check if we have valid cached data.
-    
+
     final isValid = await _cacheService.isCacheValid(category);
     if (isValid) {
       final cacheResult = await _cacheService.getMoviesWithCacheInfo(category);
@@ -145,7 +145,7 @@ class HiveCachedMovieService {
     }
 
     // Try network call with cache fallback.
-    
+
     try {
       developer.log(
         'Making network call for ${category.value}',
@@ -170,7 +170,7 @@ class HiveCachedMovieService {
       );
 
       // Fallback to stale cache if available.
-      
+
       final staleMovies = await _cacheService.getStaleMovies(category);
       if (staleMovies != null && staleMovies.isNotEmpty) {
         developer.log(
@@ -181,13 +181,13 @@ class HiveCachedMovieService {
       }
 
       // No cache available, rethrow the network error.
-      
+
       rethrow;
     }
   }
 
   /// Get popular movies with caching.
-  
+
   Future<List<Movie>> getPopularMovies() async {
     final result = await _getMoviesWithCache(
       CacheCategory.popular,
@@ -197,7 +197,7 @@ class HiveCachedMovieService {
   }
 
   /// Get now playing movies with caching.
-  
+
   Future<List<Movie>> getNowPlayingMovies() async {
     final result = await _getMoviesWithCache(
       CacheCategory.nowPlaying,
@@ -207,7 +207,7 @@ class HiveCachedMovieService {
   }
 
   /// Get top rated movies with caching.
-  
+
   Future<List<Movie>> getTopRatedMovies() async {
     final result = await _getMoviesWithCache(
       CacheCategory.topRated,
@@ -217,7 +217,7 @@ class HiveCachedMovieService {
   }
 
   /// Get upcoming movies with caching.
-  
+
   Future<List<Movie>> getUpcomingMovies() async {
     final result = await _getMoviesWithCache(
       CacheCategory.upcoming,
@@ -227,7 +227,7 @@ class HiveCachedMovieService {
   }
 
   /// Get popular movies with cache information.
-  
+
   Future<CacheResult<List<Movie>>> getPopularMoviesWithCacheInfo() async {
     return _getMoviesWithCache(
       CacheCategory.popular,
@@ -236,7 +236,7 @@ class HiveCachedMovieService {
   }
 
   /// Get now playing movies with cache information.
-  
+
   Future<CacheResult<List<Movie>>> getNowPlayingMoviesWithCacheInfo() async {
     return _getMoviesWithCache(
       CacheCategory.nowPlaying,
@@ -245,7 +245,7 @@ class HiveCachedMovieService {
   }
 
   /// Get top rated movies with cache information.
-  
+
   Future<CacheResult<List<Movie>>> getTopRatedMoviesWithCacheInfo() async {
     return _getMoviesWithCache(
       CacheCategory.topRated,
@@ -254,7 +254,7 @@ class HiveCachedMovieService {
   }
 
   /// Get upcoming movies with cache information.
-  
+
   Future<CacheResult<List<Movie>>> getUpcomingMoviesWithCacheInfo() async {
     return _getMoviesWithCache(
       CacheCategory.upcoming,
@@ -263,14 +263,14 @@ class HiveCachedMovieService {
   }
 
   /// Clear cache for all categories.
-  
+
   Future<void> clearAllCache() async {
     await _cacheService.clearAllCache();
     developer.log('Cleared all cache', name: 'HiveCachedMovieService');
   }
 
   /// Clear cache for a specific category.
-  
+
   Future<void> clearCacheForCategory(CacheCategory category) async {
     await _cacheService.clearCacheForCategory(category);
     developer.log(
@@ -280,8 +280,8 @@ class HiveCachedMovieService {
   }
 
   /// Get cache metadata for a category.
-  
+
   Future<Map<String, dynamic>?> getCacheMetadata(CacheCategory category) async {
     return await _cacheService.getCacheMetadata(category);
   }
-} 
+}

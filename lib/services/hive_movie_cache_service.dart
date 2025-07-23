@@ -35,33 +35,33 @@ import 'package:moviestar/models/movie.dart';
 
 enum CacheCategory {
   /// Popular movies from TMDB.
-  
+
   popular('popular'),
 
   /// Movies currently playing in theaters.
-  
+
   nowPlaying('now_playing'),
 
   /// Top rated movies.
-  
+
   topRated('top_rated'),
 
   /// Upcoming movies.
-  
+
   upcoming('upcoming'),
 
   /// User's to-watch movies.
-  
+
   toWatch('to_watch'),
 
   /// User's watched movies.
-  
+
   watched('watched');
 
   const CacheCategory(this.value);
 
   /// String value of the category.
-  
+
   final String value;
 }
 
@@ -69,27 +69,27 @@ enum CacheCategory {
 
 class CacheConfig {
   /// Default time-to-live (TTL) for cached data (1 hour).
-  
+
   static const Duration defaultTtl = Duration(hours: 1);
 
   /// Time-to-live (TTL) for popular movies (30 minutes).
-  
+
   static const Duration popularTtl = Duration(minutes: 30);
 
   /// Time-to-live (TTL) for now playing movies (15 minutes).
-  
+
   static const Duration nowPlayingTtl = Duration(minutes: 15);
 
   /// Time-to-live (TTL) for top rated movies (2 hours).
-  
+
   static const Duration topRatedTtl = Duration(hours: 2);
 
   /// Time-to-live (TTL) for upcoming movies (6 hours).
-  
+
   static const Duration upcomingTtl = Duration(hours: 6);
 
   /// Gets the time-to-live (TTL) for a specific category.
-  
+
   static Duration getTtlForCategory(CacheCategory category) {
     switch (category) {
       case CacheCategory.popular:
@@ -102,7 +102,7 @@ class CacheConfig {
         return upcomingTtl;
       case CacheCategory.toWatch:
       case CacheCategory.watched:
-        return defaultTtl; 
+        return defaultTtl;
     }
   }
 }
@@ -111,19 +111,19 @@ class CacheConfig {
 
 class CacheResult<T> {
   /// The data retrieved from cache.
-  
+
   final T data;
 
   /// Whether the data came from cache.
-  
+
   final bool fromCache;
 
   /// Age of the cached data.
-  
+
   final Duration? cacheAge;
 
   /// Timestamp when the data was cached.
-  
+
   final DateTime? cachedAt;
 
   const CacheResult({
@@ -138,22 +138,22 @@ class CacheResult<T> {
 
 class HiveMovieCacheService {
   /// Box for storing movie lists by category.
-  
+
   Box<List<dynamic>>? _movieBox;
 
   /// Box for storing cache timestamps.
-  
+
   Box<DateTime>? _timestampBox;
 
   /// Whether the service has been initialized.
-  
+
   bool _isInitialized = false;
 
   /// Initialise the Hive service and open boxes.
-  
+
   Future<void> initialize() async {
     if (_isInitialized) return;
-    
+
     try {
       _movieBox = await Hive.openBox<List<dynamic>>('movies');
       _timestampBox = await Hive.openBox<DateTime>('cache_timestamps');
@@ -165,7 +165,7 @@ class HiveMovieCacheService {
   }
 
   /// Ensure the service is initialised before use.
-  
+
   Future<void> _ensureInitialized() async {
     if (!_isInitialized) {
       await initialize();
@@ -173,7 +173,7 @@ class HiveMovieCacheService {
   }
 
   /// Cache movies for a specific category.
-  
+
   Future<void> cacheMoviesForCategory(
     CacheCategory category,
     List<Movie> movies,
@@ -183,9 +183,9 @@ class HiveMovieCacheService {
       // Store movies as a list.
 
       await _movieBox!.put(category.value, movies);
-      
+
       // Store timestamp for cache expiration.
-      
+
       await _timestampBox!.put(category.value, DateTime.now());
     } catch (e) {
       debugPrint('Error caching movies for ${category.value}: $e');
@@ -194,7 +194,7 @@ class HiveMovieCacheService {
   }
 
   /// Get cached movies for a specific category.
-  
+
   Future<List<Movie>?> getCachedMoviesForCategory(
     CacheCategory category,
   ) async {
@@ -213,7 +213,7 @@ class HiveMovieCacheService {
   }
 
   /// Check if cache for a category is valid (not expired).
-  
+
   Future<bool> isCacheValid(CacheCategory category) async {
     await _ensureInitialized();
     try {
@@ -222,7 +222,7 @@ class HiveMovieCacheService {
 
       final ttl = CacheConfig.getTtlForCategory(category);
       final age = DateTime.now().difference(timestamp);
-      
+
       return age <= ttl;
     } catch (e) {
       debugPrint('Error checking cache validity for ${category.value}: $e');
@@ -231,13 +231,13 @@ class HiveMovieCacheService {
   }
 
   /// Get cached movies regardless of TTL (for stale cache fallback).
-  
+
   Future<List<Movie>?> getStaleMovies(CacheCategory category) async {
     return getCachedMoviesForCategory(category);
   }
 
   /// Get movies with cache information.
-  
+
   Future<CacheResult<List<Movie>>?> getMoviesWithCacheInfo(
     CacheCategory category,
   ) async {
@@ -260,13 +260,14 @@ class HiveMovieCacheService {
         cachedAt: timestamp,
       );
     } catch (e) {
-      debugPrint('Error getting movies with cache info for ${category.value}: $e');
+      debugPrint(
+          'Error getting movies with cache info for ${category.value}: $e');
       return null;
     }
   }
 
   /// Invalidate cache for a specific category.
-  
+
   Future<void> clearCacheForCategory(CacheCategory category) async {
     await _ensureInitialized();
     try {
@@ -279,7 +280,7 @@ class HiveMovieCacheService {
   }
 
   /// Clear all cached data.
-  
+
   Future<void> clearAllCache() async {
     await _ensureInitialized();
     try {
@@ -292,13 +293,13 @@ class HiveMovieCacheService {
   }
 
   /// Get cache metadata for a category.
-  
+
   Future<Map<String, dynamic>?> getCacheMetadata(CacheCategory category) async {
     await _ensureInitialized();
     try {
       final timestamp = _timestampBox!.get(category.value);
       final movies = await getCachedMoviesForCategory(category);
-      
+
       if (timestamp == null || movies == null) return null;
 
       final age = DateTime.now().difference(timestamp);
@@ -318,7 +319,7 @@ class HiveMovieCacheService {
   }
 
   /// Close Hive boxes when service is disposed.
-  
+
   Future<void> dispose() async {
     try {
       if (_movieBox != null && _movieBox!.isOpen) {
@@ -332,4 +333,4 @@ class HiveMovieCacheService {
       debugPrint('Error disposing Hive service: $e');
     }
   }
-} 
+}

@@ -39,7 +39,7 @@ final cacheServiceProvider = Provider<HiveMovieCacheService>((ref) {
   final service = HiveMovieCacheService();
 
   // Ensure the service is disposed when the provider is disposed.
-  
+
   ref.onDispose(() {
     service.dispose();
   });

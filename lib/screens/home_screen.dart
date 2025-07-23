@@ -99,18 +99,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
         final isCached = widget.favoritesService is FavoritesServiceAdapter;
         Map<String, dynamic>? cacheStats;
-        
+
         if (isCached) {
           final adapter = widget.favoritesService as FavoritesServiceAdapter;
           cacheStats = adapter.getCacheStats();
         }
-        
+
         final toWatchStats = cacheStats?['toWatch'];
         final fromCache = toWatchStats?['valid'] ?? false;
-        final cacheAge = toWatchStats?['age'] != null 
-            ? Duration(minutes: toWatchStats['age']) 
+        final cacheAge = toWatchStats?['age'] != null
+            ? Duration(minutes: toWatchStats['age'])
             : null;
-        
+
         final cacheResult = CacheResult(
           data: snapshot.data ?? [],
           fromCache: fromCache,
@@ -245,18 +245,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
         final isCached = widget.favoritesService is FavoritesServiceAdapter;
         Map<String, dynamic>? cacheStats;
-        
+
         if (isCached) {
           final adapter = widget.favoritesService as FavoritesServiceAdapter;
           cacheStats = adapter.getCacheStats();
         }
-        
+
         final watchedStats = cacheStats?['watched'];
         final fromCache = watchedStats?['valid'] ?? false;
-        final cacheAge = watchedStats?['age'] != null 
-            ? Duration(minutes: watchedStats['age']) 
+        final cacheAge = watchedStats?['age'] != null
+            ? Duration(minutes: watchedStats['age'])
             : null;
-        
+
         final cacheResult = CacheResult(
           data: snapshot.data ?? [],
           fromCache: fromCache,
@@ -283,7 +283,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   // Show cache indicator for user data if cached.
-                  
+
                   if (fromCache && cacheAge != null)
                     _buildCacheAgeBadge(cacheAge),
                 ],

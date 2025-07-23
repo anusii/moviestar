@@ -113,12 +113,13 @@ final hiveCacheServiceProvider = Provider<HiveMovieCacheService>((ref) {
 /// Provider for the Hive movie cache service that ensures initialisation.
 /// Use this when you need a guaranteed initialised service.
 
-final initializedHiveCacheServiceProvider = FutureProvider<HiveMovieCacheService>((ref) async {
+final initializedHiveCacheServiceProvider =
+    FutureProvider<HiveMovieCacheService>((ref) async {
   final service = HiveMovieCacheService();
   await service.initialize();
 
   // Ensure the service is disposed when the provider is disposed.
-  
+
   ref.onDispose(() {
     service.dispose();
   });
@@ -281,7 +282,8 @@ final upcomingMoviesProvider = FutureProvider.autoDispose<List<Movie>>((
 
 /// Provider for cache statistics.
 
-final cacheStatsProvider = FutureProvider<Map<CacheCategory, Map<String, dynamic>>>((
+final cacheStatsProvider =
+    FutureProvider<Map<CacheCategory, Map<String, dynamic>>>((
   ref,
 ) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);

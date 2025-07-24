@@ -34,7 +34,7 @@ dependencies:
   pdf: ^3.11.3
   printing: ^5.14.2
   rdflib: ^0.2.12
-  rxdart: ^0.27.7
+  rxdart: ^0.28.0
   shared_preferences: ^2.2.2
   solidpod: ^0.7.2
   universal_io: ^2.2.2
@@ -53,6 +53,9 @@ dev_dependencies:
   test: ^1.25.15
   ubuntu_lints: ^0.4.0
 
+dependency_overrides:
+  analyzer: ^8.0.0
+  rxdart: ^0.28.0
 
 flutter:
   assets:

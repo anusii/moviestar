@@ -32,12 +32,12 @@ import 'package:solidpod/solidpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:moviestar/database/movie_cache_repository.dart';
-import 'package:moviestar/my_home_page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
+import 'package:moviestar/utils/create_solid_login.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 import 'package:moviestar/widgets/theme_toggle_button.dart';
 
@@ -768,13 +768,13 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
               // Show logout confirmation dialog and handle logout.
 
               final prefs = ref.read(sharedPreferencesProvider);
-              await logoutPopup(
-                  context,
-                  SolidLogin(
-                      child: MyHomePage(
-                    title: 'Movie Star Home Page',
-                    prefs: prefs,
-                  )));
+
+              // Create a properly configured SolidLogin widget using the same function
+              // that creates the initial login screen to maintain consistent branding.
+
+              final solidLoginWidget = createSolidLogin(context, prefs);
+
+              await logoutPopup(context, solidLoginWidget);
             }, isDestructive: true),
           ]),
         ],

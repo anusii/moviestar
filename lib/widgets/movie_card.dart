@@ -149,15 +149,29 @@ class MovieCard extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
-            child: CachedNetworkImage(
-              imageUrl: movie.posterUrl,
-              width: width,
-              height: height,
-              fit: BoxFit.cover,
-              placeholder: (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-            ),
+            child: movie.posterUrl.isEmpty
+                ? Container(
+                    width: width,
+                    height: height,
+                    color: Colors.grey[300],
+                    child:
+                        const Icon(Icons.movie, size: 40, color: Colors.grey),
+                  )
+                : CachedNetworkImage(
+                    imageUrl: movie.posterUrl,
+                    width: width,
+                    height: height,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) => Container(
+                      width: width,
+                      height: height,
+                      color: Colors.grey[300],
+                      child:
+                          const Icon(Icons.movie, size: 40, color: Colors.grey),
+                    ),
+                  ),
           ),
           _buildCacheIndicator(context),
           if (cacheOnlyMode == true) _buildOfflineModeIndicator(context),
@@ -174,15 +188,29 @@ class MovieCard extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
-            child: CachedNetworkImage(
-              imageUrl: movie.posterUrl,
-              width: width,
-              height: height,
-              fit: BoxFit.cover,
-              placeholder: (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-            ),
+            child: movie.posterUrl.isEmpty
+                ? Container(
+                    width: width,
+                    height: height,
+                    color: Colors.grey[300],
+                    child:
+                        const Icon(Icons.movie, size: 20, color: Colors.grey),
+                  )
+                : CachedNetworkImage(
+                    imageUrl: movie.posterUrl,
+                    width: width,
+                    height: height,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) => Container(
+                      width: width,
+                      height: height,
+                      color: Colors.grey[300],
+                      child:
+                          const Icon(Icons.movie, size: 20, color: Colors.grey),
+                    ),
+                  ),
           ),
           _buildCacheIndicator(context),
         ],

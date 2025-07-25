@@ -1,6 +1,6 @@
 /// Screen displaying detailed information about a selected movie.
 ///
-// Time-stamp: <Friday 2025-07-04 15:06:40 +1000 Graham Williams>
+// Time-stamp: <Friday 2025-07-25 11:58:16 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -402,7 +402,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
               fileName: movieFilePath,
               title: 'Share "${widget.movie.title}"',
               accessModeList: const ['read'],
-              recipientList: const ['indi'],
+              recipientTypeList: const ['indi'],
               showAppBar: true,
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               child: widget,

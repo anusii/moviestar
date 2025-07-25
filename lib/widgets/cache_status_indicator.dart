@@ -29,10 +29,10 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 
 /// A small indicator widget showing current cache status.

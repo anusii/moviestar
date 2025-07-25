@@ -26,6 +26,7 @@
 library;
 
 import 'package:hive/hive.dart';
+
 import 'package:moviestar/utils/tmdb_image_util.dart';
 
 part 'movie.g.dart';

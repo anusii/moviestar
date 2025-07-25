@@ -17,12 +17,14 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+    - "**/*.~*~"
+    - "**/#*#"
 
 linter:
   rules:
      avoid_print: true
      prefer_single_quotes: true
-     # Only until we stop usinf solidaut/src files!!!
+     # Only until we stop using solidpod/src files!!!
      implementation_imports: false
 
 custom_lint:

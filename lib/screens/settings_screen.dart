@@ -31,13 +31,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solidpod/solidpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:moviestar/my_home_page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/services/hive_movie_cache_service.dart';
+import 'package:moviestar/utils/create_solid_login.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 import 'package:moviestar/widgets/theme_toggle_button.dart';
 
@@ -82,6 +82,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   /// Whether POD storage is enabled.
 
   bool _podStorageEnabled = false;
+
+  /// Whether the API key is visible.
+
+  bool _isApiKeyVisible = false;
 
   /// Selected language for the app.
 
@@ -590,24 +594,45 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                     ],
                   ),
                   const SizedBox(height: 8),
-                  TextField(
-                    controller: _apiKeyController,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    focusNode: _apiKeyFocusNode,
-                    decoration: InputDecoration(
-                      hintText: 'Enter your MovieDB API key',
-                      hintStyle:
-                          Theme.of(context).inputDecorationTheme.hintStyle,
-                      filled: true,
-                      fillColor:
-                          Theme.of(context).inputDecorationTheme.fillColor,
-                      border: Theme.of(context).inputDecorationTheme.border,
-                      enabledBorder:
-                          Theme.of(context).inputDecorationTheme.enabledBorder,
-                      focusedBorder:
-                          Theme.of(context).inputDecorationTheme.focusedBorder,
+                  SizedBox(
+                    width: 420,
+                    child: TextField(
+                      controller: _apiKeyController,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      focusNode: _apiKeyFocusNode,
+                      decoration: InputDecoration(
+                        hintText: 'Enter your MovieDB API key',
+                        hintStyle:
+                            Theme.of(context).inputDecorationTheme.hintStyle,
+                        filled: true,
+                        fillColor:
+                            Theme.of(context).inputDecorationTheme.fillColor,
+                        border: Theme.of(context).inputDecorationTheme.border,
+                        enabledBorder: Theme.of(context)
+                            .inputDecorationTheme
+                            .enabledBorder,
+                        focusedBorder: Theme.of(context)
+                            .inputDecorationTheme
+                            .focusedBorder,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isApiKeyVisible
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isApiKeyVisible = !_isApiKeyVisible;
+                            });
+                          },
+                          tooltip: _isApiKeyVisible
+                              ? 'Hide API key'
+                              : 'Show API key',
+                        ),
+                      ),
+                      obscureText: !_isApiKeyVisible,
                     ),
-                    obscureText: true,
                   ),
                   const SizedBox(height: 8),
                   GestureDetector(
@@ -743,13 +768,13 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
               // Show logout confirmation dialog and handle logout.
 
               final prefs = ref.read(sharedPreferencesProvider);
-              await logoutPopup(
-                  context,
-                  SolidLogin(
-                      child: MyHomePage(
-                    title: 'Movie Star Home Page',
-                    prefs: prefs,
-                  )));
+
+              // Create a properly configured SolidLogin widget using the same function
+              // that creates the initial login screen to maintain consistent branding.
+
+              final solidLoginWidget = createSolidLogin(context, prefs);
+
+              await logoutPopup(context, solidLoginWidget);
             }, isDestructive: true),
           ]),
         ],

@@ -83,6 +83,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   bool _podStorageEnabled = false;
 
+  /// Whether the API key is visible.
+
+  bool _isApiKeyVisible = false;
+
   /// Selected language for the app.
 
   String _selectedLanguage = 'English';
@@ -590,24 +594,45 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                     ],
                   ),
                   const SizedBox(height: 8),
-                  TextField(
-                    controller: _apiKeyController,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    focusNode: _apiKeyFocusNode,
-                    decoration: InputDecoration(
-                      hintText: 'Enter your MovieDB API key',
-                      hintStyle:
-                          Theme.of(context).inputDecorationTheme.hintStyle,
-                      filled: true,
-                      fillColor:
-                          Theme.of(context).inputDecorationTheme.fillColor,
-                      border: Theme.of(context).inputDecorationTheme.border,
-                      enabledBorder:
-                          Theme.of(context).inputDecorationTheme.enabledBorder,
-                      focusedBorder:
-                          Theme.of(context).inputDecorationTheme.focusedBorder,
+                  SizedBox(
+                    width: 420,
+                    child: TextField(
+                      controller: _apiKeyController,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      focusNode: _apiKeyFocusNode,
+                      decoration: InputDecoration(
+                        hintText: 'Enter your MovieDB API key',
+                        hintStyle:
+                            Theme.of(context).inputDecorationTheme.hintStyle,
+                        filled: true,
+                        fillColor:
+                            Theme.of(context).inputDecorationTheme.fillColor,
+                        border: Theme.of(context).inputDecorationTheme.border,
+                        enabledBorder: Theme.of(context)
+                            .inputDecorationTheme
+                            .enabledBorder,
+                        focusedBorder: Theme.of(context)
+                            .inputDecorationTheme
+                            .focusedBorder,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isApiKeyVisible
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isApiKeyVisible = !_isApiKeyVisible;
+                            });
+                          },
+                          tooltip: _isApiKeyVisible
+                              ? 'Hide API key'
+                              : 'Show API key',
+                        ),
+                      ),
+                      obscureText: !_isApiKeyVisible,
                     ),
-                    obscureText: true,
                   ),
                   const SizedBox(height: 8),
                   GestureDetector(

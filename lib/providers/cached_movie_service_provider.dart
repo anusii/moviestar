@@ -75,16 +75,54 @@ class CacheOnlyModeNotifier extends StateNotifier<bool> {
   }
 }
 
+/// StateNotifier for managing API key state and changes.
+
+class ApiKeyNotifier extends StateNotifier<String?> {
+  final ApiKeyService _apiKeyService;
+
+  ApiKeyNotifier(this._apiKeyService) : super(null) {
+    _init();
+    // Listen for API key changes.
+
+    _apiKeyService.addListener(_onApiKeyChanged);
+  }
+
+  Future<void> _init() async {
+    state = await _apiKeyService.getApiKey();
+  }
+
+  void _onApiKeyChanged() async {
+    state = await _apiKeyService.getApiKey();
+  }
+
+  @override
+  void dispose() {
+    _apiKeyService.removeListener(_onApiKeyChanged);
+    super.dispose();
+  }
+}
+
 /// Provider for the API key service.
 
 final apiKeyServiceProvider = Provider<ApiKeyService>((ref) {
   return ApiKeyService();
 });
 
+/// Provider for the API key state that watches for changes.
+
+final apiKeyProvider = StateNotifierProvider<ApiKeyNotifier, String?>((ref) {
+  final apiKeyService = ref.watch(apiKeyServiceProvider);
+  return ApiKeyNotifier(apiKeyService);
+});
+
 /// Provider for the movie service.
 
 final movieServiceProvider = Provider<MovieService>((ref) {
   final apiKeyService = ref.watch(apiKeyServiceProvider);
+  // Watch the API key to trigger recreation when it changes.
+
+  ref.watch(apiKeyProvider);
+
   final movieService = MovieService(apiKeyService);
 
   // Ensure proper disposal.

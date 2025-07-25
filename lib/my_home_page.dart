@@ -31,6 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:moviestar/features/file/service/page.dart';
+import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
@@ -72,7 +73,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   /// List of screens to display in the bottom navigation bar.
 
-  late final List<Widget> _screens;
+  late List<Widget> _screens;
 
   @override
   void initState() {
@@ -103,6 +104,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     // When API key changes, update the movie service.
 
     _movieService.updateApiKey();
+
+    // Invalidate all movie providers to force refresh with new API key.
+
+    ref.invalidate(popularMoviesWithCacheInfoProvider);
+    ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+    ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+    ref.invalidate(upcomingMoviesWithCacheInfoProvider);
+    ref.invalidate(configuredCachedMovieServiceProvider);
 
     // Rebuild screens to ensure they have the latest data.
 

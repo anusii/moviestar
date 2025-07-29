@@ -94,6 +94,15 @@ class FavoritesServiceManager extends ChangeNotifier {
     }
   }
 
+  /// Refreshes UI streams with latest data from POD.
+  /// This ensures the UI shows the most current data after app restart.
+
+  Future<void> refreshUIStreams() async {
+    if (_isPodStorageEnabled && _podService != null) {
+      await _podService!.refreshUIStreams();
+    }
+  }
+
   /// Stream of to-watch movies from the active service.
 
   Stream<List<Movie>> get toWatchMovies {
@@ -301,7 +310,6 @@ class FavoritesServiceManager extends ChangeNotifier {
       _isPodStorageEnabled = true;
       await _prefs.setBool(_podStorageEnabledKey, true);
 
-      debugPrint('POD storage enabled successfully');
       notifyListeners();
       return true;
     } catch (e) {

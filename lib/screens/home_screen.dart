@@ -192,6 +192,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               fromCache: cacheResult.fromCache,
               cacheAge: cacheResult.cacheAge,
               cacheOnlyMode: cacheOnlyMode,
+              favoritesService: widget.favoritesService,
+              parentWidget: widget,
               onTap: () {
                 // Check if widget is still mounted before navigation.
 
@@ -319,6 +321,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               fromCache: cacheResult.fromCache,
               cacheAge: cacheResult.cacheAge,
               cacheOnlyMode: cacheOnlyMode,
+              favoritesService: widget.favoritesService,
+              parentWidget: widget,
               onTap: () {
                 // Check if widget is still mounted before navigation
                 if (mounted) {
@@ -393,6 +397,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       fromCache: cacheResult.fromCache,
                       cacheAge: cacheResult.cacheAge,
                       cacheOnlyMode: cacheOnlyMode,
+                      favoritesService: widget.favoritesService,
+                      parentWidget: widget,
                       onTap: () {
                         // Check if widget is still mounted before navigation.
 

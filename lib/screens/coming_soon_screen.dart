@@ -136,6 +136,8 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
                 fromCache: cacheResult.fromCache,
                 cacheAge: cacheResult.cacheAge,
                 cacheOnlyMode: cacheOnlyMode,
+                favoritesService: widget.favoritesService,
+                parentWidget: widget,
                 customSubtitle: Text(
                   'Release Date: ${DateFormatUtil.formatNumeric(movie.releaseDate)}',
                   style: Theme.of(context).textTheme.bodyMedium,

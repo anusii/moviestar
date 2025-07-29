@@ -28,7 +28,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:solidpod/solidpod.dart';
-import 'package:solidpod/src/solid/api/common_permission.dart';
 
 import 'package:moviestar/widgets/list_shared_movies.dart';
 
@@ -333,20 +332,16 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
 
       movieTitle ??= 'Movie ${movieId ?? 'Unknown'}';
 
-      final rawOwner = resourceInfo[PermissionLogLiteral.owner] ??
-          resourceInfo['ownerWebId'] ??
-          resourceInfo['owner'];
-      final rawSharedBy = resourceInfo[PermissionLogLiteral.granter] ??
-          resourceInfo['granterWebId'] ??
-          resourceInfo['granter'];
+      final rawOwner = resourceInfo['owner'] ?? resourceInfo['ownerWebId'];
+      final rawSharedBy =
+          resourceInfo['granter'] ?? resourceInfo['granterWebId'];
 
       final result = {
         'fileName': movieTitle,
         'owner': _formatWebId(rawOwner),
         'sharedBy': _formatWebId(rawSharedBy),
-        'permissions': resourceInfo[PermissionLogLiteral.permissions] ??
+        'permissions': resourceInfo['permissions'] ??
             resourceInfo['permissionList'] ??
-            resourceInfo['permissions'] ??
             'read',
         'movieId': movieId ?? 'unknown',
         'rating': rating,

@@ -173,8 +173,11 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             }
 
             // Now reload POD data since folders are ready.
-
             await _favoritesServiceManager.reloadPodDataAfterInit();
+
+            // Refresh UI streams to ensure latest data is displayed.
+
+            await _favoritesServiceManager.refreshUIStreams();
           },
         );
         if (mounted && _isLoadingFolders) {

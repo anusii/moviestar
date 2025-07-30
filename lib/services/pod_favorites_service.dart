@@ -51,12 +51,6 @@ class PodFavoritesService extends ChangeNotifier {
   static const String _watchedFileName = 'user_lists/watched.ttl';
   static const String _ratingsFileName = 'ratings/ratings.ttl';
 
-  // Full paths for reading operations (where files are actually stored).
-
-  static const String _toWatchFileNameRead = 'user_lists/to_watch.ttl';
-  static const String _watchedFileNameRead = 'user_lists/watched.ttl';
-  static const String _ratingsFileNameRead = 'ratings/ratings.ttl';
-
   /// Widget context for POD operations.
 
   final BuildContext _context;
@@ -137,26 +131,33 @@ class PodFavoritesService extends ChangeNotifier {
   Future<void> _initializePodData() async {
     try {
       // Check if user is logged into POD first.
-
       final isPodReady = await isPodAvailable();
       if (isPodReady) {
         // Initialize user profile following the ontology structure.
-
         await _userProfileService.initializeProfileIfNeeded();
 
-        // Get or create standard movie lists.
+        // Get or create standard movie lists - this is critical for proper loading.
 
         _toWatchListId =
             await _movieListService.getOrCreateStandardMovieList('to_watch');
         _watchedListId =
             await _movieListService.getOrCreateStandardMovieList('watched');
 
-        // Try to load from POD, but don't fail if folders aren't ready yet.
+        // Only load and update streams if we have valid MovieList IDs.
 
-        await _loadFromPod();
+        if (_toWatchListId != null || _watchedListId != null) {
+          await _loadFromPod();
+        } else {
+          // If we couldn't get MovieList IDs, initialize with empty but don't update streams yet.
+
+          _cachedToWatch = [];
+          _cachedWatched = [];
+          _cachedRatings = {};
+          _cachedComments = {};
+          // Don't update streams here - wait for retry initialisation.
+        }
       } else {
         // Initialize with empty data for new POD storage.
-
         _cachedToWatch = [];
         _cachedWatched = [];
         _cachedRatings = {};
@@ -166,14 +167,13 @@ class PodFavoritesService extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Failed to initialize POD data: $e');
-      // Initialize with empty data.
+      // Initialise with empty data but don't update streams yet.
 
       _cachedToWatch = [];
       _cachedWatched = [];
       _cachedRatings = {};
       _cachedComments = {};
-      _toWatchController.add(_cachedToWatch!);
-      _watchedController.add(_cachedWatched!);
+      // Wait for retry initialisation instead of showing empty state immediately.
     }
   }
 
@@ -184,92 +184,50 @@ class PodFavoritesService extends ChangeNotifier {
 
     try {
       // Initialize with empty data first.
-
       _cachedToWatch = [];
       _cachedWatched = [];
       _cachedRatings = {};
       _cachedComments = {};
 
-      // Try to load each file individually without key validation to avoid encryption conflicts
+      // Load from MovieList system instead of old TTL files.
 
-      await _loadFileFromPodWithoutKey(_toWatchFileNameRead, (content) {
-        if (content is String) {
-          _cachedToWatch = TurtleSerializer.moviesFromTurtle(content);
+      if (_toWatchListId != null) {
+        final movieListData =
+            await _movieListService.getMovieList(_toWatchListId!);
+        if (movieListData != null) {
+          _cachedToWatch = List<Movie>.from(movieListData['movies'] ?? []);
         }
-      });
+      }
 
-      await _loadFileFromPodWithoutKey(_watchedFileNameRead, (content) {
-        if (content is String) {
-          _cachedWatched = TurtleSerializer.moviesFromTurtle(content);
+      if (_watchedListId != null) {
+        final movieListData =
+            await _movieListService.getMovieList(_watchedListId!);
+        if (movieListData != null) {
+          _cachedWatched = List<Movie>.from(movieListData['movies'] ?? []);
         }
-      });
+      }
 
-      await _loadFileFromPodWithoutKey(_ratingsFileNameRead, (content) {
-        if (content is String) {
-          _cachedRatings = TurtleSerializer.ratingsFromTurtle(content);
-        }
-      });
+      // Load ratings from individual movie files (no longer using ratings.ttl).
 
-      // Skip loading old comments file - we use individual movie files now.
-      // The old comments.ttl file has encryption key conflicts.
-
+      _cachedRatings = {};
       _cachedComments = {};
 
-      // Update streams with POD data.
+      // Only update streams if we have at least one valid MovieList ID.
+      // This prevents showing empty state before MovieList IDs are discovered.
 
-      _toWatchController.add(_cachedToWatch!);
-      _watchedController.add(_cachedWatched!);
+      if (_toWatchListId != null || _watchedListId != null) {
+        _toWatchController.add(_cachedToWatch!);
+        _watchedController.add(_cachedWatched!);
+      }
     } catch (e) {
       debugPrint('Error loading from POD: $e');
       // Initialize with empty data if POD fails.
-
       _cachedToWatch = [];
       _cachedWatched = [];
       _cachedRatings = {};
       _cachedComments = {};
     } finally {
       _isSyncing = false;
-    }
-  }
-
-  /// Helper method to load a single file from POD without key validation.
-
-  Future<void> _loadFileFromPodWithoutKey(
-    String fileName,
-    Function(dynamic) onSuccess,
-  ) async {
-    try {
-      final loggedIn = await isLoggedIn();
-      if (!loggedIn) {
-        return;
-      }
-
-      if (!_context.mounted) return;
-
-      // Skip getKeyFromUserIfRequired to avoid encryption key conflicts.
-
-      final content = await readPod(fileName, _context, _child);
-      onSuccess(content);
-      return;
-    } catch (e) {
-      // Handle specific encryption key conflicts.
-
-      if (e.toString().contains('Duplicated encryption key')) {
-        // Skip this file - we'll use movie files instead.
-
-        return;
-      }
-
-      // Suppress "does not exist" errors - these are expected for new files.
-
-      if (e.toString().contains('does not exist')) {
-        return;
-      }
-
-      // For other errors, we can try to continue without this file.
-
-      debugPrint('Error loading file $fileName: $e');
-      return;
     }
   }
 
@@ -407,28 +365,32 @@ class PodFavoritesService extends ChangeNotifier {
   /// Adds a movie to the to-watch list and saves to POD.
 
   Future<void> addToWatch(Movie movie) async {
-    // Only use MovieList - remove old TTL operations.
+    // If toWatchListId is null, try to initialise it first.
 
+    if (_toWatchListId == null) {
+      await _retryInitializeMovieListIds();
+    }
+
+    // Only use MovieList - remove old TTL operations.
     if (_toWatchListId != null) {
       final success =
           await _movieListService.addMovieToList(_toWatchListId!, movie);
       if (success) {
         // Update stream with fresh data from MovieList.
-
         final movies = await getToWatch(forceRefresh: true);
         _toWatchController.add(movies);
 
         // DO NOT call _createOrUpdateMovieFile() here to avoid race condition.
         // The movie file should already be created/updated by the caller.
-
         return;
       } else {
         debugPrint('❌ Failed to add ${movie.title} to To Watch MovieList');
       }
+    } else {
+      debugPrint('❌ To Watch list ID is null, cannot add movie to MovieList');
     }
 
     // Fallback to old system if MovieList fails.
-
     final toWatch = await getToWatch();
     if (!toWatch.any((m) => m.id == movie.id)) {
       toWatch.add(movie);
@@ -441,18 +403,45 @@ class PodFavoritesService extends ChangeNotifier {
   /// Adds a movie to the watched list.
 
   Future<void> addToWatched(Movie movie) async {
+    // If watchedListId is null, try to initialise it first.
+
+    if (_watchedListId == null) {
+      await _retryInitializeMovieListIds();
+    }
+
     if (_watchedListId != null) {
-      await _movieListService.addMovieToList(_watchedListId!, movie);
+      final success =
+          await _movieListService.addMovieToList(_watchedListId!, movie);
+      if (success) {
+        // Update stream with fresh data from MovieList.
+
+        final movies = await getWatched(forceRefresh: true);
+        _watchedController.add(movies);
+
+        // Create/update the movie file to ensure it exists.
+
+        await _createOrUpdateMovieFile(movie);
+        return;
+      } else {
+        debugPrint('❌ Failed to add ${movie.title} to Watched MovieList');
+      }
     } else {
-      debugPrint('❌ Watched list ID is null, cannot add movie');
+      debugPrint('❌ Watched list ID is null, cannot add movie to MovieList');
+    }
+
+    // Fallback to old system if MovieList fails.
+
+    final watched = await getWatched();
+    if (!watched.any((m) => m.id == movie.id)) {
+      watched.add(movie);
+      await _saveWatchedToPod(watched);
+      _watchedController.add(watched);
     }
 
     // Create/update the movie file to ensure it exists.
-
     await _createOrUpdateMovieFile(movie);
 
     // Force refresh cache for UI updates.
-
     _cachedWatched = null;
   }
 
@@ -907,8 +896,19 @@ class PodFavoritesService extends ChangeNotifier {
     try {
       final isPodReady = await isPodAvailable();
       if (isPodReady) {
-        // Load data without triggering encryption key validation.
+        // Re-initialise MovieList IDs if they're not set yet.
+        // This is crucial after app folders are ready.
 
+        if (_toWatchListId == null || _watchedListId == null) {
+          await _userProfileService.initializeProfileIfNeeded();
+
+          _toWatchListId ??=
+              await _movieListService.getOrCreateStandardMovieList('to_watch');
+          _watchedListId ??=
+              await _movieListService.getOrCreateStandardMovieList('watched');
+        }
+
+        // Load data without triggering encryption key validation.
         await _loadFromPodWithoutKeyValidation();
       }
     } catch (e) {
@@ -924,44 +924,44 @@ class PodFavoritesService extends ChangeNotifier {
 
     try {
       // Initialize with empty data first.
-
       _cachedToWatch = [];
       _cachedWatched = [];
       _cachedRatings = {};
       _cachedComments = {};
 
-      // Try to load each file individually without key validation.
+      // Load from MovieList system instead of old TTL files.
 
-      await _loadFileFromPodWithoutKey(_toWatchFileNameRead, (content) {
-        if (content is String) {
-          _cachedToWatch = TurtleSerializer.moviesFromTurtle(content);
+      if (_toWatchListId != null) {
+        final movieListData =
+            await _movieListService.getMovieList(_toWatchListId!);
+        if (movieListData != null) {
+          _cachedToWatch = List<Movie>.from(movieListData['movies'] ?? []);
         }
-      });
+      }
 
-      await _loadFileFromPodWithoutKey(_watchedFileNameRead, (content) {
-        if (content is String) {
-          _cachedWatched = TurtleSerializer.moviesFromTurtle(content);
+      if (_watchedListId != null) {
+        final movieListData =
+            await _movieListService.getMovieList(_watchedListId!);
+        if (movieListData != null) {
+          _cachedWatched = List<Movie>.from(movieListData['movies'] ?? []);
         }
-      });
+      }
 
-      await _loadFileFromPodWithoutKey(_ratingsFileNameRead, (content) {
-        if (content is String) {
-          _cachedRatings = TurtleSerializer.ratingsFromTurtle(content);
-        }
-      });
+      // Load ratings from individual movie files (no longer using ratings.ttl).
 
-      // Skip loading old comments file - we use individual movie files now.
-
+      _cachedRatings = {};
       _cachedComments = {};
 
-      // Update streams with POD data.
+      // Only update streams if we have at least one valid MovieList ID.
+      // This prevents showing empty state before MovieList IDs are discovered.
 
-      _toWatchController.add(_cachedToWatch!);
-      _watchedController.add(_cachedWatched!);
+      if (_toWatchListId != null || _watchedListId != null) {
+        _toWatchController.add(_cachedToWatch!);
+        _watchedController.add(_cachedWatched!);
+      }
     } catch (e) {
       debugPrint('Error loading from POD: $e');
       // Initialize with empty data if POD fails.
-
       _cachedToWatch = [];
       _cachedWatched = [];
       _cachedRatings = {};
@@ -983,6 +983,81 @@ class PodFavoritesService extends ChangeNotifier {
     } catch (e) {
       debugPrint('POD availability check failed: $e');
       return false;
+    }
+  }
+
+  /// Retry initialization of movie list IDs if they are null.
+
+  Future<void> _retryInitializeMovieListIds() async {
+    try {
+      // Check if user is logged into POD first.
+
+      final isPodReady = await isPodAvailable();
+      if (!isPodReady) {
+        debugPrint('❌ POD not available, cannot initialize movie list IDs');
+        return;
+      }
+
+      // Initialise user profile if needed.
+
+      await _userProfileService.initializeProfileIfNeeded();
+
+      bool needsStreamUpdate = false;
+
+      // Try to get or create standard movie lists if they're still null.
+
+      if (_toWatchListId == null) {
+        _toWatchListId =
+            await _movieListService.getOrCreateStandardMovieList('to_watch');
+        if (_toWatchListId != null) {
+          needsStreamUpdate = true;
+        } else {
+          debugPrint('❌ Failed to initialize To Watch list ID');
+        }
+      }
+
+      if (_watchedListId == null) {
+        _watchedListId =
+            await _movieListService.getOrCreateStandardMovieList('watched');
+        if (_watchedListId != null) {
+          needsStreamUpdate = true;
+        } else {
+          debugPrint('❌ Failed to initialize Watched list ID');
+        }
+      }
+
+      // Update streams with current data after successful initialisation.
+
+      if (needsStreamUpdate) {
+        final toWatchMovies = await getToWatch(forceRefresh: true);
+        final watchedMovies = await getWatched(forceRefresh: true);
+        _toWatchController.add(toWatchMovies);
+        _watchedController.add(watchedMovies);
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to retry initialize movie list IDs: $e');
+    }
+  }
+
+  /// Forces a refresh of the UI streams with current data from MovieLists.
+  /// This ensures the UI shows the latest data after app restart.
+
+  Future<void> refreshUIStreams() async {
+    try {
+      // Don't update streams if MovieList IDs aren't initialised yet.
+      // This prevents showing empty state before MovieList discovery completes.
+
+      if (_toWatchListId == null && _watchedListId == null) {
+        return;
+      }
+
+      final toWatchMovies = await getToWatch(forceRefresh: true);
+      final watchedMovies = await getWatched(forceRefresh: true);
+
+      _toWatchController.add(toWatchMovies);
+      _watchedController.add(watchedMovies);
+    } catch (e) {
+      debugPrint('❌ Failed to refresh UI streams: $e');
     }
   }
 

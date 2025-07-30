@@ -448,4 +448,345 @@ class MovieListService {
   void clearCache() {
     _movieListCache.clear();
   }
+
+  // SHARING METHODS.
+
+  /// Shares a MovieList with another user using GrantPermissionUi.
+  ///
+  /// Returns true if the sharing was successful.
+
+  Future<bool> shareMovieList(
+    String listId,
+    String recipientWebId,
+    List<String> permissions, {
+    String? customTitle,
+  }) async {
+    try {
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        debugPrint('❌ User not logged in, cannot share movie list');
+        return false;
+      }
+
+      // Check if the list exists.
+
+      final movieList = await getMovieList(listId);
+      if (movieList == null) {
+        debugPrint('❌ MovieList $listId not found, cannot share');
+        return false;
+      }
+
+      // Get the relative file path for sharing.
+
+      final filePath = 'user_lists/MovieList-$listId.ttl';
+      final listName = movieList['name'] ?? 'Movie List';
+
+      if (!_context.mounted) return false;
+
+      // Navigate to GrantPermissionUi for sharing.
+
+      await Navigator.push(
+        _context,
+        MaterialPageRoute(
+          builder: (context) => Theme(
+            data: Theme.of(context),
+            child: GrantPermissionUi(
+              fileName: filePath,
+              title: customTitle ?? 'Share "$listName"',
+              accessModeList: permissions,
+              recipientTypeList: const ['indi'],
+              showAppBar: true,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              child: _child,
+            ),
+          ),
+        ),
+      );
+
+      return true;
+    } catch (e) {
+      debugPrint('❌ Failed to share movie list: $e');
+      return false;
+    }
+  }
+
+  /// Gets movie lists that have been shared with the current user.
+  ///
+  /// Returns a map where keys are list URLs and values contain list metadata.
+
+  Future<Map<String, dynamic>> getSharedLists() async {
+    try {
+      if (!_context.mounted) return {};
+
+      // Get shared resources from POD.
+
+      final sharedResourcesResult = await sharedResources(_context, _child);
+
+      if (sharedResourcesResult == SolidFunctionCallStatus.notLoggedIn) {
+        debugPrint('❌ User not logged in to POD');
+        return {};
+      }
+
+      if (sharedResourcesResult is! Map) {
+        debugPrint('❌ Invalid shared resources data');
+        return {};
+      }
+
+      final Map<String, dynamic> sharedLists = {};
+
+      // Filter for MovieList files and fetch their content.
+
+      for (final entry in sharedResourcesResult.entries) {
+        final resourceUrl = entry.key as String;
+        final resourceInfo = entry.value as Map;
+
+        // Check if this is a MovieList file.
+
+        if (resourceUrl.contains('/user_lists/') &&
+            resourceUrl.contains('MovieList-') &&
+            resourceUrl.endsWith('.ttl')) {
+          try {
+            if (!_context.mounted) break;
+
+            // Read the MovieList file content.
+
+            final listContent =
+                await readExternalPod(resourceUrl, _context, _child);
+
+            if (listContent != null && listContent.isNotEmpty) {
+              // Parse the TTL content.
+
+              final parsedList =
+                  TurtleSerializer.movieListFromTurtle(listContent);
+
+              if (parsedList != null) {
+                sharedLists[resourceUrl] = {
+                  ...parsedList,
+                  'resourceUrl': resourceUrl,
+                  'resourceInfo': resourceInfo,
+                  'listContent': listContent,
+                  'isSharedWithMe': true,
+                };
+              }
+            }
+          } catch (e) {
+            debugPrint('⚠️ Could not read shared MovieList $resourceUrl: $e');
+          }
+        }
+      }
+
+      return sharedLists;
+    } catch (e) {
+      debugPrint('❌ Failed to get shared lists: $e');
+      return {};
+    }
+  }
+
+  /// Gets movie lists that the current user has shared with others.
+  ///
+  /// Returns a map where keys are list IDs and values contain list metadata and sharing info.
+
+  Future<Map<String, dynamic>> getMySharedLists() async {
+    try {
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) return {};
+
+      // Get current user's WebID to construct the user_lists directory URL.
+
+      final currentWebId = await getWebId();
+      if (currentWebId == null) return {};
+
+      final webIdWithoutCard = currentWebId.replaceAll('/profile/card#me', '');
+      final userListsDir = '$webIdWithoutCard/moviestar/data/user_lists/';
+
+      // Get resources in the user_lists container.
+
+      final resources = await getResourcesInContainer(userListsDir);
+      final Map<String, dynamic> mySharedLists = {};
+
+      // Process each MovieList file.
+
+      for (final fileName in resources.files) {
+        if (!fileName.endsWith('.ttl') || !fileName.contains('MovieList-')) {
+          continue;
+        }
+
+        // Extract list ID from filename.
+
+        final listIdMatch =
+            RegExp(r'MovieList-(\w+)\.ttl').firstMatch(fileName);
+        if (listIdMatch == null) continue;
+
+        final listId = listIdMatch.group(1)!;
+
+        try {
+          // Get the movie list.
+
+          final movieList = await getMovieList(listId);
+          if (movieList == null) continue;
+
+          // Check if this list has sharing metadata.
+
+          final sharedWith = movieList['sharedWith'] as Map<String, String>?;
+
+          if (sharedWith != null && sharedWith.isNotEmpty) {
+            mySharedLists[listId] = {
+              ...movieList,
+              'fileName': fileName,
+              'resourceUrl': '$userListsDir$fileName',
+              'isMySharedList': true,
+            };
+          }
+        } catch (e) {
+          debugPrint('⚠️ Could not check sharing status for list $listId: $e');
+        }
+      }
+
+      return mySharedLists;
+    } catch (e) {
+      debugPrint('❌ Failed to get my shared lists: $e');
+      return {};
+    }
+  }
+
+  /// Revokes access to a MovieList for a specific user.
+  ///
+  /// Returns true if the revocation was successful.
+
+  Future<bool> revokeListAccess(String listId, String webId) async {
+    try {
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        debugPrint('❌ User not logged in, cannot revoke access');
+        return false;
+      }
+
+      // Get the movie list.
+
+      final movieList = await getMovieList(listId);
+      if (movieList == null) {
+        debugPrint('❌ MovieList $listId not found');
+        return false;
+      }
+
+      // Get current sharing metadata.
+
+      final sharedWith =
+          Map<String, String>.from(movieList['sharedWith'] ?? {});
+
+      if (!sharedWith.containsKey(webId)) {
+        debugPrint(
+            '⚠️ WebId $webId not found in shared users for list $listId');
+        return true; // Already not shared with this user.
+      }
+
+      // Remove the user from shared metadata.
+
+      sharedWith.remove(webId);
+
+      // Update the MovieList with new sharing metadata.
+
+      final updatedTtl = TurtleSerializer.createMovieList(
+        listId,
+        movieList['name'],
+        movies: List<Movie>.from(movieList['movies'] ?? []),
+        description: movieList['description'],
+        sharedWith: sharedWith.isNotEmpty ? sharedWith : null,
+        sharedDate: sharedWith.isNotEmpty ? movieList['sharedDate'] : null,
+      );
+
+      if (!_context.mounted) return false;
+      final result = await writePod(
+        'user_lists/MovieList-$listId.ttl',
+        updatedTtl,
+        _context,
+        _child,
+        encrypted: false,
+      );
+
+      if (result == SolidFunctionCallStatus.success) {
+        // Update cache.
+
+        _movieListCache[listId] = {
+          ...movieList,
+          'sharedWith': sharedWith.isNotEmpty ? sharedWith : null,
+          'sharedDate': sharedWith.isNotEmpty ? movieList['sharedDate'] : null,
+        };
+
+        // Note: POD permission revocation should be handled by the POD system
+        // when the resource metadata is updated.
+
+        return true;
+      } else {
+        debugPrint('❌ Failed to update MovieList after revoking access');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to revoke list access: $e');
+      return false;
+    }
+  }
+
+  /// Validates if a user can access a specific MovieList.
+  ///
+  /// Returns the permission level ('read', 'write', 'control') or null if no access.
+
+  Future<String?> validateUserAccess(String listId, String webId) async {
+    try {
+      final movieList = await getMovieList(listId);
+      if (movieList == null) return null;
+
+      // Check if the user is the owner (can get the list means they have some access).
+
+      final currentWebId = await getWebId();
+      if (currentWebId == webId) {
+        return 'control'; // Owner has full control.
+      }
+
+      // Check sharing metadata.
+
+      final sharedWith = movieList['sharedWith'] as Map<String, String>?;
+      if (sharedWith != null && sharedWith.containsKey(webId)) {
+        return sharedWith[webId]; // Return the specific permission level.
+      }
+
+      return null; // No access
+    } catch (e) {
+      debugPrint('❌ Failed to validate user access: $e');
+      return null;
+    }
+  }
+
+  /// Checks if the current user can perform a specific operation on a MovieList.
+  ///
+  /// Operations: 'read', 'write', 'delete', 'share'
+
+  Future<bool> canUserPerformOperation(String listId, String operation) async {
+    try {
+      final currentWebId = await getWebId();
+      if (currentWebId == null) return false;
+
+      final permission = await validateUserAccess(listId, currentWebId);
+      if (permission == null) return false;
+
+      // Map operations to required permission levels.
+
+      switch (operation.toLowerCase()) {
+        case 'read':
+          return ['read', 'write', 'control'].contains(permission);
+        case 'write':
+        case 'add':
+        case 'remove':
+          return ['write', 'control'].contains(permission);
+        case 'delete':
+        case 'share':
+          return permission == 'control';
+        default:
+          return false;
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to check user permissions: $e');
+      return false;
+    }
+  }
 }

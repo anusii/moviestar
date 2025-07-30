@@ -659,6 +659,8 @@ class TurtleSerializer {
     String listName, {
     List<Movie>? movies,
     String? description,
+    Map<String, String>? sharedWith, // Map of WebId -> permissions
+    DateTime? sharedDate,
   }) {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
@@ -675,6 +677,31 @@ class TurtleSerializer {
       rdfsLabel:
           Literal('|filePath=moviestar/data/MovieList-$movieListId.ttl|'),
     };
+
+    // Add sharing metadata if provided.
+
+    if (sharedWith != null && sharedWith.isNotEmpty) {
+      // Add shared_with as a list of WebIds.
+
+      final sharedWithWebIds =
+          sharedWith.keys.map((webId) => Literal(webId)).toList();
+      triples[movieListResource]![moviestarOntoNS.withAttr('sharedWith')] =
+          sharedWithWebIds;
+
+      // Add permissions as JSON string for flexibility.
+
+      final permissionsJson = jsonEncode(sharedWith);
+      triples[movieListResource]![moviestarOntoNS.withAttr('permissions')] =
+          Literal(permissionsJson);
+    }
+
+    // Add shared date if provided.
+
+    if (sharedDate != null) {
+      triples[movieListResource]![moviestarOntoNS.withAttr('sharedDate')] =
+          Literal(sharedDate.toIso8601String(),
+              datatype: xsdNS.withAttr('dateTime'));
+    }
 
     // Add movie references (not full movie data) if provided.
 
@@ -805,6 +832,8 @@ class TurtleSerializer {
       String? listName;
       String? description;
       String? filePath;
+      Map<String, String>? sharedWith;
+      DateTime? sharedDate;
       final Set<String> movieResourceIds = {};
 
       // Find MovieList resource and extract movie references.
@@ -836,6 +865,35 @@ class TurtleSerializer {
                 description = value;
               } else if (predicate.contains('filePath')) {
                 filePath = value;
+              } else if (predicate.contains('sharedWith')) {
+                // Extract shared WebIds.
+
+                final webIds = <String>[];
+                for (final webIdRef in values) {
+                  webIds.add(webIdRef.toString());
+                }
+                // This will be populated with permissions from the permissions field.
+
+                sharedWith = {for (final webId in webIds) webId: 'read'};
+              } else if (predicate.contains('permissions')) {
+                // Parse permissions JSON.
+
+                try {
+                  final permissionsMap =
+                      jsonDecode(value) as Map<String, dynamic>;
+                  sharedWith = permissionsMap
+                      .map((key, value) => MapEntry(key, value.toString()));
+                } catch (e) {
+                  debugPrint('⚠️ Failed to parse permissions JSON: $e');
+                }
+              } else if (predicate.contains('sharedDate')) {
+                // Parse shared date.
+
+                try {
+                  sharedDate = DateTime.parse(value);
+                } catch (e) {
+                  debugPrint('⚠️ Failed to parse shared date: $e');
+                }
               } else if (predicate.contains('hasMovie')) {
                 // Extract movie resource references.
 
@@ -887,6 +945,8 @@ class TurtleSerializer {
         'description': description,
         'filePath': filePath,
         'movies': movies,
+        'sharedWith': sharedWith,
+        'sharedDate': sharedDate,
       };
     } catch (e) {
       debugPrint('❌ Error parsing MovieList from TTL: $e');

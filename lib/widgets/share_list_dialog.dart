@@ -25,8 +25,10 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:moviestar/services/movie_list_service.dart';
+import 'package:solidpod/solidpod.dart';
+
 import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/services/movie_list_service.dart';
 
 /// Permission level options for sharing
 enum SharePermissionLevel {
@@ -147,35 +149,65 @@ class _ShareListDialogState extends State<ShareListDialog> {
     });
 
     try {
-      final success = await widget.movieListService.shareMovieList(
-        widget.listId,
-        webId,
-        [_selectedPermission.value],
-        customTitle: 'Share "${_movieListData?['name'] ?? 'Movie List'}"',
+      // Check if the movie list can be shared
+      final canShare =
+          await widget.movieListService.canShareMovieList(widget.listId);
+      if (!canShare) {
+        setState(() {
+          _errorMessage = 'Movie list not found or cannot be shared';
+          _isSharing = false;
+        });
+        return;
+      }
+
+      // Get the file path for sharing
+      final filePath =
+          widget.movieListService.getMovieListFilePath(widget.listId);
+      if (filePath == null) {
+        setState(() {
+          _errorMessage = 'Unable to get file path for sharing';
+          _isSharing = false;
+        });
+        return;
+      }
+
+      // Navigate to GrantPermissionUi for sharing
+      if (!mounted) return;
+
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Theme(
+            data: Theme.of(context),
+            child: GrantPermissionUi(
+              fileName: filePath,
+              title: 'Share "${_movieListData?['name'] ?? 'Movie List'}"',
+              accessModeList: [_selectedPermission.value],
+              recipientTypeList: const ['indi'],
+              showAppBar: true,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              child: widget,
+            ),
+          ),
+        ),
       );
 
+      // If we get here, the sharing UI has been completed
       if (mounted) {
-        if (success) {
-          // Show success feedback
-          if (widget.onShared != null) {
-            widget.onShared!();
-          }
-          Navigator.of(context).pop(true);
-
-          // Show success snackbar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('List shared successfully with $webId'),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        } else {
-          setState(() {
-            _errorMessage = 'Failed to share list. Please try again.';
-            _isSharing = false;
-          });
+        // Show success feedback
+        if (widget.onShared != null) {
+          widget.onShared!();
         }
+        Navigator.of(context).pop(true);
+
+        // Show success snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('List sharing initiated for $webId'),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {

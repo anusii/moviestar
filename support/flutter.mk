@@ -182,7 +182,6 @@ tests:: test qtest
 analyze:
 	@echo "Futter ANALYZE"
 	-flutter analyze lib
-#	dart run custom_lint
 	@echo $(SEPARATOR)
 
 # dart pub global activate dependency_validator
@@ -217,8 +216,6 @@ riverpod:
 	flutter pub add riverpod_annotation
 	flutter pub add dev:riverpod_generator
 	flutter pub add dev:build_runner
-	flutter pub add dev:custom_lint
-	flutter pub add dev:riverpod_lint
 
 .PHONY: runner
 runner:
@@ -382,18 +379,18 @@ endif
 publish:
 	dart pub publish
 
-# dart pub global activate import_order_lint
+# import_order_lint is now a standalone tool, no global activation needed
 
 .PHONY: import_order
 import_order:
 	@echo "Dart: CHECK IMPORT ORDER"
-	dart run custom_lint
+	dart run import_order_lint:import_order --set-exit-if-changed
 	@echo $(SEPARATOR)
 
 .PHONY: import_order_fix
 import_order_fix:
 	@echo "Dart: FIX IMPORT ORDER"
-	fix_imports --project-name=$(APP) -r lib
+	dart run import_order_lint:import_order
 	@echo $(SEPARATOR)
 
 ### TODO THESE SHOULD BE CHECKED AND CLEANED UP

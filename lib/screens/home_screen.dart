@@ -126,14 +126,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(
-                      'To Watch',
-                      style: TextStyle(
-                        color:
-                            Theme.of(context).textTheme.headlineMedium?.color,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Row(
+                      children: [
+                        Text(
+                          'To Watch',
+                          style: TextStyle(
+                            color: Theme.of(context)
+                                .textTheme
+                                .headlineMedium
+                                ?.color,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) ...[
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 12,
+                            height: 12,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 1.5,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Theme.of(context)
+                                    .primaryColor
+                                    .withValues(alpha: 0.6),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                   // Show cache indicator for user data if cached.
@@ -170,11 +192,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }
 
-    if (!snapshot.hasData) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: CircularProgressIndicator(),
+    // Enhanced loading indicator for initial load and connection state.
+
+    if (snapshot.connectionState == ConnectionState.waiting ||
+        !snapshot.hasData) {
+      return Container(
+        width: double.infinity,
+        height: 200,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).primaryColor,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Loading To Watch movies...',
+              style: TextStyle(
+                color: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.color
+                    ?.withValues(alpha: 0.7),
+                fontSize: 14,
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -274,14 +328,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(
-                      'Watched',
-                      style: TextStyle(
-                        color:
-                            Theme.of(context).textTheme.headlineMedium?.color,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Watched',
+                          style: TextStyle(
+                            color: Theme.of(context)
+                                .textTheme
+                                .headlineMedium
+                                ?.color,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) ...[
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 12,
+                            height: 12,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 1.5,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Theme.of(context)
+                                    .primaryColor
+                                    .withValues(alpha: 0.6),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                   // Show cache indicator for user data if cached.
@@ -318,11 +394,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }
 
-    if (!snapshot.hasData) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: CircularProgressIndicator(),
+    // Enhanced loading indicator for initial load and connection state.
+
+    if (snapshot.connectionState == ConnectionState.waiting ||
+        !snapshot.hasData) {
+      return Container(
+        width: double.infinity,
+        height: 200,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).primaryColor,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Loading Watched movies...',
+              style: TextStyle(
+                color: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.color
+                    ?.withValues(alpha: 0.7),
+                fontSize: 14,
+              ),
+            ),
+          ],
         ),
       );
     }

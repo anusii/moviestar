@@ -28,9 +28,11 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/services/cache_settings_service.dart';
@@ -50,6 +52,14 @@ void main() async {
   // Initialise cache settings service early.
 
   await CacheSettingsService.instance.initialize();
+
+  // Initialise Hive for local movie caching.
+
+  await Hive.initFlutter();
+
+  // Register Hive type adapters.
+
+  Hive.registerAdapter(MovieAdapter());
 
   // Globally remove [debugPrint] messages.
 

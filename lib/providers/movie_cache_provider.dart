@@ -27,83 +27,70 @@ library;
 
 import 'package:flutter/foundation.dart';
 
-import 'package:moviestar/database/app_database.dart';
-import 'package:moviestar/database/movie_cache_repository.dart';
+import 'package:moviestar/services/hive_movie_cache_service.dart';
 
-/// Provider for movie cache repository.
+/// Provider for movie cache using Hive.
 
 class MovieCacheProvider extends ChangeNotifier {
-  /// The movie cache repository instance.
+  /// The Hive movie cache service instance.
 
-  late final MovieCacheRepository _repository;
-
-  /// Database instance.
-
-  late final AppDatabase _database;
+  late final HiveMovieCacheService _service;
 
   /// Whether the provider is initialised.
 
   bool _isInitialized = false;
 
-  /// Getter for the repository.
+  /// Getter for the service.
 
-  MovieCacheRepository get repository {
+  HiveMovieCacheService get service {
     if (!_isInitialized) {
       throw StateError(
         'MovieCacheProvider not initialized. Call initialize() first.',
       );
     }
-    return _repository;
+    return _service;
   }
 
   /// Whether the provider is initialised.
 
   bool get isInitialized => _isInitialized;
 
-  /// Initializes the provider with database connection.
+  /// Initialises the provider with Hive cache service.
 
   Future<void> initialize() async {
     if (_isInitialized) return;
 
-    _database = AppDatabase();
-    _repository = MovieCacheRepository(_database);
+    _service = HiveMovieCacheService();
+    await _service.initialize();
     _isInitialized = true;
 
-    notifyListeners();
-  }
-
-  /// Updates cache configuration and notifies listeners.
-
-  void updateCacheConfig(Map<CacheCategory, Duration> ttls) {
-    _repository.updateCacheConfig(ttls);
-    notifyListeners();
-  }
-
-  /// Resets cache configuration to defaults and notifies listeners.
-
-  void resetCacheConfig() {
-    _repository.resetCacheConfig();
     notifyListeners();
   }
 
   /// Invalidates all cache and notifies listeners.
 
   Future<void> clearAllCache() async {
-    await _repository.invalidateAllCache();
+    await _service.clearAllCache();
     notifyListeners();
   }
 
   /// Invalidates specific category cache and notifies listeners.
 
   Future<void> clearCategoryCache(CacheCategory category) async {
-    await _repository.invalidateCache(category);
+    await _service.clearCacheForCategory(category);
     notifyListeners();
+  }
+
+  /// Get cache metadata for a category.
+
+  Future<Map<String, dynamic>?> getCacheMetadata(CacheCategory category) async {
+    return await _service.getCacheMetadata(category);
   }
 
   @override
   void dispose() {
     if (_isInitialized) {
-      _database.close();
+      _service.dispose();
     }
     super.dispose();
   }

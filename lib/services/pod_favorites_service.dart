@@ -834,10 +834,20 @@ class PodFavoritesService extends ChangeNotifier {
         final movieData = TurtleSerializer.movieWithUserDataFromTurtle(result);
         return movieData;
       } else {
-        debugPrint('❌ Movie file is empty or not found');
+        // This is expected for movies that haven't been rated/commented yet.
+
+        debugPrint(
+            '📄 Movie file is empty or not found (expected for new movies)');
       }
     } catch (e) {
-      debugPrint('❌ Error reading movie file for ${movie.title}: $e');
+      if (e.toString().contains('does not exist')) {
+        // This is expected for movies that haven't been rated/commented yet.
+
+        debugPrint(
+            '📄 Movie file does not exist for ${movie.title} (expected for new movies)');
+      } else {
+        debugPrint('❌ Error reading movie file for ${movie.title}: $e');
+      }
     }
     return null;
   }

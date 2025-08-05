@@ -28,12 +28,17 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:solidpod/solidpod.dart' show getAppNameVersion;
+import 'package:version_widget/version_widget.dart';
 
 import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
+import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
+import 'package:moviestar/screens/search_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/screens/shared_movies_screen.dart';
 import 'package:moviestar/screens/to_watch_screen.dart';
@@ -45,6 +50,8 @@ import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/services/movie_service.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
+import 'package:moviestar/widgets/movie_nav_tabs.dart';
+import 'package:moviestar/widgets/solid_nav_bar.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   final SharedPreferences prefs;
@@ -63,6 +70,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   int _selectedIndex = 0;
   bool _isLoadingFolders = false;
+  String _appVersion = '';
+  bool _isVersionLoaded = false;
 
   /// Service for managing favorite movies.
 
@@ -71,9 +80,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   late final ApiKeyService _apiKeyService;
   late final MovieService _movieService;
 
-  /// List of screens to display in the bottom navigation bar.
+  /// List of screens to display in the navigation rail.
 
   late List<Widget> _screens;
+
+  /// Navigation tabs configuration.
+
+  late List<SolidNavTab> _navTabs;
 
   @override
   void initState() {
@@ -91,6 +104,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     _apiKeyService.addListener(_onApiKeyChanged);
 
+    _loadAppInfo();
     _buildScreens();
   }
 
@@ -98,6 +112,18 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   void dispose() {
     _apiKeyService.removeListener(_onApiKeyChanged);
     super.dispose();
+  }
+
+  /// Loads the app name and version from package_info_plus.
+
+  Future<void> _loadAppInfo() async {
+    final appInfo = await getAppNameVersion();
+    if (mounted) {
+      setState(() {
+        _appVersion = appInfo.version;
+        _isVersionLoaded = true;
+      });
+    }
   }
 
   void _onApiKeyChanged() {
@@ -146,6 +172,11 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         favoritesServiceManager: _favoritesServiceManager,
       ),
     ];
+
+    // Configure navigation tabs using the MovieStar app configuration.
+
+    _navTabs = createMovieStarNavTabs();
+
     _initialiseAppData();
   }
 
@@ -189,39 +220,214 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     }
   }
 
+  /// Handles the refresh action.
+
+  void _handleRefresh() {
+    // Invalidate all movie providers to force refresh.
+
+    ref.invalidate(popularMoviesWithCacheInfoProvider);
+    ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+    ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+    ref.invalidate(upcomingMoviesWithCacheInfoProvider);
+    ref.invalidate(configuredCachedMovieServiceProvider);
+  }
+
+  /// Handles the search action.
+
+  void _handleSearch() {
+    if (mounted) {
+      final movieService = ref.read(movieServiceProvider);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SearchScreen(
+            favoritesService: _favoritesService,
+            movieService: movieService,
+          ),
+        ),
+      );
+    }
+  }
+
+  /// Handles the settings action.
+
+  void _handleSettings() {
+    setState(() {
+      _selectedIndex = 6; // Settings screen index.
+    });
+  }
+
+  /// Handles the logout action.
+
+  void _handleLogout() {
+    // TODO: Implement logout functionality
+    // This would typically involve calling solidpod logout methods.
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Logout functionality to be implemented')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      body: Stack(
-        children: [
-          _isLoadingFolders
-              ? const Center(child: CircularProgressIndicator())
-              : _screens[_selectedIndex],
+      appBar: AppBar(
+        title: Text(_navTabs[_selectedIndex].title),
+        backgroundColor: theme.colorScheme.surface,
+        automaticallyImplyLeading: false,
+        actions: [
+          // Version widget.
+
+          if (_isVersionLoaded)
+            MarkdownTooltip(
+              message: '''
+
+              **Version:** This is the current version of the MovieStar app. If
+              the version is out of date then the text will be red. You can tap on
+              the version to view the app's Change Log to determine if it is worth
+              updating your version.
+
+              ''',
+              child: VersionWidget(
+                version: _appVersion,
+                changelogUrl:
+                    'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
+                showDate: true,
+              ),
+            ),
+
+          const SizedBox(width: 16),
+
+          // Refresh button.
+
+          MarkdownTooltip(
+            message: '''
+
+            **Refresh:** Tap here to refresh all movie data and reload the latest
+            information from the movie database.
+
+            ''',
+            child: IconButton(
+              icon: Icon(
+                Icons.refresh,
+                color: theme.colorScheme.primary,
+              ),
+              onPressed: _handleRefresh,
+            ),
+          ),
+
+          // Search button.
+
+          MarkdownTooltip(
+            message: '''
+
+            **Search:** Tap here to search for movies by title, genre, or other
+            criteria.
+
+            ''',
+            child: IconButton(
+              icon: Icon(
+                Icons.search,
+                color: theme.colorScheme.primary,
+              ),
+              onPressed: _handleSearch,
+            ),
+          ),
+
+          // Theme toggle button.
+
+          Consumer(
+            builder: (context, ref, child) {
+              final themeMode = ref.watch(themeModeProvider);
+              final isDarkMode = themeMode == ThemeMode.dark;
+              return MarkdownTooltip(
+                message: '''
+
+                **Theme Toggle:** Tap here to switch between light and dark themes.
+
+                ''',
+                child: IconButton(
+                  icon: Icon(
+                    isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                    color: theme.colorScheme.primary,
+                  ),
+                  onPressed: () async {
+                    await ref.read(themeModeProvider.notifier).toggleTheme();
+                  },
+                ),
+              );
+            },
+          ),
+
+          // Settings button.
+
+          MarkdownTooltip(
+            message: '''
+
+            **Settings:** Tap here to view and manage your MovieStar account
+            settings.
+
+            ''',
+            child: IconButton(
+              icon: Icon(
+                Icons.settings,
+                color: theme.colorScheme.primary,
+              ),
+              onPressed: _handleSettings,
+            ),
+          ),
+
+          // Logout button.
+
+          MarkdownTooltip(
+            message: '''
+
+            **Logout:** Tap here to securely log out of your MovieStar account.
+            This will clear your current session and return you to the login
+            screen.
+
+            ''',
+            child: IconButton(
+              icon: Icon(
+                Icons.logout,
+                color: theme.colorScheme.primary,
+              ),
+              onPressed: _handleLogout,
+            ),
+          ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.favorite), label: 'To Watch'),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Watched'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.upcoming),
-            label: 'Coming Soon',
+      backgroundColor: theme.colorScheme.surface,
+      body: Column(
+        children: [
+          Divider(height: 1, color: theme.dividerColor),
+          Expanded(
+            child: Row(
+              children: [
+                SolidNavBar(
+                  tabs: _navTabs,
+                  selectedIndex: _selectedIndex,
+                  onTabSelected: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                ),
+                VerticalDivider(color: theme.dividerColor),
+                Expanded(
+                  child: Stack(
+                    children: [
+                      _isLoadingFolders
+                          ? const Center(child: CircularProgressIndicator())
+                          : _screens[_selectedIndex],
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.movie_outlined),
-            label: 'My Movies',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.folder), label: 'Files'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Settings'),
         ],
       ),
     );

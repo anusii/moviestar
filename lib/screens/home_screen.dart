@@ -31,9 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/screens/search_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/hive_movie_cache_service.dart';
@@ -832,7 +830,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final nowPlayingMovies = ref.watch(nowPlayingMoviesWithCacheInfoProvider);
     final topRatedMovies = ref.watch(topRatedMoviesWithCacheInfoProvider);
     final upcomingMovies = ref.watch(upcomingMoviesWithCacheInfoProvider);
-    final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
 
     // Show performance feedback after initial load.
 
@@ -840,94 +837,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        title: Row(
-          children: [
-            const Text(
-              'MOVIE STAR',
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            if (cacheOnlyMode) ...[
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text(
-                  'OFFLINE',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-        actions: [
-          Padding(
-            // Space for debug banner.
-
-            padding: const EdgeInsets.only(right: 60.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.refresh),
-                  onPressed: _forceRefresh,
-                  tooltip: 'Refresh data',
-                ),
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    // Check if widget is still mounted before navigation.
-
-                    if (mounted) {
-                      final movieService = ref.read(movieServiceProvider);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SearchScreen(
-                            favoritesService: widget.favoritesService,
-                            movieService: movieService,
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                ),
-                Consumer(
-                  builder: (context, ref, child) {
-                    final themeMode = ref.watch(themeModeProvider);
-                    final isDarkMode = themeMode == ThemeMode.dark;
-                    return IconButton(
-                      icon: Icon(
-                        isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                      ),
-                      onPressed: () async {
-                        await ref
-                            .read(themeModeProvider.notifier)
-                            .toggleTheme();
-                      },
-                      tooltip: isDarkMode
-                          ? 'Switch to light mode'
-                          : 'Switch to dark mode',
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
       body: RefreshIndicator(
         onRefresh: _forceRefresh,
         child: SingleChildScrollView(

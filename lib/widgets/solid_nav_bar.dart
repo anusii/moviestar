@@ -1,0 +1,184 @@
+/// Solid Navigation Bar.
+///
+// Time-stamp: <Friday 2025-08-05 16:00:00 +1000 Tony Chen>
+///
+/// Copyright (C) 2025, Software Innovation Institute, ANU.
+///
+/// Licensed under the GNU General Public License, Version 3 (the "License").
+///
+/// License: https://www.gnu.org/licenses/gpl-3.0.en.html.
+//
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+// details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <https://www.gnu.org/licenses/>.
+///
+/// Authors: Tony Chen
+
+library;
+
+import 'package:flutter/material.dart';
+import 'package:markdown_tooltip/markdown_tooltip.dart';
+
+/// Configuration for a navigation tab.
+///
+/// This class defines the structure for each tab in the navigation rail,
+/// including visual properties, content, and interaction handlers.
+
+class SolidNavTab {
+  /// The display title of the tab.
+
+  final String title;
+
+  /// The icon to display for the tab.
+
+  final IconData icon;
+
+  /// Optional custom colour for the icon. If null, uses theme default.
+
+  final Color? color;
+
+  /// The content widget to display when this tab is selected.
+
+  final Widget? content;
+
+  /// Optional tooltip message for the tab (supports Markdown).
+
+  final String? tooltip;
+
+  /// Optional dialog message to show when tab is selected.
+
+  final String? message;
+
+  /// Optional dialog title when showing a message.
+
+  final String? dialogTitle;
+
+  /// Optional custom action to execute when tab is selected.
+
+  final void Function(BuildContext)? action;
+
+  const SolidNavTab({
+    required this.title,
+    required this.icon,
+    this.color,
+    this.content,
+    this.tooltip,
+    this.message,
+    this.dialogTitle,
+    this.action,
+  });
+}
+
+/// A reusable navigation rail component designed for Solid POD applications.
+///
+/// This widget provides a left-side navigation rail that can be easily
+/// integrated into different applications and eventually migrated to the
+/// solidpod library.
+
+class SolidNavBar extends StatelessWidget {
+  /// List of navigation tabs to display.
+
+  final List<SolidNavTab> tabs;
+
+  /// Currently selected tab index.
+
+  final int selectedIndex;
+
+  /// Callback when a tab is selected.
+
+  final void Function(int) onTabSelected;
+
+  /// Optional callback to show alert dialogs.
+
+  final void Function(BuildContext, String, String?)? onShowAlert;
+
+  /// Creates a [SolidNavBar] with the specified configuration.
+
+  const SolidNavBar({
+    super.key,
+    required this.tabs,
+    required this.selectedIndex,
+    required this.onTabSelected,
+    this.onShowAlert,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+      child: SingleChildScrollView(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Container(
+            color: theme.colorScheme.surface,
+            child: NavigationRail(
+              backgroundColor: theme.colorScheme.surface,
+              selectedIndex: selectedIndex,
+              onDestinationSelected: (index) => _handleTabSelection(index, context),
+              labelType: NavigationRailLabelType.all,
+              destinations: tabs.map((tab) {
+                final tooltipMessage = tab.tooltip ?? tab.message;
+
+                Widget iconWidget = Icon(
+                  tab.icon,
+                  color: tab.color ?? theme.colorScheme.primary,
+                );
+
+                // Wrap with tooltip if available.
+
+                if (tooltipMessage != null) {
+                  iconWidget = MarkdownTooltip(
+                    message: tooltipMessage,
+                    child: iconWidget,
+                  );
+                }
+
+                return NavigationRailDestination(
+                  icon: iconWidget,
+                  label: Text(
+                    tab.title,
+                    style: theme.textTheme.bodyLarge,
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 0.0),
+                );
+              }).toList(),
+              selectedLabelTextStyle: theme.textTheme.labelLarge?.copyWith(
+                color: theme.colorScheme.primary,
+              ),
+              unselectedLabelTextStyle: theme.textTheme.bodyMedium,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _handleTabSelection(int index, BuildContext context) {
+    onTabSelected(index);
+
+    final tab = tabs[index];
+
+    // Handle special tab actions.
+
+    if (tab.message != null && onShowAlert != null) {
+      onShowAlert!(
+        context,
+        tab.message!,
+        tab.dialogTitle,
+      );
+    } else if (tab.action != null) {
+      tab.action!(context);
+    }
+  }
+}

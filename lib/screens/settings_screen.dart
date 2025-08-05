@@ -550,13 +550,6 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        title: Text(
-          'Settings',
-          style: Theme.of(context).appBarTheme.titleTextStyle,
-        ),
-      ),
       body: ListView(
         children: [
           const SizedBox(height: 20),

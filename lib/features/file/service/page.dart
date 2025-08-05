@@ -44,14 +44,6 @@ class FileService extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text(
-          'File Management',
-          style: Theme.of(context).appBarTheme.titleTextStyle,
-        ),
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        iconTheme: Theme.of(context).appBarTheme.iconTheme,
-      ),
       body: const Padding(
         padding: EdgeInsets.all(AppTheme.defaultPadding),
         child: FileServiceWidget(),

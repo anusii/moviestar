@@ -61,11 +61,6 @@ class _ToWatchScreenState extends State<ToWatchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        title: Text('To Watch',
-            style: Theme.of(context).appBarTheme.titleTextStyle),
-      ),
       body: Column(
         children: [
           SortControls(

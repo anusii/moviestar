@@ -603,34 +603,32 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        title: const Text('Shared Movies'),
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Shared with Me'),
-            Tab(text: 'My Rated Movies'),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _refreshData,
-            tooltip: 'Refresh',
-          ),
-        ],
-      ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: TabBarView(
-        controller: _tabController,
+      body: Column(
         children: [
-          // Tab 1: Movies shared with me.
+          Container(
+            color: Theme.of(context).appBarTheme.backgroundColor,
+            child: TabBar(
+              controller: _tabController,
+              tabs: const [
+                Tab(text: 'Shared with Me'),
+                Tab(text: 'My Rated Movies'),
+              ],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                // Tab 1: Movies shared with me.
 
-          _buildSharedWithMeTab(),
-          // Tab 2: My rated movies.
+                _buildSharedWithMeTab(),
+                // Tab 2: My rated movies.
 
-          _buildMySharedTab(),
+                _buildMySharedTab(),
+              ],
+            ),
+          ),
         ],
       ),
     );

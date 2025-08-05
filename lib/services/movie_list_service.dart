@@ -639,7 +639,7 @@ class MovieListService {
               fileName: filePath,
               title: customTitle ?? 'Share "$listName"',
               accessModeList: permissions,
-              recipientTypeList: const ['indi'],
+              recipientList: const ['indi'],
               showAppBar: true,
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               child: _child,
@@ -651,6 +651,75 @@ class MovieListService {
       return true;
     } catch (e) {
       debugPrint('❌ Failed to share movie list: $e');
+      return false;
+    }
+  }
+
+  /// Shares a MovieList and all its associated movie files with another user.
+  /// This is a comprehensive sharing method that ensures the recipient
+  /// can access both the list structure and all individual movie data.
+  ///
+  /// [listId] - The ID of the MovieList to share.
+  /// [permissions] - List of permissions (e.g., ['read', 'write']).
+  /// [customTitle] - Optional custom title for the sharing dialog.
+  ///
+  /// Returns true if the sharing was successful.
+
+  Future<bool> shareMovieListWithMovies(
+    String listId,
+    List<String> permissions, {
+    String? customTitle,
+  }) async {
+    try {
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        debugPrint('❌ User not logged in, cannot share movie list with movies');
+        return false;
+      }
+
+      // Get the movie list data.
+
+      final movieList = await getMovieList(listId);
+      if (movieList == null) {
+        debugPrint('❌ MovieList $listId not found, cannot share');
+        return false;
+      }
+
+      final listName = movieList['name'] ?? 'Movie List';
+
+      if (!_context.mounted) return false;
+
+      // Navigate directly to GrantPermissionUi for sharing
+      final result = await Navigator.push<bool>(
+        _context,
+        MaterialPageRoute(
+          fullscreenDialog: true,
+          builder: (navContext) => Theme(
+            data: Theme.of(_context),
+            child: Scaffold(
+              backgroundColor: Theme.of(_context).scaffoldBackgroundColor,
+              appBar: AppBar(
+                title: Text('Share "$listName"'),
+                backgroundColor: Theme.of(_context).appBarTheme.backgroundColor,
+                foregroundColor: Theme.of(_context).appBarTheme.foregroundColor,
+              ),
+              body: GrantPermissionUi(
+                fileName: 'user_lists/MovieList-$listId.ttl',
+                title: '',
+                accessModeList: const ['read'],
+                recipientList: const ['indi'],
+                showAppBar: false,
+                backgroundColor: Theme.of(_context).scaffoldBackgroundColor,
+                child: _child,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      return result ?? false;
+    } catch (e) {
+      debugPrint('❌ Failed to share movie list with movies: $e');
       return false;
     }
   }

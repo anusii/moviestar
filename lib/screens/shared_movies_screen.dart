@@ -87,7 +87,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
     });
   }
 
-  // Fetch movies that others have shared with me.
+  // Fetch movies and movie lists that others have shared with me.
 
   Future<Map<String, dynamic>?> _getMoviesSharedWithMe() async {
     try {
@@ -108,19 +108,20 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
       }
 
       final Map<String, dynamic> movieData = {};
+      final Map<String, dynamic> movieListData = {};
 
-      // Filter for movie files and fetch their content.
+      // Filter for movie files and movie list files, then fetch their content.
 
       for (final entry in sharedResourcesResult.entries) {
         final resourceUrl = entry.key as String;
         final resourceInfo = entry.value as Map;
 
-        // Check if this is a movie file.
+        try {
+          if (!mounted) break;
 
-        if (resourceUrl.contains('/movies/') && resourceUrl.endsWith('.ttl')) {
-          try {
-            if (!mounted) break;
-
+          // Check if this is a movie file.
+          if (resourceUrl.contains('/movies/') &&
+              resourceUrl.endsWith('.ttl')) {
             // Read the movie file content.
 
             final movieContent =
@@ -136,14 +137,42 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
                 movieData[resourceUrl] = movieInfo;
               }
             }
-          } catch (e) {
-            debugPrint('Error reading movie file $resourceUrl: $e');
-            // Continue with other files even if one fails.
           }
+          // Check if this is a movie list file.
+          else if (resourceUrl.contains('user_lists/MovieList-') &&
+              resourceUrl.endsWith('.ttl')) {
+            // Read the movie list file content.
+
+            final listContent =
+                await readExternalPod(resourceUrl, context, widget);
+
+            if (listContent != null &&
+                listContent != SolidFunctionCallStatus.notLoggedIn) {
+              // Parse the movie list data from TTL content.
+
+              final listInfo = await _parseMovieListData(
+                  listContent, resourceUrl, resourceInfo);
+              if (listInfo != null) {
+                movieListData[resourceUrl] = listInfo;
+              }
+            }
+          }
+        } catch (e) {
+          debugPrint('Error reading resource file $resourceUrl: $e');
+          // Continue with other files even if one fails.
         }
       }
 
-      return movieData.isNotEmpty ? movieData : null;
+      // Combine movie data and movie list data
+      final combinedData = <String, dynamic>{};
+      if (movieData.isNotEmpty) {
+        combinedData['movies'] = movieData;
+      }
+      if (movieListData.isNotEmpty) {
+        combinedData['movieLists'] = movieListData;
+      }
+
+      return combinedData.isNotEmpty ? combinedData : null;
     } catch (e) {
       debugPrint('Error fetching shared movies: $e');
       return null;
@@ -336,10 +365,32 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
       final rawSharedBy =
           resourceInfo['granter'] ?? resourceInfo['granterWebId'];
 
+      // Try to extract owner from resource URL if not found in resourceInfo
+      String finalOwner = rawOwner?.toString() ?? '';
+      String finalSharedBy = rawSharedBy?.toString() ?? '';
+
+      // Extract from resource URL for both owner and shared by if not found in metadata
+      final ownerMatch = RegExp(r'://[^/]+/([^/]+)/').firstMatch(resourceUrl);
+      if (ownerMatch != null) {
+        final username = ownerMatch.group(1);
+        final webId =
+            'https://pods.dev.solidcommunity.au/$username/profile/card#me';
+
+        if (finalOwner.isEmpty) {
+          finalOwner = webId;
+        }
+        if (finalSharedBy.isEmpty) {
+          finalSharedBy =
+              webId; // Use same WebID for shared by when not available
+        }
+      }
+
       final result = {
         'fileName': movieTitle,
-        'owner': _formatWebId(rawOwner),
-        'sharedBy': _formatWebId(rawSharedBy),
+        'owner': _formatWebId(finalOwner),
+        'ownerWebId': finalOwner, // Store full WebID for URL construction
+        'sharedBy': _formatWebId(finalSharedBy),
+        'sharedByWebId': finalSharedBy, // Store full WebID for URL construction
         'permissions': resourceInfo['permissions'] ??
             resourceInfo['permissionList'] ??
             'read',
@@ -360,6 +411,147 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
       return result;
     } catch (e) {
       debugPrint('❌ Error parsing movie data: $e');
+      return null;
+    }
+  }
+
+  // Parse movie list data from TTL content.
+
+  Future<Map<String, dynamic>?> _parseMovieListData(
+      String ttlContent, String resourceUrl, Map resourceInfo) async {
+    try {
+      String? listName;
+      String? listId;
+      String? description;
+      List<String> movieIds = [];
+
+      // Extract list ID from URL (e.g. MovieList-abc123.ttl -> abc123).
+
+      final urlParts = resourceUrl.split('/');
+      final fileName = urlParts.last;
+      final idMatch = RegExp(r'MovieList-(\w+)\.ttl', caseSensitive: false)
+          .firstMatch(fileName);
+      if (idMatch != null) {
+        listId = idMatch.group(1);
+      }
+
+      // Parse TTL content for movie list information.
+
+      final lines = ttlContent.split('\n');
+      for (final line in lines) {
+        final trimmedLine = line.trim();
+
+        // Extract list name (schema:name or sdo:name predicate).
+
+        if (listName == null &&
+            (trimmedLine.contains('sdo:name') ||
+                trimmedLine.contains('schema:name') ||
+                trimmedLine.contains(':name'))) {
+          final match = RegExp(r'"([^"]*)"').firstMatch(trimmedLine);
+          if (match != null) {
+            listName = match.group(1);
+          }
+        }
+
+        // Extract description (sdo:description predicate).
+
+        if (description == null &&
+            (trimmedLine.contains('sdo:description') ||
+                trimmedLine.contains('schema:description') ||
+                trimmedLine.contains(':description'))) {
+          final match = RegExp(r'"([^"]*)"').firstMatch(trimmedLine);
+          if (match != null) {
+            description = match.group(1);
+          }
+        }
+
+        // Extract movie references (moviestar-onto:hasMovie predicate).
+
+        if (trimmedLine.contains('moviestar-onto:hasMovie') ||
+            trimmedLine.contains(':hasMovie')) {
+          // Extract movie IDs from the line like: moviestar-data:movie-5fc3b7da690126
+          final movieMatches =
+              RegExp(r'moviestar-data:movie-(\w+)').allMatches(trimmedLine);
+          for (final match in movieMatches) {
+            final movieId = match.group(1);
+            if (movieId != null && !movieIds.contains(movieId)) {
+              movieIds.add(movieId);
+            }
+          }
+        }
+      }
+
+      // Use fallback values if not found.
+
+      listName ??= 'Movie List ${listId ?? 'Unknown'}';
+      description ??= 'A shared movie list';
+
+      final rawOwner = resourceInfo['owner'] ??
+          resourceInfo['ownerWebId'] ??
+          resourceInfo['webId'] ??
+          resourceInfo['ownerId'];
+      final rawSharedBy = resourceInfo['granter'] ??
+          resourceInfo['granterWebId'] ??
+          resourceInfo['sharedBy'] ??
+          resourceInfo['sharer'];
+
+      // Try to extract owner from resource URL if not found in resourceInfo
+      String finalOwner = rawOwner?.toString() ?? '';
+      String finalSharedBy = rawSharedBy?.toString() ?? '';
+
+      // Extract from resource URL for both owner and shared by if not found in metadata
+      final ownerMatch = RegExp(r'://[^/]+/([^/]+)/').firstMatch(resourceUrl);
+      if (ownerMatch != null) {
+        final username = ownerMatch.group(1);
+        final webId =
+            'https://pods.dev.solidcommunity.au/$username/profile/card#me';
+
+        if (finalOwner.isEmpty) {
+          finalOwner = webId;
+        }
+        if (finalSharedBy.isEmpty) {
+          finalSharedBy =
+              webId; // Use same WebID for shared by when not available
+        }
+      }
+
+      // Debug output to see what's available
+      debugPrint('📝 Resource info keys: ${resourceInfo.keys.toList()}');
+      debugPrint('📝 Raw owner: $rawOwner');
+      debugPrint('📝 Raw shared by: $rawSharedBy');
+      debugPrint('📝 Final owner: $finalOwner');
+      debugPrint('📝 Final shared by: $finalSharedBy');
+
+      final result = {
+        'listId': listId ?? 'unknown',
+        'listName': listName,
+        'description': description,
+        'movieCount': movieIds.length, // Use extracted movie IDs count
+        'movieIds': movieIds,
+        'movies': movieIds
+            .map((movieIdStr) => {
+                  'movieId': movieIdStr,
+                  'fileName':
+                      'Movie $movieIdStr', // Placeholder - will fetch details on-demand
+                  'owner': _formatWebId(finalOwner),
+                  'ownerWebId': finalOwner, // Inherit from parent list
+                  'sharedBy': _formatWebId(finalSharedBy),
+                  'sharedByWebId': finalSharedBy, // Inherit from parent list
+                })
+            .toList(),
+        'owner': _formatWebId(finalOwner),
+        'ownerWebId': finalOwner, // Store full WebID for URL construction
+        'sharedBy': _formatWebId(finalSharedBy),
+        'sharedByWebId': finalSharedBy, // Store full WebID for URL construction
+        'permissions': resourceInfo['permissions'] ??
+            resourceInfo['permissionList'] ??
+            'read',
+        'resourceUrl': resourceUrl,
+      };
+
+      return result;
+    } catch (e) {
+      debugPrint('❌ Error parsing movie list data: $e');
       return null;
     }
   }

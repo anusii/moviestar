@@ -125,6 +125,27 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
   bool get _isSharedMovie => widget.sharedMovieData != null;
 
+  /// Gets the appropriate text for who shared the movie
+  String _getSharedByText() {
+    if (!_isSharedMovie) return 'Unknown';
+
+    final sharedBy = widget.sharedMovieData!['sharedBy'] as String?;
+    final sharedByWebId = widget.sharedMovieData!['sharedByWebId'] as String?;
+
+    // Prefer the formatted name if available
+    if (sharedBy != null && sharedBy.isNotEmpty && sharedBy != 'Unknown') {
+      return sharedBy;
+    }
+
+    // Fall back to WebID if formatted name is not available
+    if (sharedByWebId != null && sharedByWebId.isNotEmpty) {
+      return sharedByWebId;
+    }
+
+    // Final fallback
+    return 'Unknown';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -145,6 +166,15 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   /// Checks if the current movie is in either list.
 
   Future<void> _checkListStatus() async {
+    // Don't check list status for shared movies
+    if (_isSharedMovie) {
+      setState(() {
+        _isInToWatch = false;
+        _isInWatched = false;
+      });
+      return;
+    }
+
     final isInToWatch = await widget.favoritesService.isInToWatch(widget.movie);
     final isInWatched = await widget.favoritesService.isInWatched(widget.movie);
     setState(() {
@@ -347,6 +377,14 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   /// Checks if the current movie has a file (user has rated or commented).
 
   Future<void> _checkMovieFile() async {
+    // Don't check movie file for shared movies
+    if (_isSharedMovie) {
+      setState(() {
+        _hasMovieFile = false;
+      });
+      return;
+    }
+
     final hasFile = await widget.favoritesService.hasMovieFile(widget.movie);
     setState(() {
       _hasMovieFile = hasFile;
@@ -402,7 +440,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
               fileName: movieFilePath,
               title: 'Share "${widget.movie.title}"',
               accessModeList: const ['read'],
-              recipientTypeList: const ['indi'],
+              recipientList: const ['indi'],
               showAppBar: true,
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               child: widget,
@@ -614,7 +652,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                               size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            'This movie was shared by ${widget.sharedMovieData!['sharedBy'] ?? 'someone'}',
+                            'This movie was shared by ${_getSharedByText()}',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.w600,

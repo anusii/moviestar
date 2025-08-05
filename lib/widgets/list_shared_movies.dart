@@ -30,11 +30,13 @@ import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
+import 'package:moviestar/screens/shared_movie_list_detail_screen.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
 
 class ListSharedMovies extends StatefulWidget {
-  final Map<String, dynamic> sharedMoviesMap;
+  final Map<String, dynamic>
+      sharedMoviesMap; // Contains both 'movies' and 'movieLists' keys
   final VoidCallback? onDataChanged;
 
   const ListSharedMovies({
@@ -112,7 +114,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                 fileName: movieFilePath,
                 title: '',
                 accessModeList: const ['read'],
-                recipientTypeList: const ['indi'],
+                recipientList: const ['indi'],
                 showAppBar: false,
                 backgroundColor:
                     Theme.of(currentContext).scaffoldBackgroundColor,
@@ -258,24 +260,59 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
 
   @override
   Widget build(BuildContext context) {
-    final sharedMoviesList = widget.sharedMoviesMap.entries.toList();
+    // Separate movies and movie lists from the shared data
+    final movies =
+        widget.sharedMoviesMap['movies'] as Map<String, dynamic>? ?? {};
+    final movieLists =
+        widget.sharedMoviesMap['movieLists'] as Map<String, dynamic>? ?? {};
+
+    // Combine both into a single list for display
+    final allItems = <MapEntry<String, Map<String, dynamic>>>[];
+
+    // Add movie lists first (higher priority)
+    for (final entry in movieLists.entries) {
+      final listData = entry.value as Map<String, dynamic>;
+      listData['type'] = 'movieList'; // Add type identifier
+      allItems.add(MapEntry(entry.key, listData));
+    }
+
+    // Add individual movies
+    for (final entry in movies.entries) {
+      final movieData = entry.value as Map<String, dynamic>;
+      movieData['type'] = 'movie'; // Add type identifier
+      allItems.add(MapEntry(entry.key, movieData));
+    }
+
+    if (allItems.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24.0),
+          child: Text(
+            'No shared movies or lists yet',
+            style: TextStyle(fontSize: 16, color: Colors.grey),
+          ),
+        ),
+      );
+    }
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: sharedMoviesList.length,
+      itemCount: allItems.length,
       itemBuilder: (context, index) {
-        final entry = sharedMoviesList[index];
-        final movieUrl = entry.key;
-        final movieData = entry.value as Map<String, dynamic>;
+        final entry = allItems[index];
+        final resourceUrl = entry.key;
+        final itemData = entry.value;
 
-        final movieTitle = movieData['fileName'] ?? 'Unknown Movie';
-        final owner = movieData['owner'] ?? '';
-        final sharedBy = movieData['sharedBy'] ?? '';
-        final permissions = movieData['permissions'] ?? 'none';
-        final rating = movieData['rating'];
-        final comments = movieData['comments'] ?? '';
-        final isUserRatedMovie = movieData['isUserRatedMovie'] == true;
-        final canShare = movieData['canShare'] == true;
+        final movieTitle = itemData['fileName'] ?? 'Unknown Movie';
+        final owner = itemData['owner'] ?? '';
+        final ownerWebId = itemData['ownerWebId'] ?? '';
+        final sharedBy = itemData['sharedBy'] ?? '';
+        final sharedByWebId = itemData['sharedByWebId'] ?? '';
+        final permissions = itemData['permissions'] ?? 'none';
+        final rating = itemData['rating'];
+        final comments = itemData['comments'] ?? '';
+        final isUserRatedMovie = itemData['isUserRatedMovie'] == true;
+        final canShare = itemData['canShare'] == true;
 
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
@@ -286,65 +323,91 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
             onTap: () async {
-              // Create Movie object from shared movie data.
-
               try {
-                final movieId =
-                    int.tryParse(movieData['movieId']?.toString() ?? '0') ?? 0;
-                final posterUrl = movieData['posterUrl'] ?? '';
-                final backdropUrl = movieData['backdropUrl'] ?? posterUrl ?? '';
-                final overview = movieData['overview'] ?? 'Shared movie';
-                final releaseDate =
-                    DateTime.tryParse(movieData['releaseDate'] ?? '') ??
-                        DateTime.now();
-                final voteAverage =
-                    (movieData['voteAverage'] as num?)?.toDouble() ?? 0.0;
-                final genreIds = (movieData['genreIds'] as List?)
-                        ?.map((e) => e as int)
-                        .toList() ??
-                    <int>[];
+                // Check if this is a movie list or individual movie
+                if (itemData['type'] == 'movieList') {
+                  // Navigate to SharedMovieListDetailScreen
+                  final listName = itemData['listName'] ?? movieTitle;
+                  final listDescription = itemData['description'] ?? '';
+                  final movies = (itemData['movies'] as List<dynamic>?)
+                          ?.cast<Map<String, dynamic>>() ??
+                      <Map<String, dynamic>>[];
 
-                final movie = Movie(
-                  id: movieId,
-                  title: movieTitle,
-                  overview: overview,
-                  posterUrl: posterUrl,
-                  backdropUrl: backdropUrl,
-                  voteAverage: voteAverage,
-                  releaseDate: releaseDate,
-                  genreIds: genreIds,
-                );
-
-                // Get SharedPreferences and create FavoritesServiceManager.
-
-                final prefs = await SharedPreferences.getInstance();
-                if (!context.mounted) return;
-
-                final favoritesServiceManager =
-                    FavoritesServiceManager(prefs, context, widget);
-                final favoritesService =
-                    FavoritesServiceAdapter(favoritesServiceManager);
-
-                // Navigate to MovieDetailsScreen with shared movie data.
-
-                if (context.mounted) {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MovieDetailsScreen(
-                        movie: movie,
-                        favoritesService: favoritesService,
-                        sharedMovieData: movieData,
+                  if (context.mounted) {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SharedMovieListDetailScreen(
+                          listName: listName,
+                          listDescription: listDescription,
+                          owner: owner,
+                          ownerWebId: ownerWebId,
+                          sharedBy: sharedBy,
+                          sharedByWebId: sharedByWebId,
+                          movies: movies,
+                          permissions: permissions,
+                        ),
                       ),
-                    ),
+                    );
+                  }
+                } else {
+                  // Handle individual movie navigation
+                  final movieId =
+                      int.tryParse(itemData['movieId']?.toString() ?? '0') ?? 0;
+                  final posterUrl = itemData['posterUrl'] ?? '';
+                  final backdropUrl =
+                      itemData['backdropUrl'] ?? posterUrl ?? '';
+                  final overview = itemData['overview'] ?? 'Shared movie';
+                  final releaseDate =
+                      DateTime.tryParse(itemData['releaseDate'] ?? '') ??
+                          DateTime.now();
+                  final voteAverage =
+                      (itemData['voteAverage'] as num?)?.toDouble() ?? 0.0;
+                  final genreIds = (itemData['genreIds'] as List?)
+                          ?.map((e) => e as int)
+                          .toList() ??
+                      <int>[];
+
+                  final movie = Movie(
+                    id: movieId,
+                    title: movieTitle,
+                    overview: overview,
+                    posterUrl: posterUrl,
+                    backdropUrl: backdropUrl,
+                    voteAverage: voteAverage,
+                    releaseDate: releaseDate,
+                    genreIds: genreIds,
                   );
+
+                  // Get SharedPreferences and create FavoritesServiceManager.
+                  final prefs = await SharedPreferences.getInstance();
+                  if (!context.mounted) return;
+
+                  final favoritesServiceManager =
+                      FavoritesServiceManager(prefs, context, widget);
+                  final favoritesService =
+                      FavoritesServiceAdapter(favoritesServiceManager);
+
+                  // Navigate to MovieDetailsScreen with shared movie data.
+                  if (context.mounted) {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MovieDetailsScreen(
+                          movie: movie,
+                          favoritesService: favoritesService,
+                          sharedMovieData: itemData,
+                        ),
+                      ),
+                    );
+                  }
                 }
               } catch (e) {
-                debugPrint('Error navigating to movie details: $e');
+                debugPrint('Error navigating: $e');
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Error opening movie: $movieTitle'),
+                      content: Text('Error opening: $movieTitle'),
                       backgroundColor: Theme.of(context).colorScheme.error,
                     ),
                   );
@@ -370,7 +433,9 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
-                          Icons.movie,
+                          itemData['type'] == 'movieList'
+                              ? Icons.playlist_play
+                              : Icons.movie,
                           color: Theme.of(context).colorScheme.primary,
                           size: 24,
                         ),
@@ -381,7 +446,9 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              movieTitle,
+                              itemData['type'] == 'movieList'
+                                  ? 'List: ${itemData['listName'] ?? movieTitle}'
+                                  : movieTitle,
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium
@@ -389,7 +456,29 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),
-                            if (rating != null) ...[
+                            if (itemData['type'] == 'movieList') ...[
+                              const SizedBox(height: 4),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.movie,
+                                    size: 16,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${itemData['movieCount'] ?? 0} movies',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ] else if (rating != null) ...[
                               const SizedBox(height: 4),
                               _buildRatingDisplay(rating),
                             ],
@@ -401,21 +490,20 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                           onPressed: () async {
                             // Create Movie object
                             final movieId = int.tryParse(
-                                    movieData['movieId']?.toString() ?? '0') ??
+                                    itemData['movieId']?.toString() ?? '0') ??
                                 0;
-                            final posterUrl = movieData['posterUrl'] ?? '';
+                            final posterUrl = itemData['posterUrl'] ?? '';
                             final backdropUrl =
-                                movieData['backdropUrl'] ?? posterUrl ?? '';
+                                itemData['backdropUrl'] ?? posterUrl ?? '';
                             final overview =
-                                movieData['overview'] ?? 'My rated movie';
+                                itemData['overview'] ?? 'My rated movie';
                             final releaseDate = DateTime.tryParse(
-                                    movieData['releaseDate'] ?? '') ??
+                                    itemData['releaseDate'] ?? '') ??
                                 DateTime.now();
                             final voteAverage =
-                                (movieData['voteAverage'] as num?)
-                                        ?.toDouble() ??
+                                (itemData['voteAverage'] as num?)?.toDouble() ??
                                     0.0;
-                            final genreIds = (movieData['genreIds'] as List?)
+                            final genreIds = (itemData['genreIds'] as List?)
                                     ?.map((e) => e as int)
                                     .toList() ??
                                 <int>[];
@@ -433,7 +521,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
 
                             // Use the movie file path from the URL.
 
-                            await _shareMovie(movie, movieUrl);
+                            await _shareMovie(movie, resourceUrl);
                           },
                           icon: const Icon(Icons.share),
                           tooltip: 'Share this movie with others',
@@ -451,9 +539,12 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                     ],
                   ),
 
-                  // Movie details.
+                  // Movie/List details.
 
-                  if (comments.isNotEmpty) ...[
+                  if (comments.isNotEmpty ||
+                      (itemData['type'] == 'movieList' &&
+                          itemData['description'] != null &&
+                          itemData['description'].toString().isNotEmpty)) ...[
                     const SizedBox(height: 12),
                     Container(
                       width: double.infinity,
@@ -479,7 +570,9 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'Review:',
+                                itemData['type'] == 'movieList'
+                                    ? 'Description:'
+                                    : 'Review:',
                                 style: Theme.of(context)
                                     .textTheme
                                     .labelSmall
@@ -491,7 +584,9 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            comments,
+                            itemData['type'] == 'movieList'
+                                ? (itemData['description'] ?? '')
+                                : comments,
                             style:
                                 Theme.of(context).textTheme.bodySmall?.copyWith(
                                       fontStyle: FontStyle.italic,

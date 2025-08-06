@@ -125,7 +125,8 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
   bool get _isSharedMovie => widget.sharedMovieData != null;
 
-  /// Gets the appropriate text for who shared the movie
+  // Gets the appropriate text for who shared the movie.
+
   String _getSharedByText() {
     if (!_isSharedMovie) return 'Unknown';
 

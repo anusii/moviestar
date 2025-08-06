@@ -141,7 +141,8 @@ class _EnhancedMovieListSharingUiState
     super.dispose();
   }
 
-  /// Update selected permissions based on checkboxes
+  // Update selected permissions based on checkboxes.
+
   void _updateSelectedPermissions() {
     selectedPermList.clear();
     if (readChecked) selectedPermList.add('read');
@@ -150,7 +151,8 @@ class _EnhancedMovieListSharingUiState
     if (controlChecked) selectedPermList.add('control');
   }
 
-  /// Update selected recipient - only individual sharing is supported
+  // Update selected recipient - only individual sharing is supported.
+
   void _updateSelectedRecipient() {
     selectedRecipient = RecipientType.individual;
     selectedRecipientDetails = webIdController.text.isNotEmpty
@@ -158,7 +160,8 @@ class _EnhancedMovieListSharingUiState
         : 'Individual (WebID required)';
   }
 
-  /// Load current sharing information for this movie list
+  // Load current sharing information for this movie list.
+
   Future<void> _loadCurrentSharingInfo() async {
     try {
       debugPrint(
@@ -226,8 +229,9 @@ class _EnhancedMovieListSharingUiState
     }
   }
 
-  /// Alternative method to detect sharing when TTL metadata is corrupted
-  /// This is a fallback approach that doesn't rely on TTL parsing
+  // Alternative method to detect sharing when TTL metadata is corrupted.
+  // This is a fallback approach that doesn't rely on TTL parsing.
+
   Future<Map<String, String>?> _detectAlternativeSharing() async {
     try {
       debugPrint('🔍 Attempting alternative sharing detection...');
@@ -249,7 +253,8 @@ class _EnhancedMovieListSharingUiState
     }
   }
 
-  /// Update the movie list file with sharing metadata directly (V3)
+  // Update the movie list file with sharing metadata directly (V3).
+
   Future<void> _updateMovieListWithSharingMetadataV2() async {
     try {
       debugPrint(
@@ -361,7 +366,8 @@ class _EnhancedMovieListSharingUiState
     }
   }
 
-  /// Share the movie list and all individual movies
+  // Share the movie list and all individual movies.
+
   Future<void> _shareMovieListAndMovies() async {
     if (selectedRecipient == RecipientType.none) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1053,7 +1059,8 @@ class _EnhancedMovieListSharingUiState
     );
   }
 
-  /// Creates an individual movie file if it doesn't exist
+  // Creates an individual movie file if it doesn't exist.
+
   Future<void> _createMovieFileIfNotExists(Movie movie) async {
     try {
       final movieFileName = 'movies/Movie-${movie.id}.ttl';

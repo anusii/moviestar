@@ -212,7 +212,8 @@ Recipients will be able to:
     );
   }
 
-  /// Shares the to-watch movies list
+  // Shares the to-watch movies list.
+
   Future<void> _shareToWatchList(
       BuildContext context, List<Movie> movies) async {
     if (movies.isEmpty) {
@@ -298,7 +299,8 @@ Recipients will be able to:
     }
   }
 
-  /// Shares individual movie files sequentially using GrantPermissionUi
+  // Shares individual movie files sequentially using GrantPermissionUi.
+
   Future<void> _shareIndividualMoviesSequentially(List<Movie> movies) async {
     try {
       if (movies.isEmpty) {
@@ -349,7 +351,8 @@ Recipients will be able to:
     }
   }
 
-  /// Recursively shares movies one by one using GrantPermissionUi
+  // Recursively shares movies one by one using GrantPermissionUi.
+
   Future<void> _shareMoviesOneByOne(List<Movie> movies, int index) async {
     if (index >= movies.length) {
       // All movies shared, show completion message
@@ -434,7 +437,8 @@ Recipients will be able to:
     );
   }
 
-  /// Shows dialog asking user if they want to continue sharing remaining movies
+  // Shows dialog asking user if they want to continue sharing remaining movies.
+
   void _showContinueSharingDialog(List<Movie> movies, int currentIndex) {
     final remainingCount = movies.length - currentIndex;
 
@@ -470,7 +474,8 @@ Recipients will be able to:
     );
   }
 
-  /// Creates a movie file if it doesn't exist (needed before sharing)
+  // Creates a movie file if it doesn't exist (needed before sharing).
+
   Future<void> _createMovieFileIfNotExists(Movie movie) async {
     try {
       final movieFileName = 'movies/Movie-${movie.id}.ttl';

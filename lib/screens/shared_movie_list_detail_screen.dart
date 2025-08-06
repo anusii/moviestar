@@ -115,6 +115,7 @@ class _SharedMovieListDetailScreenState
   }
 
   // Extract owner name from WebID.
+
   String _getOwnerName(String webId) {
     if (webId.isEmpty) return 'Unknown';
 
@@ -133,7 +134,8 @@ class _SharedMovieListDetailScreenState
     }
   }
 
-  /// Extracts base URL from WebID for constructing resource URLs
+  // Extracts base URL from WebID for constructing resource URLs.
+
   String? _extractBaseUrlFromWebId(String webIdOrUsername) {
     if (webIdOrUsername.isEmpty) return null;
 
@@ -164,6 +166,7 @@ class _SharedMovieListDetailScreenState
   }
 
   // Build rating display.
+
   Widget _buildRatingDisplay(dynamic rating) {
     if (rating == null) return const SizedBox.shrink();
 
@@ -258,7 +261,8 @@ class _SharedMovieListDetailScreenState
     }
   }
 
-  /// Attempts to fetch individual movie file data to get ratings and comments
+  // Attempts to fetch individual movie file data to get ratings and comments.
+
   Future<Map<String, dynamic>> _fetchIndividualMovieData(
       Map<String, dynamic> movieData) async {
     try {
@@ -323,7 +327,8 @@ class _SharedMovieListDetailScreenState
     }
   }
 
-  /// Parses individual movie file content to extract rating and comments
+  // Parses individual movie file content to extract rating and comments.
+
   Future<Map<String, dynamic>?> _parseIndividualMovieData(
       String ttlContent) async {
     try {

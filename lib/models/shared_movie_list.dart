@@ -28,6 +28,7 @@ library;
 import 'package:moviestar/models/movie.dart';
 
 /// Data structure representing a shared MovieList.
+
 class SharedMovieList {
   final String id;
   final String name;
@@ -56,6 +57,7 @@ class SharedMovieList {
   });
 
   /// Creates a SharedMovieList from a `Map<String, dynamic>` (for migration).
+
   factory SharedMovieList.fromMap(
       String resourceUrl, Map<String, dynamic> map) {
     return SharedMovieList(
@@ -76,6 +78,7 @@ class SharedMovieList {
   }
 
   /// Converts the SharedMovieList to a `Map<String, dynamic>`.
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -110,6 +113,7 @@ class SharedMovieList {
 }
 
 /// Data structure representing a MovieList that the current user has shared with others.
+
 class MySharedMovieList {
   final String id;
   final String name;
@@ -136,6 +140,7 @@ class MySharedMovieList {
   });
 
   /// Creates a MySharedMovieList from a `Map<String, dynamic>` (for migration).
+
   factory MySharedMovieList.fromMap(String listId, Map<String, dynamic> map) {
     return MySharedMovieList(
       id: map['id'] ?? listId,
@@ -154,6 +159,7 @@ class MySharedMovieList {
   }
 
   /// Converts the MySharedMovieList to a `Map<String, dynamic>`.
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,

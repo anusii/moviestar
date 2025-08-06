@@ -26,6 +26,7 @@
 library;
 
 /// Enumeration of operations that can be performed on MovieLists.
+
 enum MovieListOperation {
   read('read'),
   write('write'),

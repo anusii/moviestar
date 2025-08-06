@@ -10,8 +10,6 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
-  plugins:
-    - custom_lint
   errors:
     undefined_lint: ignore
   exclude:
@@ -26,11 +24,4 @@ linter:
      prefer_single_quotes: true
      # Only until we stop using solidpod/src files!!!
      implementation_imports: false
-
-custom_lint:
-  rules:
-    - import_order_lint
-  options:
-    import_order_lint:
-      project_name: moviestar
 

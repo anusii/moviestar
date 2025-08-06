@@ -24,14 +24,20 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 
-import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/services/movie_list_service.dart';
-import 'package:moviestar/services/user_profile_service.dart';
-import 'package:moviestar/utils/turtle_serializer.dart';
 import 'package:solidpod/solidpod.dart';
+
 import 'package:solidpod/src/solid/constants/web_acl.dart';
+
+import 'package:moviestar/models/movie.dart';
+
+import 'package:moviestar/services/movie_list_service.dart';
+
+import 'package:moviestar/services/user_profile_service.dart';
+
+import 'package:moviestar/utils/turtle_serializer.dart';
 
 /// Enhanced UI for sharing movie lists with all their individual movies.
 /// This provides a unified experience where users can see both the list

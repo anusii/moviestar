@@ -28,18 +28,26 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 
-import '../models/movie.dart';
-import '../services/favorites_service.dart';
-import '../services/favorites_service_adapter.dart';
-import '../utils/movie_sort_util.dart';
-import '../widgets/sort_controls.dart';
 import 'package:solidpod/solidpod.dart';
 
+import '../models/movie.dart';
+
+import '../services/favorites_service.dart';
+
+import '../services/favorites_service_adapter.dart';
+
 import '../services/movie_list_service.dart';
+
 import '../services/user_profile_service.dart';
+
+import '../utils/movie_sort_util.dart';
+
 import '../utils/turtle_serializer.dart';
+
+import '../widgets/sort_controls.dart';
 
 import 'movie_details_screen.dart';
 

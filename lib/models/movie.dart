@@ -25,40 +25,45 @@
 
 library;
 
+import 'package:hive/hive.dart';
+
 import 'package:moviestar/utils/tmdb_image_util.dart';
 
-/// A class representing a movie with its details.
-class Movie {
-  /// Unique identifier for the movie.
+part 'movie.g.dart';
 
+/// A class representing a movie with its details.
+@HiveType(typeId: 0)
+class Movie extends HiveObject {
+  /// Unique identifier for the movie.
+  @HiveField(0)
   final int id;
 
   /// Title of the movie.
-
+  @HiveField(1)
   final String title;
 
   /// Overview or description of the movie.
-
+  @HiveField(2)
   final String overview;
 
   /// URL for the movie's poster image.
-
+  @HiveField(3)
   final String posterUrl;
 
   /// URL for the movie's backdrop image.
-
+  @HiveField(4)
   final String backdropUrl;
 
   /// Average rating of the movie.
-
+  @HiveField(5)
   final double voteAverage;
 
   /// Release date of the movie.
-
+  @HiveField(6)
   final DateTime releaseDate;
 
   /// List of genre IDs associated with the movie.
-
+  @HiveField(7)
   final List<int> genreIds;
 
   /// Creates a new [Movie] instance.

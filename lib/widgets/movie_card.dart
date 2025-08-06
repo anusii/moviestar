@@ -25,11 +25,15 @@
 
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/widgets/quick_actions_dialog.dart';
 
 /// Different display modes for movie cards.
 
@@ -43,7 +47,7 @@ enum MovieCardStyle {
 
 /// A reusable movie card widget with cache status indicators.
 
-class MovieCard extends StatelessWidget {
+class MovieCard extends StatefulWidget {
   /// The movie to display.
 
   final Movie movie;
@@ -84,6 +88,14 @@ class MovieCard extends StatelessWidget {
 
   final Widget? customSubtitle;
 
+  /// The favorites service for quick actions (optional).
+
+  final FavoritesService? favoritesService;
+
+  /// The parent widget for navigation when sharing (optional).
+
+  final Widget? parentWidget;
+
   /// Creates a movie card widget.
 
   const MovieCard({
@@ -98,6 +110,8 @@ class MovieCard extends StatelessWidget {
     this.height,
     this.trailing,
     this.customSubtitle,
+    this.favoritesService,
+    this.parentWidget,
   });
 
   /// Creates a poster-style movie card.
@@ -111,6 +125,8 @@ class MovieCard extends StatelessWidget {
     this.onTap,
     this.width = 130,
     this.height,
+    this.favoritesService,
+    this.parentWidget,
   })  : style = MovieCardStyle.poster,
         trailing = null,
         customSubtitle = null;
@@ -126,100 +142,216 @@ class MovieCard extends StatelessWidget {
     this.onTap,
     this.trailing,
     this.customSubtitle,
+    this.favoritesService,
+    this.parentWidget,
   })  : style = MovieCardStyle.listItem,
         width = 50,
         height = 75;
 
   @override
+  State<MovieCard> createState() => _MovieCardState();
+}
+
+class _MovieCardState extends State<MovieCard> {
+  // Overlay entry for the quick actions dialog.
+
+  OverlayEntry? _overlayEntry;
+
+  // Whether the quick actions dialog is currently shown.
+
+  bool _isDialogShown = false;
+
+  // Timer for delayed hiding of the dialog.
+
+  Timer? _hideTimer;
+
+  @override
+  void dispose() {
+    _removeOverlay();
+    _hideTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    switch (style) {
+    switch (widget.style) {
       case MovieCardStyle.poster:
-        return _buildPosterCard(context);
+        return MouseRegion(
+          onEnter: _onCardMouseEnter,
+          onExit: _onCardMouseExit,
+          child: GestureDetector(
+            onTap: widget.onTap,
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: CachedNetworkImage(
+                    imageUrl: widget.movie.posterUrl,
+                    width: widget.width,
+                    height: widget.height,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
+                ),
+                _buildCacheIndicator(context),
+                if (widget.cacheOnlyMode == true)
+                  _buildOfflineModeIndicator(context),
+              ],
+            ),
+          ),
+        );
       case MovieCardStyle.listItem:
-        return _buildListItemCard(context);
+        return MouseRegion(
+          onEnter: _onCardMouseEnter,
+          onExit: _onCardMouseExit,
+          child: ListTile(
+            leading: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: CachedNetworkImage(
+                    imageUrl: widget.movie.posterUrl,
+                    width: widget.width,
+                    height: widget.height,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
+                ),
+                _buildCacheIndicator(context),
+              ],
+            ),
+            title: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.movie.title,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+                if (widget.cacheOnlyMode == true)
+                  _buildOfflineModeIcon(context),
+              ],
+            ),
+            subtitle: Row(
+              children: [
+                Expanded(
+                  child: widget.customSubtitle ??
+                      Text(
+                        '⭐ ${widget.movie.voteAverage.toStringAsFixed(1)}',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                ),
+                if (widget.fromCache == true && widget.cacheAge != null)
+                  _buildCacheAgeInfo(context),
+              ],
+            ),
+            trailing: widget.trailing,
+            onTap: widget.onTap,
+          ),
+        );
     }
   }
 
-  /// Builds a poster-style card.
+  // Shows the quick actions dialog if favoritesService is available.
 
-  Widget _buildPosterCard(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: CachedNetworkImage(
-              imageUrl: movie.posterUrl,
-              width: width,
-              height: height,
-              fit: BoxFit.cover,
-              placeholder: (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-            ),
-          ),
-          _buildCacheIndicator(context),
-          if (cacheOnlyMode == true) _buildOfflineModeIndicator(context),
-        ],
+  void _showQuickActions(BuildContext context) {
+    if (widget.favoritesService == null || _isDialogShown) return;
+
+    // Cancel any pending hide timer.
+
+    _hideTimer?.cancel();
+
+    _isDialogShown = true;
+
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final size = renderBox.size;
+    final position = renderBox.localToGlobal(Offset.zero);
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        left: position.dx + size.width + 8,
+        top: position.dy,
+        child: QuickActionsDialog(
+          movie: widget.movie,
+          favoritesService: widget.favoritesService!,
+          parentWidget: widget.parentWidget,
+          onClose: _hideQuickActions,
+          onMouseEnter: _onDialogMouseEnter,
+          onMouseExit: _onDialogMouseExit,
+        ),
       ),
     );
+
+    Overlay.of(context).insert(_overlayEntry!);
   }
 
-  /// Builds a list item-style card.
+  // Called when mouse enters the card area.
 
-  Widget _buildListItemCard(BuildContext context) {
-    return ListTile(
-      leading: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: CachedNetworkImage(
-              imageUrl: movie.posterUrl,
-              width: width,
-              height: height,
-              fit: BoxFit.cover,
-              placeholder: (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-            ),
-          ),
-          _buildCacheIndicator(context),
-        ],
-      ),
-      title: Row(
-        children: [
-          Expanded(
-            child: Text(
-              movie.title,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ),
-          if (cacheOnlyMode == true) _buildOfflineModeIcon(context),
-        ],
-      ),
-      subtitle: Row(
-        children: [
-          Expanded(
-            child: customSubtitle ??
-                Text(
-                  '⭐ ${movie.voteAverage.toStringAsFixed(1)}',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-          ),
-          if (fromCache == true && cacheAge != null)
-            _buildCacheAgeInfo(context),
-        ],
-      ),
-      trailing: trailing,
-      onTap: onTap,
-    );
+  void _onCardMouseEnter(_) {
+    _hideTimer?.cancel();
+    _showQuickActions(context);
+  }
+
+  // Called when mouse exits the card area.
+
+  void _onCardMouseExit(_) {
+    if (!_isDialogShown) return;
+
+    // Start a timer to hide the dialog after a short delay.
+    // This gives the user time to move to the dialog.
+
+    _hideTimer?.cancel();
+    _hideTimer = Timer(const Duration(milliseconds: 100), () {
+      _hideQuickActions();
+    });
+  }
+
+  // Called when mouse enters the dialog area.
+
+  void _onDialogMouseEnter() {
+    // Cancel the hide timer since mouse is over the dialog.
+
+    _hideTimer?.cancel();
+  }
+
+  // Called when mouse exits the dialog area.
+
+  void _onDialogMouseExit() {
+    // Start a timer to hide the dialog.
+
+    _hideTimer?.cancel();
+    _hideTimer = Timer(const Duration(milliseconds: 100), () {
+      _hideQuickActions();
+    });
+  }
+
+  // Hides the quick actions dialog.
+
+  void _hideQuickActions() {
+    if (!_isDialogShown) return;
+
+    _hideTimer?.cancel();
+    _removeOverlay();
+    _isDialogShown = false;
+  }
+
+  // Removes the overlay entry.
+
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
   }
 
   /// Builds cache status indicator overlay.
 
   Widget _buildCacheIndicator(BuildContext context) {
-    if (fromCache == null) return const SizedBox.shrink();
+    if (widget.fromCache == null) return const SizedBox.shrink();
 
     return Positioned(
       top: 4,
@@ -227,13 +359,13 @@ class MovieCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
-          color: fromCache!
+          color: widget.fromCache!
               ? Colors.green.withValues(alpha: 0.8)
               : Colors.blue.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
-          fromCache! ? Icons.offline_bolt : Icons.wifi,
+          widget.fromCache! ? Icons.offline_bolt : Icons.wifi,
           size: 12,
           color: Colors.white,
         ),
@@ -288,7 +420,7 @@ class MovieCard extends StatelessWidget {
   /// Builds cache age information for list items.
 
   Widget _buildCacheAgeInfo(BuildContext context) {
-    final ageText = _formatCacheAge(cacheAge!);
+    final ageText = _formatCacheAge(widget.cacheAge!);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
       decoration: BoxDecoration(

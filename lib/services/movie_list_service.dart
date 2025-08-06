@@ -588,6 +588,37 @@ class MovieListService {
     }
   }
 
+  /// Gets the file path for a MovieList for sharing purposes.
+  /// Returns the relative path that can be used with GrantPermissionUi.
+
+  String? getMovieListFilePath(String movieListId) {
+    try {
+      // Return the relative path for the movie list file
+      return 'user_lists/MovieList-$movieListId.ttl';
+    } catch (e) {
+      debugPrint('❌ Error getting movie list file path: $e');
+      return null;
+    }
+  }
+
+  /// Validates that a MovieList exists and can be shared.
+
+  Future<bool> canShareMovieList(String movieListId) async {
+    try {
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        debugPrint('❌ User not logged in, cannot share movie list');
+        return false;
+      }
+
+      final movieList = await getMovieList(movieListId);
+      return movieList != null;
+    } catch (e) {
+      debugPrint('❌ Error checking if movie list can be shared: $e');
+      return false;
+    }
+  }
+
   /// Clears the cache.
 
   void clearCache() {

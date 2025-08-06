@@ -29,10 +29,10 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:moviestar/database/movie_cache_repository.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 
 /// A small indicator widget showing current cache status.
@@ -106,7 +106,7 @@ class CacheStatusIndicator extends ConsumerWidget {
 
   Color _getStatusColor(
     bool cacheOnlyMode,
-    AsyncValue<Map<CacheCategory, CacheStats>> cacheStatsAsync,
+    AsyncValue<Map<CacheCategory, Map<String, dynamic>>> cacheStatsAsync,
   ) {
     if (cacheOnlyMode) {
       return Colors.orange.withValues(alpha: 0.9);
@@ -116,9 +116,9 @@ class CacheStatusIndicator extends ConsumerWidget {
       data: (stats) {
         if (stats.isEmpty) return Colors.grey.withValues(alpha: 0.8);
 
-        final totalCached = stats.values.fold(
+        final totalCached = stats.values.fold<int>(
           0,
-          (sum, stat) => sum + stat.movieCount,
+          (sum, stat) => sum + (stat['movieCount'] as int? ?? 0),
         );
         if (totalCached > 0) {
           return Colors.green.withValues(alpha: 0.8);
@@ -134,7 +134,7 @@ class CacheStatusIndicator extends ConsumerWidget {
 
   IconData _getStatusIcon(
     bool cacheOnlyMode,
-    AsyncValue<Map<CacheCategory, CacheStats>> cacheStatsAsync,
+    AsyncValue<Map<CacheCategory, Map<String, dynamic>>> cacheStatsAsync,
   ) {
     if (cacheOnlyMode) {
       return Icons.offline_pin;
@@ -142,9 +142,9 @@ class CacheStatusIndicator extends ConsumerWidget {
 
     return cacheStatsAsync.when(
       data: (stats) {
-        final totalCached = stats.values.fold(
+        final totalCached = stats.values.fold<int>(
           0,
-          (sum, stat) => sum + stat.movieCount,
+          (sum, stat) => sum + (stat['movieCount'] as int? ?? 0),
         );
         return totalCached > 0 ? Icons.offline_bolt : Icons.storage;
       },
@@ -157,7 +157,7 @@ class CacheStatusIndicator extends ConsumerWidget {
 
   String _getStatusText(
     bool cacheOnlyMode,
-    AsyncValue<Map<CacheCategory, CacheStats>> cacheStatsAsync,
+    AsyncValue<Map<CacheCategory, Map<String, dynamic>>> cacheStatsAsync,
   ) {
     if (cacheOnlyMode) {
       return 'OFFLINE';
@@ -165,9 +165,9 @@ class CacheStatusIndicator extends ConsumerWidget {
 
     return cacheStatsAsync.when(
       data: (stats) {
-        final totalCached = stats.values.fold(
+        final totalCached = stats.values.fold<int>(
           0,
-          (sum, stat) => sum + stat.movieCount,
+          (sum, stat) => sum + (stat['movieCount'] as int? ?? 0),
         );
         if (totalCached > 0) {
           return '$totalCached CACHED';
@@ -187,9 +187,9 @@ class CacheStatusIndicator extends ConsumerWidget {
 
     cacheStatsAsync.when(
       data: (stats) {
-        final totalCached = stats.values.fold(
+        final totalCached = stats.values.fold<int>(
           0,
-          (sum, stat) => sum + stat.movieCount,
+          (sum, stat) => sum + (stat['movieCount'] as int? ?? 0),
         );
 
         String message;
@@ -197,8 +197,9 @@ class CacheStatusIndicator extends ConsumerWidget {
           message =
               'Offline Mode: Browse movies without internet\n$totalCached movies available offline';
         } else if (totalCached > 0) {
-          final validCategories =
-              stats.values.where((stat) => stat.isValid).length;
+          final validCategories = stats.values
+              .where((stat) => stat['isValid'] as bool? ?? false)
+              .length;
           message =
               'Cache Active: $totalCached movies cached\n$validCategories categories up to date';
         } else {

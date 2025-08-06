@@ -2,7 +2,7 @@
 #
 # Makefile template for Flutter
 #
-# Copyright 2021 (c) Graham.Williams@togaware.com
+# Copyright 2021-2025 (c) Graham.Williams@togaware.com
 #
 # License: Creative Commons Attribution-ShareAlike 4.0 International.
 #
@@ -182,14 +182,13 @@ tests:: test qtest
 analyze:
 	@echo "Futter ANALYZE"
 	-flutter analyze lib
-#	dart run custom_lint
 	@echo $(SEPARATOR)
 
 # dart pub global activate dependency_validator
 
 .PHONY: depend
 depend:
-	@echo "Review pubspec.yaml dependencies."
+	@echo "Dart: REVIEW DEPENDENCIES."
 	-dependency_validator
 	@echo $(SEPARATOR)
 
@@ -208,7 +207,8 @@ todo:
 .PHONY: license
 license:
 	@echo "Files without a LICENSE:\n"
-	@-find lib -type f -not -name '*~' ! -exec grep -qE '^(/// .*|/// Copyright|/// Licensed)' {} \; -print | xargs printf "\t%s\n"
+	@-find lib -type f -not -name '*~' -not -name 'README*' \
+	! -exec grep -qE '^(/// .*|/// Copyright|/// Licensed)' {} \; -print | xargs printf "\t%s\n"
 	@echo $(SEPARATOR)
 
 .PHONY: riverpod
@@ -217,8 +217,6 @@ riverpod:
 	flutter pub add riverpod_annotation
 	flutter pub add dev:riverpod_generator
 	flutter pub add dev:build_runner
-	flutter pub add dev:custom_lint
-	flutter pub add dev:riverpod_lint
 
 .PHONY: runner
 runner:
@@ -382,18 +380,18 @@ endif
 publish:
 	dart pub publish
 
-# dart pub global activate import_order_lint
+# import_order_lint is now a standalone tool, no global activation needed
 
 .PHONY: import_order
 import_order:
 	@echo "Dart: CHECK IMPORT ORDER"
-	dart run custom_lint
+	import_order --check
 	@echo $(SEPARATOR)
 
 .PHONY: import_order_fix
 import_order_fix:
 	@echo "Dart: FIX IMPORT ORDER"
-	fix_imports --project-name=$(APP) -r lib
+	import_order
 	@echo $(SEPARATOR)
 
 ### TODO THESE SHOULD BE CHECKED AND CLEANED UP
@@ -413,6 +411,7 @@ loc: lib/*.dart
 	@cat $(shell find lib -name '*.dart') \
 	| egrep -v '^ */' \
 	| egrep -v '^ *$$' \
+	| egrep -v '^ *[)},]+, *$$' \
 	| wc -l
 
 #

@@ -64,8 +64,8 @@ class TmdbImageUtil {
 
   /// Creates a poster URL with the specified size.
 
-  static String getPosterUrl(String path, {String size = 'w185'}) {
-    if (path.isEmpty) return '';
+  static String getPosterUrl(String? path, {String size = 'w185'}) {
+    if (path == null || path.isEmpty) return '';
     // Remove any existing size prefixes.
 
     final cleanPath = path.replaceAll(RegExp(r'/[a-z0-9]+/'), '');
@@ -74,8 +74,8 @@ class TmdbImageUtil {
 
   /// Creates a backdrop URL with the specified size.
 
-  static String getBackdropUrl(String path, {String size = 'w780'}) {
-    if (path.isEmpty) return '';
+  static String getBackdropUrl(String? path, {String size = 'w780'}) {
+    if (path == null || path.isEmpty) return '';
     // Remove any existing size prefixes.
 
     final cleanPath = path.replaceAll(RegExp(r'/[a-z0-9]+/'), '');
@@ -84,8 +84,8 @@ class TmdbImageUtil {
 
   /// Creates a profile picture URL with the specified size.
 
-  static String getProfileUrl(String path, {String size = 'w185'}) {
-    if (path.isEmpty) return '';
+  static String getProfileUrl(String? path, {String size = 'w185'}) {
+    if (path == null || path.isEmpty) return '';
     // Remove any existing size prefixes.
 
     final cleanPath = path.replaceAll(RegExp(r'/[a-z0-9]+/'), '');

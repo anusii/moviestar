@@ -29,12 +29,12 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:moviestar/database/movie_cache_repository.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 import 'package:moviestar/widgets/movie_card.dart';
@@ -67,7 +67,7 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
     // Force refresh through the cached service.
 
     final cachedService = ref.read(configuredCachedMovieServiceProvider);
-    await cachedService.forceRefresh(CacheCategory.upcoming);
+    await cachedService.forceRefreshAll();
   }
 
   @override
@@ -136,6 +136,8 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
                 fromCache: cacheResult.fromCache,
                 cacheAge: cacheResult.cacheAge,
                 cacheOnlyMode: cacheOnlyMode,
+                favoritesService: widget.favoritesService,
+                parentWidget: widget,
                 customSubtitle: Text(
                   'Release Date: ${DateFormatUtil.formatNumeric(movie.releaseDate)}',
                   style: Theme.of(context).textTheme.bodyMedium,

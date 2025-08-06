@@ -27,12 +27,11 @@ library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:moviestar/database/movie_cache_repository.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/providers/database_provider.dart';
 import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/cache_settings_service.dart';
 import 'package:moviestar/services/cached_movie_service.dart';
+import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/services/movie_service.dart';
 
 /// StateNotifier for managing caching enabled setting with persistence.
@@ -134,22 +133,47 @@ final movieServiceProvider = Provider<MovieService>((ref) {
   return movieService;
 });
 
-/// Provider for the movie cache repository.
+/// Provider for the Hive movie cache service.
+/// This creates a singleton instance that auto-initialises on first access.
 
-final movieCacheRepositoryProvider = Provider<MovieCacheRepository>((ref) {
-  final database = ref.watch(databaseProvider);
-  return MovieCacheRepository(database);
+final hiveCacheServiceProvider = Provider<HiveMovieCacheService>((ref) {
+  final service = HiveMovieCacheService();
+
+  // Ensure the service is disposed when the provider is disposed.
+
+  ref.onDispose(() {
+    service.dispose();
+  });
+
+  return service;
+});
+
+/// Provider for the Hive movie cache service that ensures initialisation.
+/// Use this when you need a guaranteed initialised service.
+
+final initializedHiveCacheServiceProvider =
+    FutureProvider<HiveMovieCacheService>((ref) async {
+  final service = HiveMovieCacheService();
+  await service.initialize();
+
+  // Ensure the service is disposed when the provider is disposed.
+
+  ref.onDispose(() {
+    service.dispose();
+  });
+
+  return service;
 });
 
 /// Provider for the cached movie service.
 
 final cachedMovieServiceProvider = Provider<CachedMovieService>((ref) {
   final movieService = ref.watch(movieServiceProvider);
-  final cacheRepository = ref.watch(movieCacheRepositoryProvider);
+  final cacheService = ref.watch(hiveCacheServiceProvider);
 
   final cachedService = CachedMovieService(
     movieService,
-    cacheRepository,
+    cacheService,
     cachingEnabled: true,
     cacheOnlyMode: false,
   );
@@ -190,13 +214,13 @@ final cachingEnabledProvider =
 final configuredCachedMovieServiceProvider =
     Provider.autoDispose<CachedMovieService>((ref) {
   final movieService = ref.watch(movieServiceProvider);
-  final cacheRepository = ref.watch(movieCacheRepositoryProvider);
+  final cacheService = ref.watch(hiveCacheServiceProvider);
   final cachingEnabled = ref.watch(cachingEnabledProvider);
   final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
 
   final cachedService = CachedMovieService(
     movieService,
-    cacheRepository,
+    cacheService,
     cachingEnabled: cachingEnabled,
     cacheOnlyMode: cacheOnlyMode,
   );
@@ -219,7 +243,7 @@ final popularMoviesWithCacheInfoProvider =
 
   ref.watch(cachingEnabledProvider);
   ref.watch(cacheOnlyModeProvider);
-  return await cachedService.getPopularMoviesWithCacheInfo();
+  return cachedService.getPopularMoviesWithCacheInfo();
 });
 
 /// Provider for now playing movies with caching information.
@@ -231,7 +255,7 @@ final nowPlayingMoviesWithCacheInfoProvider =
 
   ref.watch(cachingEnabledProvider);
   ref.watch(cacheOnlyModeProvider);
-  return await cachedService.getNowPlayingMoviesWithCacheInfo();
+  return cachedService.getNowPlayingMoviesWithCacheInfo();
 });
 
 /// Provider for top rated movies with caching information.
@@ -243,7 +267,7 @@ final topRatedMoviesWithCacheInfoProvider =
 
   ref.watch(cachingEnabledProvider);
   ref.watch(cacheOnlyModeProvider);
-  return await cachedService.getTopRatedMoviesWithCacheInfo();
+  return cachedService.getTopRatedMoviesWithCacheInfo();
 });
 
 /// Provider for upcoming movies with caching information.
@@ -255,7 +279,7 @@ final upcomingMoviesWithCacheInfoProvider =
 
   ref.watch(cachingEnabledProvider);
   ref.watch(cacheOnlyModeProvider);
-  return await cachedService.getUpcomingMoviesWithCacheInfo();
+  return cachedService.getUpcomingMoviesWithCacheInfo();
 });
 
 /// Provider for popular movies with caching (backward compatibility).
@@ -296,7 +320,8 @@ final upcomingMoviesProvider = FutureProvider.autoDispose<List<Movie>>((
 
 /// Provider for cache statistics.
 
-final cacheStatsProvider = FutureProvider<Map<CacheCategory, CacheStats>>((
+final cacheStatsProvider =
+    FutureProvider<Map<CacheCategory, Map<String, dynamic>>>((
   ref,
 ) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);

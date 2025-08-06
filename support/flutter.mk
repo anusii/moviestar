@@ -2,7 +2,7 @@
 #
 # Makefile template for Flutter
 #
-# Copyright 2021 (c) Graham.Williams@togaware.com
+# Copyright 2021-2025 (c) Graham.Williams@togaware.com
 #
 # License: Creative Commons Attribution-ShareAlike 4.0 International.
 #
@@ -188,7 +188,7 @@ analyze:
 
 .PHONY: depend
 depend:
-	@echo "Review pubspec.yaml dependencies."
+	@echo "Dart: REVIEW DEPENDENCIES."
 	-dependency_validator
 	@echo $(SEPARATOR)
 
@@ -207,7 +207,8 @@ todo:
 .PHONY: license
 license:
 	@echo "Files without a LICENSE:\n"
-	@-find lib -type f -not -name '*~' ! -exec grep -qE '^(/// .*|/// Copyright|/// Licensed)' {} \; -print | xargs printf "\t%s\n"
+	@-find lib -type f -not -name '*~' -not -name 'README*' \
+	! -exec grep -qE '^(/// .*|/// Copyright|/// Licensed)' {} \; -print | xargs printf "\t%s\n"
 	@echo $(SEPARATOR)
 
 .PHONY: riverpod
@@ -384,13 +385,13 @@ publish:
 .PHONY: import_order
 import_order:
 	@echo "Dart: CHECK IMPORT ORDER"
-	dart run import_order_lint:import_order --set-exit-if-changed
+	import_order --check
 	@echo $(SEPARATOR)
 
 .PHONY: import_order_fix
 import_order_fix:
 	@echo "Dart: FIX IMPORT ORDER"
-	dart run import_order_lint:import_order
+	import_order
 	@echo $(SEPARATOR)
 
 ### TODO THESE SHOULD BE CHECKED AND CLEANED UP
@@ -410,6 +411,7 @@ loc: lib/*.dart
 	@cat $(shell find lib -name '*.dart') \
 	| egrep -v '^ */' \
 	| egrep -v '^ *$$' \
+	| egrep -v '^ *[)},]+, *$$' \
 	| wc -l
 
 #

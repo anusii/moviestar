@@ -125,13 +125,17 @@ class SolidNavBar extends StatelessWidget {
             child: NavigationRail(
               backgroundColor: theme.colorScheme.surface,
               selectedIndex: selectedIndex,
-              onDestinationSelected: (index) => _handleTabSelection(index, context),
+              onDestinationSelected: (index) =>
+                  _handleTabSelection(index, context),
               labelType: NavigationRailLabelType.all,
+              minWidth: 80.0,
+              groupAlignment: -0.8,
               destinations: tabs.map((tab) {
                 final tooltipMessage = tab.tooltip ?? tab.message;
 
                 Widget iconWidget = Icon(
                   tab.icon,
+                  size: 26.0,
                   color: tab.color ?? theme.colorScheme.primary,
                 );
 
@@ -148,15 +152,30 @@ class SolidNavBar extends StatelessWidget {
                   icon: iconWidget,
                   label: Text(
                     tab.title,
-                    style: theme.textTheme.bodyLarge,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.2,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 0.0),
+                  padding: const EdgeInsets.symmetric(vertical: 6.0),
                 );
               }).toList(),
-              selectedLabelTextStyle: theme.textTheme.labelLarge?.copyWith(
+              selectedLabelTextStyle: theme.textTheme.bodySmall?.copyWith(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.2,
                 color: theme.colorScheme.primary,
               ),
-              unselectedLabelTextStyle: theme.textTheme.bodyMedium,
+              unselectedLabelTextStyle: theme.textTheme.bodySmall?.copyWith(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 0.2,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
             ),
           ),
         ),

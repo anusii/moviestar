@@ -30,7 +30,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:solidpod/solidpod.dart' show getAppNameVersion;
+import 'package:solidpod/solidpod.dart'
+    show getAppNameVersion, logoutPopup, getWebId;
 import 'package:version_widget/version_widget.dart';
 
 import 'package:moviestar/features/file/service/page.dart';
@@ -48,13 +49,16 @@ import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/services/movie_service.dart';
+import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
+import 'package:moviestar/widgets/movie_nav_drawer.dart';
 import 'package:moviestar/widgets/movie_nav_tabs.dart';
 import 'package:moviestar/widgets/solid_nav_bar.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   final SharedPreferences prefs;
+
   const MyHomePage({super.key, required this.title, required this.prefs});
 
   final String title;
@@ -72,6 +76,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   bool _isLoadingFolders = false;
   String _appVersion = '';
   bool _isVersionLoaded = false;
+  String? _webId;
+  String? _name;
 
   /// Service for managing favorite movies.
 
@@ -105,6 +111,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     _apiKeyService.addListener(_onApiKeyChanged);
 
     _loadAppInfo();
+    _loadUserInfo();
     _buildScreens();
   }
 
@@ -123,6 +130,56 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         _appVersion = appInfo.version;
         _isVersionLoaded = true;
       });
+    }
+  }
+
+  /// Loads user information from the POD.
+
+  Future<void> _loadUserInfo() async {
+    try {
+      final webId = await getWebId();
+      if (mounted && webId != null && webId.isNotEmpty) {
+        final name = _extractNameFromWebId(webId);
+        setState(() {
+          _webId = webId;
+          _name = name;
+        });
+      } else if (mounted) {
+        setState(() {
+          _webId = null;
+          _name = 'Not logged in';
+        });
+      }
+    } catch (e) {
+      // Handle error gracefully
+      if (mounted) {
+        setState(() {
+          _webId = null;
+          _name = 'Not logged in';
+        });
+      }
+    }
+  }
+
+  /// Extracts a user-friendly name from the WebID.
+
+  String _extractNameFromWebId(String webId) {
+    try {
+      // Extract domain from WebID for a simple display name
+      final uri = Uri.parse(webId);
+      final domain = uri.host;
+
+      // Try to extract a meaningful part
+      if (domain.contains('.')) {
+        final parts = domain.split('.');
+        if (parts.isNotEmpty) {
+          return parts.first.toLowerCase();
+        }
+      }
+
+      return domain;
+    } catch (e) {
+      return 'User';
     }
   }
 
@@ -182,6 +239,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   Future<void> _initialiseAppData() async {
     final loggedIn = await isLoggedIn();
+
+    // Refresh user info based on login status
+    await _loadUserInfo();
+
     if (loggedIn) {
       if (mounted) {
         setState(() {
@@ -260,24 +321,86 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   /// Handles the logout action.
 
   void _handleLogout() {
-    // TODO: Implement logout functionality
-    // This would typically involve calling solidpod logout methods.
+    logoutPopup(context, const MovieStar());
+  }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Logout functionality to be implemented')),
-    );
+  /// Simplifies the WebID URL for display purposes.
+
+  String _getSimplifiedUrl(String webId) {
+    const suffix = 'profile/card#me';
+    String url = webId;
+    if (url.endsWith(suffix)) {
+      url = url.substring(0, url.length - suffix.length);
+    }
+    // Remove protocol for cleaner display
+    if (url.startsWith('https://')) {
+      url = url.substring(8);
+    } else if (url.startsWith('http://')) {
+      url = url.substring(7);
+    }
+    return url;
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWideScreen = screenWidth > 800;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(_navTabs[_selectedIndex].title),
         backgroundColor: theme.colorScheme.surface,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: !isWideScreen,
         actions: [
+          // User information display.
+
+          if ((_name ?? '').isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Center(
+                child: MarkdownTooltip(
+                  message: '''
+                  
+                  **User:** Currently logged in as $_name
+                  
+                  ''',
+                  child: Text(
+                    _name!,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+          // WebID display (simplified URL).
+
+          if ((_webId ?? '').isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Center(
+                child: MarkdownTooltip(
+                  message: '''
+                  
+                  **Pod URL:** Your Solid POD location
+                  
+                  Full WebID: $_webId
+                  
+                  ''',
+                  child: Text(
+                    _getSimplifiedUrl(_webId!),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
           // Version widget.
 
           if (_isVersionLoaded)
@@ -399,34 +522,55 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           ),
         ],
       ),
+      drawer: !isWideScreen
+          ? MovieNavDrawer(
+              webId: _webId ?? '',
+              userName: _name ?? '',
+              tabs: _navTabs,
+              selectedIndex: _selectedIndex,
+              onTabSelected: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+            )
+          : null,
       backgroundColor: theme.colorScheme.surface,
       body: Column(
         children: [
           Divider(height: 1, color: theme.dividerColor),
           Expanded(
-            child: Row(
-              children: [
-                SolidNavBar(
-                  tabs: _navTabs,
-                  selectedIndex: _selectedIndex,
-                  onTabSelected: (index) {
-                    setState(() {
-                      _selectedIndex = index;
-                    });
-                  },
-                ),
-                VerticalDivider(color: theme.dividerColor),
-                Expanded(
-                  child: Stack(
+            child: isWideScreen
+                ? Row(
+                    children: [
+                      SolidNavBar(
+                        tabs: _navTabs,
+                        selectedIndex: _selectedIndex,
+                        onTabSelected: (index) {
+                          setState(() {
+                            _selectedIndex = index;
+                          });
+                        },
+                      ),
+                      VerticalDivider(color: theme.dividerColor),
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            _isLoadingFolders
+                                ? const Center(child: CircularProgressIndicator())
+                                : _screens[_selectedIndex],
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                : Stack(
                     children: [
                       _isLoadingFolders
                           ? const Center(child: CircularProgressIndicator())
                           : _screens[_selectedIndex],
                     ],
                   ),
-                ),
-              ],
-            ),
           ),
         ],
       ),

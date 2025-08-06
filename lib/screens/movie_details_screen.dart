@@ -446,7 +446,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
               fileName: movieFilePath,
               title: 'Share "${widget.movie.title}"',
               accessModeList: const ['read'],
-              recipientList: const ['indi'],
+              recipientTypeList: const ['indi'],
               showAppBar: true,
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               child: widget,

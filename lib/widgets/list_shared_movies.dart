@@ -114,7 +114,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                 fileName: movieFilePath,
                 title: '',
                 accessModeList: const ['read'],
-                recipientList: const ['indi'],
+                recipientTypeList: const ['indi'],
                 showAppBar: false,
                 backgroundColor:
                     Theme.of(currentContext).scaffoldBackgroundColor,

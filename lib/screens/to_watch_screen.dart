@@ -265,7 +265,7 @@ Recipients will be able to:
                 fileName: 'user_lists/MovieList-$listId.ttl',
                 title: '',
                 accessModeList: const ['read'],
-                recipientList: const ['indi'],
+                recipientTypeList: const ['indi'],
                 showAppBar: false,
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 child: widget,
@@ -412,7 +412,7 @@ Recipients will be able to:
               fileName: movieFilePath,
               title: '',
               accessModeList: const ['read'], // Read-only for individual movies
-              recipientList: const ['indi'],
+              recipientTypeList: const ['indi'],
               showAppBar: false,
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               child: widget,

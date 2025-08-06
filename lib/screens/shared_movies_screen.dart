@@ -394,7 +394,8 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
         'owner': _formatWebId(finalOwner),
         'ownerWebId': finalOwner, // Store full WebID for URL construction.
         'sharedBy': _formatWebId(finalSharedBy),
-        'sharedByWebId': finalSharedBy, // Store full WebID for URL construction.
+        'sharedByWebId':
+            finalSharedBy, // Store full WebID for URL construction.
         'permissions': resourceInfo['permissions'] ??
             resourceInfo['permissionList'] ??
             'read',

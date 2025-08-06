@@ -627,7 +627,7 @@ class _EnhancedMovieListSharingUiState
                         decoration: BoxDecoration(
                           color: Theme.of(context)
                               .colorScheme
-                              .surfaceVariant
+                              .surfaceContainerHighest
                               .withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -652,7 +652,7 @@ class _EnhancedMovieListSharingUiState
                                             Container(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .surfaceVariant,
+                                              .surfaceContainerHighest,
                                           child: Icon(
                                             Icons.movie,
                                             color: Theme.of(context)
@@ -665,7 +665,7 @@ class _EnhancedMovieListSharingUiState
                                             Container(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .surfaceVariant,
+                                              .surfaceContainerHighest,
                                           child: Icon(
                                             Icons.movie,
                                             color: Theme.of(context)
@@ -679,7 +679,7 @@ class _EnhancedMovieListSharingUiState
                                   : Container(
                                       color: Theme.of(context)
                                           .colorScheme
-                                          .surfaceVariant,
+                                          .surfaceContainerHighest,
                                       child: Icon(
                                         Icons.movie,
                                         color: Theme.of(context)

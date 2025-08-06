@@ -285,9 +285,8 @@ class MovieListService {
         if (fileName.startsWith('MovieList-') && fileName.endsWith('.ttl')) {
           // Extract the MovieList ID from the filename.
 
-          final movieListId = fileName
-              .replaceAll('MovieList-', '')
-              .replaceAll('.ttl', '');
+          final movieListId =
+              fileName.replaceAll('MovieList-', '').replaceAll('.ttl', '');
 
           try {
             // Read the MovieList file to check its type.
@@ -322,11 +321,9 @@ class MovieListService {
 
                 // Check description patterns for different list types.
 
-                final isToWatchList =
-                    foundDesc.contains('want to watch') ||
+                final isToWatchList = foundDesc.contains('want to watch') ||
                     foundDesc.contains('to watch');
-                final isWatchedList =
-                    foundDesc.contains('have watched') ||
+                final isWatchedList = foundDesc.contains('have watched') ||
                     foundDesc.contains('you watched');
                 final isFavoritesList = foundDesc.contains('favorite');
 
@@ -690,19 +687,18 @@ class MovieListService {
       await Navigator.push(
         _context,
         MaterialPageRoute(
-          builder:
-              (context) => Theme(
-                data: Theme.of(context),
-                child: GrantPermissionUi(
-                  fileName: filePath,
-                  title: customTitle ?? 'Share "$listName"',
-                  accessModeList: permissions,
-                  recipientTypeList: const ['indi'],
-                  showAppBar: true,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  child: _child,
-                ),
-              ),
+          builder: (context) => Theme(
+            data: Theme.of(context),
+            child: GrantPermissionUi(
+              fileName: filePath,
+              title: customTitle ?? 'Share "$listName"',
+              accessModeList: permissions,
+              recipientTypeList: const ['indi'],
+              showAppBar: true,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              child: _child,
+            ),
+          ),
         ),
       );
 
@@ -752,29 +748,26 @@ class MovieListService {
         _context,
         MaterialPageRoute(
           fullscreenDialog: true,
-          builder:
-              (navContext) => Theme(
-                data: Theme.of(_context),
-                child: Scaffold(
-                  backgroundColor: Theme.of(_context).scaffoldBackgroundColor,
-                  appBar: AppBar(
-                    title: Text('Share "$listName"'),
-                    backgroundColor:
-                        Theme.of(_context).appBarTheme.backgroundColor,
-                    foregroundColor:
-                        Theme.of(_context).appBarTheme.foregroundColor,
-                  ),
-                  body: GrantPermissionUi(
-                    fileName: 'user_lists/MovieList-$listId.ttl',
-                    title: '',
-                    accessModeList: const ['read'],
-                    recipientTypeList: const ['indi'],
-                    showAppBar: false,
-                    backgroundColor: Theme.of(_context).scaffoldBackgroundColor,
-                    child: _child,
-                  ),
-                ),
+          builder: (navContext) => Theme(
+            data: Theme.of(_context),
+            child: Scaffold(
+              backgroundColor: Theme.of(_context).scaffoldBackgroundColor,
+              appBar: AppBar(
+                title: Text('Share "$listName"'),
+                backgroundColor: Theme.of(_context).appBarTheme.backgroundColor,
+                foregroundColor: Theme.of(_context).appBarTheme.foregroundColor,
               ),
+              body: GrantPermissionUi(
+                fileName: 'user_lists/MovieList-$listId.ttl',
+                title: '',
+                accessModeList: const ['read'],
+                recipientTypeList: const ['indi'],
+                showAppBar: false,
+                backgroundColor: Theme.of(_context).scaffoldBackgroundColor,
+                child: _child,
+              ),
+            ),
+          ),
         ),
       );
 

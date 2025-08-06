@@ -72,34 +72,33 @@ class SortControls extends StatelessWidget {
                 onSortChanged(newValue);
               }
             },
-            items:
-                MovieSortCriteria.values.map((MovieSortCriteria criteria) {
-                  String label;
-                  switch (criteria) {
-                    case MovieSortCriteria.nameAsc:
-                      label = 'Name (A-Z)';
-                      break;
-                    case MovieSortCriteria.nameDesc:
-                      label = 'Name (Z-A)';
-                      break;
-                    case MovieSortCriteria.ratingAsc:
-                      label = 'Rating (Low to High)';
-                      break;
-                    case MovieSortCriteria.ratingDesc:
-                      label = 'Rating (High to Low)';
-                      break;
-                    case MovieSortCriteria.dateAsc:
-                      label = 'Date (Oldest First)';
-                      break;
-                    case MovieSortCriteria.dateDesc:
-                      label = 'Date (Newest First)';
-                      break;
-                  }
-                  return DropdownMenuItem<MovieSortCriteria>(
-                    value: criteria,
-                    child: Text(label),
-                  );
-                }).toList(),
+            items: MovieSortCriteria.values.map((MovieSortCriteria criteria) {
+              String label;
+              switch (criteria) {
+                case MovieSortCriteria.nameAsc:
+                  label = 'Name (A-Z)';
+                  break;
+                case MovieSortCriteria.nameDesc:
+                  label = 'Name (Z-A)';
+                  break;
+                case MovieSortCriteria.ratingAsc:
+                  label = 'Rating (Low to High)';
+                  break;
+                case MovieSortCriteria.ratingDesc:
+                  label = 'Rating (High to Low)';
+                  break;
+                case MovieSortCriteria.dateAsc:
+                  label = 'Date (Oldest First)';
+                  break;
+                case MovieSortCriteria.dateDesc:
+                  label = 'Date (Newest First)';
+                  break;
+              }
+              return DropdownMenuItem<MovieSortCriteria>(
+                value: criteria,
+                child: Text(label),
+              );
+            }).toList(),
           ),
         ],
       ),

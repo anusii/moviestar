@@ -204,22 +204,20 @@ This will remove all cached movie data. Fresh data will be downloaded from the n
       ],
       TextButton(
         onPressed: () => Navigator.of(context).pop(true),
-        style:
-            cachingEnabled && cacheOnlyMode
-                ? TextButton.styleFrom(foregroundColor: Colors.red)
-                : null,
+        style: cachingEnabled && cacheOnlyMode
+            ? TextButton.styleFrom(foregroundColor: Colors.red)
+            : null,
         child: Text(confirmButtonText),
       ),
     ];
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(dialogTitle),
-            content: Text(dialogContent),
-            actions: actions,
-          ),
+      builder: (context) => AlertDialog(
+        title: Text(dialogTitle),
+        content: Text(dialogContent),
+        actions: actions,
+      ),
     );
 
     if (confirmed == true) {
@@ -253,24 +251,23 @@ Cache cleared! You're now in Offline Mode with no cached data. Consider disablin
 
       final confirmed = await showDialog<bool>(
         context: context,
-        builder:
-            (context) => AlertDialog(
-              title: const Text('⚠️ Force Refresh in Offline Mode'),
-              content: const Text('''
+        builder: (context) => AlertDialog(
+          title: const Text('⚠️ Force Refresh in Offline Mode'),
+          content: const Text('''
 Force refresh requires downloading fresh data from the network, but you have Offline Mode enabled.
 
 Do you want to temporarily disable Offline Mode and refresh all data?'''),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Disable Offline Mode & Refresh'),
-                ),
-              ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
             ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Disable Offline Mode & Refresh'),
+            ),
+          ],
+        ),
       );
 
       if (confirmed == true) {
@@ -652,14 +649,12 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                         fillColor:
                             Theme.of(context).inputDecorationTheme.fillColor,
                         border: Theme.of(context).inputDecorationTheme.border,
-                        enabledBorder:
-                            Theme.of(
-                              context,
-                            ).inputDecorationTheme.enabledBorder,
-                        focusedBorder:
-                            Theme.of(
-                              context,
-                            ).inputDecorationTheme.focusedBorder,
+                        enabledBorder: Theme.of(
+                          context,
+                        ).inputDecorationTheme.enabledBorder,
+                        focusedBorder: Theme.of(
+                          context,
+                        ).inputDecorationTheme.focusedBorder,
                         suffixIcon: IconButton(
                           icon: Icon(
                             _isApiKeyVisible
@@ -672,10 +667,9 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                               _isApiKeyVisible = !_isApiKeyVisible;
                             });
                           },
-                          tooltip:
-                              _isApiKeyVisible
-                                  ? 'Hide API key'
-                                  : 'Show API key',
+                          tooltip: _isApiKeyVisible
+                              ? 'Hide API key'
+                              : 'Show API key',
                         ),
                       ),
                       obscureText: !_isApiKeyVisible,
@@ -867,101 +861,92 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
 
         // Cache Statistics.
         cacheStatsAsync.when(
-          data:
-              (stats) =>
-                  stats.isEmpty
-                      ? const SizedBox.shrink()
-                      : Card(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+          data: (stats) => stats.isEmpty
+              ? const SizedBox.shrink()
+              : Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.storage, size: 16),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Cache Statistics',
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                          ],
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(Icons.storage, size: 16),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Cache Statistics',
-                                    style:
-                                        Theme.of(context).textTheme.titleSmall,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              ...stats.entries.map((entry) {
-                                final category = entry.key;
-                                final stat = entry.value;
-                                final categoryName = _getCategoryDisplayName(
-                                  category,
-                                );
+                        const SizedBox(height: 12),
+                        ...stats.entries.map((entry) {
+                          final category = entry.key;
+                          final stat = entry.value;
+                          final categoryName = _getCategoryDisplayName(
+                            category,
+                          );
 
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            categoryName,
-                                            style:
-                                                Theme.of(
-                                                  context,
-                                                ).textTheme.bodyMedium,
-                                          ),
-                                          Text(
-                                            'Updated ${_getTimeAgo(stat['age'] as Duration)} ago',
-                                            style: Theme.of(
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      categoryName,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium,
+                                    ),
+                                    Text(
+                                      'Updated ${_getTimeAgo(stat['age'] as Duration)} ago',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall?.copyWith(
+                                            color: Theme.of(
                                               context,
-                                            ).textTheme.bodySmall?.copyWith(
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).textTheme.bodyMedium?.color,
-                                            ),
+                                            ).textTheme.bodyMedium?.color,
                                           ),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            (stat['isValid'] as bool)
-                                                ? Icons.check_circle
-                                                : Icons.schedule,
-                                            size: 16,
-                                            color:
-                                                (stat['isValid'] as bool)
-                                                    ? Colors.green
-                                                    : Colors.orange,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            (stat['isValid'] as bool)
-                                                ? '${stat['movieCount']} movies'
-                                                : 'Expired',
-                                            style:
-                                                Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall,
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }),
-                            ],
-                          ),
-                        ),
-                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      (stat['isValid'] as bool)
+                                          ? Icons.check_circle
+                                          : Icons.schedule,
+                                      size: 16,
+                                      color: (stat['isValid'] as bool)
+                                          ? Colors.green
+                                          : Colors.orange,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      (stat['isValid'] as bool)
+                                          ? '${stat['movieCount']} movies'
+                                          : 'Expired',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                ),
           loading: () => const SizedBox.shrink(),
           error: (_, __) => const SizedBox.shrink(),
         ),
@@ -1017,10 +1002,9 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
     return SwitchListTile(
       title: Text(
         'Offline Mode',
-        style:
-            cachingEnabled
-                ? Theme.of(context).textTheme.bodyLarge
-                : Theme.of(context).textTheme.bodyLarge?.copyWith(
+        style: cachingEnabled
+            ? Theme.of(context).textTheme.bodyLarge
+            : Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).disabledColor,
                 ),
       ),
@@ -1030,31 +1014,27 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                 ? 'Browse movies offline using cached data only'
                 : 'Allow network access when cache is empty')
             : 'Enable caching first to use offline mode',
-        style:
-            cachingEnabled
-                ? Theme.of(context).textTheme.bodyMedium
-                : Theme.of(context).textTheme.bodyMedium?.copyWith(
+        style: cachingEnabled
+            ? Theme.of(context).textTheme.bodyMedium
+            : Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).disabledColor,
                 ),
       ),
       value: cacheOnlyMode && cachingEnabled,
-      onChanged:
-          cachingEnabled
-              ? (value) {
-                ref
-                    .read(cacheOnlyModeProvider.notifier)
-                    .setCacheOnlyMode(value);
+      onChanged: cachingEnabled
+          ? (value) {
+              ref.read(cacheOnlyModeProvider.notifier).setCacheOnlyMode(value);
 
-                // Show feedback about the mode change.
+              // Show feedback about the mode change.
 
-                if (mounted) {
-                  CacheFeedbackWidget.showOfflineModeNotification(
-                    context,
-                    isEnabled: value,
-                  );
-                }
+              if (mounted) {
+                CacheFeedbackWidget.showOfflineModeNotification(
+                  context,
+                  isEnabled: value,
+                );
               }
-              : null,
+            }
+          : null,
       activeColor: Theme.of(context).colorScheme.primary,
     );
   }
@@ -1111,16 +1091,15 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
       title: Text(title, style: Theme.of(context).textTheme.bodyLarge),
       trailing: DropdownButton<String>(
         value: value,
-        items:
-            items.map((String item) {
-              return DropdownMenuItem<String>(
-                value: item,
-                child: Text(
-                  item,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              );
-            }).toList(),
+        items: items.map((String item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Text(
+              item,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          );
+        }).toList(),
         onChanged: onChanged,
         dropdownColor: Theme.of(context).cardColor,
         underline: const SizedBox(),
@@ -1139,18 +1118,16 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
     return ListTile(
       leading: Icon(
         icon,
-        color:
-            isDestructive
-                ? Theme.of(context).colorScheme.error
-                : Theme.of(context).iconTheme.color,
+        color: isDestructive
+            ? Theme.of(context).colorScheme.error
+            : Theme.of(context).iconTheme.color,
       ),
       title: Text(
         title,
         style: TextStyle(
-          color:
-              isDestructive
-                  ? Theme.of(context).colorScheme.error
-                  : Theme.of(context).textTheme.bodyLarge?.color,
+          color: isDestructive
+              ? Theme.of(context).colorScheme.error
+              : Theme.of(context).textTheme.bodyLarge?.color,
         ),
       ),
       onTap: onTap,

@@ -430,8 +430,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
       // Get the movie file path using the service method and make it relative.
 
       final fullPath = adapter.getMovieFilePath(widget.movie);
-      final movieFilePath =
-          fullPath?.replaceFirst('moviestar/data/', '') ??
+      final movieFilePath = fullPath?.replaceFirst('moviestar/data/', '') ??
           'movies/Movie-${widget.movie.id}.ttl';
 
       // Navigate directly to GrantPermissionUi with improved theming and pre-selected options.
@@ -441,19 +440,18 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder:
-              (context) => Theme(
-                data: Theme.of(context),
-                child: GrantPermissionUi(
-                  fileName: movieFilePath,
-                  title: 'Share "${widget.movie.title}"',
-                  accessModeList: const ['read'],
-                  recipientTypeList: const ['indi'],
-                  showAppBar: true,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  child: widget,
-                ),
-              ),
+          builder: (context) => Theme(
+            data: Theme.of(context),
+            child: GrantPermissionUi(
+              fileName: movieFilePath,
+              title: 'Share "${widget.movie.title}"',
+              accessModeList: const ['read'],
+              recipientTypeList: const ['indi'],
+              showAppBar: true,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              child: widget,
+            ),
+          ),
         ),
       );
 
@@ -469,31 +467,30 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            title: Text(
-              'Cannot Share Movie',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onErrorContainer,
-              ),
-            ),
-            content: Text(
-              message,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  'OK',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.errorContainer,
+        title: Text(
+          'Cannot Share Movie',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onErrorContainer,
           ),
+        ),
+        content: Text(
+          message,
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'OK',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -511,9 +508,8 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
               background: CachedNetworkImage(
                 imageUrl: widget.movie.backdropUrl,
                 fit: BoxFit.cover,
-                placeholder:
-                    (context, url) =>
-                        const Center(child: CircularProgressIndicator()),
+                placeholder: (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
             ),
@@ -544,32 +540,28 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                               _isInToWatch
                                   ? Icons.bookmark
                                   : Icons.bookmark_border,
-                              color:
-                                  _isInToWatch
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context).colorScheme.onSurface,
+                              color: _isInToWatch
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.onSurface,
                             ),
                             onPressed: _toggleToWatch,
-                            tooltip:
-                                _isInToWatch
-                                    ? 'Remove from To Watch'
-                                    : 'Add to To Watch',
+                            tooltip: _isInToWatch
+                                ? 'Remove from To Watch'
+                                : 'Add to To Watch',
                           ),
                           IconButton(
                             icon: Icon(
                               _isInWatched
                                   ? Icons.check_circle
                                   : Icons.check_circle_outline,
-                              color:
-                                  _isInWatched
-                                      ? Theme.of(context).colorScheme.tertiary
-                                      : Theme.of(context).colorScheme.onSurface,
+                              color: _isInWatched
+                                  ? Theme.of(context).colorScheme.tertiary
+                                  : Theme.of(context).colorScheme.onSurface,
                             ),
                             onPressed: _toggleWatched,
-                            tooltip:
-                                _isInWatched
-                                    ? 'Remove from Watched'
-                                    : 'Add to Watched',
+                            tooltip: _isInWatched
+                                ? 'Remove from Watched'
+                                : 'Add to Watched',
                           ),
                           if (_hasMovieFile &&
                               widget.favoritesService
@@ -604,10 +596,9 @@ Your shared movies will appear in their "Shared with Me" tab.
                     children: [
                       Icon(
                         Icons.star,
-                        color:
-                            _isSharedMovie && _personalRating != null
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.amber,
+                        color: _isSharedMovie && _personalRating != null
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.amber,
                         size: 20,
                       ),
                       const SizedBox(width: 4),
@@ -719,85 +710,82 @@ Your shared movies will appear in their "Shared with Me" tab.
                   _isLoadingRating
                       ? const Center(child: CircularProgressIndicator())
                       : Row(
-                        children: [
-                          Expanded(
-                            child: SliderTheme(
-                              data: SliderTheme.of(context).copyWith(
-                                // Track colors.
-                                activeTrackColor:
-                                    _isSharedMovie
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Colors.amber,
-                                inactiveTrackColor:
-                                    Theme.of(context).colorScheme.outline,
-                                disabledActiveTrackColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary.withValues(alpha: 0.7),
-                                disabledInactiveTrackColor:
-                                    Theme.of(context).colorScheme.outline,
+                          children: [
+                            Expanded(
+                              child: SliderTheme(
+                                data: SliderTheme.of(context).copyWith(
+                                  // Track colors.
+                                  activeTrackColor: _isSharedMovie
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.amber,
+                                  inactiveTrackColor:
+                                      Theme.of(context).colorScheme.outline,
+                                  disabledActiveTrackColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.7),
+                                  disabledInactiveTrackColor:
+                                      Theme.of(context).colorScheme.outline,
 
-                                // Thumb colors.
-                                thumbColor:
-                                    _isSharedMovie
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Colors.amber,
-                                disabledThumbColor:
-                                    Theme.of(context).colorScheme.primary,
+                                  // Thumb colors.
+                                  thumbColor: _isSharedMovie
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.amber,
+                                  disabledThumbColor:
+                                      Theme.of(context).colorScheme.primary,
 
-                                // Track height.
-                                trackHeight: 4.0,
+                                  // Track height.
+                                  trackHeight: 4.0,
 
-                                // Thumb size.
-                                thumbShape: const RoundSliderThumbShape(
-                                  enabledThumbRadius: 8.0,
+                                  // Thumb size.
+                                  thumbShape: const RoundSliderThumbShape(
+                                    enabledThumbRadius: 8.0,
+                                  ),
+
+                                  // Overlay (when pressed).
+                                  overlayColor: (_isSharedMovie
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Colors.amber)
+                                      .withValues(alpha: 0.2),
+
+                                  // Value indicator (tooltip).
+                                  valueIndicatorColor: _isSharedMovie
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.amber,
+                                  valueIndicatorTextStyle: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-
-                                // Overlay (when pressed).
-                                overlayColor: (_isSharedMovie
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Colors.amber)
-                                    .withValues(alpha: 0.2),
-
-                                // Value indicator (tooltip).
-                                valueIndicatorColor:
-                                    _isSharedMovie
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Colors.amber,
-                                valueIndicatorTextStyle: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              child: Slider(
-                                value: _personalRating ?? 0,
-                                min: 0,
-                                max: 10,
-                                divisions: 100,
-                                label:
-                                    _personalRating?.toStringAsFixed(1) ??
-                                    '0.0',
-                                onChanged:
-                                    _isSharedMovie
-                                        ? null
-                                        : (value) => _updateRating(value),
-                              ),
-                            ),
-                          ),
-                          if (!_isSharedMovie)
-                            IconButton(
-                              icon: Icon(
-                                Icons.clear,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                              onPressed:
-                                  _personalRating == null
+                                child: Slider(
+                                  value: _personalRating ?? 0,
+                                  min: 0,
+                                  max: 10,
+                                  divisions: 100,
+                                  label: _personalRating?.toStringAsFixed(1) ??
+                                      '0.0',
+                                  onChanged: _isSharedMovie
                                       ? null
-                                      : () => _updateRating(null),
-                              tooltip: 'Clear rating',
+                                      : (value) => _updateRating(value),
+                                ),
+                              ),
                             ),
-                        ],
-                      ),
+                            if (!_isSharedMovie)
+                              IconButton(
+                                icon: Icon(
+                                  Icons.clear,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                                onPressed: _personalRating == null
+                                    ? null
+                                    : () => _updateRating(null),
+                                tooltip: 'Clear rating',
+                              ),
+                          ],
+                        ),
                   Text(
                     _personalRating == null
                         ? (_isSharedMovie
@@ -870,44 +858,40 @@ Your shared movies will appear in their "Shared with Me" tab.
                   _isLoadingComments
                       ? const Center(child: CircularProgressIndicator())
                       : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextField(
-                            controller: _commentsController,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            maxLines: 4,
-                            readOnly: _isSharedMovie,
-                            decoration: InputDecoration(
-                              hintText:
-                                  _isSharedMovie
-                                      ? 'No comments shared...'
-                                      : 'Add your thoughts about this movie...',
-                              hintStyle: TextStyle(
-                                color:
-                                    Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextField(
+                              controller: _commentsController,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
-                              filled: true,
-                              fillColor:
-                                  _isSharedMovie
-                                      ? Theme.of(
+                              maxLines: 4,
+                              readOnly: _isSharedMovie,
+                              decoration: InputDecoration(
+                                hintText: _isSharedMovie
+                                    ? 'No comments shared...'
+                                    : 'Add your thoughts about this movie...',
+                                hintStyle: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
+                                filled: true,
+                                fillColor: _isSharedMovie
+                                    ? Theme.of(
                                         context,
                                       ).colorScheme.surfaceContainerHigh
-                                      : Theme.of(
+                                    : Theme.of(
                                         context,
                                       ).colorScheme.surfaceContainer,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide.none,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide.none,
+                                ),
                               ),
-                            ),
-                            onChanged:
-                                _isSharedMovie
-                                    ? null
-                                    : (value) {
+                              onChanged: _isSharedMovie
+                                  ? null
+                                  : (value) {
                                       // Mark as modified when user types.
 
                                       setState(() {
@@ -918,65 +902,62 @@ Your shared movies will appear in their "Shared with Me" tab.
 
                                       _commentsSavedTimer?.cancel();
                                     },
-                            onSubmitted:
-                                _isSharedMovie
-                                    ? null
-                                    : (value) {
+                              onSubmitted: _isSharedMovie
+                                  ? null
+                                  : (value) {
                                       // Save when user presses Enter (if modified).
 
                                       if (_commentsModified) {
                                         _saveComments();
                                       }
                                     },
-                          ),
-                          const SizedBox(height: 8),
-                          if (!_isSharedMovie)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                if (_commentsModified)
-                                  ElevatedButton.icon(
-                                    icon: const Icon(Icons.save, size: 18),
-                                    label: const Text('Save Comments'),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          Theme.of(context).colorScheme.primary,
-                                      foregroundColor:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onPrimary,
+                            ),
+                            const SizedBox(height: 8),
+                            if (!_isSharedMovie)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  if (_commentsModified)
+                                    ElevatedButton.icon(
+                                      icon: const Icon(Icons.save, size: 18),
+                                      label: const Text('Save Comments'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        foregroundColor: Theme.of(
+                                          context,
+                                        ).colorScheme.onPrimary,
+                                      ),
+                                      onPressed: _saveComments,
                                     ),
-                                    onPressed: _saveComments,
-                                  ),
-                                if (_commentsModified &&
-                                    (_personalComments != null &&
-                                        _personalComments!.isNotEmpty))
-                                  const SizedBox(width: 8),
-                                if (_personalComments != null &&
-                                    _personalComments!.isNotEmpty)
-                                  TextButton.icon(
-                                    icon: Icon(
-                                      Icons.clear,
-                                      color:
-                                          Theme.of(
+                                  if (_commentsModified &&
+                                      (_personalComments != null &&
+                                          _personalComments!.isNotEmpty))
+                                    const SizedBox(width: 8),
+                                  if (_personalComments != null &&
+                                      _personalComments!.isNotEmpty)
+                                    TextButton.icon(
+                                      icon: Icon(
+                                        Icons.clear,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
+                                      label: Text(
+                                        'Clear Comments',
+                                        style: TextStyle(
+                                          color: Theme.of(
                                             context,
                                           ).colorScheme.onSurface,
-                                    ),
-                                    label: Text(
-                                      'Clear Comments',
-                                      style: TextStyle(
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface,
+                                        ),
                                       ),
+                                      onPressed: _clearComments,
                                     ),
-                                    onPressed: _clearComments,
-                                  ),
-                              ],
-                            ),
-                        ],
-                      ),
+                                ],
+                              ),
+                          ],
+                        ),
                   const SizedBox(height: 16),
                   Text(
                     'Overview',

@@ -166,191 +166,14 @@ class _FileServiceWidgetState extends ConsumerState<FileServiceWidget> {
         // Main content area.
         Expanded(
           child: SingleChildScrollView(
-            child:
-                isWideScreen
-                    ? Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // File browser on the left.
-                        Expanded(
-                          flex: 2,
-                          child: Card(
-                            color: Theme.of(context).cardColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppTheme.defaultBorderRadius,
-                              ),
-                            ),
-                            elevation: 4,
-                            margin: const EdgeInsets.only(
-                              right: AppTheme.defaultPadding / 2,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                AppTheme.defaultPadding / 2,
-                              ),
-                              child: FileBrowser(
-                                key: _browserKey,
-                                browserKey: _browserKey,
-                                friendlyFolderName: friendlyFolderName,
-                                onFileSelected: (name, filePath) async {
-                                  setState(() {});
-
-                                  try {
-                                    // Read file content for preview.
-
-                                    final content = await readPod(
-                                      filePath,
-                                      context,
-                                      Container(),
-                                    );
-                                    String preview;
-
-                                    if (isTextFile(name)) {
-                                      // For text files, show the first 500 characters.
-
-                                      preview =
-                                          content.length > 500
-                                              ? '${content.substring(0, 500)}...'
-                                              : content;
-                                    } else {
-                                      // For binary files, show basic info.
-
-                                      preview =
-                                          'Binary file\nSize: ${(content.length / 1024).toStringAsFixed(2)} KB\nType: ${path.extension(name)}';
-                                    }
-
-                                    ref.read(fileServiceProvider.notifier)
-                                      ..setDownloadFile(filePath)
-                                      ..setFilePreview(preview)
-                                      ..setRemoteFileName(path.basename(name));
-                                  } catch (e) {
-                                    debugPrint('Preview error: $e');
-                                    ref.read(fileServiceProvider.notifier)
-                                      ..setDownloadFile(filePath)
-                                      ..setFilePreview('Error loading preview')
-                                      ..setRemoteFileName(path.basename(name));
-                                  }
-                                },
-                                onFileDownload: (name, filePath) async {
-                                  ref.read(fileServiceProvider.notifier)
-                                    ..setDownloadFile(filePath)
-                                    ..setRemoteFileName(path.basename(name))
-                                    ..handleDownload(context);
-                                },
-                                onFileDelete: (name, filePath) async {
-                                  // Show confirmation dialog before deleting.
-
-                                  final bool? confirm = await showDialog<bool>(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        backgroundColor:
-                                            Theme.of(
-                                              context,
-                                            ).dialogTheme.backgroundColor,
-                                        title: Text(
-                                          'Confirm Delete',
-                                          style:
-                                              Theme.of(
-                                                context,
-                                              ).textTheme.titleLarge,
-                                        ),
-                                        content: Text(
-                                          'Are you sure you want to delete "$name"?',
-                                          style:
-                                              Theme.of(
-                                                context,
-                                              ).textTheme.bodyMedium,
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed:
-                                                () => Navigator.of(
-                                                  context,
-                                                ).pop(false),
-                                            style: TextButton.styleFrom(
-                                              foregroundColor:
-                                                  AppTheme.primaryTextColor,
-                                            ),
-                                            child: const Text('Cancel'),
-                                          ),
-                                          TextButton(
-                                            onPressed:
-                                                () => Navigator.of(
-                                                  context,
-                                                ).pop(true),
-                                            style: TextButton.styleFrom(
-                                              foregroundColor:
-                                                  AppTheme.primaryColor,
-                                            ),
-                                            child: const Text('Delete'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-
-                                  if (!context.mounted) return;
-
-                                  if (confirm == true) {
-                                    ref.read(fileServiceProvider.notifier)
-                                      ..setRemoteFileName(path.basename(name))
-                                      ..handleDelete(context);
-                                  }
-                                },
-                                onImportCsv: (name, filePath) {
-                                  if (mounted) {
-                                    // The provider doesn't have an importCsv method.
-                                    // Just refresh the file list instead.
-
-                                    ref
-                                        .read(fileServiceProvider.notifier)
-                                        .updateCurrentPath(filePath);
-                                    _browserKey.currentState?.refreshFiles();
-                                  }
-                                },
-                                onDirectoryChanged: (path) {
-                                  if (mounted) {
-                                    ref
-                                        .read(fileServiceProvider.notifier)
-                                        .updateCurrentPath(path);
-                                  }
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        // Upload section on the right.
-                        Expanded(
-                          flex: 1,
-                          child: Card(
-                            color: Theme.of(context).cardColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppTheme.defaultBorderRadius,
-                              ),
-                            ),
-                            elevation: 4,
-                            margin: const EdgeInsets.only(
-                              left: AppTheme.defaultPadding / 2,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                AppTheme.defaultPadding,
-                              ),
-                              child: FileUploadSection(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                    : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // File browser.
-                        Card(
+            child: isWideScreen
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // File browser on the left.
+                      Expanded(
+                        flex: 2,
+                        child: Card(
                           color: Theme.of(context).cardColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
@@ -358,9 +181,13 @@ class _FileServiceWidgetState extends ConsumerState<FileServiceWidget> {
                             ),
                           ),
                           elevation: 4,
-                          margin: const EdgeInsets.all(AppTheme.defaultPadding),
-                          child: SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.4,
+                          margin: const EdgeInsets.only(
+                            right: AppTheme.defaultPadding / 2,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(
+                              AppTheme.defaultPadding / 2,
+                            ),
                             child: FileBrowser(
                               key: _browserKey,
                               browserKey: _browserKey,
@@ -381,10 +208,9 @@ class _FileServiceWidgetState extends ConsumerState<FileServiceWidget> {
                                   if (isTextFile(name)) {
                                     // For text files, show the first 500 characters.
 
-                                    preview =
-                                        content.length > 500
-                                            ? '${content.substring(0, 500)}...'
-                                            : content;
+                                    preview = content.length > 500
+                                        ? '${content.substring(0, 500)}...'
+                                        : content;
                                   } else {
                                     // For binary files, show basic info.
 
@@ -417,30 +243,26 @@ class _FileServiceWidgetState extends ConsumerState<FileServiceWidget> {
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
-                                      backgroundColor:
-                                          Theme.of(
-                                            context,
-                                          ).dialogTheme.backgroundColor,
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).dialogTheme.backgroundColor,
                                       title: Text(
                                         'Confirm Delete',
-                                        style:
-                                            Theme.of(
-                                              context,
-                                            ).textTheme.titleLarge,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleLarge,
                                       ),
                                       content: Text(
                                         'Are you sure you want to delete "$name"?',
-                                        style:
-                                            Theme.of(
-                                              context,
-                                            ).textTheme.bodyMedium,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodyMedium,
                                       ),
                                       actions: [
                                         TextButton(
-                                          onPressed:
-                                              () => Navigator.of(
-                                                context,
-                                              ).pop(false),
+                                          onPressed: () => Navigator.of(
+                                            context,
+                                          ).pop(false),
                                           style: TextButton.styleFrom(
                                             foregroundColor:
                                                 AppTheme.primaryTextColor,
@@ -448,10 +270,9 @@ class _FileServiceWidgetState extends ConsumerState<FileServiceWidget> {
                                           child: const Text('Cancel'),
                                         ),
                                         TextButton(
-                                          onPressed:
-                                              () => Navigator.of(
-                                                context,
-                                              ).pop(true),
+                                          onPressed: () => Navigator.of(
+                                            context,
+                                          ).pop(true),
                                           style: TextButton.styleFrom(
                                             foregroundColor:
                                                 AppTheme.primaryColor,
@@ -492,9 +313,12 @@ class _FileServiceWidgetState extends ConsumerState<FileServiceWidget> {
                             ),
                           ),
                         ),
+                      ),
 
-                        // Upload section.
-                        Card(
+                      // Upload section on the right.
+                      Expanded(
+                        flex: 1,
+                        child: Card(
                           color: Theme.of(context).cardColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
@@ -502,7 +326,9 @@ class _FileServiceWidgetState extends ConsumerState<FileServiceWidget> {
                             ),
                           ),
                           elevation: 4,
-                          margin: const EdgeInsets.all(AppTheme.defaultPadding),
+                          margin: const EdgeInsets.only(
+                            left: AppTheme.defaultPadding / 2,
+                          ),
                           child: Padding(
                             padding: const EdgeInsets.all(
                               AppTheme.defaultPadding,
@@ -510,8 +336,169 @@ class _FileServiceWidgetState extends ConsumerState<FileServiceWidget> {
                             child: FileUploadSection(),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // File browser.
+                      Card(
+                        color: Theme.of(context).cardColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.defaultBorderRadius,
+                          ),
+                        ),
+                        elevation: 4,
+                        margin: const EdgeInsets.all(AppTheme.defaultPadding),
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.4,
+                          child: FileBrowser(
+                            key: _browserKey,
+                            browserKey: _browserKey,
+                            friendlyFolderName: friendlyFolderName,
+                            onFileSelected: (name, filePath) async {
+                              setState(() {});
+
+                              try {
+                                // Read file content for preview.
+
+                                final content = await readPod(
+                                  filePath,
+                                  context,
+                                  Container(),
+                                );
+                                String preview;
+
+                                if (isTextFile(name)) {
+                                  // For text files, show the first 500 characters.
+
+                                  preview = content.length > 500
+                                      ? '${content.substring(0, 500)}...'
+                                      : content;
+                                } else {
+                                  // For binary files, show basic info.
+
+                                  preview =
+                                      'Binary file\nSize: ${(content.length / 1024).toStringAsFixed(2)} KB\nType: ${path.extension(name)}';
+                                }
+
+                                ref.read(fileServiceProvider.notifier)
+                                  ..setDownloadFile(filePath)
+                                  ..setFilePreview(preview)
+                                  ..setRemoteFileName(path.basename(name));
+                              } catch (e) {
+                                debugPrint('Preview error: $e');
+                                ref.read(fileServiceProvider.notifier)
+                                  ..setDownloadFile(filePath)
+                                  ..setFilePreview('Error loading preview')
+                                  ..setRemoteFileName(path.basename(name));
+                              }
+                            },
+                            onFileDownload: (name, filePath) async {
+                              ref.read(fileServiceProvider.notifier)
+                                ..setDownloadFile(filePath)
+                                ..setRemoteFileName(path.basename(name))
+                                ..handleDownload(context);
+                            },
+                            onFileDelete: (name, filePath) async {
+                              // Show confirmation dialog before deleting.
+
+                              final bool? confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: Theme.of(
+                                      context,
+                                    ).dialogTheme.backgroundColor,
+                                    title: Text(
+                                      'Confirm Delete',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleLarge,
+                                    ),
+                                    content: Text(
+                                      'Are you sure you want to delete "$name"?',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium,
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(
+                                          context,
+                                        ).pop(false),
+                                        style: TextButton.styleFrom(
+                                          foregroundColor:
+                                              AppTheme.primaryTextColor,
+                                        ),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => Navigator.of(
+                                          context,
+                                        ).pop(true),
+                                        style: TextButton.styleFrom(
+                                          foregroundColor:
+                                              AppTheme.primaryColor,
+                                        ),
+                                        child: const Text('Delete'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+
+                              if (!context.mounted) return;
+
+                              if (confirm == true) {
+                                ref.read(fileServiceProvider.notifier)
+                                  ..setRemoteFileName(path.basename(name))
+                                  ..handleDelete(context);
+                              }
+                            },
+                            onImportCsv: (name, filePath) {
+                              if (mounted) {
+                                // The provider doesn't have an importCsv method.
+                                // Just refresh the file list instead.
+
+                                ref
+                                    .read(fileServiceProvider.notifier)
+                                    .updateCurrentPath(filePath);
+                                _browserKey.currentState?.refreshFiles();
+                              }
+                            },
+                            onDirectoryChanged: (path) {
+                              if (mounted) {
+                                ref
+                                    .read(fileServiceProvider.notifier)
+                                    .updateCurrentPath(path);
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+
+                      // Upload section.
+                      Card(
+                        color: Theme.of(context).cardColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.defaultBorderRadius,
+                          ),
+                        ),
+                        elevation: 4,
+                        margin: const EdgeInsets.all(AppTheme.defaultPadding),
+                        child: Padding(
+                          padding: const EdgeInsets.all(
+                            AppTheme.defaultPadding,
+                          ),
+                          child: FileUploadSection(),
+                        ),
+                      ),
+                    ],
+                  ),
           ),
         ),
       ],

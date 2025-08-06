@@ -90,9 +90,9 @@ class ErrorDisplayWidget extends StatelessWidget {
     super.key,
     required this.message,
     this.onRetry,
-  }) : iconSize = 32,
-       textSize = 14,
-       isCompact = true;
+  })  : iconSize = 32,
+        textSize = 14,
+        isCompact = true;
 
   @override
   Widget build(BuildContext context) {

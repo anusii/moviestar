@@ -243,37 +243,35 @@ class _FileUploadSectionState extends ConsumerState<FileUploadSection> {
 
                 ''',
                 child: ElevatedButton.icon(
-                  onPressed:
-                      state.uploadInProgress
-                          ? null
-                          : () async {
-                            final result =
-                                await FilePicker.platform.pickFiles();
-                            if (result != null && result.files.isNotEmpty) {
-                              final file = result.files.first;
-                              if (file.path != null) {
-                                ref
-                                    .read(fileServiceProvider.notifier)
-                                    .setUploadFile(file.path);
-                                await handlePreview(file.path!);
-                                if (!context.mounted) return;
-                                await ref
-                                    .read(fileServiceProvider.notifier)
-                                    .handleUpload(context);
-                                // Clear the upload file after successful upload.
+                  onPressed: state.uploadInProgress
+                      ? null
+                      : () async {
+                          final result = await FilePicker.platform.pickFiles();
+                          if (result != null && result.files.isNotEmpty) {
+                            final file = result.files.first;
+                            if (file.path != null) {
+                              ref
+                                  .read(fileServiceProvider.notifier)
+                                  .setUploadFile(file.path);
+                              await handlePreview(file.path!);
+                              if (!context.mounted) return;
+                              await ref
+                                  .read(fileServiceProvider.notifier)
+                                  .handleUpload(context);
+                              // Clear the upload file after successful upload.
 
-                                ref
-                                    .read(fileServiceProvider.notifier)
-                                    .setUploadFile(null);
-                                // Clear the preview.
+                              ref
+                                  .read(fileServiceProvider.notifier)
+                                  .setUploadFile(null);
+                              // Clear the preview.
 
-                                setState(() {
-                                  filePreview = null;
-                                  showPreview = false;
-                                });
-                              }
+                              setState(() {
+                                filePreview = null;
+                                showPreview = false;
+                              });
                             }
-                          },
+                          }
+                        },
                   icon: const Icon(Icons.file_upload, color: Colors.white),
                   label: const Text(
                     'Upload',
@@ -306,21 +304,20 @@ class _FileUploadSectionState extends ConsumerState<FileUploadSection> {
 
           ''',
           child: TextButton.icon(
-            onPressed:
-                state.uploadInProgress
-                    ? null
-                    : () async {
-                      final result = await FilePicker.platform.pickFiles(
-                        type: FileType.custom,
-                        allowedExtensions: ['json'],
-                      );
-                      if (result != null && result.files.isNotEmpty) {
-                        final file = result.files.first;
-                        if (file.path != null) {
-                          await handlePreview(file.path!);
-                        }
+            onPressed: state.uploadInProgress
+                ? null
+                : () async {
+                    final result = await FilePicker.platform.pickFiles(
+                      type: FileType.custom,
+                      allowedExtensions: ['json'],
+                    );
+                    if (result != null && result.files.isNotEmpty) {
+                      final file = result.files.first;
+                      if (file.path != null) {
+                        await handlePreview(file.path!);
                       }
-                    },
+                    }
+                  },
             icon: const Icon(Icons.analytics, color: AppTheme.primaryColor),
             label: const Text(
               'Visualize JSON',
@@ -351,10 +348,9 @@ class _FileUploadSectionState extends ConsumerState<FileUploadSection> {
 
             ''',
             child: TextButton.icon(
-              onPressed:
-                  state.uploadInProgress
-                      ? null
-                      : () => handlePreview(state.uploadFile!),
+              onPressed: state.uploadInProgress
+                  ? null
+                  : () => handlePreview(state.uploadFile!),
               icon: const Icon(Icons.preview, color: AppTheme.primaryColor),
               label: const Text(
                 'Preview File',

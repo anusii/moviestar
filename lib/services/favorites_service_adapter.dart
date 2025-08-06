@@ -185,24 +185,20 @@ class FavoritesServiceAdapter extends FavoritesService {
       'toWatch': {
         'cached': _cachedToWatch != null,
         'count': _cachedToWatch?.length ?? 0,
-        'age':
-            _toWatchCacheTime != null
-                ? now.difference(_toWatchCacheTime!).inMinutes
-                : null,
-        'valid':
-            _cachedToWatch != null &&
+        'age': _toWatchCacheTime != null
+            ? now.difference(_toWatchCacheTime!).inMinutes
+            : null,
+        'valid': _cachedToWatch != null &&
             _toWatchCacheTime != null &&
             now.difference(_toWatchCacheTime!) < _userDataTtl,
       },
       'watched': {
         'cached': _cachedWatched != null,
         'count': _cachedWatched?.length ?? 0,
-        'age':
-            _watchedCacheTime != null
-                ? now.difference(_watchedCacheTime!).inMinutes
-                : null,
-        'valid':
-            _cachedWatched != null &&
+        'age': _watchedCacheTime != null
+            ? now.difference(_watchedCacheTime!).inMinutes
+            : null,
+        'valid': _cachedWatched != null &&
             _watchedCacheTime != null &&
             now.difference(_watchedCacheTime!) < _userDataTtl,
       },

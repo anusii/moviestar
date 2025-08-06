@@ -265,8 +265,7 @@ class FavoritesServiceManager extends ChangeNotifier {
     // For local storage, check if either rating or comment exists.
 
     final hasRating = await getPersonalRating(movie) != null;
-    final hasComment =
-        await getMovieComments(movie) != null &&
+    final hasComment = await getMovieComments(movie) != null &&
         (await getMovieComments(movie))!.isNotEmpty;
     return hasRating || hasComment;
   }

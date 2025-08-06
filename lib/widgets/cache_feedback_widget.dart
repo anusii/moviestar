@@ -139,10 +139,9 @@ class CacheFeedbackWidget {
     BuildContext context, {
     required bool isEnabled,
   }) {
-    final message =
-        isEnabled
-            ? 'Offline Mode enabled - browse movies without internet'
-            : 'Offline Mode disabled - network access restored';
+    final message = isEnabled
+        ? 'Offline Mode enabled - browse movies without internet'
+        : 'Offline Mode disabled - network access restored';
 
     final backgroundColor = isEnabled ? Colors.orange : Colors.blue;
     final icon = isEnabled ? Icons.offline_pin : Icons.wifi;

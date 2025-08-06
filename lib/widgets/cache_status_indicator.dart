@@ -197,10 +197,9 @@ class CacheStatusIndicator extends ConsumerWidget {
           message =
               'Offline Mode: Browse movies without internet\n$totalCached movies available offline';
         } else if (totalCached > 0) {
-          final validCategories =
-              stats.values
-                  .where((stat) => stat['isValid'] as bool? ?? false)
-                  .length;
+          final validCategories = stats.values
+              .where((stat) => stat['isValid'] as bool? ?? false)
+              .length;
           message =
               'Cache Active: $totalCached movies cached\n$validCategories categories up to date';
         } else {
@@ -226,44 +225,43 @@ class CacheStatusIndicator extends ConsumerWidget {
 
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Row(
-              children: [
-                Icon(Icons.storage, size: 24),
-                SizedBox(width: 8),
-                Text('Cache Status'),
-              ],
-            ),
-            content: Text(message),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
-              ),
-              if (cacheOnlyMode)
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    ref
-                        .read(cacheOnlyModeProvider.notifier)
-                        .setCacheOnlyMode(false);
-                    CacheFeedbackWidget.showOfflineModeNotification(
-                      context,
-                      isEnabled: false,
-                    );
-                  },
-                  child: const Text('Go Online'),
-                ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _navigateToSettings(context, ref);
-                },
-                child: const Text('Cache Settings'),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.storage, size: 24),
+            SizedBox(width: 8),
+            Text('Cache Status'),
+          ],
+        ),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
           ),
+          if (cacheOnlyMode)
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                ref
+                    .read(cacheOnlyModeProvider.notifier)
+                    .setCacheOnlyMode(false);
+                CacheFeedbackWidget.showOfflineModeNotification(
+                  context,
+                  isEnabled: false,
+                );
+              },
+              child: const Text('Go Online'),
+            ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _navigateToSettings(context, ref);
+            },
+            child: const Text('Cache Settings'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -275,11 +273,10 @@ class CacheStatusIndicator extends ConsumerWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder:
-              (context) => SettingsScreen(
-                favoritesService: favoritesService!,
-                apiKeyService: apiKeyService,
-              ),
+          builder: (context) => SettingsScreen(
+            favoritesService: favoritesService!,
+            apiKeyService: apiKeyService,
+          ),
         ),
       );
     } else {

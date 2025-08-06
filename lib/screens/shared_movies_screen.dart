@@ -417,8 +417,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
         'sharedBy': _formatWebId(finalSharedBy),
         'sharedByWebId':
             finalSharedBy, // Store full WebID for URL construction.
-        'permissions':
-            resourceInfo['permissions'] ??
+        'permissions': resourceInfo['permissions'] ??
             resourceInfo['permissionList'] ??
             'read',
         'movieId': movieId ?? 'unknown',
@@ -520,13 +519,11 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
       listName ??= 'Movie List ${listId ?? 'Unknown'}';
       description ??= 'A shared movie list';
 
-      final rawOwner =
-          resourceInfo['owner'] ??
+      final rawOwner = resourceInfo['owner'] ??
           resourceInfo['ownerWebId'] ??
           resourceInfo['webId'] ??
           resourceInfo['ownerId'];
-      final rawSharedBy =
-          resourceInfo['granter'] ??
+      final rawSharedBy = resourceInfo['granter'] ??
           resourceInfo['granterWebId'] ??
           resourceInfo['sharedBy'] ??
           resourceInfo['sharer'];
@@ -560,27 +557,25 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
         'movieCount': movieIds.length, // Use extracted movie IDs count.
 
         'movieIds': movieIds,
-        'movies':
-            movieIds
-                .map(
-                  (movieIdStr) => {
-                    'movieId': movieIdStr,
-                    'fileName':
-                        'Movie $movieIdStr', // Placeholder - will fetch details on-demand.
-                    'owner': _formatWebId(finalOwner),
-                    'ownerWebId': finalOwner, // Inherit from parent list.
+        'movies': movieIds
+            .map(
+              (movieIdStr) => {
+                'movieId': movieIdStr,
+                'fileName':
+                    'Movie $movieIdStr', // Placeholder - will fetch details on-demand.
+                'owner': _formatWebId(finalOwner),
+                'ownerWebId': finalOwner, // Inherit from parent list.
 
-                    'sharedBy': _formatWebId(finalSharedBy),
-                    'sharedByWebId': finalSharedBy, // Inherit from parent list
-                  },
-                )
-                .toList(),
+                'sharedBy': _formatWebId(finalSharedBy),
+                'sharedByWebId': finalSharedBy, // Inherit from parent list
+              },
+            )
+            .toList(),
         'owner': _formatWebId(finalOwner),
         'ownerWebId': finalOwner, // Store full WebID for URL construction
         'sharedBy': _formatWebId(finalSharedBy),
         'sharedByWebId': finalSharedBy, // Store full WebID for URL construction
-        'permissions':
-            resourceInfo['permissions'] ??
+        'permissions': resourceInfo['permissions'] ??
             resourceInfo['permissionList'] ??
             'read',
         'resourceUrl': resourceUrl,
@@ -717,9 +712,8 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
           // Create a fallback entry.
 
           enrichedMoviesMap[resourceUrl] = {
-            'fileName': fileName
-                .replaceAll('.ttl', '')
-                .replaceAll('Movie-', 'Movie '),
+            'fileName':
+                fileName.replaceAll('.ttl', '').replaceAll('Movie-', 'Movie '),
             'owner': 'ME',
             'sharedBy': 'ME',
             'permissions': 'read',
@@ -769,21 +763,21 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
             Text(
               'No Shared Movies',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.7),
-              ),
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
             ),
             const SizedBox(height: 8),
             Text(
               'Movies shared with you will appear here.\nStart sharing movies with friends to see them!\n\nMake sure you have POD storage enabled in Settings.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.5),
-              ),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
             ),
           ],
         ),
@@ -807,19 +801,19 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
             Text(
               'Unable to Load Shared Movies',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.error,
-              ),
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
             ),
             const SizedBox(height: 8),
             Text(
               'Please check your connection and try again.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.7),
-              ),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
@@ -943,21 +937,21 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
             Text(
               'No Rated Movies Yet',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.7),
-              ),
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
             ),
             const SizedBox(height: 8),
             Text(
               'Movies you\'ve rated or commented on will appear here.\n\nTo rate a movie:\n1. Go to any movie details\n2. Add a rating or comment\n3. Save your review\n\nYou can then share your rated movies with friends.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.5),
-              ),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
             ),
           ],
         ),

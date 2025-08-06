@@ -70,12 +70,11 @@ class ShareListDialog extends StatefulWidget {
   }) async {
     return await showDialog<bool>(
       context: context,
-      builder:
-          (context) => ShareListDialog(
-            listId: listId,
-            movieListService: movieListService,
-            onShared: onShared,
-          ),
+      builder: (context) => ShareListDialog(
+        listId: listId,
+        movieListService: movieListService,
+        onShared: onShared,
+      ),
     );
   }
 
@@ -180,19 +179,18 @@ class _ShareListDialogState extends State<ShareListDialog> {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder:
-              (context) => Theme(
-                data: Theme.of(context),
-                child: GrantPermissionUi(
-                  fileName: filePath,
-                  title: 'Share "${_movieListData?['name'] ?? 'Movie List'}"',
-                  accessModeList: [_selectedPermission.value],
-                  recipientTypeList: const ['indi'],
-                  showAppBar: true,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  child: widget,
-                ),
-              ),
+          builder: (context) => Theme(
+            data: Theme.of(context),
+            child: GrantPermissionUi(
+              fileName: filePath,
+              title: 'Share "${_movieListData?['name'] ?? 'Movie List'}"',
+              accessModeList: [_selectedPermission.value],
+              recipientTypeList: const ['indi'],
+              showAppBar: true,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              child: widget,
+            ),
+          ),
         ),
       );
 
@@ -301,7 +299,9 @@ class _ShareListDialogState extends State<ShareListDialog> {
                     children: [
                       Text(
                         listName,
-                        style: Theme.of(context).textTheme.titleMedium
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       if (description != null && description.isNotEmpty) ...[
@@ -311,10 +311,10 @@ class _ShareListDialogState extends State<ShareListDialog> {
                           style: Theme.of(
                             context,
                           ).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.7),
-                          ),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.7),
+                              ),
                         ),
                       ],
                     ],
@@ -341,9 +341,9 @@ class _ShareListDialogState extends State<ShareListDialog> {
                   Text(
                     '$movieCount ${movieCount == 1 ? 'movie' : 'movies'}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                   ),
                 ],
               ),
@@ -353,11 +353,11 @@ class _ShareListDialogState extends State<ShareListDialog> {
               Text(
                 'Movies:',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.7),
-                ),
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
               ),
               const SizedBox(height: 8),
               ...movies.map(
@@ -414,92 +414,88 @@ class _ShareListDialogState extends State<ShareListDialog> {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
-            children:
-                SharePermissionLevel.values.map((permission) {
-                  final isSelected = _selectedPermission == permission;
-                  return InkWell(
-                    onTap: () {
-                      setState(() {
-                        _selectedPermission = permission;
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color:
-                            isSelected
-                                ? Theme.of(
-                                  context,
-                                ).colorScheme.primary.withValues(alpha: 0.1)
-                                : null,
-                        borderRadius:
-                            permission == SharePermissionLevel.values.first
+            children: SharePermissionLevel.values.map((permission) {
+              final isSelected = _selectedPermission == permission;
+              return InkWell(
+                onTap: () {
+                  setState(() {
+                    _selectedPermission = permission;
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.1)
+                        : null,
+                    borderRadius:
+                        permission == SharePermissionLevel.values.first
+                            ? const BorderRadius.only(
+                                topLeft: Radius.circular(8),
+                                topRight: Radius.circular(8),
+                              )
+                            : permission == SharePermissionLevel.values.last
                                 ? const BorderRadius.only(
-                                  topLeft: Radius.circular(8),
-                                  topRight: Radius.circular(8),
-                                )
-                                : permission == SharePermissionLevel.values.last
-                                ? const BorderRadius.only(
-                                  bottomLeft: Radius.circular(8),
-                                  bottomRight: Radius.circular(8),
-                                )
+                                    bottomLeft: Radius.circular(8),
+                                    bottomRight: Radius.circular(8),
+                                  )
                                 : null,
+                  ),
+                  child: Row(
+                    children: [
+                      Radio<SharePermissionLevel>(
+                        value: permission,
+                        groupValue: _selectedPermission,
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() {
+                              _selectedPermission = value;
+                            });
+                          }
+                        },
                       ),
-                      child: Row(
-                        children: [
-                          Radio<SharePermissionLevel>(
-                            value: permission,
-                            groupValue: _selectedPermission,
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  _selectedPermission = value;
-                                });
-                              }
-                            },
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  permission.displayName,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodyMedium?.copyWith(
-                                    fontWeight:
-                                        isSelected
-                                            ? FontWeight.w600
-                                            : FontWeight.w500,
-                                    color:
-                                        isSelected
-                                            ? Theme.of(
-                                              context,
-                                            ).colorScheme.primary
-                                            : null,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              permission.displayName,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.copyWith(
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                    color: isSelected
+                                        ? Theme.of(
+                                            context,
+                                          ).colorScheme.primary
+                                        : null,
                                   ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  permission.description,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodySmall?.copyWith(
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              permission.description,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(
                                     color: Theme.of(context)
                                         .colorScheme
                                         .onSurface
                                         .withValues(alpha: 0.7),
                                   ),
-                                ),
-                              ],
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                }).toList(),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
           ),
         ),
       ],
@@ -542,16 +538,15 @@ class _ShareListDialogState extends State<ShareListDialog> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 prefixIcon: const Icon(Icons.person),
-                suffixIcon:
-                    _webIdController.text.isNotEmpty
-                        ? IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            _webIdController.clear();
-                            setState(() {});
-                          },
-                        )
-                        : null,
+                suffixIcon: _webIdController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _webIdController.clear();
+                          setState(() {});
+                        },
+                      )
+                    : null,
                 errorText: _errorMessage,
               ),
               keyboardType: TextInputType.url,
@@ -587,14 +582,13 @@ class _ShareListDialogState extends State<ShareListDialog> {
         ),
         ElevatedButton(
           onPressed: _isSharing || _movieListData == null ? null : _handleShare,
-          child:
-              _isSharing
-                  ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                  : const Text('Share'),
+          child: _isSharing
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Share'),
         ),
       ],
     );

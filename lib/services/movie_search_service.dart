@@ -153,8 +153,8 @@ class MovieSearchService {
 
     final matchingGenre = genres.firstWhere(
       (genre) => (genre['name'] as String).toLowerCase().contains(
-        genreName.toLowerCase(),
-      ),
+            genreName.toLowerCase(),
+          ),
       orElse: () => null,
     );
 

@@ -93,45 +93,44 @@ class FileBrowserContent extends StatelessWidget {
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(AppTheme.defaultBorderRadius),
       ),
-      child:
-          directories.isEmpty && files.isEmpty
-              ? Center(
-                child: Padding(
-                  padding: EdgeInsets.all(AppTheme.defaultPadding),
-                  child: Text(
-                    'No files or folders found in this directory',
-                    style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyMedium?.color,
-                      fontSize: 14,
-                    ),
+      child: directories.isEmpty && files.isEmpty
+          ? Center(
+              child: Padding(
+                padding: EdgeInsets.all(AppTheme.defaultPadding),
+                child: Text(
+                  'No files or folders found in this directory',
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                    fontSize: 14,
                   ),
                 ),
-              )
-              : ListView(
-                padding: const EdgeInsets.all(AppTheme.defaultPadding / 2),
-                children: [
-                  // Directory list.
-                  DirectoryList(
-                    directories: directories,
-                    directoryCounts: directoryCounts,
-                    onDirectorySelected: onDirectorySelected,
-                  ),
-
-                  // Add visual separator if both directories and files exist.
-                  if (directories.isNotEmpty && files.isNotEmpty)
-                    Divider(height: 24, color: Theme.of(context).dividerColor),
-
-                  // File list.
-                  FileList(
-                    files: files,
-                    currentPath: currentPath,
-                    selectedFile: selectedFile,
-                    onFileSelected: onFileSelected,
-                    onFileDownload: onFileDownload,
-                    onFileDelete: onFileDelete,
-                  ),
-                ],
               ),
+            )
+          : ListView(
+              padding: const EdgeInsets.all(AppTheme.defaultPadding / 2),
+              children: [
+                // Directory list.
+                DirectoryList(
+                  directories: directories,
+                  directoryCounts: directoryCounts,
+                  onDirectorySelected: onDirectorySelected,
+                ),
+
+                // Add visual separator if both directories and files exist.
+                if (directories.isNotEmpty && files.isNotEmpty)
+                  Divider(height: 24, color: Theme.of(context).dividerColor),
+
+                // File list.
+                FileList(
+                  files: files,
+                  currentPath: currentPath,
+                  selectedFile: selectedFile,
+                  onFileSelected: onFileSelected,
+                  onFileDownload: onFileDownload,
+                  onFileDelete: onFileDelete,
+                ),
+              ],
+            ),
     );
   }
 }

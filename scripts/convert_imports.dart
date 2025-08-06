@@ -72,10 +72,9 @@ Future<void> convertImportsInFile(File file) async {
 
       final startQuote =
           line.contains("'") ? line.indexOf("'") : line.indexOf('"');
-      final endQuote =
-          line.lastIndexOf("'") != -1
-              ? line.lastIndexOf("'")
-              : line.lastIndexOf('"');
+      final endQuote = line.lastIndexOf("'") != -1
+          ? line.lastIndexOf("'")
+          : line.lastIndexOf('"');
 
       if (startQuote != -1 && endQuote != -1 && startQuote < endQuote) {
         final importPath = line.substring(startQuote + 1, endQuote);
@@ -110,10 +109,9 @@ Future<void> convertImportsInFile(File file) async {
 
 bool isLocalImport(String line) {
   final startQuote = line.contains("'") ? line.indexOf("'") : line.indexOf('"');
-  final endQuote =
-      line.lastIndexOf("'") != -1
-          ? line.lastIndexOf("'")
-          : line.lastIndexOf('"');
+  final endQuote = line.lastIndexOf("'") != -1
+      ? line.lastIndexOf("'")
+      : line.lastIndexOf('"');
 
   if (startQuote != -1 && endQuote != -1 && startQuote < endQuote) {
     final importPath = line.substring(startQuote + 1, endQuote);

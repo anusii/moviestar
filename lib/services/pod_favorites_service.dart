@@ -118,7 +118,7 @@ class PodFavoritesService extends ChangeNotifier {
   /// Creates a new [PodFavoritesService] instance.
 
   PodFavoritesService(this._prefs, this._context, this._child)
-    : _fallbackService = FavoritesService(_prefs) {
+      : _fallbackService = FavoritesService(_prefs) {
     // Initialize ontology services.
 
     _userProfileService = UserProfileService(_context, _child);
@@ -808,8 +808,7 @@ class PodFavoritesService extends ChangeNotifier {
     final movieData = await _readMovieFile(movie);
     if (movieData != null) {
       final hasRating = movieData['rating'] != null;
-      final hasComment =
-          movieData['comment'] != null &&
+      final hasComment = movieData['comment'] != null &&
           (movieData['comment'] as String?)?.isNotEmpty == true;
 
       if (hasRating || hasComment) {
@@ -944,10 +943,10 @@ class PodFavoritesService extends ChangeNotifier {
         if (_toWatchListId == null || _watchedListId == null) {
           await _userProfileService.initializeProfileIfNeeded();
 
-          _toWatchListId ??= await _movieListService
-              .getOrCreateStandardMovieList('to_watch');
-          _watchedListId ??= await _movieListService
-              .getOrCreateStandardMovieList('watched');
+          _toWatchListId ??=
+              await _movieListService.getOrCreateStandardMovieList('to_watch');
+          _watchedListId ??=
+              await _movieListService.getOrCreateStandardMovieList('watched');
         }
 
         // Load data without triggering encryption key validation.

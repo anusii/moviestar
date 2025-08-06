@@ -67,10 +67,9 @@ class ThemeToggleButton extends ConsumerWidget {
     final themeModeNotifier = ref.read(themeModeProvider.notifier);
 
     final isDarkMode = themeMode == ThemeMode.dark;
-    final icon =
-        isDarkMode
-            ? (lightModeIcon ?? Icons.light_mode)
-            : (darkModeIcon ?? Icons.dark_mode);
+    final icon = isDarkMode
+        ? (lightModeIcon ?? Icons.light_mode)
+        : (darkModeIcon ?? Icons.dark_mode);
 
     if (isIconButton) {
       return MarkdownTooltip(

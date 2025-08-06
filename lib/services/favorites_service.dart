@@ -232,8 +232,7 @@ class FavoritesService extends ChangeNotifier {
 
   Future<bool> hasMovieFile(Movie movie) async {
     final hasRating = await getPersonalRating(movie) != null;
-    final hasComment =
-        await getMovieComments(movie) != null &&
+    final hasComment = await getMovieComments(movie) != null &&
         (await getMovieComments(movie))!.isNotEmpty;
     return hasRating || hasComment;
   }

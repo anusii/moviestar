@@ -73,10 +73,9 @@ class SharedMovieList {
       listContent: map['listContent'] ?? '',
       isSharedWithMe: map['isSharedWithMe'] ?? false,
       sharedWith: map['sharedWith']?.cast<String, String>(),
-      sharedDate:
-          map['sharedDate'] != null
-              ? DateTime.tryParse(map['sharedDate'].toString())
-              : null,
+      sharedDate: map['sharedDate'] != null
+          ? DateTime.tryParse(map['sharedDate'].toString())
+          : null,
     );
   }
 
@@ -155,10 +154,9 @@ class MySharedMovieList {
       resourceUrl: map['resourceUrl'] ?? '',
       isMySharedList: map['isMySharedList'] ?? true,
       sharedWith: map['sharedWith']?.cast<String, String>(),
-      sharedDate:
-          map['sharedDate'] != null
-              ? DateTime.tryParse(map['sharedDate'].toString())
-              : null,
+      sharedDate: map['sharedDate'] != null
+          ? DateTime.tryParse(map['sharedDate'].toString())
+          : null,
     );
   }
 

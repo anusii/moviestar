@@ -191,10 +191,9 @@ class FileBrowserState extends State<FileBrowser> {
 
       // Count files in current directory.
 
-      currentDirFileCount =
-          resources.files
-              .where((f) => f.endsWith('.enc.ttl') || f.endsWith('.ttl'))
-              .length;
+      currentDirFileCount = resources.files
+          .where((f) => f.endsWith('.enc.ttl') || f.endsWith('.ttl'))
+          .length;
 
       // Get file counts for all subdirectories.
 
@@ -264,25 +263,24 @@ class FileBrowserState extends State<FileBrowser> {
 
             // Main content area with conditional rendering.
             Expanded(
-              child:
-                  isLoading
-                      ? const FileBrowserLoadingState()
-                      : directories.isEmpty && files.isEmpty
+              child: isLoading
+                  ? const FileBrowserLoadingState()
+                  : directories.isEmpty && files.isEmpty
                       ? const EmptyDirectoryView()
                       : FileBrowserContent(
-                        directories: directories,
-                        files: files,
-                        directoryCounts: directoryCounts,
-                        currentPath: currentPath,
-                        selectedFile: selectedFile,
-                        onDirectorySelected: navigateToDirectory,
-                        onFileSelected: (name, path) {
-                          setState(() => selectedFile = name);
-                          widget.onFileSelected.call(name, path);
-                        },
-                        onFileDownload: widget.onFileDownload,
-                        onFileDelete: widget.onFileDelete,
-                      ),
+                          directories: directories,
+                          files: files,
+                          directoryCounts: directoryCounts,
+                          currentPath: currentPath,
+                          selectedFile: selectedFile,
+                          onDirectorySelected: navigateToDirectory,
+                          onFileSelected: (name, path) {
+                            setState(() => selectedFile = name);
+                            widget.onFileSelected.call(name, path);
+                          },
+                          onFileDownload: widget.onFileDownload,
+                          onFileDelete: widget.onFileDelete,
+                        ),
             ),
           ],
         ),

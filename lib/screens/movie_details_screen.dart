@@ -133,17 +133,20 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     final sharedBy = widget.sharedMovieData!['sharedBy'] as String?;
     final sharedByWebId = widget.sharedMovieData!['sharedByWebId'] as String?;
 
-    // Prefer the formatted name if available
+    // Prefer the formatted name if available.
+
     if (sharedBy != null && sharedBy.isNotEmpty && sharedBy != 'Unknown') {
       return sharedBy;
     }
 
-    // Fall back to WebID if formatted name is not available
+    // Fall back to WebID if formatted name is not available.
+
     if (sharedByWebId != null && sharedByWebId.isNotEmpty) {
       return sharedByWebId;
     }
 
-    // Final fallback
+    // Final fallback.
+
     return 'Unknown';
   }
 
@@ -167,7 +170,8 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   /// Checks if the current movie is in either list.
 
   Future<void> _checkListStatus() async {
-    // Don't check list status for shared movies
+    // Don't check list status for shared movies.
+
     if (_isSharedMovie) {
       setState(() {
         _isInToWatch = false;
@@ -378,7 +382,8 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   /// Checks if the current movie has a file (user has rated or commented).
 
   Future<void> _checkMovieFile() async {
-    // Don't check movie file for shared movies
+    // Don't check movie file for shared movies.
+
     if (_isSharedMovie) {
       setState(() {
         _hasMovieFile = false;

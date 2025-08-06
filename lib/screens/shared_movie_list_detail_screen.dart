@@ -40,6 +40,7 @@ import 'package:moviestar/services/favorites_service_manager.dart';
 ///
 /// Shows the list metadata and all movies within the shared list,
 /// allowing users to view individual movie details.
+
 class SharedMovieListDetailScreen extends ConsumerStatefulWidget {
   final String listName;
   final String listDescription;
@@ -69,7 +70,7 @@ class SharedMovieListDetailScreen extends ConsumerStatefulWidget {
 
 class _SharedMovieListDetailScreenState
     extends ConsumerState<SharedMovieListDetailScreen> {
-  Map<String, String> _movieTitles = {}; // Cache for movie titles
+  Map<String, String> _movieTitles = {}; // Cache for movie titles.
   bool _loadingTitles = true;
 
   @override
@@ -78,7 +79,8 @@ class _SharedMovieListDetailScreenState
     _loadMovieTitles();
   }
 
-  /// Load movie titles from TMDB API for all movies in the list
+  /// Load movie titles from TMDB API for all movies in the list.
+
   Future<void> _loadMovieTitles() async {
     try {
       final cachedMovieService = ref.read(cachedMovieServiceProvider);
@@ -120,14 +122,16 @@ class _SharedMovieListDetailScreenState
     if (webId.isEmpty) return 'Unknown';
 
     try {
-      // For WebIDs like: https://pods.dev.solidcommunity.au/my-moviestar/profile/card#me
+      // For WebIDs like: https://pods.dev.solidcommunity.au/my-moviestar/profile/card#me.
+
       final match = RegExp(r'://[^/]+/([^/]+)/').firstMatch(webId);
       if (match != null) {
         final username = match.group(1) ?? 'Unknown';
         return username.replaceAll('-', ' ');
       }
 
-      // If it doesn't match the expected pattern, return the full WebID
+      // If it doesn't match the expected pattern, return the full WebID.
+
       return webId.length > 30 ? '${webId.substring(0, 30)}...' : webId;
     } catch (e) {
       return webId.length > 30 ? '${webId.substring(0, 30)}...' : webId;
@@ -140,7 +144,8 @@ class _SharedMovieListDetailScreenState
     if (webIdOrUsername.isEmpty) return null;
 
     try {
-      // Case 1: Full WebID like: https://pods.dev.solidcommunity.au/my-moviestar/profile/card#me
+      // Case 1: Full WebID like: https://pods.dev.solidcommunity.au/my-moviestar/profile/card#me.
+
       if (webIdOrUsername.startsWith('http')) {
         final match =
             RegExp(r'(https?://[^/]+/[^/]+/)').firstMatch(webIdOrUsername);
@@ -149,10 +154,12 @@ class _SharedMovieListDetailScreenState
         }
       }
 
-      // Case 2: Just username like: my-moviestar
-      // Need to construct the full URL - assume same POD service as current user
+      // Case 2: Just username like: my-moviestar.
+      // Need to construct the full URL - assume same POD service as current user.
+
       else {
-        // For now, assume pods.dev.solidcommunity.au since that's what the logs show
+        // For now, assume pods.dev.solidcommunity.au since that's what the logs show.
+
         final constructedUrl =
             'https://pods.dev.solidcommunity.au/$webIdOrUsername/';
         return constructedUrl;
@@ -198,7 +205,8 @@ class _SharedMovieListDetailScreenState
         throw Exception('Invalid movie ID');
       }
 
-      // Show loading indicator
+      // Show loading indicator.
+
       if (mounted) {
         showDialog(
           context: context,
@@ -209,19 +217,23 @@ class _SharedMovieListDetailScreenState
         );
       }
 
-      // Fetch full movie details from TMDB API
+      // Fetch full movie details from TMDB API.
+
       final cachedMovieService = ref.read(cachedMovieServiceProvider);
       final movie = await cachedMovieService.getMovieDetails(movieId);
 
-      // Try to fetch individual movie file data to get ratings and comments
+      // Try to fetch individual movie file data to get ratings and comments.
+
       final enhancedMovieData = await _fetchIndividualMovieData(movieData);
 
-      // Dismiss loading indicator
+      // Dismiss loading indicator.
+
       if (mounted) {
         Navigator.of(context).pop();
       }
 
       // Get SharedPreferences and create FavoritesServiceManager.
+
       final prefs = await SharedPreferences.getInstance();
       if (!mounted) return;
 
@@ -230,6 +242,7 @@ class _SharedMovieListDetailScreenState
       final favoritesService = FavoritesServiceAdapter(favoritesServiceManager);
 
       // Navigate to MovieDetailsScreen with enhanced shared movie data.
+
       if (mounted) {
         await Navigator.push(
           context,
@@ -243,7 +256,8 @@ class _SharedMovieListDetailScreenState
         );
       }
     } catch (e) {
-      // Dismiss loading indicator if it's showing
+      // Dismiss loading indicator if it's showing.
+
       if (mounted) {
         Navigator.of(context, rootNavigator: true)
             .popUntil((route) => route.isFirst);
@@ -266,14 +280,16 @@ class _SharedMovieListDetailScreenState
   Future<Map<String, dynamic>> _fetchIndividualMovieData(
       Map<String, dynamic> movieData) async {
     try {
-      // If we already have rating and comments, return as-is
+      // If we already have rating and comments, return as-is.
+
       if (movieData['rating'] != null &&
           movieData['comments'] != null &&
           movieData['comments'].isNotEmpty) {
         return movieData;
       }
 
-      // Construct the expected individual movie file path
+      // Construct the expected individual movie file path.
+
       final movieId = movieData['movieId']?.toString() ?? '';
       if (movieId.isEmpty) {
         return movieData;
@@ -282,17 +298,20 @@ class _SharedMovieListDetailScreenState
       final ownerWebId = widget.ownerWebId;
       final individualMovieFileName = 'movies/Movie-$movieId.ttl';
 
-      // Extract base URL from WebID like: https://pods.dev.solidcommunity.au/my-moviestar/profile/card#me
-      // Should become: https://pods.dev.solidcommunity.au/my-moviestar/
+      // Extract base URL from WebID like: https://pods.dev.solidcommunity.au/my-moviestar/profile/card#me.
+      // Should become: https://pods.dev.solidcommunity.au/my-moviestar/.
+
       final baseUrl = _extractBaseUrlFromWebId(ownerWebId);
       if (baseUrl == null) {
         return movieData;
       }
 
-      // Construct the full resource URL
+      // Construct the full resource URL.
+
       final resourceUrl = '${baseUrl}moviestar/data/$individualMovieFileName';
 
-      // Try to read the individual movie file from the owner's POD
+      // Try to read the individual movie file from the owner's POD.
+
       final movieFileContent = await readExternalPod(
         resourceUrl,
         context,
@@ -305,11 +324,13 @@ class _SharedMovieListDetailScreenState
         return movieData;
       }
 
-      // Parse the movie file content to extract rating and comments
+      // Parse the movie file content to extract rating and comments.
+
       final parsedData = await _parseIndividualMovieData(movieFileContent);
 
       if (parsedData != null) {
-        // Merge the parsed data with the original movie data
+        // Merge the parsed data with the original movie data.
+
         final enhancedData = Map<String, dynamic>.from(movieData);
         if (parsedData['rating'] != null) {
           enhancedData['rating'] = parsedData['rating'];
@@ -323,7 +344,7 @@ class _SharedMovieListDetailScreenState
       return movieData;
     } catch (e) {
       debugPrint('❌ Error fetching individual movie data: $e');
-      return movieData; // Return original data if fetching fails
+      return movieData; // Return original data if fetching fails.
     }
   }
 
@@ -346,13 +367,15 @@ class _SharedMovieListDetailScreenState
         comments = userData['comment'] as String?;
       }
 
-      // If no JSON backup, try TTL parsing (fallback)
+      // If no JSON backup, try TTL parsing (fallback).
+
       if (rating == null && comments == null) {
         final lines = ttlContent.split('\n');
         for (final line in lines) {
           final trimmedLine = line.trim();
 
-          // Extract rating
+          // Extract rating.
+
           if (rating == null && trimmedLine.contains('schema:ratingValue')) {
             final match = RegExp(r'"?([0-9.]+)"?').firstMatch(trimmedLine);
             if (match != null) {
@@ -360,7 +383,8 @@ class _SharedMovieListDetailScreenState
             }
           }
 
-          // Extract comments
+          // Extract comments.
+
           if (comments == null && trimmedLine.contains('schema:reviewBody')) {
             final match = RegExp(r'"([^"]*)"').firstMatch(trimmedLine);
             if (match != null) {
@@ -395,7 +419,8 @@ class _SharedMovieListDetailScreenState
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // List metadata header
+          // List metadata header.
+
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -559,7 +584,8 @@ class _SharedMovieListDetailScreenState
               ],
             ),
           ),
-          // Movies list
+          // Movies list.
+
           Expanded(
             child: widget.movies.isEmpty
                 ? const Center(
@@ -599,7 +625,8 @@ class _SharedMovieListDetailScreenState
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Movie header
+                                // Movie header.
+
                                 Row(
                                   children: [
                                     Container(
@@ -650,7 +677,8 @@ class _SharedMovieListDetailScreenState
                                     ),
                                   ],
                                 ),
-                                // Movie comments
+                                // Movie comments.
+
                                 if (comments.isNotEmpty) ...[
                                   const SizedBox(height: 12),
                                   Container(

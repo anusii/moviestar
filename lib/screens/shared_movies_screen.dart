@@ -120,6 +120,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
           if (!mounted) break;
 
           // Check if this is a movie file.
+
           if (resourceUrl.contains('/movies/') &&
               resourceUrl.endsWith('.ttl')) {
             // Read the movie file content.
@@ -163,7 +164,8 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
         }
       }
 
-      // Combine movie data and movie list data
+      // Combine movie data and movie list data.
+
       final combinedData = <String, dynamic>{};
       if (movieData.isNotEmpty) {
         combinedData['movies'] = movieData;
@@ -365,11 +367,13 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
       final rawSharedBy =
           resourceInfo['granter'] ?? resourceInfo['granterWebId'];
 
-      // Try to extract owner from resource URL if not found in resourceInfo
+      // Try to extract owner from resource URL if not found in resourceInfo.
+
       String finalOwner = rawOwner?.toString() ?? '';
       String finalSharedBy = rawSharedBy?.toString() ?? '';
 
-      // Extract from resource URL for both owner and shared by if not found in metadata
+      // Extract from resource URL for both owner and shared by if not found in metadata.
+
       final ownerMatch = RegExp(r'://[^/]+/([^/]+)/').firstMatch(resourceUrl);
       if (ownerMatch != null) {
         final username = ownerMatch.group(1);
@@ -381,16 +385,16 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
         }
         if (finalSharedBy.isEmpty) {
           finalSharedBy =
-              webId; // Use same WebID for shared by when not available
+              webId; // Use same WebID for shared by when not available.
         }
       }
 
       final result = {
         'fileName': movieTitle,
         'owner': _formatWebId(finalOwner),
-        'ownerWebId': finalOwner, // Store full WebID for URL construction
+        'ownerWebId': finalOwner, // Store full WebID for URL construction.
         'sharedBy': _formatWebId(finalSharedBy),
-        'sharedByWebId': finalSharedBy, // Store full WebID for URL construction
+        'sharedByWebId': finalSharedBy, // Store full WebID for URL construction.
         'permissions': resourceInfo['permissions'] ??
             resourceInfo['permissionList'] ??
             'read',
@@ -469,7 +473,8 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
 
         if (trimmedLine.contains('moviestar-onto:hasMovie') ||
             trimmedLine.contains(':hasMovie')) {
-          // Extract movie IDs from the line like: moviestar-data:movie-5fc3b7da690126
+          // Extract movie IDs from the line like: moviestar-data:movie-5fc3b7da690126.
+
           final movieMatches =
               RegExp(r'moviestar-data:movie-(\w+)').allMatches(trimmedLine);
           for (final match in movieMatches) {
@@ -495,11 +500,13 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
           resourceInfo['sharedBy'] ??
           resourceInfo['sharer'];
 
-      // Try to extract owner from resource URL if not found in resourceInfo
+      // Try to extract owner from resource URL if not found in resourceInfo.
+
       String finalOwner = rawOwner?.toString() ?? '';
       String finalSharedBy = rawSharedBy?.toString() ?? '';
 
-      // Extract from resource URL for both owner and shared by if not found in metadata
+      // Extract from resource URL for both owner and shared by if not found in metadata.
+
       final ownerMatch = RegExp(r'://[^/]+/([^/]+)/').firstMatch(resourceUrl);
       if (ownerMatch != null) {
         final username = ownerMatch.group(1);
@@ -511,30 +518,25 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
         }
         if (finalSharedBy.isEmpty) {
           finalSharedBy =
-              webId; // Use same WebID for shared by when not available
+              webId; // Use same WebID for shared by when not available.
         }
       }
-
-      // Debug output to see what's available
-      debugPrint('📝 Resource info keys: ${resourceInfo.keys.toList()}');
-      debugPrint('📝 Raw owner: $rawOwner');
-      debugPrint('📝 Raw shared by: $rawSharedBy');
-      debugPrint('📝 Final owner: $finalOwner');
-      debugPrint('📝 Final shared by: $finalSharedBy');
 
       final result = {
         'listId': listId ?? 'unknown',
         'listName': listName,
         'description': description,
-        'movieCount': movieIds.length, // Use extracted movie IDs count
+        'movieCount': movieIds.length, // Use extracted movie IDs count.
+
         'movieIds': movieIds,
         'movies': movieIds
             .map((movieIdStr) => {
                   'movieId': movieIdStr,
                   'fileName':
-                      'Movie $movieIdStr', // Placeholder - will fetch details on-demand
+                      'Movie $movieIdStr', // Placeholder - will fetch details on-demand.
                   'owner': _formatWebId(finalOwner),
-                  'ownerWebId': finalOwner, // Inherit from parent list
+                  'ownerWebId': finalOwner, // Inherit from parent list.
+
                   'sharedBy': _formatWebId(finalSharedBy),
                   'sharedByWebId': finalSharedBy, // Inherit from parent list
                 })

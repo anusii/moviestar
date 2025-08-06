@@ -30,6 +30,8 @@ import 'package:flutter/material.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/models/movie_list_operation.dart';
+import 'package:moviestar/models/shared_movie_list.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
@@ -757,11 +759,11 @@ class MovieListService {
 
   /// Gets movie lists that have been shared with the current user.
   ///
-  /// Returns a map where keys are list URLs and values contain list metadata.
+  /// Returns a list of SharedMovieList objects representing lists shared with the user.
 
-  Future<Map<String, dynamic>> getSharedLists() async {
+  Future<List<SharedMovieList>> getSharedLists() async {
     try {
-      if (!_context.mounted) return {};
+      if (!_context.mounted) return [];
 
       // Get shared resources from POD.
 
@@ -769,15 +771,15 @@ class MovieListService {
 
       if (sharedResourcesResult == SolidFunctionCallStatus.notLoggedIn) {
         debugPrint('❌ User not logged in to POD');
-        return {};
+        return [];
       }
 
       if (sharedResourcesResult is! Map) {
         debugPrint('❌ Invalid shared resources data');
-        return {};
+        return [];
       }
 
-      final Map<String, dynamic> sharedLists = {};
+      final List<SharedMovieList> sharedLists = [];
 
       // Filter for MovieList files and fetch their content.
 
@@ -805,13 +807,14 @@ class MovieListService {
                   TurtleSerializer.movieListFromTurtle(listContent);
 
               if (parsedList != null) {
-                sharedLists[resourceUrl] = {
+                final sharedMovieList = SharedMovieList.fromMap(resourceUrl, {
                   ...parsedList,
                   'resourceUrl': resourceUrl,
                   'resourceInfo': resourceInfo,
                   'listContent': listContent,
                   'isSharedWithMe': true,
-                };
+                });
+                sharedLists.add(sharedMovieList);
               }
             }
           } catch (e) {
@@ -823,23 +826,23 @@ class MovieListService {
       return sharedLists;
     } catch (e) {
       debugPrint('❌ Failed to get shared lists: $e');
-      return {};
+      return [];
     }
   }
 
   /// Gets movie lists that the current user has shared with others.
   ///
-  /// Returns a map where keys are list IDs and values contain list metadata and sharing info.
+  /// Returns a list of MySharedMovieList objects representing lists the user has shared.
 
-  Future<Map<String, dynamic>> getMySharedLists() async {
+  Future<List<MySharedMovieList>> getMySharedLists() async {
     try {
       final loggedIn = await isLoggedIn();
-      if (!loggedIn) return {};
+      if (!loggedIn) return [];
 
       // Get current user's WebID to construct the user_lists directory URL.
 
       final currentWebId = await getWebId();
-      if (currentWebId == null) return {};
+      if (currentWebId == null) return [];
 
       final webIdWithoutCard = currentWebId.replaceAll('/profile/card#me', '');
       final userListsDir = '$webIdWithoutCard/moviestar/data/user_lists/';
@@ -847,7 +850,7 @@ class MovieListService {
       // Get resources in the user_lists container.
 
       final resources = await getResourcesInContainer(userListsDir);
-      final Map<String, dynamic> mySharedLists = {};
+      final List<MySharedMovieList> mySharedLists = [];
 
       // Process each MovieList file.
 
@@ -875,12 +878,13 @@ class MovieListService {
           final sharedWith = movieList['sharedWith'] as Map<String, String>?;
 
           if (sharedWith != null && sharedWith.isNotEmpty) {
-            mySharedLists[listId] = {
+            final mySharedMovieList = MySharedMovieList.fromMap(listId, {
               ...movieList,
               'fileName': fileName,
               'resourceUrl': '$userListsDir$fileName',
               'isMySharedList': true,
-            };
+            });
+            mySharedLists.add(mySharedMovieList);
           }
         } catch (e) {
           debugPrint('⚠️ Could not check sharing status for list $listId: $e');
@@ -890,7 +894,7 @@ class MovieListService {
       return mySharedLists;
     } catch (e) {
       debugPrint('❌ Failed to get my shared lists: $e');
-      return {};
+      return [];
     }
   }
 
@@ -1003,10 +1007,9 @@ class MovieListService {
   }
 
   /// Checks if the current user can perform a specific operation on a MovieList.
-  ///
-  /// Operations: 'read', 'write', 'delete', 'share'
 
-  Future<bool> canUserPerformOperation(String listId, String operation) async {
+  Future<bool> canUserPerformOperation(
+      String listId, MovieListOperation operation) async {
     try {
       final currentWebId = await getWebId();
       if (currentWebId == null) return false;
@@ -1016,18 +1019,16 @@ class MovieListService {
 
       // Map operations to required permission levels.
 
-      switch (operation.toLowerCase()) {
-        case 'read':
+      switch (operation) {
+        case MovieListOperation.read:
           return ['read', 'write', 'control'].contains(permission);
-        case 'write':
-        case 'add':
-        case 'remove':
+        case MovieListOperation.write:
+        case MovieListOperation.add:
+        case MovieListOperation.remove:
           return ['write', 'control'].contains(permission);
-        case 'delete':
-        case 'share':
+        case MovieListOperation.delete:
+        case MovieListOperation.share:
           return permission == 'control';
-        default:
-          return false;
       }
     } catch (e) {
       debugPrint('❌ Failed to check user permissions: $e');

@@ -121,9 +121,10 @@ class FileServiceNotifier extends StateNotifier<FileState> {
       // Extract the subdirectory path.
 
       String? subPath = state.currentPath?.replaceFirst(basePath, '').trim();
-      String uploadPath = subPath == null || subPath.isEmpty
-          ? remoteFileName
-          : '${subPath.startsWith("/") ? subPath.substring(1) : subPath}/$remoteFileName';
+      String uploadPath =
+          subPath == null || subPath.isEmpty
+              ? remoteFileName
+              : '${subPath.startsWith("/") ? subPath.substring(1) : subPath}/$remoteFileName';
 
       // debugPrint('Upload path: $uploadPath');
 
@@ -187,7 +188,8 @@ class FileServiceNotifier extends StateNotifier<FileState> {
 
       String? outputFile = await FilePicker.platform.saveFile(
         dialogTitle: 'Save file as:',
-        fileName: state.cleanFileName ??
+        fileName:
+            state.cleanFileName ??
             state.remoteFileName?.replaceAll('.enc.ttl', ''),
       );
 
@@ -197,9 +199,10 @@ class FileServiceNotifier extends StateNotifier<FileState> {
       }
 
       final baseDir = basePath;
-      final relativePath = state.currentPath == baseDir
-          ? '$baseDir/${state.remoteFileName}'
-          : '${state.currentPath}/${state.remoteFileName}';
+      final relativePath =
+          state.currentPath == baseDir
+              ? '$baseDir/${state.remoteFileName}'
+              : '${state.currentPath}/${state.remoteFileName}';
 
       // debugPrint('Attempting to download from path: $relativePath');
 
@@ -284,9 +287,10 @@ class FileServiceNotifier extends StateNotifier<FileState> {
       state = state.copyWith(deleteInProgress: true, deleteDone: false);
 
       final baseDir = basePath;
-      final filePath = state.currentPath == baseDir
-          ? '$baseDir/${state.remoteFileName}'
-          : '${state.currentPath}/${state.remoteFileName}';
+      final filePath =
+          state.currentPath == baseDir
+              ? '$baseDir/${state.remoteFileName}'
+              : '${state.currentPath}/${state.remoteFileName}';
 
       // debugPrint('Attempting to delete file at path: $filePath');
 
@@ -351,10 +355,11 @@ class FileServiceNotifier extends StateNotifier<FileState> {
 
       // Provide user-friendly error messages.
 
-      final message = e.toString().contains('404') ||
-              e.toString().contains('NotFoundHttpError')
-          ? 'File not found or already deleted'
-          : 'Delete failed: ${e.toString()}';
+      final message =
+          e.toString().contains('404') ||
+                  e.toString().contains('NotFoundHttpError')
+              ? 'File not found or already deleted'
+              : 'Delete failed: ${e.toString()}';
 
       showAlert(context, message);
       debugPrint('Delete error: $e');
@@ -376,10 +381,10 @@ class FileServiceNotifier extends StateNotifier<FileState> {
 
 final fileServiceProvider =
     StateNotifierProvider<FileServiceNotifier, FileState>((ref) {
-  return FileServiceNotifier(
-    isVaccination: false,
-    isDiary: false,
-    isMedication: false,
-    isBloodPressure: false,
-  );
-});
+      return FileServiceNotifier(
+        isVaccination: false,
+        isDiary: false,
+        isMedication: false,
+        isBloodPressure: false,
+      );
+    });

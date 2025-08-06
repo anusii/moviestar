@@ -113,9 +113,10 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
                             .read(themeModeProvider.notifier)
                             .toggleTheme();
                       },
-                      tooltip: isDarkMode
-                          ? 'Switch to light mode'
-                          : 'Switch to dark mode',
+                      tooltip:
+                          isDarkMode
+                              ? 'Switch to light mode'
+                              : 'Switch to dark mode',
                     );
                   },
                 ),
@@ -127,40 +128,43 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
       body: RefreshIndicator(
         onRefresh: _forceRefresh,
         child: upcomingMoviesAsync.when(
-          data: (cacheResult) => ListView.builder(
-            itemCount: cacheResult.data.length,
-            itemBuilder: (context, index) {
-              final movie = cacheResult.data[index];
-              return MovieCard.listItem(
-                movie: movie,
-                fromCache: cacheResult.fromCache,
-                cacheAge: cacheResult.cacheAge,
-                cacheOnlyMode: cacheOnlyMode,
-                favoritesService: widget.favoritesService,
-                parentWidget: widget,
-                customSubtitle: Text(
-                  'Release Date: ${DateFormatUtil.formatNumeric(movie.releaseDate)}',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MovieDetailsScreen(
-                        movie: movie,
-                        favoritesService: widget.favoritesService,
-                      ),
+          data:
+              (cacheResult) => ListView.builder(
+                itemCount: cacheResult.data.length,
+                itemBuilder: (context, index) {
+                  final movie = cacheResult.data[index];
+                  return MovieCard.listItem(
+                    movie: movie,
+                    fromCache: cacheResult.fromCache,
+                    cacheAge: cacheResult.cacheAge,
+                    cacheOnlyMode: cacheOnlyMode,
+                    favoritesService: widget.favoritesService,
+                    parentWidget: widget,
+                    customSubtitle: Text(
+                      'Release Date: ${DateFormatUtil.formatNumeric(movie.releaseDate)}',
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => MovieDetailsScreen(
+                                movie: movie,
+                                favoritesService: widget.favoritesService,
+                              ),
+                        ),
+                      );
+                    },
                   );
                 },
-              );
-            },
-          ),
+              ),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => ErrorDisplayWidget(
-            message: 'Failed to load upcoming movies',
-            onRetry: _forceRefresh,
-          ),
+          error:
+              (error, stack) => ErrorDisplayWidget(
+                message: 'Failed to load upcoming movies',
+                onRetry: _forceRefresh,
+              ),
         ),
       ),
     );

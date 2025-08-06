@@ -147,16 +147,15 @@ class _SharedMovieListDetailScreenState
       // Case 1: Full WebID like: https://pods.dev.solidcommunity.au/my-moviestar/profile/card#me.
 
       if (webIdOrUsername.startsWith('http')) {
-        final match =
-            RegExp(r'(https?://[^/]+/[^/]+/)').firstMatch(webIdOrUsername);
+        final match = RegExp(
+          r'(https?://[^/]+/[^/]+/)',
+        ).firstMatch(webIdOrUsername);
         if (match != null) {
           return match.group(1);
         }
       }
-
       // Case 2: Just username like: my-moviestar.
       // Need to construct the full URL - assume same POD service as current user.
-
       else {
         // For now, assume pods.dev.solidcommunity.au since that's what the logs show.
 
@@ -187,10 +186,7 @@ class _SharedMovieListDetailScreenState
         const SizedBox(width: 4),
         Text(
           ratingValue.toStringAsFixed(1),
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         ),
       ],
     );
@@ -211,9 +207,8 @@ class _SharedMovieListDetailScreenState
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) => const Center(
-            child: CircularProgressIndicator(),
-          ),
+          builder:
+              (context) => const Center(child: CircularProgressIndicator()),
         );
       }
 
@@ -237,8 +232,11 @@ class _SharedMovieListDetailScreenState
       final prefs = await SharedPreferences.getInstance();
       if (!mounted) return;
 
-      final favoritesServiceManager =
-          FavoritesServiceManager(prefs, context, widget);
+      final favoritesServiceManager = FavoritesServiceManager(
+        prefs,
+        context,
+        widget,
+      );
       final favoritesService = FavoritesServiceAdapter(favoritesServiceManager);
 
       // Navigate to MovieDetailsScreen with enhanced shared movie data.
@@ -247,11 +245,12 @@ class _SharedMovieListDetailScreenState
         await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => MovieDetailsScreen(
-              movie: movie,
-              favoritesService: favoritesService,
-              sharedMovieData: enhancedMovieData,
-            ),
+            builder:
+                (context) => MovieDetailsScreen(
+                  movie: movie,
+                  favoritesService: favoritesService,
+                  sharedMovieData: enhancedMovieData,
+                ),
           ),
         );
       }
@@ -259,8 +258,10 @@ class _SharedMovieListDetailScreenState
       // Dismiss loading indicator if it's showing.
 
       if (mounted) {
-        Navigator.of(context, rootNavigator: true)
-            .popUntil((route) => route.isFirst);
+        Navigator.of(
+          context,
+          rootNavigator: true,
+        ).popUntil((route) => route.isFirst);
       }
 
       debugPrint('Error navigating to movie details: $e');
@@ -278,7 +279,8 @@ class _SharedMovieListDetailScreenState
   // Attempts to fetch individual movie file data to get ratings and comments.
 
   Future<Map<String, dynamic>> _fetchIndividualMovieData(
-      Map<String, dynamic> movieData) async {
+    Map<String, dynamic> movieData,
+  ) async {
     try {
       // If we already have rating and comments, return as-is.
 
@@ -351,14 +353,16 @@ class _SharedMovieListDetailScreenState
   // Parses individual movie file content to extract rating and comments.
 
   Future<Map<String, dynamic>?> _parseIndividualMovieData(
-      String ttlContent) async {
+    String ttlContent,
+  ) async {
     try {
       double? rating;
       String? comments;
 
       // Try to parse JSON backup data first (more reliable)
-      final userJsonMatch =
-          RegExp(r'# JSON_USER_DATA: (.+)').firstMatch(ttlContent);
+      final userJsonMatch = RegExp(
+        r'# JSON_USER_DATA: (.+)',
+      ).firstMatch(ttlContent);
 
       if (userJsonMatch != null) {
         final userJsonData = userJsonMatch.group(1)!;
@@ -395,10 +399,7 @@ class _SharedMovieListDetailScreenState
       }
 
       if (rating != null || (comments != null && comments.isNotEmpty)) {
-        return {
-          'rating': rating,
-          'comments': comments,
-        };
+        return {'rating': rating, 'comments': comments};
       }
 
       return null;
@@ -420,7 +421,6 @@ class _SharedMovieListDetailScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // List metadata header.
-
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -439,10 +439,9 @@ class _SharedMovieListDetailScreenState
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withValues(alpha: 0.1),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -458,22 +457,20 @@ class _SharedMovieListDetailScreenState
                         children: [
                           Text(
                             widget.listName,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             '${widget.movies.length} movies',
-                            style:
-                                Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                    ),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyLarge?.copyWith(
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                            ),
                           ),
                         ],
                       ),
@@ -485,8 +482,8 @@ class _SharedMovieListDetailScreenState
                   Text(
                     widget.listDescription,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontStyle: FontStyle.italic,
-                        ),
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
                 ],
                 const SizedBox(height: 16),
@@ -501,9 +498,10 @@ class _SharedMovieListDetailScreenState
                               Icon(
                                 Icons.person,
                                 size: 16,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                               ),
                               const SizedBox(width: 4),
                               Text(
@@ -518,9 +516,10 @@ class _SharedMovieListDetailScreenState
                               Icon(
                                 Icons.share,
                                 size: 16,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                               ),
                               const SizedBox(width: 4),
                               Text(
@@ -534,22 +533,24 @@ class _SharedMovieListDetailScreenState
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
-                        color: widget.permissions.contains('read')
-                            ? Theme.of(context)
-                                .colorScheme
-                                .tertiary
-                                .withValues(alpha: 0.1)
-                            : Theme.of(context)
-                                .colorScheme
-                                .error
-                                .withValues(alpha: 0.1),
+                        color:
+                            widget.permissions.contains('read')
+                                ? Theme.of(
+                                  context,
+                                ).colorScheme.tertiary.withValues(alpha: 0.1)
+                                : Theme.of(
+                                  context,
+                                ).colorScheme.error.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: widget.permissions.contains('read')
-                              ? Theme.of(context).colorScheme.tertiary
-                              : Theme.of(context).colorScheme.error,
+                          color:
+                              widget.permissions.contains('read')
+                                  ? Theme.of(context).colorScheme.tertiary
+                                  : Theme.of(context).colorScheme.error,
                           width: 1,
                         ),
                       ),
@@ -561,9 +562,10 @@ class _SharedMovieListDetailScreenState
                                 ? Icons.visibility
                                 : Icons.visibility_off,
                             size: 14,
-                            color: widget.permissions.contains('read')
-                                ? Theme.of(context).colorScheme.tertiary
-                                : Theme.of(context).colorScheme.error,
+                            color:
+                                widget.permissions.contains('read')
+                                    ? Theme.of(context).colorScheme.tertiary
+                                    : Theme.of(context).colorScheme.error,
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -571,9 +573,10 @@ class _SharedMovieListDetailScreenState
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: widget.permissions.contains('read')
-                                  ? Theme.of(context).colorScheme.tertiary
-                                  : Theme.of(context).colorScheme.error,
+                              color:
+                                  widget.permissions.contains('read')
+                                      ? Theme.of(context).colorScheme.tertiary
+                                      : Theme.of(context).colorScheme.error,
                             ),
                           ),
                         ],
@@ -584,159 +587,164 @@ class _SharedMovieListDetailScreenState
               ],
             ),
           ),
+
           // Movies list.
-
           Expanded(
-            child: widget.movies.isEmpty
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24.0),
-                      child: Text(
-                        'No movies in this list',
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: widget.movies.length,
-                    itemBuilder: (context, index) {
-                      final movieData = widget.movies[index];
-                      final movieId = movieData['movieId']?.toString() ?? '0';
-                      final movieTitle = _loadingTitles
-                          ? 'Loading...'
-                          : (_movieTitles[movieId] ??
-                              movieData['fileName'] ??
-                              'Unknown Movie');
-                      final rating = movieData['rating'];
-                      final comments = movieData['comments'] ?? '';
-
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+            child:
+                widget.movies.isEmpty
+                    ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(24.0),
+                        child: Text(
+                          'No movies in this list',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
                         ),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: () => _navigateToMovieDetails(movieData),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Movie header.
+                      ),
+                    )
+                    : ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: widget.movies.length,
+                      itemBuilder: (context, index) {
+                        final movieData = widget.movies[index];
+                        final movieId = movieData['movieId']?.toString() ?? '0';
+                        final movieTitle =
+                            _loadingTitles
+                                ? 'Loading...'
+                                : (_movieTitles[movieId] ??
+                                    movieData['fileName'] ??
+                                    'Unknown Movie');
+                        final rating = movieData['rating'];
+                        final comments = movieData['comments'] ?? '';
 
-                                Row(
-                                  children: [
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () => _navigateToMovieDetails(movieData),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Movie header.
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                              .withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          Icons.movie,
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                          size: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              movieTitle,
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.titleMedium?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            if (rating != null) ...[
+                                              const SizedBox(height: 4),
+                                              _buildRatingDisplay(rating),
+                                            ],
+                                          ],
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: 16,
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
+                                      ),
+                                    ],
+                                  ),
+
+                                  // Movie comments.
+                                  if (comments.isNotEmpty) ...[
+                                    const SizedBox(height: 12),
                                     Container(
-                                      padding: const EdgeInsets.all(8),
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
                                         color: Theme.of(context)
                                             .colorScheme
-                                            .primary
-                                            .withValues(alpha: 0.1),
+                                            .surfaceContainerHighest
+                                            .withValues(alpha: 0.3),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      child: Icon(
-                                        Icons.movie,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        size: 20,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            movieTitle,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.comment,
+                                                size: 14,
+                                                color:
+                                                    Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurfaceVariant,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                'Review:',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .labelSmall
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                              ),
+                                            ],
                                           ),
-                                          if (rating != null) ...[
-                                            const SizedBox(height: 4),
-                                            _buildRatingDisplay(rating),
-                                          ],
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            comments,
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.bodySmall?.copyWith(
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
-                                    Icon(
-                                      Icons.arrow_forward_ios,
-                                      size: 16,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                    ),
                                   ],
-                                ),
-                                // Movie comments.
-
-                                if (comments.isNotEmpty) ...[
-                                  const SizedBox(height: 12),
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .surfaceContainerHighest
-                                          .withValues(alpha: 0.3),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              Icons.comment,
-                                              size: 14,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurfaceVariant,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              'Review:',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .labelSmall
-                                                  ?.copyWith(
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          comments,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall
-                                              ?.copyWith(
-                                                fontStyle: FontStyle.italic,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
                                 ],
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    ),
           ),
         ],
       ),

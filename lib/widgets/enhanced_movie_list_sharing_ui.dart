@@ -155,9 +155,10 @@ class _EnhancedMovieListSharingUiState
 
   void _updateSelectedRecipient() {
     selectedRecipient = RecipientType.individual;
-    selectedRecipientDetails = webIdController.text.isNotEmpty
-        ? 'Individual: ${webIdController.text}'
-        : 'Individual (WebID required)';
+    selectedRecipientDetails =
+        webIdController.text.isNotEmpty
+            ? 'Individual: ${webIdController.text}'
+            : 'Individual (WebID required)';
   }
 
   // Load current sharing information for this movie list.
@@ -165,12 +166,16 @@ class _EnhancedMovieListSharingUiState
   Future<void> _loadCurrentSharingInfo() async {
     try {
       debugPrint(
-          '🔄 Loading current sharing info for listId: ${widget.listId}');
+        '🔄 Loading current sharing info for listId: ${widget.listId}',
+      );
 
       // Create a temporary MovieListService to get sharing information
       final userProfileService = UserProfileService(context, widget.child);
-      final movieListService =
-          MovieListService(context, widget.child, userProfileService);
+      final movieListService = MovieListService(
+        context,
+        widget.child,
+        userProfileService,
+      );
 
       // Get the movie list data
       debugPrint('📖 Getting movie list data...');
@@ -185,7 +190,8 @@ class _EnhancedMovieListSharingUiState
         Map<String, String>? finalSharingInfo = sharedWith;
         if (sharedWith == null || sharedWith.isEmpty) {
           debugPrint(
-              '🔍 TTL metadata empty, trying alternative permission detection...');
+            '🔍 TTL metadata empty, trying alternative permission detection...',
+          );
 
           // Alternative: Check if we can detect shared permissions through POD queries
           // This is a fallback approach when TTL metadata is corrupted
@@ -193,7 +199,8 @@ class _EnhancedMovieListSharingUiState
             final alternativeSharing = await _detectAlternativeSharing();
             if (alternativeSharing != null && alternativeSharing.isNotEmpty) {
               debugPrint(
-                  '✅ Found alternative sharing info: $alternativeSharing');
+                '✅ Found alternative sharing info: $alternativeSharing',
+              );
               finalSharingInfo = alternativeSharing;
             }
           } catch (e) {
@@ -258,24 +265,30 @@ class _EnhancedMovieListSharingUiState
   Future<void> _updateMovieListWithSharingMetadataV2() async {
     try {
       debugPrint(
-          '🔄 Starting to update movie list with sharing metadata (V3 - Direct TTL update)...');
+        '🔄 Starting to update movie list with sharing metadata (V3 - Direct TTL update)...',
+      );
 
       // Create a temporary MovieListService to get current data
       final userProfileService = UserProfileService(context, widget.child);
-      final movieListService =
-          MovieListService(context, widget.child, userProfileService);
+      final movieListService = MovieListService(
+        context,
+        widget.child,
+        userProfileService,
+      );
 
       // Get the current movie list data
       debugPrint(
-          '📖 Getting current movie list data for listId: ${widget.listId}');
+        '📖 Getting current movie list data for listId: ${widget.listId}',
+      );
       final movieList = await movieListService.getMovieList(widget.listId);
 
       if (movieList != null) {
         debugPrint('✅ Found movie list: ${movieList['name']}');
 
         // Get current sharing metadata
-        final sharedWith =
-            Map<String, String>.from(movieList['sharedWith'] ?? {});
+        final sharedWith = Map<String, String>.from(
+          movieList['sharedWith'] ?? {},
+        );
         debugPrint('📋 Current sharedWith: $sharedWith');
 
         // Add the new recipient with the selected permissions
@@ -283,7 +296,8 @@ class _EnhancedMovieListSharingUiState
         final newWebId = webIdController.text;
         sharedWith[newWebId] = permissions;
         debugPrint(
-            '➕ Adding new recipient: $newWebId with permissions: $permissions');
+          '➕ Adding new recipient: $newWebId with permissions: $permissions',
+        );
         debugPrint('📋 Updated sharedWith: $sharedWith');
 
         // Create updated TTL content with new sharing metadata
@@ -299,13 +313,15 @@ class _EnhancedMovieListSharingUiState
 
         debugPrint('📄 Generated TTL content length: ${updatedTtl.length}');
         debugPrint('📄 Generated TTL content (first 500 chars):');
-        debugPrint(updatedTtl.length > 500
-            ? updatedTtl.substring(0, 500)
-            : updatedTtl);
+        debugPrint(
+          updatedTtl.length > 500 ? updatedTtl.substring(0, 500) : updatedTtl,
+        );
         debugPrint('📄 Generated TTL content (last 500 chars):');
-        debugPrint(updatedTtl.length > 500
-            ? updatedTtl.substring(updatedTtl.length - 500)
-            : updatedTtl);
+        debugPrint(
+          updatedTtl.length > 500
+              ? updatedTtl.substring(updatedTtl.length - 500)
+              : updatedTtl,
+        );
 
         // Write the updated movie list file
         debugPrint('💾 Writing updated movie list file...');
@@ -319,7 +335,8 @@ class _EnhancedMovieListSharingUiState
 
         if (result == SolidFunctionCallStatus.success) {
           debugPrint(
-              '✅ Successfully updated movie list with sharing metadata (V3)');
+            '✅ Successfully updated movie list with sharing metadata (V3)',
+          );
 
           // Clear the cache so it reloads fresh data
           movieListService.clearCache();
@@ -341,7 +358,8 @@ class _EnhancedMovieListSharingUiState
               debugPrint('✅ File verification successful - lengths match');
             } else {
               debugPrint(
-                  '⚠️ File verification warning - length mismatch: expected ${updatedTtl.length}, got ${verifyContent.length}');
+                '⚠️ File verification warning - length mismatch: expected ${updatedTtl.length}, got ${verifyContent.length}',
+              );
             }
 
             // Check if sharing metadata is present in TTL
@@ -355,7 +373,8 @@ class _EnhancedMovieListSharingUiState
           }
         } else {
           debugPrint(
-              '❌ Failed to update movie list with sharing metadata. Result: $result');
+            '❌ Failed to update movie list with sharing metadata. Result: $result',
+          );
         }
       } else {
         debugPrint('❌ Movie list not found for listId: ${widget.listId}');
@@ -443,7 +462,8 @@ class _EnhancedMovieListSharingUiState
           try {
             // First, ensure the individual movie file exists
             debugPrint(
-                '🎬 Ensuring movie file exists for: ${movie.title} (${movie.id})');
+              '🎬 Ensuring movie file exists for: ${movie.title} (${movie.id})',
+            );
             await _createMovieFileIfNotExists(movie);
 
             // Then share the movie file
@@ -463,7 +483,8 @@ class _EnhancedMovieListSharingUiState
               debugPrint('✅ Successfully shared movie: ${movie.title}');
             } else {
               debugPrint(
-                  '❌ Failed to share movie ${movie.title}: $movieResult');
+                '❌ Failed to share movie ${movie.title}: $movieResult',
+              );
             }
           } catch (e) {
             debugPrint('❌ Error sharing movie ${movie.title}: $e');
@@ -481,7 +502,8 @@ class _EnhancedMovieListSharingUiState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Successfully shared "${widget.listName}" and ${widget.movies.length} movies!'),
+              'Successfully shared "${widget.listName}" and ${widget.movies.length} movies!',
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -490,7 +512,7 @@ class _EnhancedMovieListSharingUiState
         if (mounted) {
           setState(() {
             _currentSharingInfo = {
-              webIdController.text: selectedPermList.join(',')
+              webIdController.text: selectedPermList.join(','),
             };
             _isLoadingSharingInfo = false;
           });
@@ -519,7 +541,8 @@ class _EnhancedMovieListSharingUiState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: widget.backgroundColor,
-      appBar: widget.customAppBar ??
+      appBar:
+          widget.customAppBar ??
           AppBar(
             title: Text('Share "${widget.listName}"'),
             backgroundColor: Theme.of(context).colorScheme.primary,
@@ -608,9 +631,9 @@ class _EnhancedMovieListSharingUiState
               const SizedBox(height: 12),
               Text(
                 'Movies in this list:',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               SizedBox(
@@ -642,52 +665,63 @@ class _EnhancedMovieListSharingUiState
                                 borderRadius: BorderRadius.circular(4),
                                 color: Theme.of(context).colorScheme.surface,
                               ),
-                              child: movie.posterUrl.isNotEmpty
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(4),
-                                      child: CachedNetworkImage(
-                                        imageUrl: movie.posterUrl,
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) =>
-                                            Container(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .surfaceContainerHighest,
-                                          child: Icon(
-                                            Icons.movie,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                            size: 16,
-                                          ),
+                              child:
+                                  movie.posterUrl.isNotEmpty
+                                      ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(4),
+                                        child: CachedNetworkImage(
+                                          imageUrl: movie.posterUrl,
+                                          fit: BoxFit.cover,
+                                          placeholder:
+                                              (context, url) => Container(
+                                                color:
+                                                    Theme.of(context)
+                                                        .colorScheme
+                                                        .surfaceContainerHighest,
+                                                child: Icon(
+                                                  Icons.movie,
+                                                  color:
+                                                      Theme.of(
+                                                        context,
+                                                      ).colorScheme.primary,
+                                                  size: 16,
+                                                ),
+                                              ),
+                                          errorWidget:
+                                              (
+                                                context,
+                                                url,
+                                                error,
+                                              ) => Container(
+                                                color:
+                                                    Theme.of(context)
+                                                        .colorScheme
+                                                        .surfaceContainerHighest,
+                                                child: Icon(
+                                                  Icons.movie,
+                                                  color:
+                                                      Theme.of(
+                                                        context,
+                                                      ).colorScheme.primary,
+                                                  size: 16,
+                                                ),
+                                              ),
                                         ),
-                                        errorWidget: (context, url, error) =>
-                                            Container(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .surfaceContainerHighest,
-                                          child: Icon(
-                                            Icons.movie,
-                                            color: Theme.of(context)
+                                      )
+                                      : Container(
+                                        color:
+                                            Theme.of(context)
                                                 .colorScheme
-                                                .primary,
-                                            size: 16,
-                                          ),
+                                                .surfaceContainerHighest,
+                                        child: Icon(
+                                          Icons.movie,
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                          size: 16,
                                         ),
                                       ),
-                                    )
-                                  : Container(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .surfaceContainerHighest,
-                                      child: Icon(
-                                        Icons.movie,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        size: 16,
-                                      ),
-                                    ),
                             ),
                             const SizedBox(height: 4),
                             // Movie title
@@ -721,19 +755,18 @@ class _EnhancedMovieListSharingUiState
           children: [
             Text(
               'Permissions',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               'Select permissions for the movie list. Individual movies will be shared with read-only access.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
-                  ),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
             ),
             smallGapV,
             CheckboxListTile(
@@ -799,9 +832,9 @@ class _EnhancedMovieListSharingUiState
           children: [
             Text(
               'Recipient',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             smallGapV,
 
@@ -809,11 +842,10 @@ class _EnhancedMovieListSharingUiState
             Text(
               'Share with a specific person',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
-                  ),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
             ),
             const SizedBox(height: 12),
             TextFormField(
@@ -843,10 +875,11 @@ class _EnhancedMovieListSharingUiState
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: selectedRecipient != RecipientType.none &&
-                selectedPermList.isNotEmpty
-            ? _shareMovieListAndMovies
-            : null,
+        onPressed:
+            selectedRecipient != RecipientType.none &&
+                    selectedPermList.isNotEmpty
+                ? _shareMovieListAndMovies
+                : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.primary,
           foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -869,40 +902,37 @@ class _EnhancedMovieListSharingUiState
           children: [
             Text(
               'Current Sharing Status',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               'This movie list is currently shared with:',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
-                  ),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
             ),
             const SizedBox(height: 4),
             Text(
               'Note: Sharing status is based on recent sharing activity, not TTL metadata',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.5),
-                    fontSize: 10,
-                  ),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.5),
+                fontSize: 10,
+              ),
             ),
             const SizedBox(height: 12),
             if (_isLoadingSharingInfo)
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .surfaceVariant
-                      .withValues(alpha: 0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -921,11 +951,10 @@ class _EnhancedMovieListSharingUiState
                     Text(
                       'Loading sharing information...',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
-                          ),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
                     ),
                   ],
                 ),
@@ -935,10 +964,9 @@ class _EnhancedMovieListSharingUiState
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .surfaceVariant
-                      .withValues(alpha: 0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -949,21 +977,20 @@ class _EnhancedMovieListSharingUiState
                         Icon(
                           Icons.info_outline,
                           size: 16,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.7),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                         const SizedBox(width: 8),
                         Text(
                           'Not currently shared with anyone',
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.7),
-                                  ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
+                          ),
                         ),
                       ],
                     ),
@@ -974,10 +1001,9 @@ class _EnhancedMovieListSharingUiState
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .surfaceVariant
-                      .withValues(alpha: 0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -986,69 +1012,66 @@ class _EnhancedMovieListSharingUiState
                     Text(
                       'Shared with ${_currentSharingInfo!.length} recipient${_currentSharingInfo!.length == 1 ? '' : 's'}:',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.8),
-                          ),
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.8),
+                      ),
                     ),
                     const SizedBox(height: 8),
                     ...(_currentSharingInfo!.entries
-                        .map((entry) => Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.person,
-                                    size: 14,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      entry.key,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface
-                                                .withValues(alpha: 0.8),
-                                            fontFamily: 'monospace',
-                                          ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
+                        .map(
+                          (entry) => Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.person,
+                                  size: 14,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    entry.key,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall?.copyWith(
                                       color: Theme.of(context)
                                           .colorScheme
-                                          .primary
-                                          .withValues(alpha: 0.1),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      entry.value.toUpperCase(),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 10,
-                                          ),
+                                          .onSurface
+                                          .withValues(alpha: 0.8),
+                                      fontFamily: 'monospace',
                                     ),
                                   ),
-                                ],
-                              ),
-                            ))
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.primary
+                                        .withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    entry.value.toUpperCase(),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall?.copyWith(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
                         .toList()),
                   ],
                 ),
@@ -1067,8 +1090,11 @@ class _EnhancedMovieListSharingUiState
 
       // Check if the file already exists
       try {
-        final existingContent =
-            await readPod(movieFileName, context, widget.child);
+        final existingContent = await readPod(
+          movieFileName,
+          context,
+          widget.child,
+        );
         if (existingContent.isNotEmpty) {
           debugPrint('✅ Movie file already exists for: ${movie.title}');
           return;
@@ -1076,7 +1102,8 @@ class _EnhancedMovieListSharingUiState
       } catch (e) {
         // File doesn't exist, we'll create it
         debugPrint(
-            '📝 Movie file doesn\'t exist, creating for: ${movie.title}');
+          '📝 Movie file doesn\'t exist, creating for: ${movie.title}',
+        );
       }
 
       // Create the movie TTL content with full data

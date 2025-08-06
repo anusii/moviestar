@@ -71,16 +71,18 @@ Widget _buildNormalLogin(String serverUrl, SharedPreferences prefs) {
         children: [
           Expanded(
             child: Theme(
-              data: Theme.of(context).brightness == Brightness.dark
-                  ? ThemeData.dark()
-                  : ThemeData.light(),
+              data:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? ThemeData.dark()
+                      : ThemeData.light(),
               child: SolidLogin(
                 required: false,
                 title: 'Movie Star',
                 appDirectory: 'moviestar',
-                webID: serverUrl.isNotEmpty
-                    ? serverUrl
-                    : 'https://pods.dev.solidcommunity.au',
+                webID:
+                    serverUrl.isNotEmpty
+                        ? serverUrl
+                        : 'https://pods.dev.solidcommunity.au',
                 image: const AssetImage('assets/images/app_image.jpg'),
                 logo: const AssetImage('assets/images/app_icon.png'),
                 link:
@@ -149,54 +151,55 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          backgroundColor: Theme.of(context).cardTheme.color,
-          title: Text(
-            'API Key Required',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'To use MovieStar, you need to set up a MovieDB API key.',
-                style: Theme.of(context).textTheme.bodyLarge,
+        builder:
+            (context) => AlertDialog(
+              backgroundColor: Theme.of(context).cardTheme.color,
+              title: Text(
+                'API Key Required',
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
-              const SizedBox(height: 12),
-              Text(
-                'You can get your free API key from The Movie Database (TMDB) website.',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(fontSize: 13),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'To use MovieStar, you need to set up a MovieDB API key.',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'You can get your free API key from The Movie Database (TMDB) website.',
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(fontSize: 13),
+                  ),
+                ],
               ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: TextButton.styleFrom(
-                  foregroundColor:
-                      Theme.of(context).textTheme.bodyMedium?.color),
-              child: const Text('Later'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor:
+                        Theme.of(context).textTheme.bodyMedium?.color,
+                  ),
+                  child: const Text('Later'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    // Navigate to settings screen
+                    _navigateToSettings();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                  child: const Text('Set Up Now'),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Navigate to settings screen
-                _navigateToSettings();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              ),
-              child: const Text('Set Up Now'),
-            ),
-          ],
-        ),
       );
     }
   }
@@ -214,11 +217,12 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
     Future.delayed(const Duration(milliseconds: 100), () {
       navigator.push(
         MaterialPageRoute(
-          builder: (context) => SettingsScreen(
-            favoritesService: FavoritesService(widget.prefs),
-            apiKeyService: apiKeyService,
-            fromApiKeyPrompt: true,
-          ),
+          builder:
+              (context) => SettingsScreen(
+                favoritesService: FavoritesService(widget.prefs),
+                apiKeyService: apiKeyService,
+                fromApiKeyPrompt: true,
+              ),
         ),
       );
     });

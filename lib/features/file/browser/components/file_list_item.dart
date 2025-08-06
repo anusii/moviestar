@@ -100,11 +100,12 @@ class FileListItem extends StatelessWidget {
             child: Container(
               // Apply selection highlighting using theme colours.
               decoration: BoxDecoration(
-                color: isSelected
-                    ? Theme.of(
-                        context,
-                      ).colorScheme.primary.withValues(alpha: 0.1)
-                    : Theme.of(context).cardColor,
+                color:
+                    isSelected
+                        ? Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.1)
+                        : Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(
                   AppTheme.defaultBorderRadius,
                 ),
@@ -193,38 +194,44 @@ class FileListItem extends StatelessWidget {
 
                           showDialog(
                             context: context,
-                            builder: (dialogContext) => AlertDialog(
-                              backgroundColor: Theme.of(
-                                context,
-                              ).dialogTheme.backgroundColor,
-                              title: Text(
-                                'File Preview',
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              content: SizedBox(
-                                width: double.maxFinite,
-                                height: 500,
-                                child: PdfPreview(
-                                  build: (PdfPageFormat format) async =>
-                                      pdfBytes,
-                                  canChangeOrientation: false,
-                                  canChangePageFormat: false,
-                                  allowPrinting: false,
-                                  allowSharing: false,
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(dialogContext),
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
+                            builder:
+                                (dialogContext) => AlertDialog(
+                                  backgroundColor:
+                                      Theme.of(
+                                        context,
+                                      ).dialogTheme.backgroundColor,
+                                  title: Text(
+                                    'File Preview',
+                                    style:
+                                        Theme.of(context).textTheme.titleLarge,
                                   ),
-                                  child: const Text('Close'),
+                                  content: SizedBox(
+                                    width: double.maxFinite,
+                                    height: 500,
+                                    child: PdfPreview(
+                                      build:
+                                          (PdfPageFormat format) async =>
+                                              pdfBytes,
+                                      canChangeOrientation: false,
+                                      canChangePageFormat: false,
+                                      allowPrinting: false,
+                                      allowSharing: false,
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed:
+                                          () => Navigator.pop(dialogContext),
+                                      style: TextButton.styleFrom(
+                                        foregroundColor:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
+                                      ),
+                                      child: const Text('Close'),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
                           );
                         },
                         style: IconButton.styleFrom(

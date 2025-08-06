@@ -59,7 +59,9 @@ class SharedMovieList {
   /// Creates a SharedMovieList from a `Map<String, dynamic>` (for migration).
 
   factory SharedMovieList.fromMap(
-      String resourceUrl, Map<String, dynamic> map) {
+    String resourceUrl,
+    Map<String, dynamic> map,
+  ) {
     return SharedMovieList(
       id: map['id'] ?? '',
       name: map['name'] ?? 'Unknown List',
@@ -71,9 +73,10 @@ class SharedMovieList {
       listContent: map['listContent'] ?? '',
       isSharedWithMe: map['isSharedWithMe'] ?? false,
       sharedWith: map['sharedWith']?.cast<String, String>(),
-      sharedDate: map['sharedDate'] != null
-          ? DateTime.tryParse(map['sharedDate'].toString())
-          : null,
+      sharedDate:
+          map['sharedDate'] != null
+              ? DateTime.tryParse(map['sharedDate'].toString())
+              : null,
     );
   }
 
@@ -152,9 +155,10 @@ class MySharedMovieList {
       resourceUrl: map['resourceUrl'] ?? '',
       isMySharedList: map['isMySharedList'] ?? true,
       sharedWith: map['sharedWith']?.cast<String, String>(),
-      sharedDate: map['sharedDate'] != null
-          ? DateTime.tryParse(map['sharedDate'].toString())
-          : null,
+      sharedDate:
+          map['sharedDate'] != null
+              ? DateTime.tryParse(map['sharedDate'].toString())
+              : null,
     );
   }
 

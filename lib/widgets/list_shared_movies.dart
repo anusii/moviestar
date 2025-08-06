@@ -36,7 +36,7 @@ import 'package:moviestar/services/favorites_service_manager.dart';
 
 class ListSharedMovies extends StatefulWidget {
   final Map<String, dynamic>
-      sharedMoviesMap; // Contains both 'movies' and 'movieLists' keys
+  sharedMoviesMap; // Contains both 'movies' and 'movieLists' keys
   final VoidCallback? onDataChanged;
 
   const ListSharedMovies({
@@ -64,64 +64,65 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
         context,
         MaterialPageRoute(
           fullscreenDialog: true,
-          builder: (navContext) => Theme(
-            data: Theme.of(currentContext).copyWith(),
-            child: Scaffold(
-              backgroundColor: Theme.of(currentContext).scaffoldBackgroundColor,
-              appBar: AppBar(
-                title: Text('Share "${movie.title}"'),
-                backgroundColor:
-                    Theme.of(currentContext).appBarTheme.backgroundColor,
-                foregroundColor:
-                    Theme.of(currentContext).appBarTheme.foregroundColor,
-                leading: IconButton(
-                  icon: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(currentContext)
-                          .colorScheme
-                          .primary
-                          .withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.arrow_back,
-                      color: Theme.of(currentContext).colorScheme.primary,
-                      size: 20,
-                    ),
-                  ),
-                  onPressed: () {
-                    // Ensure we properly return to the main navigation context.
+          builder:
+              (navContext) => Theme(
+                data: Theme.of(currentContext).copyWith(),
+                child: Scaffold(
+                  backgroundColor:
+                      Theme.of(currentContext).scaffoldBackgroundColor,
+                  appBar: AppBar(
+                    title: Text('Share "${movie.title}"'),
+                    backgroundColor:
+                        Theme.of(currentContext).appBarTheme.backgroundColor,
+                    foregroundColor:
+                        Theme.of(currentContext).appBarTheme.foregroundColor,
+                    leading: IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            currentContext,
+                          ).colorScheme.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Theme.of(currentContext).colorScheme.primary,
+                          size: 20,
+                        ),
+                      ),
+                      onPressed: () {
+                        // Ensure we properly return to the main navigation context.
 
-                    Navigator.of(navContext).pop(null);
-                  },
-                  tooltip: 'Back to My Movies',
-                ),
-                actions: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      color: Theme.of(currentContext).colorScheme.onSurface,
+                        Navigator.of(navContext).pop(null);
+                      },
+                      tooltip: 'Back to My Movies',
                     ),
-                    onPressed: () {
-                      Navigator.of(navContext).pop(null);
-                    },
-                    tooltip: 'Cancel',
+                    actions: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.close,
+                          color: Theme.of(currentContext).colorScheme.onSurface,
+                        ),
+                        onPressed: () {
+                          Navigator.of(navContext).pop(null);
+                        },
+                        tooltip: 'Cancel',
+                      ),
+                    ],
                   ),
-                ],
+                  body: GrantPermissionUi(
+                    fileName: movieFilePath,
+                    title: '',
+                    accessModeList: const ['read'],
+                    recipientTypeList: const ['indi'],
+                    showAppBar: false,
+                    backgroundColor:
+                        Theme.of(currentContext).scaffoldBackgroundColor,
+                    child: widget,
+                  ),
+                ),
               ),
-              body: GrantPermissionUi(
-                fileName: movieFilePath,
-                title: '',
-                accessModeList: const ['read'],
-                recipientTypeList: const ['indi'],
-                showAppBar: false,
-                backgroundColor:
-                    Theme.of(currentContext).scaffoldBackgroundColor,
-                child: widget,
-              ),
-            ),
-          ),
         ),
       );
 
@@ -152,12 +153,15 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(result != null
-                ? 'Movie "${movie.title}" shared successfully'
-                : 'Share cancelled for "${movie.title}"'),
-            backgroundColor: result != null
-                ? Theme.of(context).colorScheme.tertiary
-                : Theme.of(context).colorScheme.secondary,
+            content: Text(
+              result != null
+                  ? 'Movie "${movie.title}" shared successfully'
+                  : 'Share cancelled for "${movie.title}"',
+            ),
+            backgroundColor:
+                result != null
+                    ? Theme.of(context).colorScheme.tertiary
+                    : Theme.of(context).colorScheme.secondary,
           ),
         );
       }
@@ -204,10 +208,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
         const SizedBox(width: 4),
         Text(
           ratingValue.toStringAsFixed(1),
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         ),
       ],
     );
@@ -219,14 +220,16 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: permissions.contains('read')
-            ? Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.1)
-            : Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+        color:
+            permissions.contains('read')
+                ? Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.1)
+                : Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: permissions.contains('read')
-              ? Theme.of(context).colorScheme.tertiary
-              : Theme.of(context).colorScheme.error,
+          color:
+              permissions.contains('read')
+                  ? Theme.of(context).colorScheme.tertiary
+                  : Theme.of(context).colorScheme.error,
           width: 1,
         ),
       ),
@@ -238,9 +241,10 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                 ? Icons.visibility
                 : Icons.visibility_off,
             size: 12,
-            color: permissions.contains('read')
-                ? Theme.of(context).colorScheme.tertiary
-                : Theme.of(context).colorScheme.error,
+            color:
+                permissions.contains('read')
+                    ? Theme.of(context).colorScheme.tertiary
+                    : Theme.of(context).colorScheme.error,
           ),
           const SizedBox(width: 4),
           Text(
@@ -248,9 +252,10 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: permissions.contains('read')
-                  ? Theme.of(context).colorScheme.tertiary
-                  : Theme.of(context).colorScheme.error,
+              color:
+                  permissions.contains('read')
+                      ? Theme.of(context).colorScheme.tertiary
+                      : Theme.of(context).colorScheme.error,
             ),
           ),
         ],
@@ -329,7 +334,8 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                   // Navigate to SharedMovieListDetailScreen
                   final listName = itemData['listName'] ?? movieTitle;
                   final listDescription = itemData['description'] ?? '';
-                  final movies = (itemData['movies'] as List<dynamic>?)
+                  final movies =
+                      (itemData['movies'] as List<dynamic>?)
                           ?.cast<Map<String, dynamic>>() ??
                       <Map<String, dynamic>>[];
 
@@ -337,16 +343,17 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SharedMovieListDetailScreen(
-                          listName: listName,
-                          listDescription: listDescription,
-                          owner: owner,
-                          ownerWebId: ownerWebId,
-                          sharedBy: sharedBy,
-                          sharedByWebId: sharedByWebId,
-                          movies: movies,
-                          permissions: permissions,
-                        ),
+                        builder:
+                            (context) => SharedMovieListDetailScreen(
+                              listName: listName,
+                              listDescription: listDescription,
+                              owner: owner,
+                              ownerWebId: ownerWebId,
+                              sharedBy: sharedBy,
+                              sharedByWebId: sharedByWebId,
+                              movies: movies,
+                              permissions: permissions,
+                            ),
                       ),
                     );
                   }
@@ -360,10 +367,11 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                   final overview = itemData['overview'] ?? 'Shared movie';
                   final releaseDate =
                       DateTime.tryParse(itemData['releaseDate'] ?? '') ??
-                          DateTime.now();
+                      DateTime.now();
                   final voteAverage =
                       (itemData['voteAverage'] as num?)?.toDouble() ?? 0.0;
-                  final genreIds = (itemData['genreIds'] as List?)
+                  final genreIds =
+                      (itemData['genreIds'] as List?)
                           ?.map((e) => e as int)
                           .toList() ??
                       <int>[];
@@ -383,21 +391,26 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                   final prefs = await SharedPreferences.getInstance();
                   if (!context.mounted) return;
 
-                  final favoritesServiceManager =
-                      FavoritesServiceManager(prefs, context, widget);
-                  final favoritesService =
-                      FavoritesServiceAdapter(favoritesServiceManager);
+                  final favoritesServiceManager = FavoritesServiceManager(
+                    prefs,
+                    context,
+                    widget,
+                  );
+                  final favoritesService = FavoritesServiceAdapter(
+                    favoritesServiceManager,
+                  );
 
                   // Navigate to MovieDetailsScreen with shared movie data.
                   if (context.mounted) {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => MovieDetailsScreen(
-                          movie: movie,
-                          favoritesService: favoritesService,
-                          sharedMovieData: itemData,
-                        ),
+                        builder:
+                            (context) => MovieDetailsScreen(
+                              movie: movie,
+                              favoritesService: favoritesService,
+                              sharedMovieData: itemData,
+                            ),
                       ),
                     );
                   }
@@ -420,16 +433,14 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header row with movie icon and title.
-
                   Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withValues(alpha: 0.1),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
@@ -449,12 +460,8 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                               itemData['type'] == 'movieList'
                                   ? 'List: ${itemData['listName'] ?? movieTitle}'
                                   : movieTitle,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
                             ),
                             if (itemData['type'] == 'movieList') ...[
                               const SizedBox(height: 4),
@@ -464,9 +471,10 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                                   Icon(
                                     Icons.movie,
                                     size: 16,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
@@ -489,21 +497,26 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                         IconButton(
                           onPressed: () async {
                             // Create Movie object
-                            final movieId = int.tryParse(
-                                    itemData['movieId']?.toString() ?? '0') ??
+                            final movieId =
+                                int.tryParse(
+                                  itemData['movieId']?.toString() ?? '0',
+                                ) ??
                                 0;
                             final posterUrl = itemData['posterUrl'] ?? '';
                             final backdropUrl =
                                 itemData['backdropUrl'] ?? posterUrl ?? '';
                             final overview =
                                 itemData['overview'] ?? 'My rated movie';
-                            final releaseDate = DateTime.tryParse(
-                                    itemData['releaseDate'] ?? '') ??
+                            final releaseDate =
+                                DateTime.tryParse(
+                                  itemData['releaseDate'] ?? '',
+                                ) ??
                                 DateTime.now();
                             final voteAverage =
                                 (itemData['voteAverage'] as num?)?.toDouble() ??
-                                    0.0;
-                            final genreIds = (itemData['genreIds'] as List?)
+                                0.0;
+                            final genreIds =
+                                (itemData['genreIds'] as List?)
                                     ?.map((e) => e as int)
                                     .toList() ??
                                 <int>[];
@@ -526,10 +539,9 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                           icon: const Icon(Icons.share),
                           tooltip: 'Share this movie with others',
                           style: IconButton.styleFrom(
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withValues(alpha: 0.1),
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.1),
                             foregroundColor:
                                 Theme.of(context).colorScheme.primary,
                           ),
@@ -540,7 +552,6 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                   ),
 
                   // Movie/List details.
-
                   if (comments.isNotEmpty ||
                       (itemData['type'] == 'movieList' &&
                           itemData['description'] != null &&
@@ -564,21 +575,18 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                               Icon(
                                 Icons.comment,
                                 size: 14,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 itemData['type'] == 'movieList'
                                     ? 'Description:'
                                     : 'Review:',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelSmall
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                style: Theme.of(context).textTheme.labelSmall
+                                    ?.copyWith(fontWeight: FontWeight.w600),
                               ),
                             ],
                           ),
@@ -587,10 +595,8 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                             itemData['type'] == 'movieList'
                                 ? (itemData['description'] ?? '')
                                 : comments,
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      fontStyle: FontStyle.italic,
-                                    ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(fontStyle: FontStyle.italic),
                           ),
                         ],
                       ),
@@ -600,75 +606,82 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                   const SizedBox(height: 12),
 
                   // Sharing info or ownership info.
-
                   Row(
                     children: [
                       Expanded(
-                        child: isUserRatedMovie
-                            ? const SizedBox.shrink()
-                            : Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.person,
-                                        size: 14,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'Owner: ${_getOwnerName(owner)}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall,
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.share,
-                                        size: 14,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'Shared by: ${_getOwnerName(sharedBy)}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall,
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                        child:
+                            isUserRatedMovie
+                                ? const SizedBox.shrink()
+                                : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.person,
+                                          size: 14,
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurfaceVariant,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'Owner: ${_getOwnerName(owner)}',
+                                          style:
+                                              Theme.of(
+                                                context,
+                                              ).textTheme.bodySmall,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.share,
+                                          size: 14,
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurfaceVariant,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'Shared by: ${_getOwnerName(sharedBy)}',
+                                          style:
+                                              Theme.of(
+                                                context,
+                                              ).textTheme.bodySmall,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                       ),
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: isUserRatedMovie
-                              ? Theme.of(context)
-                                  .colorScheme
-                                  .primary
-                                  .withValues(alpha: 0.1)
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant
-                                  .withValues(alpha: 0.1),
+                          color:
+                              isUserRatedMovie
+                                  ? Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.1)
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant
+                                      .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
                           isUserRatedMovie ? Icons.edit : Icons.visibility,
                           size: 16,
-                          color: isUserRatedMovie
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.onSurfaceVariant,
+                          color:
+                              isUserRatedMovie
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],

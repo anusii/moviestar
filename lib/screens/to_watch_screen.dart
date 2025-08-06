@@ -71,8 +71,10 @@ class _ToWatchScreenState extends State<ToWatchScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        title: Text('To Watch',
-            style: Theme.of(context).appBarTheme.titleTextStyle),
+        title: Text(
+          'To Watch',
+          style: Theme.of(context).appBarTheme.titleTextStyle,
+        ),
         actions: [
           StreamBuilder<List<Movie>>(
             stream: widget.favoritesService.toWatchMovies,
@@ -80,12 +82,13 @@ class _ToWatchScreenState extends State<ToWatchScreen> {
               final hasMovies = snapshot.hasData && snapshot.data!.isNotEmpty;
               final isPodEnabled =
                   widget.favoritesService is FavoritesServiceAdapter &&
-                      (widget.favoritesService as FavoritesServiceAdapter)
-                          .isPodStorageEnabled;
+                  (widget.favoritesService as FavoritesServiceAdapter)
+                      .isPodStorageEnabled;
 
               return Padding(
                 padding: const EdgeInsets.only(
-                    right: 60.0), // Add space to avoid debug banner
+                  right: 60.0,
+                ), // Add space to avoid debug banner
                 child: MarkdownTooltip(
                   message: '''
 
@@ -103,9 +106,10 @@ Recipients will be able to:
                   ''',
                   child: IconButton(
                     icon: const Icon(Icons.share),
-                    onPressed: (hasMovies && isPodEnabled)
-                        ? () => _shareToWatchList(context, snapshot.data!)
-                        : null,
+                    onPressed:
+                        (hasMovies && isPodEnabled)
+                            ? () => _shareToWatchList(context, snapshot.data!)
+                            : null,
                   ),
                 ),
               );
@@ -131,10 +135,9 @@ Recipients will be able to:
                   return Center(
                     child: Text(
                       'Error: ${snapshot.error}',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(color: Colors.red),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyLarge?.copyWith(color: Colors.red),
                     ),
                   );
                 }
@@ -166,11 +169,12 @@ Recipients will be able to:
                           width: 50,
                           height: 75,
                           fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
+                          placeholder:
+                              (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                          errorWidget:
+                              (context, url, error) => const Icon(Icons.error),
                         ),
                       ),
                       title: Text(
@@ -194,10 +198,11 @@ Recipients will be able to:
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MovieDetailsScreen(
-                              movie: movie,
-                              favoritesService: widget.favoritesService,
-                            ),
+                            builder:
+                                (context) => MovieDetailsScreen(
+                                  movie: movie,
+                                  favoritesService: widget.favoritesService,
+                                ),
                           ),
                         );
                       },
@@ -215,19 +220,24 @@ Recipients will be able to:
   // Shares the to-watch movies list.
 
   Future<void> _shareToWatchList(
-      BuildContext context, List<Movie> movies) async {
+    BuildContext context,
+    List<Movie> movies,
+  ) async {
     if (movies.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No movies to share')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No movies to share')));
       return;
     }
 
     try {
       // Create MovieList service to create the list file first
       final userProfileService = UserProfileService(context, widget);
-      final movieListService =
-          MovieListService(context, widget, userProfileService);
+      final movieListService = MovieListService(
+        context,
+        widget,
+        userProfileService,
+      );
 
       // Create the MovieList TTL file
       final listId = await movieListService.createMovieList(
@@ -252,49 +262,52 @@ Recipients will be able to:
         context,
         MaterialPageRoute(
           fullscreenDialog: true,
-          builder: (navContext) => Theme(
-            data: Theme.of(context),
-            child: Scaffold(
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              appBar: AppBar(
-                title: const Text('Share "To Watch Movies"'),
-                backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-                foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
-              ),
-              body: GrantPermissionUi(
-                fileName: 'user_lists/MovieList-$listId.ttl',
-                title: '',
-                accessModeList: const ['read'],
-                recipientTypeList: const ['indi'],
-                showAppBar: false,
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                child: widget,
-                onPermissionGranted: () async {
-                  // After movie list sharing, chain individual movie sharing
-                  if (mounted) {
-                    Navigator.of(navContext).pop(true);
+          builder:
+              (navContext) => Theme(
+                data: Theme.of(context),
+                child: Scaffold(
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  appBar: AppBar(
+                    title: const Text('Share "To Watch Movies"'),
+                    backgroundColor:
+                        Theme.of(context).appBarTheme.backgroundColor,
+                    foregroundColor:
+                        Theme.of(context).appBarTheme.foregroundColor,
+                  ),
+                  body: GrantPermissionUi(
+                    fileName: 'user_lists/MovieList-$listId.ttl',
+                    title: '',
+                    accessModeList: const ['read'],
+                    recipientTypeList: const ['indi'],
+                    showAppBar: false,
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                    child: widget,
+                    onPermissionGranted: () async {
+                      // After movie list sharing, chain individual movie sharing
+                      if (mounted) {
+                        Navigator.of(navContext).pop(true);
 
-                    // Show loading and start individual movie sharing
-                    await _shareIndividualMoviesSequentially(movies);
-                  }
-                },
-                onNavigateBack: () {
-                  // Handle back navigation
-                  if (mounted) {
-                    Navigator.of(navContext).pop(false);
-                  }
-                },
+                        // Show loading and start individual movie sharing
+                        await _shareIndividualMoviesSequentially(movies);
+                      }
+                    },
+                    onNavigateBack: () {
+                      // Handle back navigation
+                      if (mounted) {
+                        Navigator.of(navContext).pop(false);
+                      }
+                    },
+                  ),
+                ),
               ),
-            ),
-          ),
         ),
       );
     } catch (e) {
       debugPrint('❌ Error sharing to-watch list: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error sharing list: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error sharing list: $e')));
       }
     }
   }
@@ -317,17 +330,19 @@ Recipients will be able to:
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CircularProgressIndicator(),
-                const SizedBox(height: 16),
-                Text(
-                    'Preparing to share ${movies.length} individual movies with ratings and comments...'),
-              ],
-            ),
-          ),
+          builder:
+              (context) => AlertDialog(
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Preparing to share ${movies.length} individual movies with ratings and comments...',
+                    ),
+                  ],
+                ),
+              ),
         );
       }
 
@@ -360,7 +375,8 @@ Recipients will be able to:
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Successfully shared movie list and all ${movies.length} individual movies!'),
+              'Successfully shared movie list and all ${movies.length} individual movies!',
+            ),
             backgroundColor: Theme.of(context).colorScheme.tertiary,
           ),
         );
@@ -372,7 +388,8 @@ Recipients will be able to:
     final adapter = widget.favoritesService as FavoritesServiceAdapter;
     final fullPath = adapter.getMovieFilePath(movie);
     // Remove the 'moviestar/data/' prefix like the individual movie screen does
-    final movieFilePath = fullPath?.replaceFirst('moviestar/data/', '') ??
+    final movieFilePath =
+        fullPath?.replaceFirst('moviestar/data/', '') ??
         'movies/Movie-${movie.id}.ttl';
 
     if (fullPath == null) {
@@ -398,41 +415,47 @@ Recipients will be able to:
       context,
       MaterialPageRoute(
         fullscreenDialog: true,
-        builder: (navContext) => Theme(
-          data: Theme.of(context),
-          child: Scaffold(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            appBar: AppBar(
-              title: Text(
-                  'Share "${movie.title}" (${index + 1}/${movies.length})'),
-              backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-              foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
+        builder:
+            (navContext) => Theme(
+              data: Theme.of(context),
+              child: Scaffold(
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                appBar: AppBar(
+                  title: Text(
+                    'Share "${movie.title}" (${index + 1}/${movies.length})',
+                  ),
+                  backgroundColor:
+                      Theme.of(context).appBarTheme.backgroundColor,
+                  foregroundColor:
+                      Theme.of(context).appBarTheme.foregroundColor,
+                ),
+                body: GrantPermissionUi(
+                  fileName: movieFilePath,
+                  title: '',
+                  accessModeList: const [
+                    'read',
+                  ], // Read-only for individual movies
+                  recipientTypeList: const ['indi'],
+                  showAppBar: false,
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  child: widget,
+                  onPermissionGranted: () async {
+                    // Movie shared successfully, continue with next movie
+                    if (mounted) {
+                      Navigator.of(navContext).pop(true);
+                      await _shareMoviesOneByOne(movies, index + 1);
+                    }
+                  },
+                  onNavigateBack: () {
+                    // User cancelled, ask if they want to continue or stop
+                    if (mounted) {
+                      Navigator.of(navContext).pop(false);
+                      _showContinueSharingDialog(movies, index);
+                    }
+                  },
+                ),
+              ),
             ),
-            body: GrantPermissionUi(
-              fileName: movieFilePath,
-              title: '',
-              accessModeList: const ['read'], // Read-only for individual movies
-              recipientTypeList: const ['indi'],
-              showAppBar: false,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              child: widget,
-              onPermissionGranted: () async {
-                // Movie shared successfully, continue with next movie
-                if (mounted) {
-                  Navigator.of(navContext).pop(true);
-                  await _shareMoviesOneByOne(movies, index + 1);
-                }
-              },
-              onNavigateBack: () {
-                // User cancelled, ask if they want to continue or stop
-                if (mounted) {
-                  Navigator.of(navContext).pop(false);
-                  _showContinueSharingDialog(movies, index);
-                }
-              },
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -444,33 +467,36 @@ Recipients will be able to:
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Continue Sharing?'),
-        content: Text(
-            'You have $remainingCount movies left to share. Do you want to continue?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // Show completion message for partial sharing
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                      'Shared movie list and $currentIndex individual movies.'),
-                ),
-              );
-            },
-            child: const Text('Stop'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Continue Sharing?'),
+            content: Text(
+              'You have $remainingCount movies left to share. Do you want to continue?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  // Show completion message for partial sharing
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Shared movie list and $currentIndex individual movies.',
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('Stop'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _shareMoviesOneByOne(movies, currentIndex);
+                },
+                child: const Text('Continue'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _shareMoviesOneByOne(movies, currentIndex);
-            },
-            child: const Text('Continue'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -490,7 +516,8 @@ Recipients will be able to:
       } catch (e) {
         // File doesn't exist, we'll create it
         debugPrint(
-            '📝 Movie file doesn\'t exist, creating for: ${movie.title}');
+          '📝 Movie file doesn\'t exist, creating for: ${movie.title}',
+        );
       }
 
       // Get current rating and comments from favorites service

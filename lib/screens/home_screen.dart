@@ -107,9 +107,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
         final toWatchStats = cacheStats?['toWatch'];
         final fromCache = toWatchStats?['valid'] ?? false;
-        final cacheAge = toWatchStats?['age'] != null
-            ? Duration(minutes: toWatchStats['age'])
-            : null;
+        final cacheAge =
+            toWatchStats?['age'] != null
+                ? Duration(minutes: toWatchStats['age'])
+                : null;
 
         final cacheResult = CacheResult(
           data: snapshot.data ?? [],
@@ -131,10 +132,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         Text(
                           'To Watch',
                           style: TextStyle(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.color,
+                            color:
+                                Theme.of(
+                                  context,
+                                ).textTheme.headlineMedium?.color,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -148,9 +149,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             child: CircularProgressIndicator(
                               strokeWidth: 1.5,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                Theme.of(context)
-                                    .primaryColor
-                                    .withValues(alpha: 0.6),
+                                Theme.of(
+                                  context,
+                                ).primaryColor.withValues(alpha: 0.6),
                               ),
                             ),
                           ),
@@ -158,8 +159,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ],
                     ),
                   ),
-                  // Show cache indicator for user data if cached.
 
+                  // Show cache indicator for user data if cached.
                   if (fromCache && cacheAge != null)
                     _buildCacheAgeBadge(cacheAge),
                 ],
@@ -168,7 +169,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             SizedBox(
               height: 200,
               child: _buildToWatchMovieContent(
-                  snapshot, cacheResult, cacheOnlyMode),
+                snapshot,
+                cacheResult,
+                cacheOnlyMode,
+              ),
             ),
           ],
         );
@@ -220,11 +224,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Text(
               'Loading To Watch movies...',
               style: TextStyle(
-                color: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.color
-                    ?.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
             ),
@@ -274,10 +276,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MovieDetailsScreen(
-                        movie: movie,
-                        favoritesService: widget.favoritesService,
-                      ),
+                      builder:
+                          (context) => MovieDetailsScreen(
+                            movie: movie,
+                            favoritesService: widget.favoritesService,
+                          ),
                     ),
                   );
                 }
@@ -309,9 +312,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
         final watchedStats = cacheStats?['watched'];
         final fromCache = watchedStats?['valid'] ?? false;
-        final cacheAge = watchedStats?['age'] != null
-            ? Duration(minutes: watchedStats['age'])
-            : null;
+        final cacheAge =
+            watchedStats?['age'] != null
+                ? Duration(minutes: watchedStats['age'])
+                : null;
 
         final cacheResult = CacheResult(
           data: snapshot.data ?? [],
@@ -333,10 +337,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         Text(
                           'Watched',
                           style: TextStyle(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.color,
+                            color:
+                                Theme.of(
+                                  context,
+                                ).textTheme.headlineMedium?.color,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -350,9 +354,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             child: CircularProgressIndicator(
                               strokeWidth: 1.5,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                Theme.of(context)
-                                    .primaryColor
-                                    .withValues(alpha: 0.6),
+                                Theme.of(
+                                  context,
+                                ).primaryColor.withValues(alpha: 0.6),
                               ),
                             ),
                           ),
@@ -360,8 +364,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ],
                     ),
                   ),
-                  // Show cache indicator for user data if cached.
 
+                  // Show cache indicator for user data if cached.
                   if (fromCache && cacheAge != null)
                     _buildCacheAgeBadge(cacheAge),
                 ],
@@ -370,7 +374,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             SizedBox(
               height: 200,
               child: _buildWatchedMovieContent(
-                  snapshot, cacheResult, cacheOnlyMode),
+                snapshot,
+                cacheResult,
+                cacheOnlyMode,
+              ),
             ),
           ],
         );
@@ -422,11 +429,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Text(
               'Loading Watched movies...',
               style: TextStyle(
-                color: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.color
-                    ?.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
             ),
@@ -475,10 +480,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MovieDetailsScreen(
-                        movie: movie,
-                        favoritesService: widget.favoritesService,
-                      ),
+                      builder:
+                          (context) => MovieDetailsScreen(
+                            movie: movie,
+                            favoritesService: widget.favoritesService,
+                          ),
                     ),
                   );
                 }
@@ -524,66 +530,71 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         SizedBox(
           height: 200,
           child: moviesAsync.when(
-            data: (cacheResult) => Scrollbar(
-              controller: _scrollControllers[key],
-              thickness: 6,
-              radius: const Radius.circular(3),
-              thumbVisibility: true,
-              child: ListView.builder(
-                controller: _scrollControllers[key],
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                itemCount: cacheResult.data.length,
-                itemBuilder: (context, index) {
-                  final movie = cacheResult.data[index];
-                  return Padding(
+            data:
+                (cacheResult) => Scrollbar(
+                  controller: _scrollControllers[key],
+                  thickness: 6,
+                  radius: const Radius.circular(3),
+                  thumbVisibility: true,
+                  child: ListView.builder(
+                    controller: _scrollControllers[key],
+                    scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: MovieCard.poster(
-                      movie: movie,
-                      fromCache: cacheResult.fromCache,
-                      cacheAge: cacheResult.cacheAge,
-                      cacheOnlyMode: cacheOnlyMode,
-                      favoritesService: widget.favoritesService,
-                      parentWidget: widget,
-                      onTap: () {
-                        // Check if widget is still mounted before navigation.
+                    itemCount: cacheResult.data.length,
+                    itemBuilder: (context, index) {
+                      final movie = cacheResult.data[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: MovieCard.poster(
+                          movie: movie,
+                          fromCache: cacheResult.fromCache,
+                          cacheAge: cacheResult.cacheAge,
+                          cacheOnlyMode: cacheOnlyMode,
+                          favoritesService: widget.favoritesService,
+                          parentWidget: widget,
+                          onTap: () {
+                            // Check if widget is still mounted before navigation.
 
-                        if (mounted) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MovieDetailsScreen(
-                                movie: movie,
-                                favoritesService: widget.favoritesService,
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-            loading: () => const Center(
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: CircularProgressIndicator(),
-              ),
-            ),
-            error: (error, stack) => ErrorDisplayWidget.compact(
-              message: 'Failed to load $title',
-              onRetry: () {
-                // Check if widget is still mounted before invalidating providers.
+                            if (mounted) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => MovieDetailsScreen(
+                                        movie: movie,
+                                        favoritesService:
+                                            widget.favoritesService,
+                                      ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+            loading:
+                () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+            error:
+                (error, stack) => ErrorDisplayWidget.compact(
+                  message: 'Failed to load $title',
+                  onRetry: () {
+                    // Check if widget is still mounted before invalidating providers.
 
-                if (mounted) {
-                  ref.invalidate(popularMoviesWithCacheInfoProvider);
-                  ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
-                  ref.invalidate(topRatedMoviesWithCacheInfoProvider);
-                  ref.invalidate(upcomingMoviesWithCacheInfoProvider);
-                }
-              },
-            ),
+                    if (mounted) {
+                      ref.invalidate(popularMoviesWithCacheInfoProvider);
+                      ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+                      ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+                      ref.invalidate(upcomingMoviesWithCacheInfoProvider);
+                    }
+                  },
+                ),
           ),
         ),
       ],
@@ -875,7 +886,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         actions: [
           Padding(
             // Space for debug banner.
-
             padding: const EdgeInsets.only(right: 60.0),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -895,10 +905,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SearchScreen(
-                            favoritesService: widget.favoritesService,
-                            movieService: movieService,
-                          ),
+                          builder:
+                              (context) => SearchScreen(
+                                favoritesService: widget.favoritesService,
+                                movieService: movieService,
+                              ),
                         ),
                       );
                     }
@@ -917,9 +928,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             .read(themeModeProvider.notifier)
                             .toggleTheme();
                       },
-                      tooltip: isDarkMode
-                          ? 'Switch to light mode'
-                          : 'Switch to dark mode',
+                      tooltip:
+                          isDarkMode
+                              ? 'Switch to light mode'
+                              : 'Switch to dark mode',
                     );
                   },
                 ),

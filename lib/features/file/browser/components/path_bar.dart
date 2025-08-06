@@ -137,19 +137,20 @@ class PathBar extends StatelessWidget {
             IconButton(
               icon: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
-                child: isLoading
-                    ? SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Theme.of(context).colorScheme.primary,
+                child:
+                    isLoading
+                        ? SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        )
+                        : Icon(
+                          Icons.refresh,
+                          color: Theme.of(context).iconTheme.color,
                         ),
-                      )
-                    : Icon(
-                        Icons.refresh,
-                        color: Theme.of(context).iconTheme.color,
-                      ),
               ),
               tooltip: 'Refresh',
               onPressed: isLoading ? null : onRefresh,

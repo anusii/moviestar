@@ -127,9 +127,9 @@ class MovieCard extends StatefulWidget {
     this.height,
     this.favoritesService,
     this.parentWidget,
-  })  : style = MovieCardStyle.poster,
-        trailing = null,
-        customSubtitle = null;
+  }) : style = MovieCardStyle.poster,
+       trailing = null,
+       customSubtitle = null;
 
   /// Creates a list item-style movie card.
 
@@ -144,9 +144,9 @@ class MovieCard extends StatefulWidget {
     this.customSubtitle,
     this.favoritesService,
     this.parentWidget,
-  })  : style = MovieCardStyle.listItem,
-        width = 50,
-        height = 75;
+  }) : style = MovieCardStyle.listItem,
+       width = 50,
+       height = 75;
 
   @override
   State<MovieCard> createState() => _MovieCardState();
@@ -190,10 +190,11 @@ class _MovieCardState extends State<MovieCard> {
                     width: widget.width,
                     height: widget.height,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) =>
-                        const Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
+                    placeholder:
+                        (context, url) =>
+                            const Center(child: CircularProgressIndicator()),
+                    errorWidget:
+                        (context, url, error) => const Icon(Icons.error),
                   ),
                 ),
                 _buildCacheIndicator(context),
@@ -217,10 +218,11 @@ class _MovieCardState extends State<MovieCard> {
                     width: widget.width,
                     height: widget.height,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) =>
-                        const Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
+                    placeholder:
+                        (context, url) =>
+                            const Center(child: CircularProgressIndicator()),
+                    errorWidget:
+                        (context, url, error) => const Icon(Icons.error),
                   ),
                 ),
                 _buildCacheIndicator(context),
@@ -241,7 +243,8 @@ class _MovieCardState extends State<MovieCard> {
             subtitle: Row(
               children: [
                 Expanded(
-                  child: widget.customSubtitle ??
+                  child:
+                      widget.customSubtitle ??
                       Text(
                         '⭐ ${widget.movie.voteAverage.toStringAsFixed(1)}',
                         style: Theme.of(context).textTheme.bodyMedium,
@@ -274,18 +277,19 @@ class _MovieCardState extends State<MovieCard> {
     final position = renderBox.localToGlobal(Offset.zero);
 
     _overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        left: position.dx + size.width + 8,
-        top: position.dy,
-        child: QuickActionsDialog(
-          movie: widget.movie,
-          favoritesService: widget.favoritesService!,
-          parentWidget: widget.parentWidget,
-          onClose: _hideQuickActions,
-          onMouseEnter: _onDialogMouseEnter,
-          onMouseExit: _onDialogMouseExit,
-        ),
-      ),
+      builder:
+          (context) => Positioned(
+            left: position.dx + size.width + 8,
+            top: position.dy,
+            child: QuickActionsDialog(
+              movie: widget.movie,
+              favoritesService: widget.favoritesService!,
+              parentWidget: widget.parentWidget,
+              onClose: _hideQuickActions,
+              onMouseEnter: _onDialogMouseEnter,
+              onMouseExit: _onDialogMouseExit,
+            ),
+          ),
     );
 
     Overlay.of(context).insert(_overlayEntry!);
@@ -359,9 +363,10 @@ class _MovieCardState extends State<MovieCard> {
       child: Container(
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
-          color: widget.fromCache!
-              ? Colors.green.withValues(alpha: 0.8)
-              : Colors.blue.withValues(alpha: 0.8),
+          color:
+              widget.fromCache!
+                  ? Colors.green.withValues(alpha: 0.8)
+                  : Colors.blue.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(

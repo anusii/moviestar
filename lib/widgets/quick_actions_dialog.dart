@@ -108,12 +108,15 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
 
   Future<void> _loadMovieStatus() async {
     try {
-      final isInToWatch =
-          await widget.favoritesService.isInToWatch(widget.movie);
-      final isInWatched =
-          await widget.favoritesService.isInWatched(widget.movie);
-      final rating =
-          await widget.favoritesService.getPersonalRating(widget.movie);
+      final isInToWatch = await widget.favoritesService.isInToWatch(
+        widget.movie,
+      );
+      final isInWatched = await widget.favoritesService.isInWatched(
+        widget.movie,
+      );
+      final rating = await widget.favoritesService.getPersonalRating(
+        widget.movie,
+      );
       final hasFile = await widget.favoritesService.hasMovieFile(widget.movie);
 
       if (mounted) {
@@ -242,7 +245,8 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
       // Get the movie file path using the service method and make it relative.
 
       final fullPath = adapter.getMovieFilePath(widget.movie);
-      final movieFilePath = fullPath?.replaceFirst('moviestar/data/', '') ??
+      final movieFilePath =
+          fullPath?.replaceFirst('moviestar/data/', '') ??
           'movies/Movie-${widget.movie.id}.ttl';
 
       // Navigate directly to GrantPermissionUi.
@@ -252,18 +256,19 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Theme(
-            data: Theme.of(context),
-            child: GrantPermissionUi(
-              fileName: movieFilePath,
-              title: 'Share "${widget.movie.title}"',
-              accessModeList: const ['read'],
-              recipientTypeList: const ['indi'],
-              showAppBar: true,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              child: widget.parentWidget ?? widget,
-            ),
-          ),
+          builder:
+              (context) => Theme(
+                data: Theme.of(context),
+                child: GrantPermissionUi(
+                  fileName: movieFilePath,
+                  title: 'Share "${widget.movie.title}"',
+                  accessModeList: const ['read'],
+                  recipientTypeList: const ['indi'],
+                  showAppBar: true,
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  child: widget.parentWidget ?? widget,
+                ),
+              ),
         ),
       );
     } catch (e) {
@@ -276,27 +281,31 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.errorContainer,
-        title: Text(
-          'Cannot Share Movie',
-          style:
-              TextStyle(color: Theme.of(context).colorScheme.onErrorContainer),
-        ),
-        content: Text(
-          message,
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'OK',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: Theme.of(context).colorScheme.errorContainer,
+            title: Text(
+              'Cannot Share Movie',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onErrorContainer,
+              ),
             ),
+            content: Text(
+              message,
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'OK',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -321,78 +330,81 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
               ),
             ],
             border: Border.all(
-              color:
-                  Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.2),
             ),
           ),
-          child: _isLoading
-              ? const Center(
-                  child: SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                )
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title.
-
-                    Text(
-                      widget.movie.title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+          child:
+              _isLoading
+                  ? const Center(
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
                     ),
-                    const SizedBox(height: 12),
+                  )
+                  : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title.
+                      Text(
+                        widget.movie.title,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 12),
 
-                    // Quick action buttons.
+                      // Quick action buttons.
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          // Bookmark (To Watch).
+                          _buildActionButton(
+                            icon:
+                                _isInToWatch
+                                    ? Icons.bookmark
+                                    : Icons.bookmark_border,
+                            color:
+                                _isInToWatch
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.onSurface,
+                            tooltip:
+                                _isInToWatch
+                                    ? 'Remove from To Watch'
+                                    : 'Add to To Watch',
+                            onPressed: _toggleToWatch,
+                          ),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // Bookmark (To Watch).
+                          // Watched.
+                          _buildActionButton(
+                            icon:
+                                _isInWatched
+                                    ? Icons.check_circle
+                                    : Icons.check_circle_outline,
+                            color:
+                                _isInWatched
+                                    ? Theme.of(context).colorScheme.tertiary
+                                    : Theme.of(context).colorScheme.onSurface,
+                            tooltip:
+                                _isInWatched
+                                    ? 'Remove from Watched'
+                                    : 'Add to Watched',
+                            onPressed: _toggleWatched,
+                          ),
 
-                        _buildActionButton(
-                          icon: _isInToWatch
-                              ? Icons.bookmark
-                              : Icons.bookmark_border,
-                          color: _isInToWatch
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.onSurface,
-                          tooltip: _isInToWatch
-                              ? 'Remove from To Watch'
-                              : 'Add to To Watch',
-                          onPressed: _toggleToWatch,
-                        ),
-
-                        // Watched.
-
-                        _buildActionButton(
-                          icon: _isInWatched
-                              ? Icons.check_circle
-                              : Icons.check_circle_outline,
-                          color: _isInWatched
-                              ? Theme.of(context).colorScheme.tertiary
-                              : Theme.of(context).colorScheme.onSurface,
-                          tooltip: _isInWatched
-                              ? 'Remove from Watched'
-                              : 'Add to Watched',
-                          onPressed: _toggleWatched,
-                        ),
-
-                        // Share button (only if movie has rating/comment and POD is enabled).
-
-                        if (_hasMovieFile &&
-                            widget.favoritesService
-                                is FavoritesServiceAdapter &&
-                            (widget.favoritesService as FavoritesServiceAdapter)
-                                .isPodStorageEnabled)
-                          MarkdownTooltip(
-                            message: '''
+                          // Share button (only if movie has rating/comment and POD is enabled).
+                          if (_hasMovieFile &&
+                              widget.favoritesService
+                                  is FavoritesServiceAdapter &&
+                              (widget.favoritesService
+                                      as FavoritesServiceAdapter)
+                                  .isPodStorageEnabled)
+                            MarkdownTooltip(
+                              message: '''
 
 **Share this movie and my review**
 
@@ -400,85 +412,89 @@ Share your rating and comments for this movie with friends via their WebID.
 Your shared movies will appear in their "Shared with Me" tab.
 
                             ''',
-                            child: _buildActionButton(
-                              icon: Icons.share,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              tooltip: 'Share movie',
-                              onPressed: _shareMovie,
-                            ),
-                          ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Rating section
-                    Text(
-                      'Your Rating',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: SliderTheme(
-                            data: SliderTheme.of(context).copyWith(
-                              activeTrackColor: Colors.amber,
-                              inactiveTrackColor:
-                                  Theme.of(context).colorScheme.outline,
-                              thumbColor: Colors.amber,
-                              trackHeight: 3.0,
-                              thumbShape: const RoundSliderThumbShape(
-                                  enabledThumbRadius: 6.0),
-                              overlayColor: Colors.amber.withValues(alpha: 0.2),
-                              valueIndicatorColor: Colors.amber,
-                              valueIndicatorTextStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                              child: _buildActionButton(
+                                icon: Icons.share,
+                                color: Theme.of(context).colorScheme.onSurface,
+                                tooltip: 'Share movie',
+                                onPressed: _shareMovie,
                               ),
                             ),
-                            child: Slider(
-                              value: _personalRating ?? 0,
-                              min: 0,
-                              max: 10,
-                              divisions: 100,
-                              label:
-                                  _personalRating?.toStringAsFixed(1) ?? '0.0',
-                              onChanged: (value) => _updateRating(value),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Rating section
+                      Text(
+                        'Your Rating',
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SliderTheme(
+                              data: SliderTheme.of(context).copyWith(
+                                activeTrackColor: Colors.amber,
+                                inactiveTrackColor:
+                                    Theme.of(context).colorScheme.outline,
+                                thumbColor: Colors.amber,
+                                trackHeight: 3.0,
+                                thumbShape: const RoundSliderThumbShape(
+                                  enabledThumbRadius: 6.0,
+                                ),
+                                overlayColor: Colors.amber.withValues(
+                                  alpha: 0.2,
+                                ),
+                                valueIndicatorColor: Colors.amber,
+                                valueIndicatorTextStyle: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              child: Slider(
+                                value: _personalRating ?? 0,
+                                min: 0,
+                                max: 10,
+                                divisions: 100,
+                                label:
+                                    _personalRating?.toStringAsFixed(1) ??
+                                    '0.0',
+                                onChanged: (value) => _updateRating(value),
+                              ),
                             ),
                           ),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.clear,
-                            color: Theme.of(context).colorScheme.onSurface,
-                            size: 18,
+                          IconButton(
+                            icon: Icon(
+                              Icons.clear,
+                              color: Theme.of(context).colorScheme.onSurface,
+                              size: 18,
+                            ),
+                            onPressed:
+                                _personalRating == null
+                                    ? null
+                                    : () => _updateRating(null),
+                            tooltip: 'Clear rating',
                           ),
-                          onPressed: _personalRating == null
-                              ? null
-                              : () => _updateRating(null),
-                          tooltip: 'Clear rating',
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
 
-                    Text(
-                      _personalRating == null
-                          ? 'No rating yet'
-                          : '${_personalRating!.toStringAsFixed(1)}/10',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
-                          ),
-                    ),
-                  ],
-                ),
+                      Text(
+                        _personalRating == null
+                            ? 'No rating yet'
+                            : '${_personalRating!.toStringAsFixed(1)}/10',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
+                  ),
         ),
       ),
     );

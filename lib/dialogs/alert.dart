@@ -34,17 +34,18 @@ Future<void> alert(
 ]) async {
   await showDialog(
     context: context,
-    builder: (context) => AlertDialog(
-      title: Text(title),
-      content: Text(msg),
-      actions: [
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('OK'),
+    builder:
+        (context) => AlertDialog(
+          title: Text(title),
+          content: Text(msg),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
         ),
-      ],
-    ),
   );
 }

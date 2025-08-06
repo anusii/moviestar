@@ -131,12 +131,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   void _buildScreens() {
     _screens = [
       HomeScreen(favoritesService: _favoritesService),
-      ToWatchScreen(
-        favoritesService: _favoritesService,
-      ),
-      WatchedScreen(
-        favoritesService: _favoritesService,
-      ),
+      ToWatchScreen(favoritesService: _favoritesService),
+      WatchedScreen(favoritesService: _favoritesService),
       ComingSoonScreen(favoritesService: _favoritesService),
       const SharedMoviesScreen(),
       const FileService(),
@@ -210,7 +206,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.favorite), label: 'To Watch'),
+            icon: Icon(Icons.favorite),
+            label: 'To Watch',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Watched'),
           BottomNavigationBarItem(
             icon: Icon(Icons.upcoming),

@@ -81,11 +81,9 @@ void main() async {
       // apps on the desktop so that it is visible (otherwise, with GNOME on
       // Ubuntu the app is often lost below other windows on startup).
       // We later turn it off as we don't want to force it always on top.
-
       alwaysOnTop: true,
 
       // The [title] is used for the window manager's window title.
-
       title: 'Movie Star - Manage and share ratings through private PODs',
     );
 

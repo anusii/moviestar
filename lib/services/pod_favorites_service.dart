@@ -118,7 +118,7 @@ class PodFavoritesService extends ChangeNotifier {
   /// Creates a new [PodFavoritesService] instance.
 
   PodFavoritesService(this._prefs, this._context, this._child)
-      : _fallbackService = FavoritesService(_prefs) {
+    : _fallbackService = FavoritesService(_prefs) {
     // Initialize ontology services.
 
     _userProfileService = UserProfileService(_context, _child);
@@ -138,10 +138,12 @@ class PodFavoritesService extends ChangeNotifier {
 
         // Get or create standard movie lists - this is critical for proper loading.
 
-        _toWatchListId =
-            await _movieListService.getOrCreateStandardMovieList('to_watch');
-        _watchedListId =
-            await _movieListService.getOrCreateStandardMovieList('watched');
+        _toWatchListId = await _movieListService.getOrCreateStandardMovieList(
+          'to_watch',
+        );
+        _watchedListId = await _movieListService.getOrCreateStandardMovieList(
+          'watched',
+        );
 
         // Only load and update streams if we have valid MovieList IDs.
 
@@ -192,16 +194,18 @@ class PodFavoritesService extends ChangeNotifier {
       // Load from MovieList system instead of old TTL files.
 
       if (_toWatchListId != null) {
-        final movieListData =
-            await _movieListService.getMovieList(_toWatchListId!);
+        final movieListData = await _movieListService.getMovieList(
+          _toWatchListId!,
+        );
         if (movieListData != null) {
           _cachedToWatch = List<Movie>.from(movieListData['movies'] ?? []);
         }
       }
 
       if (_watchedListId != null) {
-        final movieListData =
-            await _movieListService.getMovieList(_watchedListId!);
+        final movieListData = await _movieListService.getMovieList(
+          _watchedListId!,
+        );
         if (movieListData != null) {
           _cachedWatched = List<Movie>.from(movieListData['movies'] ?? []);
         }
@@ -303,8 +307,13 @@ class PodFavoritesService extends ChangeNotifier {
 
     try {
       final ttlContent = TurtleSerializer.ratingsToTurtleWithJson(ratings);
-      await writePod(_ratingsFileName, ttlContent, _context, _child,
-          encrypted: false);
+      await writePod(
+        _ratingsFileName,
+        ttlContent,
+        _context,
+        _child,
+        encrypted: false,
+      );
       _cachedRatings = Map.from(ratings);
     } catch (e) {
       // Don't log - this is background save for compatibility
@@ -318,8 +327,10 @@ class PodFavoritesService extends ChangeNotifier {
     // Read from MovieList file instead of cached old TTL data.
 
     if (_toWatchListId != null) {
-      final movieListData = await _movieListService
-          .getMovieList(_toWatchListId!, forceRefresh: forceRefresh);
+      final movieListData = await _movieListService.getMovieList(
+        _toWatchListId!,
+        forceRefresh: forceRefresh,
+      );
       if (movieListData != null) {
         final movies = movieListData['movies'] as List<Movie>? ?? [];
         return List.from(movies);
@@ -343,8 +354,10 @@ class PodFavoritesService extends ChangeNotifier {
     // Read from MovieList file instead of cached old TTL data.
 
     if (_watchedListId != null) {
-      final movieListData = await _movieListService
-          .getMovieList(_watchedListId!, forceRefresh: forceRefresh);
+      final movieListData = await _movieListService.getMovieList(
+        _watchedListId!,
+        forceRefresh: forceRefresh,
+      );
       if (movieListData != null) {
         final movies = movieListData['movies'] as List<Movie>? ?? [];
         return List.from(movies);
@@ -373,8 +386,10 @@ class PodFavoritesService extends ChangeNotifier {
 
     // Only use MovieList - remove old TTL operations.
     if (_toWatchListId != null) {
-      final success =
-          await _movieListService.addMovieToList(_toWatchListId!, movie);
+      final success = await _movieListService.addMovieToList(
+        _toWatchListId!,
+        movie,
+      );
       if (success) {
         // Update stream with fresh data from MovieList.
         final movies = await getToWatch(forceRefresh: true);
@@ -410,8 +425,10 @@ class PodFavoritesService extends ChangeNotifier {
     }
 
     if (_watchedListId != null) {
-      final success =
-          await _movieListService.addMovieToList(_watchedListId!, movie);
+      final success = await _movieListService.addMovieToList(
+        _watchedListId!,
+        movie,
+      );
       if (success) {
         // Update stream with fresh data from MovieList.
 
@@ -451,8 +468,10 @@ class PodFavoritesService extends ChangeNotifier {
     // Only use MovieList - remove old TTL operations.
 
     if (_toWatchListId != null) {
-      final success =
-          await _movieListService.removeMovieFromList(_toWatchListId!, movie);
+      final success = await _movieListService.removeMovieFromList(
+        _toWatchListId!,
+        movie,
+      );
       if (success) {
         // Update stream with fresh data from MovieList.
 
@@ -478,8 +497,10 @@ class PodFavoritesService extends ChangeNotifier {
     // Only use MovieList - remove old TTL operations.
 
     if (_watchedListId != null) {
-      final success =
-          await _movieListService.removeMovieFromList(_watchedListId!, movie);
+      final success = await _movieListService.removeMovieFromList(
+        _watchedListId!,
+        movie,
+      );
       if (success) {
         // Update stream with fresh data from MovieList.
 
@@ -660,8 +681,11 @@ class PodFavoritesService extends ChangeNotifier {
   /// Creates or updates a single movie file containing movie data and user's personal rating/comment.
   /// This is called whenever a user rates or comments on a movie.
 
-  Future<void> _createOrUpdateMovieFile(Movie movie,
-      {double? rating, String? comment}) async {
+  Future<void> _createOrUpdateMovieFile(
+    Movie movie, {
+    double? rating,
+    String? comment,
+  }) async {
     if (_isSyncing) {
       return;
     }
@@ -672,17 +696,22 @@ class PodFavoritesService extends ChangeNotifier {
 
     // Schedule a new update with a 500ms delay to batch rapid changes.
 
-    _pendingMovieUpdates[movie.id] =
-        Timer(const Duration(milliseconds: 500), () async {
-      await _performMovieFileUpdate(movie, rating: rating, comment: comment);
-      _pendingMovieUpdates.remove(movie.id);
-    });
+    _pendingMovieUpdates[movie.id] = Timer(
+      const Duration(milliseconds: 500),
+      () async {
+        await _performMovieFileUpdate(movie, rating: rating, comment: comment);
+        _pendingMovieUpdates.remove(movie.id);
+      },
+    );
   }
 
   /// Actually performs the movie file update after debouncing.
 
-  Future<void> _performMovieFileUpdate(Movie movie,
-      {double? rating, String? comment}) async {
+  Future<void> _performMovieFileUpdate(
+    Movie movie, {
+    double? rating,
+    String? comment,
+  }) async {
     try {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
@@ -779,7 +808,8 @@ class PodFavoritesService extends ChangeNotifier {
     final movieData = await _readMovieFile(movie);
     if (movieData != null) {
       final hasRating = movieData['rating'] != null;
-      final hasComment = movieData['comment'] != null &&
+      final hasComment =
+          movieData['comment'] != null &&
           (movieData['comment'] as String?)?.isNotEmpty == true;
 
       if (hasRating || hasComment) {
@@ -837,14 +867,16 @@ class PodFavoritesService extends ChangeNotifier {
         // This is expected for movies that haven't been rated/commented yet.
 
         debugPrint(
-            '📄 Movie file is empty or not found (expected for new movies)');
+          '📄 Movie file is empty or not found (expected for new movies)',
+        );
       }
     } catch (e) {
       if (e.toString().contains('does not exist')) {
         // This is expected for movies that haven't been rated/commented yet.
 
         debugPrint(
-            '📄 Movie file does not exist for ${movie.title} (expected for new movies)');
+          '📄 Movie file does not exist for ${movie.title} (expected for new movies)',
+        );
       } else {
         debugPrint('❌ Error reading movie file for ${movie.title}: $e');
       }
@@ -912,10 +944,10 @@ class PodFavoritesService extends ChangeNotifier {
         if (_toWatchListId == null || _watchedListId == null) {
           await _userProfileService.initializeProfileIfNeeded();
 
-          _toWatchListId ??=
-              await _movieListService.getOrCreateStandardMovieList('to_watch');
-          _watchedListId ??=
-              await _movieListService.getOrCreateStandardMovieList('watched');
+          _toWatchListId ??= await _movieListService
+              .getOrCreateStandardMovieList('to_watch');
+          _watchedListId ??= await _movieListService
+              .getOrCreateStandardMovieList('watched');
         }
 
         // Load data without triggering encryption key validation.
@@ -942,16 +974,18 @@ class PodFavoritesService extends ChangeNotifier {
       // Load from MovieList system instead of old TTL files.
 
       if (_toWatchListId != null) {
-        final movieListData =
-            await _movieListService.getMovieList(_toWatchListId!);
+        final movieListData = await _movieListService.getMovieList(
+          _toWatchListId!,
+        );
         if (movieListData != null) {
           _cachedToWatch = List<Movie>.from(movieListData['movies'] ?? []);
         }
       }
 
       if (_watchedListId != null) {
-        final movieListData =
-            await _movieListService.getMovieList(_watchedListId!);
+        final movieListData = await _movieListService.getMovieList(
+          _watchedListId!,
+        );
         if (movieListData != null) {
           _cachedWatched = List<Movie>.from(movieListData['movies'] ?? []);
         }
@@ -1017,8 +1051,9 @@ class PodFavoritesService extends ChangeNotifier {
       // Try to get or create standard movie lists if they're still null.
 
       if (_toWatchListId == null) {
-        _toWatchListId =
-            await _movieListService.getOrCreateStandardMovieList('to_watch');
+        _toWatchListId = await _movieListService.getOrCreateStandardMovieList(
+          'to_watch',
+        );
         if (_toWatchListId != null) {
           needsStreamUpdate = true;
         } else {
@@ -1027,8 +1062,9 @@ class PodFavoritesService extends ChangeNotifier {
       }
 
       if (_watchedListId == null) {
-        _watchedListId =
-            await _movieListService.getOrCreateStandardMovieList('watched');
+        _watchedListId = await _movieListService.getOrCreateStandardMovieList(
+          'watched',
+        );
         if (_watchedListId != null) {
           needsStreamUpdate = true;
         } else {

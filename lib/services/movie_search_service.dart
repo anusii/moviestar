@@ -40,8 +40,9 @@ class MovieSearchService {
   /// Searches for movies matching the given query.
 
   Future<List<Movie>> searchMovies(String query) async {
-    final results = await _client
-        .getJsonList('search/movie?query=${Uri.encodeComponent(query)}');
+    final results = await _client.getJsonList(
+      'search/movie?query=${Uri.encodeComponent(query)}',
+    );
     return results.map((movie) => Movie.fromJson(movie)).toList();
   }
 
@@ -50,8 +51,9 @@ class MovieSearchService {
   Future<List<Movie>> searchMoviesByActor(String actorName) async {
     // First search for people.
 
-    final personResults = await _client
-        .getJsonList('search/person?query=${Uri.encodeComponent(actorName)}');
+    final personResults = await _client.getJsonList(
+      'search/person?query=${Uri.encodeComponent(actorName)}',
+    );
 
     if (personResults.isEmpty) return [];
 
@@ -100,8 +102,9 @@ class MovieSearchService {
           continue;
         }
 
-        final movieCredits =
-            await _client.getJson('person/$personId/movie_credits');
+        final movieCredits = await _client.getJson(
+          'person/$personId/movie_credits',
+        );
         final cast = movieCredits['cast'] as List<dynamic>? ?? [];
 
         for (final movieData in cast) {
@@ -149,9 +152,9 @@ class MovieSearchService {
     // Find matching genre.
 
     final matchingGenre = genres.firstWhere(
-      (genre) => (genre['name'] as String)
-          .toLowerCase()
-          .contains(genreName.toLowerCase()),
+      (genre) => (genre['name'] as String).toLowerCase().contains(
+        genreName.toLowerCase(),
+      ),
       orElse: () => null,
     );
 
@@ -160,8 +163,9 @@ class MovieSearchService {
     // Search movies by genre ID.
 
     final genreId = matchingGenre['id'];
-    final results =
-        await _client.getJsonList('discover/movie?with_genres=$genreId');
+    final results = await _client.getJsonList(
+      'discover/movie?with_genres=$genreId',
+    );
 
     return results.map((movie) => Movie.fromJson(movie)).toList();
   }
@@ -169,7 +173,8 @@ class MovieSearchService {
   /// Comprehensive search that searches by title, actor, and genre.
 
   Future<Map<String, List<Movie>>> searchMoviesComprehensive(
-      String query) async {
+    String query,
+  ) async {
     final results = <String, List<Movie>>{};
 
     try {

@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang, Graham Williams, Ashley Tang
+/// Authors: Kevin Wang, Graham Williams, Ashley Tang, Tony Chen
 
 library;
 
@@ -52,9 +52,13 @@ import 'package:moviestar/services/movie_service.dart';
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
+import 'package:moviestar/constants/navigation_style.dart';
 import 'package:moviestar/widgets/movie_nav_drawer.dart';
 import 'package:moviestar/widgets/movie_nav_tabs.dart';
 import 'package:moviestar/widgets/solid_nav_bar.dart';
+import 'package:moviestar/widgets/solid_nav_drawer.dart';
+import 'package:moviestar/widgets/solid_navigation_manager.dart';
+import 'package:moviestar/widgets/solid_nav_utils.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   final SharedPreferences prefs;
@@ -344,236 +348,172 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isWideScreen = screenWidth > 800;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_navTabs[_selectedIndex].title),
-        backgroundColor: theme.colorScheme.surface,
-        automaticallyImplyLeading: !isWideScreen,
-        actions: [
-          // User information display.
+    // Create user info for the solid navigation.
 
-          if ((_name ?? '').isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Center(
-                child: MarkdownTooltip(
-                  message: '''
-                  
-                  **User:** Currently logged in as $_name
-                  
-                  ''',
-                  child: Text(
-                    _name!,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                ),
-              ),
+    final userInfo = SolidNavUtils.createUserInfo(
+      userName: _name ?? '',
+      webId: _webId,
+      showWebId: false,
+    );
+
+    // Create the main content with loading overlay.
+
+    final mainContent = Stack(
+      children: [
+        _isLoadingFolders
+            ? const Center(child: CircularProgressIndicator())
+            : _screens[_selectedIndex],
+      ],
+    );
+
+    // Create the AppBar with action buttons.
+
+    final appBar = AppBar(
+      title: Text(_navTabs[_selectedIndex].title),
+      backgroundColor: theme.colorScheme.surface,
+      actions: [
+        // Version widget.
+
+        if (_isVersionLoaded)
+          MarkdownTooltip(
+            message: '''
+
+            **Version:** This is the current version of the MovieStar app. If
+            the version is out of date then the text will be red. You can tap on
+            the version to view the app's Change Log to determine if it is worth
+            updating your version.
+
+            ''',
+            child: VersionWidget(
+              version: _appVersion,
+              changelogUrl:
+                  'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
+              showDate: true,
             ),
+          ),
 
-          // WebID display (simplified URL).
+        const SizedBox(width: 16),
 
-          if ((_webId ?? '').isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Center(
-                child: MarkdownTooltip(
-                  message: '''
-                  
-                  **Pod URL:** Your Solid POD location
-                  
-                  Full WebID: $_webId
-                  
-                  ''',
-                  child: Text(
-                    _getSimplifiedUrl(_webId!),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ),
-              ),
+        // Refresh button.
+
+        MarkdownTooltip(
+          message: '''
+
+          **Refresh:** Tap here to refresh all movie data and reload the latest
+          information from the movie database.
+
+          ''',
+          child: IconButton(
+            icon: Icon(
+              Icons.refresh,
+              color: theme.colorScheme.primary,
             ),
+            onPressed: _handleRefresh,
+          ),
+        ),
 
-          // Version widget.
+        // Search button.
 
-          if (_isVersionLoaded)
-            MarkdownTooltip(
+        MarkdownTooltip(
+          message: '''
+
+          **Search:** Tap here to search for movies by title, genre, or other
+          criteria.
+
+          ''',
+          child: IconButton(
+            icon: Icon(
+              Icons.search,
+              color: theme.colorScheme.primary,
+            ),
+            onPressed: _handleSearch,
+          ),
+        ),
+
+        // Theme toggle button.
+
+        Consumer(
+          builder: (context, ref, child) {
+            final themeMode = ref.watch(themeModeProvider);
+            final isDarkMode = themeMode == ThemeMode.dark;
+            return MarkdownTooltip(
               message: '''
 
-              **Version:** This is the current version of the MovieStar app. If
-              the version is out of date then the text will be red. You can tap on
-              the version to view the app's Change Log to determine if it is worth
-              updating your version.
+              **Theme Toggle:** Tap here to switch between light and dark themes.
 
               ''',
-              child: VersionWidget(
-                version: _appVersion,
-                changelogUrl:
-                    'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
-                showDate: true,
-              ),
-            ),
-
-          const SizedBox(width: 16),
-
-          // Refresh button.
-
-          MarkdownTooltip(
-            message: '''
-
-            **Refresh:** Tap here to refresh all movie data and reload the latest
-            information from the movie database.
-
-            ''',
-            child: IconButton(
-              icon: Icon(
-                Icons.refresh,
-                color: theme.colorScheme.primary,
-              ),
-              onPressed: _handleRefresh,
-            ),
-          ),
-
-          // Search button.
-
-          MarkdownTooltip(
-            message: '''
-
-            **Search:** Tap here to search for movies by title, genre, or other
-            criteria.
-
-            ''',
-            child: IconButton(
-              icon: Icon(
-                Icons.search,
-                color: theme.colorScheme.primary,
-              ),
-              onPressed: _handleSearch,
-            ),
-          ),
-
-          // Theme toggle button.
-
-          Consumer(
-            builder: (context, ref, child) {
-              final themeMode = ref.watch(themeModeProvider);
-              final isDarkMode = themeMode == ThemeMode.dark;
-              return MarkdownTooltip(
-                message: '''
-
-                **Theme Toggle:** Tap here to switch between light and dark themes.
-
-                ''',
-                child: IconButton(
-                  icon: Icon(
-                    isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                    color: theme.colorScheme.primary,
-                  ),
-                  onPressed: () async {
-                    await ref.read(themeModeProvider.notifier).toggleTheme();
-                  },
+              child: IconButton(
+                icon: Icon(
+                  isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  color: theme.colorScheme.primary,
                 ),
-              );
-            },
-          ),
-
-          // Settings button.
-
-          MarkdownTooltip(
-            message: '''
-
-            **Settings:** Tap here to view and manage your MovieStar account
-            settings.
-
-            ''',
-            child: IconButton(
-              icon: Icon(
-                Icons.settings,
-                color: theme.colorScheme.primary,
+                onPressed: () async {
+                  await ref.read(themeModeProvider.notifier).toggleTheme();
+                },
               ),
-              onPressed: _handleSettings,
+            );
+          },
+        ),
+
+        // Settings button.
+
+        MarkdownTooltip(
+          message: '''
+
+          **Settings:** Tap here to view and manage your MovieStar account
+          settings.
+
+          ''',
+          child: IconButton(
+            icon: Icon(
+              Icons.settings,
+              color: theme.colorScheme.primary,
             ),
+            onPressed: _handleSettings,
           ),
+        ),
 
-          // Logout button.
+        // Logout button.
 
-          MarkdownTooltip(
-            message: '''
+        MarkdownTooltip(
+          message: '''
 
-            **Logout:** Tap here to securely log out of your MovieStar account.
-            This will clear your current session and return you to the login
-            screen.
+          **Logout:** Tap here to securely log out of your MovieStar account.
+          This will clear your current session and return you to the login
+          screen.
 
-            ''',
-            child: IconButton(
-              icon: Icon(
-                Icons.logout,
-                color: theme.colorScheme.primary,
-              ),
-              onPressed: _handleLogout,
+          ''',
+          child: IconButton(
+            icon: Icon(
+              Icons.logout,
+              color: theme.colorScheme.primary,
             ),
+            onPressed: _handleLogout,
           ),
-        ],
+        ),
+      ],
+    );
+
+    // Use the Solid Navigation Manager with configurable width threshold.
+
+    return SolidNavigationManager.movieStar(
+      config: const SolidNavigationConfig(
+        wideScreenThreshold: NavigationConstants.wideScreenThreshold,
+        autoSwitch: true,
       ),
-      drawer: !isWideScreen
-          ? MovieNavDrawer(
-              webId: _webId ?? '',
-              userName: _name ?? '',
-              tabs: _navTabs,
-              selectedIndex: _selectedIndex,
-              onTabSelected: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
-            )
-          : null,
+      tabs: _navTabs,
+      selectedIndex: _selectedIndex,
+      onTabSelected: (index) {
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
+      content: mainContent,
+      userInfo: userInfo,
+      onLogout: (context) => _handleLogout(),
+      appBar: appBar,
       backgroundColor: theme.colorScheme.surface,
-      body: Column(
-        children: [
-          Divider(height: 1, color: theme.dividerColor),
-          Expanded(
-            child: isWideScreen
-                ? Row(
-                    children: [
-                      SolidNavBar(
-                        tabs: _navTabs,
-                        selectedIndex: _selectedIndex,
-                        onTabSelected: (index) {
-                          setState(() {
-                            _selectedIndex = index;
-                          });
-                        },
-                      ),
-                      VerticalDivider(color: theme.dividerColor),
-                      Expanded(
-                        child: Stack(
-                          children: [
-                            _isLoadingFolders
-                                ? const Center(child: CircularProgressIndicator())
-                                : _screens[_selectedIndex],
-                          ],
-                        ),
-                      ),
-                    ],
-                  )
-                : Stack(
-                    children: [
-                      _isLoadingFolders
-                          ? const Center(child: CircularProgressIndicator())
-                          : _screens[_selectedIndex],
-                    ],
-                  ),
-          ),
-        ],
-      ),
     );
   }
 }

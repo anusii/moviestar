@@ -28,6 +28,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 
+import 'package:moviestar/constants/navigation_style.dart';
+
 /// Configuration for a navigation tab.
 ///
 /// This class defines the structure for each tab in the navigation rail,
@@ -101,6 +103,22 @@ class SolidNavBar extends StatelessWidget {
 
   final void Function(BuildContext, String, String?)? onShowAlert;
 
+  /// Optional custom minimum width for the navigation rail.
+
+  final double? minWidth;
+
+  /// Optional custom group alignment for navigation items.
+
+  final double? groupAlignment;
+
+  /// Optional custom icon size.
+
+  final double? iconSize;
+
+  /// Optional custom label font size.
+
+  final double? labelFontSize;
+
   /// Creates a [SolidNavBar] with the specified configuration.
 
   const SolidNavBar({
@@ -109,6 +127,10 @@ class SolidNavBar extends StatelessWidget {
     required this.selectedIndex,
     required this.onTabSelected,
     this.onShowAlert,
+    this.minWidth,
+    this.groupAlignment,
+    this.iconSize,
+    this.labelFontSize,
   });
 
   @override
@@ -117,66 +139,64 @@ class SolidNavBar extends StatelessWidget {
 
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-      child: SingleChildScrollView(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: Container(
-            color: theme.colorScheme.surface,
-            child: NavigationRail(
-              backgroundColor: theme.colorScheme.surface,
-              selectedIndex: selectedIndex,
-              onDestinationSelected: (index) =>
-                  _handleTabSelection(index, context),
-              labelType: NavigationRailLabelType.all,
-              minWidth: 80.0,
-              groupAlignment: -0.8,
-              destinations: tabs.map((tab) {
-                final tooltipMessage = tab.tooltip ?? tab.message;
+      child: Container(
+        color: theme.colorScheme.surface,
+        child: NavigationRail(
+          backgroundColor: theme.colorScheme.surface,
+          selectedIndex: selectedIndex,
+          onDestinationSelected: (index) => _handleTabSelection(index, context),
+          labelType: NavigationRailLabelType.all,
+          minWidth: minWidth ?? NavigationConstants.navRailMinWidth,
+          groupAlignment:
+              groupAlignment ?? NavigationConstants.navRailGroupAlignment,
+          destinations: tabs.map((tab) {
+            final tooltipMessage = tab.tooltip ?? tab.message;
 
-                Widget iconWidget = Icon(
-                  tab.icon,
-                  size: 26.0,
-                  color: tab.color ?? theme.colorScheme.primary,
-                );
+            Widget iconWidget = Icon(
+              tab.icon,
+              size: iconSize ?? NavigationConstants.navIconSize,
+              color: tab.color ?? theme.colorScheme.primary,
+            );
 
-                // Wrap with tooltip if available.
+            // Wrap with tooltip if available.
 
-                if (tooltipMessage != null) {
-                  iconWidget = MarkdownTooltip(
-                    message: tooltipMessage,
-                    child: iconWidget,
-                  );
-                }
+            if (tooltipMessage != null) {
+              iconWidget = MarkdownTooltip(
+                message: tooltipMessage,
+                child: iconWidget,
+              );
+            }
 
-                return NavigationRailDestination(
-                  icon: iconWidget,
-                  label: Text(
-                    tab.title,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.2,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 6.0),
-                );
-              }).toList(),
-              selectedLabelTextStyle: theme.textTheme.bodySmall?.copyWith(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.2,
-                color: theme.colorScheme.primary,
+            return NavigationRailDestination(
+              icon: iconWidget,
+              label: Text(
+                tab.title,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontSize:
+                      labelFontSize ?? NavigationConstants.navLabelFontSize,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: NavigationConstants.navLabelLetterSpacing,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: NavigationConstants.navLabelMaxLines,
+                overflow: TextOverflow.ellipsis,
               ),
-              unselectedLabelTextStyle: theme.textTheme.bodySmall?.copyWith(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w400,
-                letterSpacing: 0.2,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              padding: const EdgeInsets.symmetric(
+                vertical: NavigationConstants.navDestinationVerticalPadding,
               ),
-            ),
+            );
+          }).toList(),
+          selectedLabelTextStyle: theme.textTheme.bodySmall?.copyWith(
+            fontSize: labelFontSize ?? NavigationConstants.navLabelFontSize,
+            fontWeight: FontWeight.w600,
+            letterSpacing: NavigationConstants.navLabelLetterSpacing,
+            color: theme.colorScheme.primary,
+          ),
+          unselectedLabelTextStyle: theme.textTheme.bodySmall?.copyWith(
+            fontSize: labelFontSize ?? NavigationConstants.navLabelFontSize,
+            fontWeight: FontWeight.w400,
+            letterSpacing: NavigationConstants.navLabelLetterSpacing,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ),

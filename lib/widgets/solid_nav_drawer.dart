@@ -27,7 +27,7 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:moviestar/constants/navigation_style.dart';
+import 'package:moviestar/constants/navigation_constants.dart';
 import 'package:moviestar/widgets/solid_nav_bar.dart';
 
 /// User information configuration for the navigation drawer.

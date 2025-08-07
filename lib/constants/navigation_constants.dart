@@ -35,6 +35,14 @@ class NavigationConstants {
 
   static const double wideScreenThreshold = 800.0;
 
+  /// The width threshold for determining very narrow screen layout.
+
+  static const double veryNarrowScreenThreshold = 600.0;
+
+  /// The width threshold for determining narrow screen layout.
+
+  static const double narrowScreenThreshold = 800.0;
+
   /// Minimum width for the navigation rail.
 
   static const double navRailMinWidth = 80.0;

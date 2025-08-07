@@ -52,11 +52,9 @@ import 'package:moviestar/services/movie_service.dart';
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
-import 'package:moviestar/constants/navigation_style.dart';
-import 'package:moviestar/widgets/movie_nav_drawer.dart';
+import 'package:moviestar/constants/navigation_constants.dart';
 import 'package:moviestar/widgets/movie_nav_tabs.dart';
 import 'package:moviestar/widgets/solid_nav_bar.dart';
-import 'package:moviestar/widgets/solid_nav_drawer.dart';
 import 'package:moviestar/widgets/solid_navigation_manager.dart';
 import 'package:moviestar/widgets/solid_nav_utils.dart';
 
@@ -328,23 +326,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     logoutPopup(context, const MovieStar());
   }
 
-  /// Simplifies the WebID URL for display purposes.
-
-  String _getSimplifiedUrl(String webId) {
-    const suffix = 'profile/card#me';
-    String url = webId;
-    if (url.endsWith(suffix)) {
-      url = url.substring(0, url.length - suffix.length);
-    }
-    // Remove protocol for cleaner display
-    if (url.startsWith('https://')) {
-      url = url.substring(8);
-    } else if (url.startsWith('http://')) {
-      url = url.substring(7);
-    }
-    return url;
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -367,15 +348,19 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       ],
     );
 
-    // Create the AppBar with action buttons.
+    // Create responsive AppBar with action buttons.
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isVeryNarrow = screenWidth < NavigationConstants.veryNarrowScreenThreshold;
+    final isNarrow = screenWidth < NavigationConstants.narrowScreenThreshold;
+    
     final appBar = AppBar(
       title: Text(_navTabs[_selectedIndex].title),
       backgroundColor: theme.colorScheme.surface,
       actions: [
-        // Version widget.
+        // Version widget - hide on very narrow screens.
 
-        if (_isVersionLoaded)
+        if (_isVersionLoaded && !isVeryNarrow)
           MarkdownTooltip(
             message: '''
 
@@ -389,13 +374,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               version: _appVersion,
               changelogUrl:
                   'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
-              showDate: true,
+              showDate: !isNarrow, // Hide date on narrow screens.
             ),
           ),
 
-        const SizedBox(width: 16),
+        if (!isVeryNarrow) const SizedBox(width: 8), // Reduced spacing.
 
-        // Refresh button.
+        // Essential buttons - always show.
 
         MarkdownTooltip(
           message: '''
@@ -431,67 +416,156 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           ),
         ),
 
-        // Theme toggle button.
+        // Theme toggle - hide on very narrow screens.
 
-        Consumer(
-          builder: (context, ref, child) {
-            final themeMode = ref.watch(themeModeProvider);
-            final isDarkMode = themeMode == ThemeMode.dark;
-            return MarkdownTooltip(
-              message: '''
+        if (!isVeryNarrow)
+          Consumer(
+            builder: (context, ref, child) {
+              final themeMode = ref.watch(themeModeProvider);
+              final isDarkMode = themeMode == ThemeMode.dark;
+              return MarkdownTooltip(
+                message: '''
 
-              **Theme Toggle:** Tap here to switch between light and dark themes.
+                **Theme Toggle:** Tap here to switch between light and dark themes.
 
-              ''',
-              child: IconButton(
-                icon: Icon(
-                  isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                  color: theme.colorScheme.primary,
+                ''',
+                child: IconButton(
+                  icon: Icon(
+                    isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                    color: theme.colorScheme.primary,
+                  ),
+                  onPressed: () async {
+                    await ref.read(themeModeProvider.notifier).toggleTheme();
+                  },
                 ),
-                onPressed: () async {
+              );
+            },
+          ),
+
+        // Overflow menu for narrow screens.
+
+        if (isVeryNarrow)
+          PopupMenuButton<String>(
+            icon: Icon(
+              Icons.more_vert,
+              color: theme.colorScheme.primary,
+            ),
+            onSelected: (value) async {
+              switch (value) {
+                case 'theme':
                   await ref.read(themeModeProvider.notifier).toggleTheme();
-                },
+                  break;
+                case 'settings':
+                  _handleSettings();
+                  break;
+                case 'logout':
+                  _handleLogout();
+                  break;
+                case 'version':
+                  // Show version info in a dialog.
+
+                  if (mounted) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Version Information'),
+                        content: Text('Version: $_appVersion'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'theme',
+                child: Row(
+                  children: [
+                    Icon(
+                      ref.watch(themeModeProvider) == ThemeMode.dark
+                          ? Icons.light_mode
+                          : Icons.dark_mode,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('Toggle Theme'),
+                  ],
+                ),
               ),
-            );
-          },
-        ),
+              const PopupMenuItem(
+                value: 'settings',
+                child: Row(
+                  children: [
+                    Icon(Icons.settings),
+                    SizedBox(width: 8),
+                    Text('Settings'),
+                  ],
+                ),
+              ),
+              if (_isVersionLoaded)
+                const PopupMenuItem(
+                  value: 'version',
+                  child: Row(
+                    children: [
+                      Icon(Icons.info),
+                      SizedBox(width: 8),
+                      Text('Version Info'),
+                    ],
+                  ),
+                ),
+              const PopupMenuItem(
+                value: 'logout',
+                child: Row(
+                  children: [
+                    Icon(Icons.logout),
+                    SizedBox(width: 8),
+                    Text('Logout'),
+                  ],
+                ),
+              ),
+            ],
+          )
+        else ...[
+          // Settings and logout buttons for wider screens.
 
-        // Settings button.
+          MarkdownTooltip(
+            message: '''
 
-        MarkdownTooltip(
-          message: '''
+            **Settings:** Tap here to view and manage your MovieStar account
+            settings.
 
-          **Settings:** Tap here to view and manage your MovieStar account
-          settings.
-
-          ''',
-          child: IconButton(
-            icon: Icon(
-              Icons.settings,
-              color: theme.colorScheme.primary,
+            ''',
+            child: IconButton(
+              icon: Icon(
+                Icons.settings,
+                color: theme.colorScheme.primary,
+              ),
+              onPressed: _handleSettings,
             ),
-            onPressed: _handleSettings,
           ),
-        ),
 
-        // Logout button.
+          MarkdownTooltip(
+            message: '''
 
-        MarkdownTooltip(
-          message: '''
+            **Logout:** Tap here to securely log out of your MovieStar account.
+            This will clear your current session and return you to the login
+            screen.
 
-          **Logout:** Tap here to securely log out of your MovieStar account.
-          This will clear your current session and return you to the login
-          screen.
-
-          ''',
-          child: IconButton(
-            icon: Icon(
-              Icons.logout,
-              color: theme.colorScheme.primary,
+            ''',
+            child: IconButton(
+              icon: Icon(
+                Icons.logout,
+                color: theme.colorScheme.primary,
+              ),
+              onPressed: _handleLogout,
             ),
-            onPressed: _handleLogout,
           ),
-        ),
+        ],
       ],
     );
 

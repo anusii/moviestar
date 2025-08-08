@@ -35,7 +35,6 @@ import 'package:solidpod/solidpod.dart'
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/search_screen.dart';
@@ -240,7 +239,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   Future<void> _initialiseAppData() async {
     final loggedIn = await isLoggedIn();
 
-    // Refresh user info based on login status
+    // Refresh user info based on login status.
+
     await _loadUserInfo();
 
     if (loggedIn) {
@@ -265,6 +265,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             }
 
             // Now reload POD data since folders are ready.
+
             await _favoritesServiceManager.reloadPodDataAfterInit();
 
             // Refresh UI streams to ensure latest data is displayed.

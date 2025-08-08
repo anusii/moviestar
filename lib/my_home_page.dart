@@ -53,7 +53,6 @@ import 'package:moviestar/services/movie_service.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/constants/navigation_constants.dart';
-import 'package:moviestar/widgets/movie_nav_tabs.dart';
 import 'package:moviestar/widgets/solid_nav_bar.dart';
 import 'package:moviestar/widgets/solid_navigation_manager.dart';
 import 'package:moviestar/widgets/solid_nav_utils.dart';
@@ -235,7 +234,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     // Configure navigation tabs using the MovieStar app configuration.
 
-    _navTabs = createMovieStarNavTabs();
+    _navTabs = SolidNavUtils.createMovieStarNavTabs();
 
     _initialiseAppData();
   }

@@ -184,7 +184,7 @@ class SolidNavDrawer extends StatelessWidget {
                       Navigator.of(context).pop(); // Close drawer.
                     },
                   );
-                }).toList(),
+                }),
 
                 // Additional menu items (if provided).
 

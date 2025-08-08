@@ -28,11 +28,9 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart'
     show getAppNameVersion, logoutPopup, getWebId;
-import 'package:version_widget/version_widget.dart';
 
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/features/file/service/page.dart';
@@ -348,225 +346,18 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       ],
     );
 
-    // Create responsive AppBar with action buttons.
+    // Create responsive AppBar using SolidNavUtils.
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isVeryNarrow = screenWidth < NavigationConstants.veryNarrowScreenThreshold;
-    final isNarrow = screenWidth < NavigationConstants.narrowScreenThreshold;
-    
-    final appBar = AppBar(
-      title: Text(_navTabs[_selectedIndex].title),
-      backgroundColor: theme.colorScheme.surface,
-      actions: [
-        // Version widget - hide on very narrow screens.
-
-        if (_isVersionLoaded && !isVeryNarrow)
-          MarkdownTooltip(
-            message: '''
-
-            **Version:** This is the current version of the MovieStar app. If
-            the version is out of date then the text will be red. You can tap on
-            the version to view the app's Change Log to determine if it is worth
-            updating your version.
-
-            ''',
-            child: VersionWidget(
-              version: _appVersion,
-              changelogUrl:
-                  'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
-              showDate: !isNarrow, // Hide date on narrow screens.
-            ),
-          ),
-
-        if (!isVeryNarrow) const SizedBox(width: 8), // Reduced spacing.
-
-        // Essential buttons - always show.
-
-        MarkdownTooltip(
-          message: '''
-
-          **Refresh:** Tap here to refresh all movie data and reload the latest
-          information from the movie database.
-
-          ''',
-          child: IconButton(
-            icon: Icon(
-              Icons.refresh,
-              color: theme.colorScheme.primary,
-            ),
-            onPressed: _handleRefresh,
-          ),
-        ),
-
-        // Search button.
-
-        MarkdownTooltip(
-          message: '''
-
-          **Search:** Tap here to search for movies by title, genre, or other
-          criteria.
-
-          ''',
-          child: IconButton(
-            icon: Icon(
-              Icons.search,
-              color: theme.colorScheme.primary,
-            ),
-            onPressed: _handleSearch,
-          ),
-        ),
-
-        // Theme toggle - hide on very narrow screens.
-
-        if (!isVeryNarrow)
-          Consumer(
-            builder: (context, ref, child) {
-              final themeMode = ref.watch(themeModeProvider);
-              final isDarkMode = themeMode == ThemeMode.dark;
-              return MarkdownTooltip(
-                message: '''
-
-                **Theme Toggle:** Tap here to switch between light and dark themes.
-
-                ''',
-                child: IconButton(
-                  icon: Icon(
-                    isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                    color: theme.colorScheme.primary,
-                  ),
-                  onPressed: () async {
-                    await ref.read(themeModeProvider.notifier).toggleTheme();
-                  },
-                ),
-              );
-            },
-          ),
-
-        // Overflow menu for narrow screens.
-
-        if (isVeryNarrow)
-          PopupMenuButton<String>(
-            icon: Icon(
-              Icons.more_vert,
-              color: theme.colorScheme.primary,
-            ),
-            onSelected: (value) async {
-              switch (value) {
-                case 'theme':
-                  await ref.read(themeModeProvider.notifier).toggleTheme();
-                  break;
-                case 'settings':
-                  _handleSettings();
-                  break;
-                case 'logout':
-                  _handleLogout();
-                  break;
-                case 'version':
-                  // Show version info in a dialog.
-
-                  if (mounted) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Version Information'),
-                        content: Text('Version: $_appVersion'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'theme',
-                child: Row(
-                  children: [
-                    Icon(
-                      ref.watch(themeModeProvider) == ThemeMode.dark
-                          ? Icons.light_mode
-                          : Icons.dark_mode,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text('Toggle Theme'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'settings',
-                child: Row(
-                  children: [
-                    Icon(Icons.settings),
-                    SizedBox(width: 8),
-                    Text('Settings'),
-                  ],
-                ),
-              ),
-              if (_isVersionLoaded)
-                const PopupMenuItem(
-                  value: 'version',
-                  child: Row(
-                    children: [
-                      Icon(Icons.info),
-                      SizedBox(width: 8),
-                      Text('Version Info'),
-                    ],
-                  ),
-                ),
-              const PopupMenuItem(
-                value: 'logout',
-                child: Row(
-                  children: [
-                    Icon(Icons.logout),
-                    SizedBox(width: 8),
-                    Text('Logout'),
-                  ],
-                ),
-              ),
-            ],
-          )
-        else ...[
-          // Settings and logout buttons for wider screens.
-
-          MarkdownTooltip(
-            message: '''
-
-            **Settings:** Tap here to view and manage your MovieStar account
-            settings.
-
-            ''',
-            child: IconButton(
-              icon: Icon(
-                Icons.settings,
-                color: theme.colorScheme.primary,
-              ),
-              onPressed: _handleSettings,
-            ),
-          ),
-
-          MarkdownTooltip(
-            message: '''
-
-            **Logout:** Tap here to securely log out of your MovieStar account.
-            This will clear your current session and return you to the login
-            screen.
-
-            ''',
-            child: IconButton(
-              icon: Icon(
-                Icons.logout,
-                color: theme.colorScheme.primary,
-              ),
-              onPressed: _handleLogout,
-            ),
-          ),
-        ],
-      ],
+    final appBar = SolidNavUtils.createMovieStarAppBar(
+      context: context,
+      ref: ref,
+      title: _navTabs[_selectedIndex].title,
+      appVersion: _appVersion,
+      isVersionLoaded: _isVersionLoaded,
+      onRefresh: _handleRefresh,
+      onSearch: _handleSearch,
+      onSettings: _handleSettings,
+      onLogout: _handleLogout,
     );
 
     // Use the Solid Navigation Manager with configurable width threshold.

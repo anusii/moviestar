@@ -34,6 +34,7 @@ import 'package:solidpod/solidpod.dart'
     show getAppNameVersion, logoutPopup, getWebId;
 import 'package:version_widget/version_widget.dart';
 
+import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/theme_provider.dart';
@@ -49,7 +50,6 @@ import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/services/movie_service.dart';
-import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/constants/navigation_constants.dart';
@@ -153,7 +153,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         });
       }
     } catch (e) {
-      // Handle error gracefully
+      // Handle error gracefully.
+
       if (mounted) {
         setState(() {
           _webId = null;

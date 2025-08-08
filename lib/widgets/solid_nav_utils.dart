@@ -1,4 +1,4 @@
-/// Navigation utilities for Solid navigation system.
+/// Solid Navigation Utilities.
 ///
 // Time-stamp: <Tuesday 2025-08-06 16:30:00 +1000 Tony Chen>
 ///
@@ -30,25 +30,78 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:version_widget/version_widget.dart';
 
-import 'package:moviestar/constants/navigation_constants.dart';
-import 'package:moviestar/providers/theme_provider.dart';
-import 'package:moviestar/widgets/solid_nav_bar.dart';
-import 'package:moviestar/widgets/solid_nav_drawer.dart';
+import 'package:moviestar/widgets/solid_nav_models.dart';
 
-/// Utility class for navigation-related helper functions.
+/// Utility class for navigation components.
+///
+/// This class provides high-level functions for creating navigation elements
+/// that can be used across different applications without coupling to specific
+/// app logic.
 
 class SolidNavUtils {
-  /// Creates a SolidNavUserInfo from basic user information.
+  /// Creates a generic responsive AppBar with configurable actions.
+  ///
+  /// This method provides a complete AppBar implementation that handles:
+  /// - Responsive design (adapts to screen width)
+  /// - Action buttons with tooltips
+  /// - Overflow menu for narrow screens
+  /// - Version display
+  /// - Theme toggle
+  /// - Proper colour theming
 
-  static SolidNavUserInfo createUserInfo({
-    required String userName,
-    String? webId,
-    bool showWebId = false,
+  static AppBar createAppBar({
+    required BuildContext context,
+    required SolidAppBarConfig config,
+    WidgetRef? ref,
   }) {
+    final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isNarrow = screenWidth < config.narrowScreenThreshold;
+    final isVeryNarrow = screenWidth < config.veryNarrowScreenThreshold;
+
+    return AppBar(
+      title: Text(config.title),
+      backgroundColor: config.backgroundColor ?? theme.colorScheme.surface,
+      actions: [
+        // Version widget - hide on very narrow screens.
+
+        if (config.versionConfig != null && !isVeryNarrow)
+          _buildVersionWidget(config.versionConfig!, isNarrow),
+
+        if (config.versionConfig != null && !isVeryNarrow) 
+          const SizedBox(width: 8),
+
+        // Regular action buttons.
+
+        ...config.actions
+            .where((action) => 
+                (!isNarrow || !action.hideOnNarrowScreen) &&
+                (!isVeryNarrow || !action.hideOnVeryNarrowScreen))
+            .map((action) => _buildActionButton(context, action)),
+
+        // Theme toggle - hide on very narrow screens.
+
+        if (config.themeConfig?.enabled == true && !isVeryNarrow && ref != null)
+          _buildThemeToggle(context, config.themeConfig!, ref),
+
+        // Overflow menu for narrow screens.
+
+        if (isVeryNarrow && config.overflowItems.isNotEmpty)
+          _buildOverflowMenu(context, config, ref),
+      ],
+    );
+  }
+
+  /// Creates a SolidNavUserInfo from user configuration.
+
+  static SolidNavUserInfo createUserInfo(SolidNavUserConfig config) {
     return SolidNavUserInfo(
-      userName: userName,
-      webId: webId,
-      showWebId: showWebId,
+      userName: config.userName,
+      webId: config.userId,
+      showWebId: config.showUserId,
+      avatar: config.avatar,
+      avatarIcon: config.avatarIcon,
+      avatarSize: config.avatarSize,
     );
   }
 
@@ -69,331 +122,123 @@ class SolidNavUtils {
     return null;
   }
 
-  /// Creates a MovieStar-specific AppBar with responsive design.
-  ///
-  /// This method handles the complex logic for creating an AppBar that adapts
-  /// to different screen sizes and includes all necessary action buttons.
+  /// Builds a version widget with proper tooltip.
 
-  static AppBar createMovieStarAppBar({
-    required BuildContext context,
-    required WidgetRef ref,
-    required String title,
-    required String appVersion,
-    required bool isVersionLoaded,
-    required VoidCallback onRefresh,
-    required VoidCallback onSearch,
-    required VoidCallback onSettings,
-    required VoidCallback onLogout,
-  }) {
+  static Widget _buildVersionWidget(SolidVersionConfig config, bool isNarrow) {
+    final widget = VersionWidget(
+      version: config.version,
+      changelogUrl: config.changelogUrl,
+      showDate: config.showDate && !isNarrow,
+    );
+
+    if (config.tooltip != null) {
+      return MarkdownTooltip(
+        message: config.tooltip!,
+        child: widget,
+      );
+    }
+
+    return widget;
+  }
+
+  /// Builds an action button with proper theming and tooltip.
+
+  static Widget _buildActionButton(BuildContext context, SolidAppBarAction action) {
     final theme = Theme.of(context);
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isVeryNarrow = screenWidth < NavigationConstants.veryNarrowScreenThreshold;
-    final isNarrow = screenWidth < NavigationConstants.narrowScreenThreshold;
+    final button = IconButton(
+      icon: Icon(
+        action.icon,
+        color: action.color ?? theme.colorScheme.primary,
+      ),
+      onPressed: action.onPressed,
+    );
 
-    return AppBar(
-      title: Text(title),
-      backgroundColor: theme.colorScheme.surface,
-      actions: [
-        // Version widget - hide on very narrow screens.
-        if (isVersionLoaded && !isVeryNarrow)
-          MarkdownTooltip(
-            message: '''
+    if (action.tooltip != null) {
+      return MarkdownTooltip(
+        message: action.tooltip!,
+        child: button,
+      );
+    }
 
-            **Version:** This is the current version of the MovieStar app. If
-            the version is out of date then the text will be red. You can tap on
-            the version to view the app's Change Log to determine if it is worth
-            updating your version.
+    return button;
+  }
 
-            ''',
-            child: VersionWidget(
-              version: appVersion,
-              changelogUrl:
-                  'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
-              showDate: !isNarrow, // Hide date on narrow screens.
-            ),
-          ),
+  /// Builds a theme toggle button with proper theming.
 
-        if (!isVeryNarrow) const SizedBox(width: 8), // Reduced spacing.
-
-        // Essential buttons - always show.
-        MarkdownTooltip(
-          message: '''
-
-          **Refresh:** Tap here to refresh all movie data and reload the latest
-          information from the movie database.
-
-          ''',
+  static Widget _buildThemeToggle(
+    BuildContext context,
+    SolidThemeConfig config,
+    WidgetRef ref,
+  ) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+        
+        return MarkdownTooltip(
+          message: isDarkMode ? config.lightModeTooltip : config.darkModeTooltip,
           child: IconButton(
             icon: Icon(
-              Icons.refresh,
-              color: theme.colorScheme.primary,
+              isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: Theme.of(context).colorScheme.primary,
             ),
-            onPressed: onRefresh,
-          ),
-        ),
-
-        // Search button.
-        MarkdownTooltip(
-          message: '''
-
-          **Search:** Tap here to search for movies by title, genre, or other
-          criteria.
-
-          ''',
-          child: IconButton(
-            icon: Icon(
-              Icons.search,
-              color: theme.colorScheme.primary,
-            ),
-            onPressed: onSearch,
-          ),
-        ),
-
-        // Theme toggle - hide on very narrow screens.
-        if (!isVeryNarrow)
-          Consumer(
-            builder: (context, ref, child) {
-              final themeMode = ref.watch(themeModeProvider);
-              final isDarkMode = themeMode == ThemeMode.dark;
-              return MarkdownTooltip(
-                message: '''
-
-                **Theme Toggle:** Tap here to switch between light and dark themes.
-
-                ''',
-                child: IconButton(
-                  icon: Icon(
-                    isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                    color: theme.colorScheme.primary,
-                  ),
-                  onPressed: () async {
-                    await ref.read(themeModeProvider.notifier).toggleTheme();
-                  },
-                ),
-              );
+            onPressed: () async {
+              if (config.onToggle != null) {
+                await config.onToggle!();
+              }
             },
           ),
-
-        // Overflow menu for narrow screens.
-        if (isVeryNarrow)
-          _buildOverflowMenu(
-            context,
-            ref,
-            theme,
-            isVersionLoaded,
-            appVersion,
-            onSettings,
-            onLogout,
-          )
-        else ...[
-          // Settings and logout buttons for wider screens.
-          MarkdownTooltip(
-            message: '''
-
-            **Settings:** Tap here to view and manage your MovieStar account
-            settings.
-
-            ''',
-            child: IconButton(
-              icon: Icon(
-                Icons.settings,
-                color: theme.colorScheme.primary,
-              ),
-              onPressed: onSettings,
-            ),
-          ),
-
-          MarkdownTooltip(
-            message: '''
-
-            **Logout:** Tap here to securely log out of your MovieStar account.
-            This will clear your current session and return you to the login
-            screen.
-
-            ''',
-            child: IconButton(
-              icon: Icon(
-                Icons.logout,
-                color: theme.colorScheme.primary,
-              ),
-              onPressed: onLogout,
-            ),
-          ),
-        ],
-      ],
+        );
+      },
     );
   }
 
-  /// Builds the overflow menu for very narrow screens.
+  /// Builds an overflow menu for narrow screens.
 
   static Widget _buildOverflowMenu(
     BuildContext context,
-    WidgetRef ref,
-    ThemeData theme,
-    bool isVersionLoaded,
-    String appVersion,
-    VoidCallback onSettings,
-    VoidCallback onLogout,
+    SolidAppBarConfig config,
+    WidgetRef? ref,
   ) {
+    final theme = Theme.of(context);
+
     return PopupMenuButton<String>(
       icon: Icon(
         Icons.more_vert,
         color: theme.colorScheme.primary,
       ),
-      onSelected: (value) async {
-        switch (value) {
-          case 'theme':
-            await ref.read(themeModeProvider.notifier).toggleTheme();
-            break;
-          case 'settings':
-            onSettings();
-            break;
-          case 'logout':
-            onLogout();
-            break;
-          case 'version':
-            // Show version info in a dialog.
-            if (context.mounted) {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Version Information'),
-                  content: Text('Version: $appVersion'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('OK'),
-                    ),
+      onSelected: (value) {
+        final item = config.overflowItems.firstWhere(
+          (item) => item.id == value,
+        );
+        item.onSelected();
+      },
+      itemBuilder: (context) => config.overflowItems
+          .where((item) => item.showInOverflow)
+          .map((item) => PopupMenuItem<String>(
+                value: item.id,
+                child: Row(
+                  children: [
+                    Icon(item.icon),
+                    const SizedBox(width: 8),
+                    Text(item.label),
                   ],
                 ),
-              );
-            }
-            break;
-        }
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: 'theme',
-          child: Row(
-            children: [
-              Icon(
-                ref.watch(themeModeProvider) == ThemeMode.dark
-                    ? Icons.light_mode
-                    : Icons.dark_mode,
-              ),
-              const SizedBox(width: 8),
-              const Text('Toggle Theme'),
-            ],
-          ),
-        ),
-        const PopupMenuItem(
-          value: 'settings',
-          child: Row(
-            children: [
-              Icon(Icons.settings),
-              SizedBox(width: 8),
-              Text('Settings'),
-            ],
-          ),
-        ),
-        if (isVersionLoaded)
-          const PopupMenuItem(
-            value: 'version',
-            child: Row(
-              children: [
-                Icon(Icons.info),
-                SizedBox(width: 8),
-                Text('Version Info'),
-              ],
-            ),
-          ),
-        const PopupMenuItem(
-          value: 'logout',
-          child: Row(
-            children: [
-              Icon(Icons.logout),
-              SizedBox(width: 8),
-              Text('Logout'),
-            ],
-          ),
-        ),
-      ],
+              ))
+          .toList(),
     );
   }
 
-  /// Creates the MovieStar app navigation tabs.
-  ///
-  /// This provides the specific configuration for the MovieStar application
-  /// with titles matching the original screen titles.
+  /// Creates a list of navigation tabs.
 
-  static List<SolidNavTab> createMovieStarNavTabs() {
-    return [
-      const SolidNavTab(
-        title: 'MOVIE STAR',
-        icon: Icons.home,
-        tooltip: '''
-
-        **Home:** Tap here to view your movie dashboard and discover new films.
-
-        ''',
-      ),
-      const SolidNavTab(
-        title: 'To Watch',
-        icon: Icons.favorite,
-        tooltip: '''
-
-        **To Watch:** Tap here to view your watchlist of movies you want to see.
-
-        ''',
-      ),
-      const SolidNavTab(
-        title: 'Watched',
-        icon: Icons.history,
-        tooltip: '''
-
-        **Watched:** Tap here to view movies you have already watched and rated.
-
-        ''',
-      ),
-      const SolidNavTab(
-        title: 'Coming Soon',
-        icon: Icons.upcoming,
-        tooltip: '''
-
-        **Coming Soon:** Tap here to discover upcoming movie releases.
-
-        ''',
-      ),
-      const SolidNavTab(
-        title: 'Shared Movies',
-        icon: Icons.movie_outlined,
-        tooltip: '''
-
-        **Shared Movies:** Tap here to view movies shared from your POD.
-
-        ''',
-      ),
-      const SolidNavTab(
-        title: 'File Management',
-        icon: Icons.folder,
-        tooltip: '''
-
-        **File Management:** Tap here to access file management features for your POD.
-
-        You can browse POD storage, upload files, download files, and manage
-        your movie data files.
-
-        ''',
-      ),
-      const SolidNavTab(
-        title: 'Settings',
-        icon: Icons.person,
-        tooltip: '''
-
-        **Settings:** Tap here to configure your movie preferences and account settings.
-
-        ''',
-      ),
-    ];
+  static List<SolidNavTab> createNavTabs(List<Map<String, dynamic>> tabConfigs) {
+    return tabConfigs.map((config) => SolidNavTab(
+      title: config['title'] as String,
+      icon: config['icon'] as IconData,
+      tooltip: config['tooltip'] as String?,
+      content: config['content'] as Widget?,
+      message: config['message'] as String?,
+      dialogTitle: config['dialogTitle'] as String?,
+      action: config['action'] as void Function(BuildContext)?,
+    )).toList();
   }
 }

@@ -28,44 +28,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:moviestar/constants/navigation_constants.dart';
-import 'package:moviestar/widgets/solid_nav_bar.dart';
-
-/// User information configuration for the navigation drawer.
-
-class SolidNavUserInfo {
-  /// The user's display name.
-
-  final String userName;
-
-  /// The user's WebID (optional).
-
-  final String? webId;
-
-  /// Whether to show the WebID in the drawer.
-
-  final bool showWebId;
-
-  /// Custom user avatar widget (optional).
-
-  final Widget? avatar;
-
-  /// Custom user avatar icon (used if avatar widget is null).
-
-  final IconData? avatarIcon;
-
-  /// Custom avatar size.
-
-  final double? avatarSize;
-
-  const SolidNavUserInfo({
-    required this.userName,
-    this.webId,
-    this.showWebId = false,
-    this.avatar,
-    this.avatarIcon,
-    this.avatarSize,
-  });
-}
+import 'package:moviestar/widgets/solid_nav_models.dart';
 
 /// A solid navigation drawer component.
 ///

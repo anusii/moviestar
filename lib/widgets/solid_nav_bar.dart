@@ -29,56 +29,7 @@ import 'package:flutter/material.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 
 import 'package:moviestar/constants/navigation_constants.dart';
-
-/// Configuration for a navigation tab.
-///
-/// This class defines the structure for each tab in the navigation rail,
-/// including visual properties, content, and interaction handlers.
-
-class SolidNavTab {
-  /// The display title of the tab.
-
-  final String title;
-
-  /// The icon to display for the tab.
-
-  final IconData icon;
-
-  /// Optional custom colour for the icon. If null, uses theme default.
-
-  final Color? color;
-
-  /// The content widget to display when this tab is selected.
-
-  final Widget? content;
-
-  /// Optional tooltip message for the tab (supports Markdown).
-
-  final String? tooltip;
-
-  /// Optional dialog message to show when tab is selected.
-
-  final String? message;
-
-  /// Optional dialog title when showing a message.
-
-  final String? dialogTitle;
-
-  /// Optional custom action to execute when tab is selected.
-
-  final void Function(BuildContext)? action;
-
-  const SolidNavTab({
-    required this.title,
-    required this.icon,
-    this.color,
-    this.content,
-    this.tooltip,
-    this.message,
-    this.dialogTitle,
-    this.action,
-  });
-}
+import 'package:moviestar/widgets/solid_nav_models.dart';
 
 /// A reusable navigation rail component designed for Solid POD applications.
 ///

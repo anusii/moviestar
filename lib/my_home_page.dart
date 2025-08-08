@@ -33,6 +33,7 @@ import 'package:solidpod/solidpod.dart'
     show getAppNameVersion, logoutPopup, getWebId;
 
 import 'package:moviestar/moviestar.dart';
+import 'package:moviestar/constants/navigation_constants.dart';
 import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
@@ -49,10 +50,10 @@ import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/services/movie_service.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
-import 'package:moviestar/constants/navigation_constants.dart';
-import 'package:moviestar/widgets/solid_nav_bar.dart';
+import 'package:moviestar/widgets/solid_nav_models.dart';
 import 'package:moviestar/widgets/solid_navigation_manager.dart';
 import 'package:moviestar/widgets/solid_nav_utils.dart';
+import 'package:moviestar/widgets/moviestar_nav_config.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   final SharedPreferences prefs;
@@ -231,7 +232,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     // Configure navigation tabs using the MovieStar app configuration.
 
-    _navTabs = SolidNavUtils.createMovieStarNavTabs();
+    _navTabs = MovieStarNavConfig.createNavTabs();
 
     _initialiseAppData();
   }
@@ -325,17 +326,37 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     logoutPopup(context, const MovieStar());
   }
 
+  /// Handles the version info action.
+
+  void _handleVersionInfo() {
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Version Information'),
+          content: Text('Version: $_appVersion'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     // Create user info for the solid navigation.
 
-    final userInfo = SolidNavUtils.createUserInfo(
+    final userConfig = MovieStarNavConfig.createUserConfig(
       userName: _name ?? '',
       webId: _webId,
-      showWebId: false,
     );
+    final userInfo = SolidNavUtils.createUserInfo(userConfig);
 
     // Create the main content with loading overlay.
 
@@ -347,11 +368,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       ],
     );
 
-    // Create responsive AppBar using SolidNavUtils.
+    // Create responsive AppBar.
 
-    final appBar = SolidNavUtils.createMovieStarAppBar(
-      context: context,
-      ref: ref,
+    final appBarConfig = MovieStarNavConfig.createAppBarConfig(
       title: _navTabs[_selectedIndex].title,
       appVersion: _appVersion,
       isVersionLoaded: _isVersionLoaded,
@@ -359,6 +378,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       onSearch: _handleSearch,
       onSettings: _handleSettings,
       onLogout: _handleLogout,
+      onVersionInfo: _handleVersionInfo,
+      ref: ref,
+    );
+    final appBar = SolidNavUtils.createAppBar(
+      context: context,
+      config: appBarConfig,
+      ref: ref,
     );
 
     // Use the Solid Navigation Manager with configurable width threshold.

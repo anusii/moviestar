@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:moviestar/constants/navigation_constants.dart';
 import 'package:moviestar/widgets/solid_nav_bar.dart';
 import 'package:moviestar/widgets/solid_nav_drawer.dart';
+import 'package:moviestar/widgets/solid_nav_models.dart';
 
 /// Configuration for the solid navigation manager.
 

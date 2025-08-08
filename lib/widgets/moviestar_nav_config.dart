@@ -26,6 +26,7 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moviestar/constants/navigation_constants.dart';
@@ -129,10 +130,12 @@ your movie data files.
       title: title,
       narrowScreenThreshold: NavigationConstants.narrowScreenThreshold,
       veryNarrowScreenThreshold: NavigationConstants.veryNarrowScreenThreshold,
-      versionConfig: isVersionLoaded ? SolidVersionConfig(
-        version: appVersion,
-        changelogUrl: 'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
-        tooltip: '''
+      versionConfig: isVersionLoaded
+          ? SolidVersionConfig(
+              version: appVersion,
+              changelogUrl:
+                  'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
+              tooltip: '''
 
 **Version:** This is the current version of the MovieStar app. If
 the version is out of date then the text will be red. You can tap on
@@ -140,7 +143,8 @@ the version to view the app's Change Log to determine if it is worth
 updating your version.
 
 ''',
-      ) : null,
+            )
+          : null,
       actions: [
         SolidAppBarAction(
           icon: Icons.refresh,

@@ -26,6 +26,7 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:version_widget/version_widget.dart';
@@ -68,13 +69,13 @@ class SolidNavUtils {
         if (config.versionConfig != null && !isVeryNarrow)
           _buildVersionWidget(config.versionConfig!, isNarrow),
 
-        if (config.versionConfig != null && !isVeryNarrow) 
+        if (config.versionConfig != null && !isVeryNarrow)
           const SizedBox(width: 8),
 
         // Regular action buttons.
 
         ...config.actions
-            .where((action) => 
+            .where((action) =>
                 (!isNarrow || !action.hideOnNarrowScreen) &&
                 (!isVeryNarrow || !action.hideOnVeryNarrowScreen))
             .map((action) => _buildActionButton(context, action)),
@@ -143,7 +144,8 @@ class SolidNavUtils {
 
   /// Builds an action button with proper theming and tooltip.
 
-  static Widget _buildActionButton(BuildContext context, SolidAppBarAction action) {
+  static Widget _buildActionButton(
+      BuildContext context, SolidAppBarAction action) {
     final theme = Theme.of(context);
     final button = IconButton(
       icon: Icon(
@@ -173,9 +175,10 @@ class SolidNavUtils {
     return Consumer(
       builder: (context, ref, child) {
         final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-        
+
         return MarkdownTooltip(
-          message: isDarkMode ? config.lightModeTooltip : config.darkModeTooltip,
+          message:
+              isDarkMode ? config.lightModeTooltip : config.darkModeTooltip,
           child: IconButton(
             icon: Icon(
               isDarkMode ? Icons.light_mode : Icons.dark_mode,
@@ -230,15 +233,18 @@ class SolidNavUtils {
 
   /// Creates a list of navigation tabs.
 
-  static List<SolidNavTab> createNavTabs(List<Map<String, dynamic>> tabConfigs) {
-    return tabConfigs.map((config) => SolidNavTab(
-      title: config['title'] as String,
-      icon: config['icon'] as IconData,
-      tooltip: config['tooltip'] as String?,
-      content: config['content'] as Widget?,
-      message: config['message'] as String?,
-      dialogTitle: config['dialogTitle'] as String?,
-      action: config['action'] as void Function(BuildContext)?,
-    )).toList();
+  static List<SolidNavTab> createNavTabs(
+      List<Map<String, dynamic>> tabConfigs) {
+    return tabConfigs
+        .map((config) => SolidNavTab(
+              title: config['title'] as String,
+              icon: config['icon'] as IconData,
+              tooltip: config['tooltip'] as String?,
+              content: config['content'] as Widget?,
+              message: config['message'] as String?,
+              dialogTitle: config['dialogTitle'] as String?,
+              action: config['action'] as void Function(BuildContext)?,
+            ))
+        .toList();
   }
 }

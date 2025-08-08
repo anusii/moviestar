@@ -573,7 +573,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     return SolidNavigationManager.movieStar(
       config: const SolidNavigationConfig(
-        wideScreenThreshold: NavigationConstants.wideScreenThreshold,
+        narrowScreenThreshold: NavigationConstants.narrowScreenThreshold,
         autoSwitch: true,
       ),
       tabs: _navTabs,

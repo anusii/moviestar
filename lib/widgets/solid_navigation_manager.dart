@@ -36,7 +36,7 @@ import 'package:moviestar/widgets/solid_nav_drawer.dart';
 class SolidNavigationConfig {
   /// The width threshold for determining wide screen layout.
 
-  final double wideScreenThreshold;
+  final double narrowScreenThreshold;
 
   /// Whether to automatically switch between nav bar and drawer based on screen width.
 
@@ -51,7 +51,7 @@ class SolidNavigationConfig {
   final bool forceNarrowScreen;
 
   const SolidNavigationConfig({
-    this.wideScreenThreshold = NavigationConstants.wideScreenThreshold,
+    this.narrowScreenThreshold = NavigationConstants.narrowScreenThreshold,
     this.autoSwitch = true,
     this.forceWideScreen = false,
     this.forceNarrowScreen = false,
@@ -206,7 +206,7 @@ class SolidNavigationManager extends StatelessWidget {
     if (!config.autoSwitch) return true;
 
     final screenWidth = MediaQuery.of(context).size.width;
-    return screenWidth > config.wideScreenThreshold;
+    return screenWidth > config.narrowScreenThreshold;
   }
 
   /// Determines whether to show the navigation drawer.

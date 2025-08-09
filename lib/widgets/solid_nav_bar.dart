@@ -29,7 +29,7 @@ import 'package:flutter/material.dart';
 
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 
-import 'package:moviestar/constants/navigation_constants.dart';
+import 'package:moviestar/constants/navigation.dart';
 import 'package:moviestar/widgets/solid_nav_models.dart';
 
 /// A reusable navigation rail component designed for Solid POD applications.

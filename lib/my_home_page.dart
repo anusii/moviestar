@@ -32,7 +32,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart'
     show getAppNameVersion, logoutPopup, getWebId;
 
-import 'package:moviestar/constants/navigation_constants.dart';
+import 'package:moviestar/constants/navigation.dart';
 import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';

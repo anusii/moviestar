@@ -29,14 +29,24 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:gap/gap.dart';
+
 import 'package:moviestar/models/movie.dart';
+
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
+
 import 'package:moviestar/providers/theme_provider.dart';
+
 import 'package:moviestar/screens/movie_details_screen.dart';
+
 import 'package:moviestar/services/favorites_service.dart';
+
 import 'package:moviestar/services/hive_movie_cache_service.dart';
+
 import 'package:moviestar/utils/date_format_util.dart';
+
 import 'package:moviestar/widgets/error_display_widget.dart';
+
 import 'package:moviestar/widgets/movie_card.dart';
 
 /// A screen that displays upcoming movies and their release dates with caching.
@@ -85,7 +95,7 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
               'Coming Soon',
               style: Theme.of(context).appBarTheme.titleTextStyle,
             ),
-            const SizedBox(width: 8),
+            const Gap(8),
             _buildCacheIndicator(upcomingMoviesAsync, cacheOnlyMode),
           ],
         ),
@@ -185,7 +195,7 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.offline_pin, size: 12, color: Colors.white),
-                SizedBox(width: 4),
+                Gap(4),
                 Text(
                   'OFFLINE',
                   style: TextStyle(
@@ -213,7 +223,7 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(icon, size: 12, color: Colors.white),
-              const SizedBox(width: 4),
+              const Gap(4),
               Text(
                 text,
                 style: const TextStyle(

@@ -30,12 +30,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:file_picker/file_picker.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:gap/gap.dart';
+
 import 'package:markdown_tooltip/markdown_tooltip.dart';
+
 import 'package:path/path.dart' as path;
 
 import 'package:moviestar/features/file/service/providers/file_service_provider.dart';
+
 import 'package:moviestar/theme/app_theme.dart';
+
 import 'package:moviestar/utils/is_text_file.dart';
 
 /// A widget that handles file upload functionality and preview.
@@ -131,7 +138,7 @@ class _FileUploadSectionState extends ConsumerState<FileUploadSection> {
                   size: 20,
                   color: AppTheme.primaryColor,
                 ),
-                const SizedBox(width: 8),
+                const Gap(8),
                 const Text(
                   'Preview',
                   style: TextStyle(
@@ -188,11 +195,11 @@ class _FileUploadSectionState extends ConsumerState<FileUploadSection> {
             color: Theme.of(context).textTheme.headlineSmall?.color,
           ),
         ),
-        const SizedBox(height: 16),
+        const Gap(16),
 
         // Display preview card if enabled.
         _buildPreviewCard(),
-        if (showPreview) const SizedBox(height: 16),
+        if (showPreview) const Gap(16),
 
         // Selected file indicator (the one showing in the upload area).
         if (state.remoteFileName != null &&
@@ -215,7 +222,7 @@ class _FileUploadSectionState extends ConsumerState<FileUploadSection> {
                   size: 20,
                   color: AppTheme.primaryColor,
                 ),
-                const SizedBox(width: 8),
+                const Gap(8),
                 Expanded(
                   child: Text(
                     state.cleanFileName ?? '',
@@ -296,7 +303,7 @@ class _FileUploadSectionState extends ConsumerState<FileUploadSection> {
           ],
         ),
 
-        const SizedBox(height: 12),
+        const Gap(12),
         MarkdownTooltip(
           message: '''
 
@@ -340,7 +347,7 @@ class _FileUploadSectionState extends ConsumerState<FileUploadSection> {
 
         // Preview button.
         if (state.uploadFile != null) ...[
-          const SizedBox(height: 12),
+          const Gap(12),
           MarkdownTooltip(
             message: '''
 

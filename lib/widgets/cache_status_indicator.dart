@@ -86,7 +86,7 @@ class CacheStatusIndicator extends ConsumerWidget {
               color: Colors.white,
             ),
             if (!compact) ...[
-              const SizedBox(width: 4),
+              const Gap(4),
               Text(
                 _getStatusText(cacheOnlyMode, cacheStatsAsync),
                 style: TextStyle(
@@ -229,7 +229,7 @@ class CacheStatusIndicator extends ConsumerWidget {
         title: const Row(
           children: [
             Icon(Icons.storage, size: 24),
-            SizedBox(width: 8),
+            Gap(8),
             Text('Cache Status'),
           ],
         ),

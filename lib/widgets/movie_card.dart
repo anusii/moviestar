@@ -31,8 +31,12 @@ import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 
+import 'package:gap/gap.dart';
+
 import 'package:moviestar/models/movie.dart';
+
 import 'package:moviestar/services/favorites_service.dart';
+
 import 'package:moviestar/widgets/quick_actions_dialog.dart';
 
 /// Different display modes for movie cards.
@@ -389,7 +393,7 @@ class _MovieCardState extends State<MovieCard> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.offline_pin, size: 10, color: Colors.white),
-            SizedBox(width: 2),
+            Gap(2),
             Text(
               'OFFLINE',
               style: TextStyle(

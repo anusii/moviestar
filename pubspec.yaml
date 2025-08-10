@@ -19,13 +19,14 @@ environment:
 dependencies:
   cached_network_image: ^3.3.0
   file_picker: ^10.1.9
-  # Database dependencies for local caching  
+  # Database dependencies for local caching
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
   flutter_secure_storage: ^10.0.0-beta.4
+  gap: ^3.0.1
   http: ^1.1.0
   intl: any
   markdown_tooltip: ^0.0.7

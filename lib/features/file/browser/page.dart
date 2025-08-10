@@ -26,6 +26,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 import 'package:solidpod/solidpod.dart';
 
@@ -259,7 +260,7 @@ class FileBrowserState extends State<FileBrowser> {
               friendlyFolderName: widget.friendlyFolderName,
             ),
 
-            const SizedBox(height: 12),
+            const Gap(12),
 
             // Main content area with conditional rendering.
             Expanded(

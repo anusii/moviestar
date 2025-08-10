@@ -43,12 +43,12 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.movie, size: 100, color: Colors.blue),
-            const SizedBox(height: 20),
+            const Gap(20),
             Text(
               'Welcome to Movie Star',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            const SizedBox(height: 10),
+            const Gap(10),
             Text(
               'Your ultimate movie companion',
               style: Theme.of(context).textTheme.bodyLarge,

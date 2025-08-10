@@ -31,10 +31,16 @@ import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 
+import 'package:gap/gap.dart';
+
 import 'package:moviestar/models/movie.dart';
+
 import 'package:moviestar/screens/movie_details_screen.dart';
+
 import 'package:moviestar/services/favorites_service.dart';
+
 import 'package:moviestar/services/movie_service.dart';
+
 import 'package:moviestar/widgets/error_display_widget.dart';
 
 /// A screen that allows users to search for movies.
@@ -196,7 +202,7 @@ class _SearchScreenState extends State<SearchScreen> {
             children: [
               Icon(categoryIcon,
                   color: Theme.of(context).colorScheme.primary, size: 20),
-              const SizedBox(width: 8),
+              const Gap(8),
               Text(
                 categoryTitle,
                 style: TextStyle(
@@ -205,7 +211,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 8),
+              const Gap(8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
@@ -270,7 +276,7 @@ class _SearchScreenState extends State<SearchScreen> {
             );
           },
         ),
-        const SizedBox(height: 16),
+        const Gap(16),
       ],
     );
   }
@@ -335,7 +341,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   .colorScheme
                                   .onSurface
                                   .withValues(alpha: 0.4)),
-                          const SizedBox(height: 16),
+                          const Gap(16),
                           Text(
                             _searchController.text.isEmpty
                                 ? 'Search for movies'
@@ -350,7 +356,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               fontSize: 18,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const Gap(8),
                           Text(
                             'Find movies by title, actor, or genre',
                             style: TextStyle(

@@ -1,6 +1,6 @@
 /// Moviestar - Manage and share ratings through private PODs
 ///
-// Time-stamp: <Tuesday 2025-07-15 07:12:49 +1000 Graham Williams>
+// Time-stamp: <Sunday 2025-08-10 11:10:15 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -28,6 +28,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gap/gap.dart';
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
@@ -141,7 +142,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) ...[
-                          const SizedBox(width: 8),
+                          const Gap(8),
                           SizedBox(
                             width: 12,
                             height: 12,
@@ -216,7 +217,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const Gap(12),
             Text(
               'Loading To Watch movies...',
               style: TextStyle(
@@ -343,7 +344,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) ...[
-                          const SizedBox(width: 8),
+                          const Gap(8),
                           SizedBox(
                             width: 12,
                             height: 12,
@@ -418,7 +419,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const Gap(12),
             Text(
               'Loading Watched movies...',
               style: TextStyle(
@@ -630,7 +631,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.offline_pin, size: 12, color: Colors.white),
-          SizedBox(width: 4),
+          Gap(4),
           Text(
             'OFFLINE',
             style: TextStyle(
@@ -658,7 +659,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(Icons.offline_bolt, size: 12, color: Colors.white),
-          const SizedBox(width: 4),
+          const Gap(4),
           Text(
             ageText,
             style: const TextStyle(
@@ -685,7 +686,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.offline_bolt, size: 12, color: Colors.white),
-          SizedBox(width: 4),
+          Gap(4),
           Text(
             'CACHED',
             style: TextStyle(
@@ -712,7 +713,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.wifi, size: 12, color: Colors.white),
-          SizedBox(width: 4),
+          Gap(4),
           Text(
             'LIVE',
             style: TextStyle(
@@ -853,7 +854,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             if (cacheOnlyMode) ...[
-              const SizedBox(width: 8),
+              const Gap(8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(

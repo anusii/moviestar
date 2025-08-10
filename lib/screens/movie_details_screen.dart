@@ -30,12 +30,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
+
+import 'package:gap/gap.dart';
+
 import 'package:markdown_tooltip/markdown_tooltip.dart';
+
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/models/movie.dart';
+
 import 'package:moviestar/services/favorites_service.dart';
+
 import 'package:moviestar/services/favorites_service_adapter.dart';
+
 import 'package:moviestar/utils/date_format_util.dart';
 
 /// A screen that displays detailed information about a selected movie.
@@ -543,7 +550,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const Gap(8),
                   Row(
                     children: [
                       Icon(
@@ -553,7 +560,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                             : Colors.amber,
                         size: 20,
                       ),
-                      const SizedBox(width: 4),
+                      const Gap(4),
                       Text(
                         _isSharedMovie && _personalRating != null
                             ? _personalRating!.toStringAsFixed(1)
@@ -572,13 +579,13 @@ Your shared movies will appear in their "Shared with Me" tab.
                             fontStyle: FontStyle.italic,
                           ),
                         ),
-                      const SizedBox(width: 16),
+                      const Gap(16),
                       Icon(
                         Icons.calendar_today,
                         color: Theme.of(context).colorScheme.onSurface,
                         size: 20,
                       ),
-                      const SizedBox(width: 4),
+                      const Gap(4),
                       Text(
                         DateFormatUtil.formatShort(widget.movie.releaseDate),
                         style: TextStyle(
@@ -588,7 +595,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const Gap(16),
 
                   // Shared Movie Indicator.
 
@@ -612,7 +619,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                           Icon(Icons.share,
                               color: Theme.of(context).colorScheme.primary,
                               size: 20),
-                          const SizedBox(width: 8),
+                          const Gap(8),
                           Text(
                             'This movie was shared by ${widget.sharedMovieData!['sharedBy'] ?? 'someone'}',
                             style: TextStyle(
@@ -657,7 +664,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                         ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const Gap(8),
                   _isLoadingRating
                       ? const Center(child: CircularProgressIndicator())
                       : Row(
@@ -754,7 +761,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16),
                   ),
-                  const SizedBox(height: 16),
+                  const Gap(16),
 
                   // Personal Comments Section
                   Row(
@@ -809,7 +816,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                         ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const Gap(8),
                   _isLoadingComments
                       ? const Center(child: CircularProgressIndicator())
                       : Column(
@@ -866,7 +873,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                                       }
                                     },
                             ),
-                            const SizedBox(height: 8),
+                            const Gap(8),
                             if (!_isSharedMovie)
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -888,7 +895,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                                   if (_commentsModified &&
                                       (_personalComments != null &&
                                           _personalComments!.isNotEmpty))
-                                    const SizedBox(width: 8),
+                                    const Gap(8),
                                   if (_personalComments != null &&
                                       _personalComments!.isNotEmpty)
                                     TextButton.icon(
@@ -911,7 +918,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                               ),
                           ],
                         ),
-                  const SizedBox(height: 16),
+                  const Gap(16),
                   Text(
                     'Overview',
                     style: TextStyle(
@@ -920,7 +927,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const Gap(8),
                   Text(
                     widget.movie.overview,
                     style: TextStyle(

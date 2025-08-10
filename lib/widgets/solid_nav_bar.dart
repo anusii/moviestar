@@ -1,6 +1,6 @@
 /// Solid Navigation Bar.
 ///
-// Time-stamp: <Friday 2025-08-05 16:00:00 +1000 Tony Chen>
+// Time-stamp: <Sunday 2025-08-10 08:32:58 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -35,8 +35,7 @@ import 'package:moviestar/widgets/solid_nav_models.dart';
 /// A reusable navigation rail component designed for Solid POD applications.
 ///
 /// This widget provides a left-side navigation rail that can be easily
-/// integrated into different applications and eventually migrated to the
-/// solidpod library.
+/// integrated into different applications built for Solid Pods.
 
 class SolidNavBar extends StatelessWidget {
   /// List of navigation tabs to display.

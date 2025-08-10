@@ -1,6 +1,6 @@
 /// MovieStar Navigation Configuration - App-specific navigation setup.
 ///
-// Time-stamp: <Tuesday 2025-08-06 16:30:00 +1000 Tony Chen>
+// Time-stamp: <Sunday 2025-08-10 08:13:23 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -45,7 +45,7 @@ class MovieStarNavConfig {
   static List<SolidNavTab> createNavTabs() {
     return SolidNavUtils.createNavTabs([
       {
-        'title': 'MOVIE STAR',
+        'title': 'Home',
         'icon': Icons.home,
         'tooltip': '''
 
@@ -54,7 +54,7 @@ class MovieStarNavConfig {
 ''',
       },
       {
-        'title': 'To Watch',
+        'title': 'Watch',
         'icon': Icons.favorite,
         'tooltip': '''
 
@@ -72,7 +72,7 @@ class MovieStarNavConfig {
 ''',
       },
       {
-        'title': 'Coming Soon',
+        'title': 'Soon',
         'icon': Icons.upcoming,
         'tooltip': '''
 
@@ -81,7 +81,7 @@ class MovieStarNavConfig {
 ''',
       },
       {
-        'title': 'Shared Movies',
+        'title': 'Shared',
         'icon': Icons.movie_outlined,
         'tooltip': '''
 
@@ -90,7 +90,7 @@ class MovieStarNavConfig {
 ''',
       },
       {
-        'title': 'File Management',
+        'title': 'Files',
         'icon': Icons.folder,
         'tooltip': '''
 

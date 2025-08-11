@@ -27,91 +27,48 @@ library;
 
 import 'package:flutter/foundation.dart';
 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:solidpod/solidpod.dart' show KeyManager;
 
-/// Service for managing security keys used for encrypting movie data.
+/// Service for managing security keys used for POD encryption in MovieStar.
 
 class SecurityKeyService extends ChangeNotifier {
-  static const String _securityKeySecureKey = 'movie_security_key';
-  static const String _securityKeyStatusKey = 'movie_security_key_status';
-  
-  static final FlutterSecureStorage _secureStorage = FlutterSecureStorage(
-    aOptions: const AndroidOptions(),
-    iOptions: const IOSOptions(
-      accessibility: KeychainAccessibility.first_unlock_this_device,
-    ),
-    mOptions: const MacOsOptions(
-      synchronizable: false,
-    ),
-  );
-
   SecurityKeyService();
-
-  /// Gets the current security key from secure storage.
-  
-  Future<String?> getSecurityKey() async {
-    try {
-      return await _secureStorage.read(key: _securityKeySecureKey);
-    } catch (e) {
-      debugPrint('Error reading security key from secure storage: $e');
-      return null;
-    }
-  }
-
-  /// Sets a new security key in secure storage.
-  
-  Future<void> setSecurityKey(String securityKey) async {
-    try {
-      await _secureStorage.write(key: _securityKeySecureKey, value: securityKey);
-      await _secureStorage.write(key: _securityKeyStatusKey, value: 'saved');
-      notifyListeners();
-    } catch (e) {
-      debugPrint('Error writing security key to secure storage: $e');
-      rethrow;
-    }
-  }
-
-  /// Removes the security key from secure storage.
-  
-  Future<void> clearSecurityKey() async {
-    try {
-      await _secureStorage.delete(key: _securityKeySecureKey);
-      await _secureStorage.delete(key: _securityKeyStatusKey);
-      notifyListeners();
-    } catch (e) {
-      debugPrint('Error deleting security key from secure storage: $e');
-      rethrow;
-    }
-  }
 
   /// Checks if a security key is currently saved.
   
   Future<bool> isKeySaved() async {
     try {
-      final key = await _secureStorage.read(key: _securityKeySecureKey);
-      final status = await _secureStorage.read(key: _securityKeyStatusKey);
-      return key != null && key.isNotEmpty && status == 'saved';
+      return await KeyManager.hasSecurityKey();
     } catch (e) {
       debugPrint('Error checking security key status: $e');
       return false;
     }
   }
 
-  /// Generates a new random security key.
+  /// Fetches the security key status and optionally triggers a callback.
   
-  Future<String> generateSecurityKey() async {
-    // Generate a secure random key (for demonstration)
-    // In a real app, this would use proper cryptographic key generation
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final random = timestamp.toString();
-    return 'moviestar_key_$random';
+  Future<bool> fetchKeySavedStatus([Function(bool)? onKeyStatusChanged]) async {
+    try {
+      final hasKey = await KeyManager.hasSecurityKey();
+      
+      if (onKeyStatusChanged != null) {
+        onKeyStatusChanged(hasKey);
+      }
+      
+      // Notify listeners of status change.
+
+      notifyListeners();
+      
+      return hasKey;
+    } catch (e) {
+      debugPrint('Error fetching security key status: $e');
+      return false;
+    }
   }
 
-  /// Validates if a security key format is correct.
+  /// Forces a refresh of the security key status.
   
-  bool isValidSecurityKey(String key) {
-    // Basic validation.
-
-    return key.isNotEmpty && key.length >= 8;
+  Future<void> refreshKeyStatus() async {
+    await fetchKeySavedStatus();
   }
 }

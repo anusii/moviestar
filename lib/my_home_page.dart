@@ -53,6 +53,7 @@ import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/widgets/moviestar_status_bar_config.dart';
 import 'package:moviestar/widgets/moviestar_nav_config.dart';
+import 'package:moviestar/widgets/security_key_manager_dialog.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   final SharedPreferences prefs;
@@ -231,7 +232,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   Future<void> _loadSecurityKeyStatus() async {
     try {
-      final isKeySaved = await _securityKeyService.isKeySaved();
+      final isKeySaved = await _securityKeyService.fetchKeySavedStatus((bool hasKey) {
+        if (mounted) {
+          setState(() {
+            _isKeySaved = hasKey;
+          });
+        }
+      });
+      
       if (mounted) {
         setState(() {
           _isKeySaved = isKeySaved;
@@ -367,87 +375,15 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   void _handleSecurityKeyManagement() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Security Key Manager'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-                'Current status: ${_isKeySaved ? "Key Saved" : "No Key Saved"}'),
-            const SizedBox(height: 16),
-            const Text(
-              'Security keys are used to encrypt your movie data for enhanced'
-              'protection.',
-              style: TextStyle(fontSize: 12),
-            ),
-          ],
-        ),
-        actions: [
-          if (_isKeySaved) ...[
-            TextButton(
-              onPressed: () async {
-                try {
-                  await _securityKeyService.clearSecurityKey();
-                  if (mounted) {
-                    Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Security Key: Removed'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Error removing key: $e'),
-                        duration: const Duration(seconds: 3),
-                      ),
-                    );
-                  }
-                }
-              },
-              child: const Text('Remove Key'),
-            ),
-          ] else ...[
-            TextButton(
-              onPressed: () async {
-                try {
-                  final newKey =
-                      await _securityKeyService.generateSecurityKey();
-                  await _securityKeyService.setSecurityKey(newKey);
-                  if (mounted) {
-                    Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Security Key: Generated and Saved'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Error generating key: $e'),
-                        duration: const Duration(seconds: 3),
-                      ),
-                    );
-                  }
-                }
-              },
-              child: const Text('Generate Key'),
-            ),
-          ],
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-        ],
+      barrierColor: Theme.of(context).colorScheme.onSurface,
+      builder: (BuildContext context) => SecurityKeyManagerDialog(
+        onKeyStatusChanged: (bool hasKey) {
+          if (mounted) {
+            setState(() {
+              _isKeySaved = hasKey;
+            });
+          }
+        },
       ),
     );
   }

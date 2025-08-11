@@ -28,31 +28,19 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:gap/gap.dart';
-
 import 'package:solidpod/solidpod.dart';
-
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
-
 import 'package:moviestar/providers/theme_provider.dart';
-
 import 'package:moviestar/services/api_key_service.dart';
-
 import 'package:moviestar/services/favorites_service.dart';
-
 import 'package:moviestar/services/favorites_service_manager.dart';
-
 import 'package:moviestar/services/hive_movie_cache_service.dart';
-
 import 'package:moviestar/utils/create_solid_login.dart';
-
 import 'package:moviestar/utils/is_logged_in.dart';
-
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
-
 import 'package:moviestar/widgets/theme_toggle_button.dart';
 
 /// A screen that displays and manages user settings.

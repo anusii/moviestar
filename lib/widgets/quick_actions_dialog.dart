@@ -26,8 +26,8 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 
+import 'package:gap/gap.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 

@@ -26,6 +26,7 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:gap/gap.dart';
 
 /// A reusable widget for displaying error states with consistent styling.

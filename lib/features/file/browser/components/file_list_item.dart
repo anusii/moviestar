@@ -30,15 +30,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:gap/gap.dart';
-
 import 'package:pdf/pdf.dart';
-
 import 'package:printing/printing.dart';
-
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/features/file/browser/models/file_item.dart';
-
 import 'package:moviestar/theme/app_theme.dart';
 
 /// A widget that displays a single file item with its metadata and actions.

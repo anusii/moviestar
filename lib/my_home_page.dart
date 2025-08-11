@@ -31,7 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart'
     show getAppNameVersion, logoutPopup, getWebId;
-
+import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/moviestar.dart';
@@ -51,7 +51,6 @@ import 'package:moviestar/services/movie_service.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/widgets/moviestar_nav_config.dart';
-import 'package:solidui/solidui.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   final SharedPreferences prefs;

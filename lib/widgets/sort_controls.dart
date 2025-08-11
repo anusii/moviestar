@@ -26,6 +26,7 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:gap/gap.dart';
 
 /// Enum representing different sort criteria for movies.

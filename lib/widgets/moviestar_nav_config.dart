@@ -29,10 +29,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:moviestar/constants/navigation.dart';
 import 'package:moviestar/providers/theme_provider.dart';
-import 'package:moviestar/widgets/solid_nav_models.dart';
-import 'package:moviestar/widgets/solid_nav_utils.dart';
+import 'package:solidui/solidui.dart';
 
 /// MovieStar-specific navigation configuration and factory methods.
 

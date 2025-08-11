@@ -32,7 +32,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart'
     show getAppNameVersion, logoutPopup, getWebId;
 
-import 'package:moviestar/constants/navigation.dart';
+
 import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
@@ -51,9 +51,7 @@ import 'package:moviestar/services/movie_service.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/widgets/moviestar_nav_config.dart';
-import 'package:moviestar/widgets/solid_nav_models.dart';
-import 'package:moviestar/widgets/solid_nav_utils.dart';
-import 'package:moviestar/widgets/solid_navigation_manager.dart';
+import 'package:solidui/solidui.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   final SharedPreferences prefs;
@@ -391,7 +389,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     return SolidNavigationManager.movieStar(
       config: const SolidNavigationConfig(
-        narrowScreenThreshold: NavigationConstants.narrowScreenThreshold,
+        narrowScreenThreshold: 800.0,
         autoSwitch: true,
       ),
       tabs: _navTabs,

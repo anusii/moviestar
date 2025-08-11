@@ -24,6 +24,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart';
@@ -199,7 +200,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(Icons.star, color: Colors.amber, size: 16),
-        const SizedBox(width: 4),
+        const Gap(4),
         Text(
           ratingValue.toStringAsFixed(1),
           style: const TextStyle(
@@ -240,7 +241,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                 ? Theme.of(context).colorScheme.tertiary
                 : Theme.of(context).colorScheme.error,
           ),
-          const SizedBox(width: 4),
+          const Gap(4),
           Text(
             permissions.toUpperCase(),
             style: TextStyle(
@@ -375,7 +376,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                           size: 24,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const Gap(12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -390,7 +391,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                                   ),
                             ),
                             if (rating != null) ...[
-                              const SizedBox(height: 4),
+                              const Gap(4),
                               _buildRatingDisplay(rating),
                             ],
                           ],
@@ -454,7 +455,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                   // Movie details.
 
                   if (comments.isNotEmpty) ...[
-                    const SizedBox(height: 12),
+                    const Gap(12),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
@@ -477,7 +478,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                                     .colorScheme
                                     .onSurfaceVariant,
                               ),
-                              const SizedBox(width: 4),
+                              const Gap(4),
                               Text(
                                 'Review:',
                                 style: Theme.of(context)
@@ -489,7 +490,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 4),
+                          const Gap(4),
                           Text(
                             comments,
                             style:
@@ -502,7 +503,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                     ),
                   ],
 
-                  const SizedBox(height: 12),
+                  const Gap(12),
 
                   // Sharing info or ownership info.
 
@@ -523,7 +524,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                                             .colorScheme
                                             .onSurfaceVariant,
                                       ),
-                                      const SizedBox(width: 4),
+                                      const Gap(4),
                                       Text(
                                         'Owner: ${_getOwnerName(owner)}',
                                         style: Theme.of(context)
@@ -532,7 +533,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 2),
+                                  const Gap(2),
                                   Row(
                                     children: [
                                       Icon(
@@ -542,7 +543,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                                             .colorScheme
                                             .onSurfaceVariant,
                                       ),
-                                      const SizedBox(width: 4),
+                                      const Gap(4),
                                       Text(
                                         'Shared by: ${_getOwnerName(sharedBy)}',
                                         style: Theme.of(context)

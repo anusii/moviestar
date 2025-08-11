@@ -26,6 +26,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
@@ -347,7 +348,7 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 12),
+                    const Gap(12),
 
                     // Quick action buttons.
 
@@ -410,7 +411,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                       ],
                     ),
 
-                    const SizedBox(height: 16),
+                    const Gap(16),
 
                     // Rating section
                     Text(
@@ -419,7 +420,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                             fontWeight: FontWeight.w600,
                           ),
                     ),
-                    const SizedBox(height: 8),
+                    const Gap(8),
 
                     Row(
                       children: [

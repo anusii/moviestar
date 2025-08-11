@@ -1,6 +1,6 @@
 /// Widget for showing current cache status in the UI.
 ///
-// Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
+// Time-stamp: <Sunday 2025-08-10 11:33:49 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -28,6 +28,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gap/gap.dart';
 
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/settings_screen.dart';
@@ -86,7 +87,7 @@ class CacheStatusIndicator extends ConsumerWidget {
               color: Colors.white,
             ),
             if (!compact) ...[
-              const SizedBox(width: 4),
+              const Gap(4),
               Text(
                 _getStatusText(cacheOnlyMode, cacheStatsAsync),
                 style: TextStyle(
@@ -229,7 +230,7 @@ class CacheStatusIndicator extends ConsumerWidget {
         title: const Row(
           children: [
             Icon(Icons.storage, size: 24),
-            SizedBox(width: 8),
+            Gap(8),
             Text('Cache Status'),
           ],
         ),

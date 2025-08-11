@@ -1,6 +1,6 @@
 /// Moviestar - Manage and share ratings through private PODs.
 ///
-// Time-stamp: <Wednesday 2025-07-23 16:54:30 +1000 Graham Williams>
+// Time-stamp: <Sunday 2025-08-10 11:33:19 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU
 ///
@@ -27,6 +27,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:gap/gap.dart';
+
 /// A placeholder home page widget.
 
 class HomePage extends StatelessWidget {
@@ -43,12 +45,12 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.movie, size: 100, color: Colors.blue),
-            const SizedBox(height: 20),
+            const Gap(20),
             Text(
               'Welcome to Movie Star',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            const SizedBox(height: 10),
+            const Gap(10),
             Text(
               'Your ultimate movie companion',
               style: Theme.of(context).textTheme.bodyLarge,

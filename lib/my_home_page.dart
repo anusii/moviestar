@@ -48,6 +48,7 @@ import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/services/movie_service.dart';
+import 'package:moviestar/services/security_key_service.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/widgets/moviestar_status_bar_config.dart';
@@ -83,6 +84,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   late final FavoritesService _favoritesService;
   late final ApiKeyService _apiKeyService;
   late final MovieService _movieService;
+  late final SecurityKeyService _securityKeyService;
 
   /// List of screens to display in the navigation rail.
 
@@ -103,19 +105,26 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     _favoritesService = FavoritesServiceAdapter(_favoritesServiceManager);
     _apiKeyService = ApiKeyService();
     _movieService = MovieService(_apiKeyService);
+    _securityKeyService = SecurityKeyService();
 
     // Listen for API key changes.
 
     _apiKeyService.addListener(_onApiKeyChanged);
 
+    // Listen for security key changes.
+
+    _securityKeyService.addListener(_onSecurityKeyChanged);
+
     _loadAppInfo();
     _loadUserInfo();
+    _loadSecurityKeyStatus();
     _buildScreens();
   }
 
   @override
   void dispose() {
     _apiKeyService.removeListener(_onApiKeyChanged);
+    _securityKeyService.removeListener(_onSecurityKeyChanged);
     super.dispose();
   }
 
@@ -207,6 +216,34 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       // Force refresh by rebuilding.
 
       setState(() {});
+    }
+  }
+
+  /// Handles security key changes.
+
+  void _onSecurityKeyChanged() {
+    // Reload security key status when it changes.
+
+    _loadSecurityKeyStatus();
+  }
+
+  /// Loads the current security key status.
+
+  Future<void> _loadSecurityKeyStatus() async {
+    try {
+      final isKeySaved = await _securityKeyService.isKeySaved();
+      if (mounted) {
+        setState(() {
+          _isKeySaved = isKeySaved;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading security key status: $e');
+      if (mounted) {
+        setState(() {
+          _isKeySaved = false;
+        });
+      }
     }
   }
 
@@ -328,21 +365,89 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   /// Handles the security key management action.
 
   void _handleSecurityKeyManagement() {
-    // For now, just toggle the key status as a demonstration
-    // In a real app, this would open a proper security key manager dialog
-    setState(() {
-      _isKeySaved = !_isKeySaved;
-    });
-    
-    // Show a snackbar to indicate the change
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          _isKeySaved 
-            ? 'Security Key: Saved'
-            : 'Security Key: Not Saved',
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Security Key Manager'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+                'Current status: ${_isKeySaved ? "Key Saved" : "No Key Saved"}'),
+            const SizedBox(height: 16),
+            const Text(
+              'Security keys are used to encrypt your movie data for enhanced'
+              'protection.',
+              style: TextStyle(fontSize: 12),
+            ),
+          ],
         ),
-        duration: const Duration(seconds: 2),
+        actions: [
+          if (_isKeySaved) ...[
+            TextButton(
+              onPressed: () async {
+                try {
+                  await _securityKeyService.clearSecurityKey();
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Security Key: Removed'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error removing key: $e'),
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                }
+              },
+              child: const Text('Remove Key'),
+            ),
+          ] else ...[
+            TextButton(
+              onPressed: () async {
+                try {
+                  final newKey =
+                      await _securityKeyService.generateSecurityKey();
+                  await _securityKeyService.setSecurityKey(newKey);
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Security Key: Generated and Saved'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error generating key: $e'),
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                }
+              },
+              child: const Text('Generate Key'),
+            ),
+          ],
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
       ),
     );
   }

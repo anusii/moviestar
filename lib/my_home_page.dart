@@ -50,6 +50,7 @@ import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/services/movie_service.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
+import 'package:moviestar/widgets/moviestar_status_bar_config.dart';
 import 'package:moviestar/widgets/moviestar_nav_config.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
@@ -74,6 +75,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   bool _isVersionLoaded = false;
   String? _webId;
   String? _name;
+  bool _isKeySaved = false;
 
   /// Service for managing favorite movies.
 
@@ -323,6 +325,28 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     logoutPopup(context, const MovieStar());
   }
 
+  /// Handles the security key management action.
+
+  void _handleSecurityKeyManagement() {
+    // For now, just toggle the key status as a demonstration
+    // In a real app, this would open a proper security key manager dialog
+    setState(() {
+      _isKeySaved = !_isKeySaved;
+    });
+    
+    // Show a snackbar to indicate the change
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          _isKeySaved 
+            ? 'Security Key: Saved'
+            : 'Security Key: Not Saved',
+        ),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   /// Handles the version info action.
 
   void _handleVersionInfo() {
@@ -384,6 +408,16 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       ref: ref,
     );
 
+    // Create status bar configuration.
+
+    final statusBarConfig = MovieStarStatusBarConfig.createStatusBarConfig(
+      webId: _webId,
+      onLoginTap: () => _handleLogout(),
+      isKeySaved: _isKeySaved,
+      onSecurityKeyTap: _handleSecurityKeyManagement,
+      showOnNarrowScreens: false, // Hide status bar on narrow screens.
+    );
+
     // Use the Solid Navigation Manager with configurable width threshold.
 
     return SolidNavigationManager.movieStar(
@@ -403,6 +437,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       onLogout: (context) => _handleLogout(),
       appBar: appBar,
       backgroundColor: theme.colorScheme.surface,
+      statusBarConfig: statusBarConfig,
     );
   }
 }

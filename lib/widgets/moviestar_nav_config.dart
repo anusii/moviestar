@@ -31,6 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/providers/theme_provider.dart';
+import 'package:moviestar/providers/view_mode_provider.dart';
 
 /// MovieStar-specific navigation configuration and factory methods.
 
@@ -123,6 +124,7 @@ your movie data files.
     required VoidCallback onLogout,
     required WidgetRef ref,
     VoidCallback? onVersionInfo,
+    VoidCallback? onViewModeToggle,
   }) {
     return SolidAppBarConfig(
       title: title,
@@ -144,6 +146,16 @@ updating your version.
             )
           : null,
       actions: [
+        if (onViewModeToggle != null)
+          SolidAppBarAction(
+            icon: _getViewModeIcon(ref.watch(viewModeProvider)),
+            onPressed: onViewModeToggle,
+            tooltip: '''
+
+**View Mode:** Tap here to cycle between different view modes (Grid, Kanban, List).
+
+''',
+          ),
         SolidAppBarAction(
           icon: Icons.refresh,
           onPressed: onRefresh,
@@ -259,5 +271,18 @@ screen.
       text: 'Logout',
       icon: Icons.logout,
     );
+  }
+
+  // Helper method to get the appropriate icon for the current view mode.
+  
+  static IconData _getViewModeIcon(HomeViewMode viewMode) {
+    switch (viewMode) {
+      case HomeViewMode.grid:
+        return Icons.grid_view;
+      case HomeViewMode.kanban:
+        return Icons.view_kanban;
+      case HomeViewMode.list:
+        return Icons.view_list;
+    }
   }
 }

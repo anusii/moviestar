@@ -31,7 +31,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import '../models/movie.dart';
 import '../services/favorites_service.dart';
+import '../services/favorites_service_adapter.dart';
+import '../services/movie_list_service.dart';
+import '../services/user_profile_service.dart';
 import '../utils/movie_sort_util.dart';
+import '../widgets/share_list_dialog.dart';
 import '../widgets/sort_controls.dart';
 import 'movie_details_screen.dart';
 
@@ -57,10 +61,93 @@ class _ToWatchScreenState extends State<ToWatchScreen> {
 
   MovieSortCriteria _sortCriteria = MovieSortCriteria.nameAsc;
 
+  // Share the To Watch list as a movie list.
+  
+  Future<void> _shareToWatchList() async {
+    try {
+      // Check if the favorites service supports POD storage.
+      
+      if (widget.favoritesService is! FavoritesServiceAdapter) {
+        _showErrorSnackBar('POD storage is required for sharing lists');
+        return;
+      }
+
+      final adapter = widget.favoritesService as FavoritesServiceAdapter;
+      if (!adapter.isPodStorageEnabled) {
+        _showErrorSnackBar('POD storage must be enabled to share lists');
+        return;
+      }
+
+      // Create UserProfileService and get the standard To Watch list ID.
+      
+      final userProfileService = UserProfileService(context, widget);
+      final movieListService = MovieListService(context, widget, userProfileService);
+      final toWatchListId = await movieListService.getOrCreateStandardMovieList('towatch');
+      
+      if (toWatchListId == null) {
+        _showErrorSnackBar('Could not access To Watch list');
+        return;
+      }
+
+      if (!mounted) {
+        return;
+      }
+
+      // Show the share dialog.
+      
+      final result = await ShareListDialog.show(
+        context: context,
+        listId: toWatchListId,
+        movieListService: movieListService,
+        onShared: () {
+          _showSuccessSnackBar('To Watch list shared successfully!');
+        },
+      );
+
+      if (result == true) {
+        // Additional success handling if needed.
+        
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error sharing list: $e');
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('To Watch'),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: _shareToWatchList,
+            tooltip: 'Share To Watch List',
+          ),
+        ],
+      ),
       body: Column(
         children: [
           SortControls(

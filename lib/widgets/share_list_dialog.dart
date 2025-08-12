@@ -19,13 +19,12 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Assistant
+/// Authors: Ashley Tang
 
 library;
 
 import 'package:flutter/material.dart';
 
-import 'package:gap/gap.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/models/movie.dart';
@@ -229,7 +228,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
           child: Row(
             children: [
               const CircularProgressIndicator(),
-              const Gap(16),
+              const SizedBox(width: 16),
               Text(
                 'Loading list...',
                 style: Theme.of(context).textTheme.bodyMedium,
@@ -250,7 +249,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
                 Icons.error_outline,
                 color: Theme.of(context).colorScheme.error,
               ),
-              const Gap(16),
+              const SizedBox(width: 16),
               Expanded(
                 child: Text(
                   'Failed to load list data',
@@ -294,7 +293,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
                     size: 24,
                   ),
                 ),
-                const Gap(12),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,7 +306,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
                                 ),
                       ),
                       if (description != null && description.isNotEmpty) ...[
-                        const Gap(4),
+                        const SizedBox(height: 4),
                         Text(
                           description,
                           style:
@@ -324,7 +323,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
                 ),
               ],
             ),
-            const Gap(12),
+                                  const SizedBox(width: 12),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -339,7 +338,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
                     size: 16,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
-                  const Gap(8),
+                  const SizedBox(width: 8),
                   Text(
                     '$movieCount ${movieCount == 1 ? 'movie' : 'movies'}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -351,7 +350,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
               ),
             ),
             if (movies.isNotEmpty && movies.length <= 3) ...[
-              const Gap(12),
+                                    const SizedBox(width: 12),
               Text(
                 'Movies:',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -362,7 +361,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
                           .withValues(alpha: 0.7),
                     ),
               ),
-              const Gap(8),
+              const SizedBox(height: 8),
               ...movies.map((movie) => Padding(
                     padding: const EdgeInsets.symmetric(vertical: 2),
                     child: Row(
@@ -375,7 +374,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
                               .onSurface
                               .withValues(alpha: 0.5),
                         ),
-                        const Gap(8),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             movie.title,
@@ -405,7 +404,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
                 fontWeight: FontWeight.w500,
               ),
         ),
-        const Gap(8),
+        const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
             border: Border.all(
@@ -458,7 +457,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
                           }
                         },
                       ),
-                      const Gap(12),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -477,7 +476,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
                                         : null,
                                   ),
                             ),
-                            const Gap(2),
+                            const SizedBox(height: 2),
                             Text(
                               permission.description,
                               style: Theme.of(context)
@@ -522,7 +521,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
             // List Preview
             _buildListPreview(),
 
-            const Gap(24),
+            const SizedBox(height: 24),
 
             // WebID Input
             Text(
@@ -531,7 +530,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
                     fontWeight: FontWeight.w500,
                   ),
             ),
-            const Gap(8),
+            const SizedBox(height: 8),
             TextField(
               controller: _webIdController,
               decoration: InputDecoration(
@@ -563,7 +562,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
               onSubmitted: (_) => _handleShare(),
             ),
 
-            const Gap(24),
+            const SizedBox(height: 24),
 
             // Permission Selector
             _buildPermissionSelector(),

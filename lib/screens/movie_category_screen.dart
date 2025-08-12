@@ -28,11 +28,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moviestar/models/movie.dart';
-
 import 'package:moviestar/screens/movie_details_screen.dart';
-
 import 'package:moviestar/services/favorites_service.dart';
-
 import 'package:moviestar/widgets/movie_card.dart';
 
 /// Screen that displays all movies in a specific category.

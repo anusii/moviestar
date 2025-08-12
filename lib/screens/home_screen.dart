@@ -28,31 +28,19 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/models/movie.dart';
-
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
-
 import 'package:moviestar/providers/view_mode_provider.dart';
-
 import 'package:moviestar/screens/movie_category_screen.dart';
-
 import 'package:moviestar/screens/movie_details_screen.dart';
-
 import 'package:moviestar/services/favorites_service.dart';
-
 import 'package:moviestar/services/favorites_service_adapter.dart';
-
 import 'package:moviestar/services/hive_movie_cache_service.dart';
-
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
-
 import 'package:moviestar/widgets/error_display_widget.dart';
-
 import 'package:moviestar/widgets/movie_card.dart';
-
 import 'package:moviestar/widgets/movie_kanban_board.dart';
 
 /// Main home screen of the Movie Star application, displaying featured and

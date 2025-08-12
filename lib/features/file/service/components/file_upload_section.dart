@@ -30,19 +30,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:file_picker/file_picker.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:gap/gap.dart';
-
 import 'package:markdown_tooltip/markdown_tooltip.dart';
-
 import 'package:path/path.dart' as path;
 
 import 'package:moviestar/features/file/service/providers/file_service_provider.dart';
-
 import 'package:moviestar/theme/app_theme.dart';
-
 import 'package:moviestar/utils/is_text_file.dart';
 
 /// A widget that handles file upload functionality and preview.

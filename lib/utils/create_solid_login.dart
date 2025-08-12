@@ -28,19 +28,13 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:gap/gap.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/my_home_page.dart';
-
 import 'package:moviestar/screens/settings_screen.dart';
-
 import 'package:moviestar/services/api_key_service.dart';
-
 import 'package:moviestar/services/favorites_service.dart';
 
 /// Creates a Solid login widget for authentication.

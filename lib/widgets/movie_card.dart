@@ -30,13 +30,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/models/movie.dart';
-
 import 'package:moviestar/services/favorites_service.dart';
-
 import 'package:moviestar/widgets/quick_actions_dialog.dart';
 
 /// Different display modes for movie cards.

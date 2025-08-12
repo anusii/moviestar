@@ -30,19 +30,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:gap/gap.dart';
-
 import 'package:markdown_tooltip/markdown_tooltip.dart';
-
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/models/movie.dart';
-
 import 'package:moviestar/services/favorites_service.dart';
-
 import 'package:moviestar/services/favorites_service_adapter.dart';
-
 import 'package:moviestar/utils/date_format_util.dart';
 
 /// A screen that displays detailed information about a selected movie.

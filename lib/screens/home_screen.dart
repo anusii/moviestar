@@ -28,21 +28,32 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/providers/view_mode_provider.dart';
-import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/screens/movie_category_screen.dart';
-import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/services/favorites_service_adapter.dart';
-import 'package:moviestar/services/hive_movie_cache_service.dart';
-import 'package:moviestar/widgets/cache_feedback_widget.dart';
-import 'package:moviestar/widgets/error_display_widget.dart';
-import 'package:moviestar/widgets/movie_card.dart';
-import 'package:moviestar/widgets/movie_kanban_board.dart';
 
+import 'package:moviestar/providers/cached_movie_service_provider.dart';
+
+import 'package:moviestar/providers/view_mode_provider.dart';
+
+import 'package:moviestar/screens/movie_category_screen.dart';
+
+import 'package:moviestar/screens/movie_details_screen.dart';
+
+import 'package:moviestar/services/favorites_service.dart';
+
+import 'package:moviestar/services/favorites_service_adapter.dart';
+
+import 'package:moviestar/services/hive_movie_cache_service.dart';
+
+import 'package:moviestar/widgets/cache_feedback_widget.dart';
+
+import 'package:moviestar/widgets/error_display_widget.dart';
+
+import 'package:moviestar/widgets/movie_card.dart';
+
+import 'package:moviestar/widgets/movie_kanban_board.dart';
 
 /// Main home screen of the Movie Star application, displaying featured and
 /// trending movies.
@@ -526,9 +537,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 data: (cacheResult) {
                   if (cacheResult.data.length > 10) {
                     return TextButton(
-                      onPressed: () => _navigateToMovieCategory(title, cacheResult.data, fromCache: cacheResult.fromCache),
+                      onPressed: () => _navigateToMovieCategory(
+                          title, cacheResult.data,
+                          fromCache: cacheResult.fromCache),
                       style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
@@ -881,7 +895,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build content based on the selected view mode.
-  
+
   Widget _buildContentForViewMode(
     HomeViewMode viewMode,
     AsyncValue<CacheResult<List<Movie>>> popularMovies,
@@ -915,8 +929,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Navigate to a dedicated page for viewing all movies in a category.
-  
-  void _navigateToMovieCategory(String categoryName, List<Movie> movies, {bool fromCache = false}) {
+
+  void _navigateToMovieCategory(String categoryName, List<Movie> movies,
+      {bool fromCache = false}) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -931,7 +946,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build the traditional grid/horizontal scroll view (current implementation).
-  
+
   Widget _buildGridView(
     AsyncValue<CacheResult<List<Movie>>> popularMovies,
     AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,
@@ -975,7 +990,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build the kanban view with AppFlowy Board.
-  
+
   Widget _buildKanbanView(
     AsyncValue<CacheResult<List<Movie>>> popularMovies,
     AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,
@@ -991,7 +1006,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build a list view of movies.
-  
+
   Widget _buildListView(
     AsyncValue<CacheResult<List<Movie>>> popularMovies,
     AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,
@@ -1004,12 +1019,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // To Watch and Watched sections.
-          
+
           _buildListSection('To Watch', _buildToWatchListItems()),
           _buildListSection('Watched', _buildWatchedListItems()),
-          
+
           // API Movie sections.
-          
+
           _buildAsyncListSection('Popular on Movie Star', popularMovies),
           _buildAsyncListSection('Now Playing', nowPlayingMovies),
           _buildAsyncListSection('Top Rated', topRatedMovies),
@@ -1020,7 +1035,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build a list section with title and items.
-  
+
   Widget _buildListSection(String title, Widget content) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1033,12 +1048,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Text(
                   title,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ),
               // Add View More button based on section type.
-              
+
               _buildViewMoreForUserList(title),
             ],
           ),
@@ -1050,7 +1065,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build View More button for user lists (To Watch/Watched).
-  
+
   Widget _buildViewMoreForUserList(String title) {
     if (title == 'To Watch') {
       return StreamBuilder<List<Movie>>(
@@ -1107,8 +1122,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build a list section for async movie data.
-  
-  Widget _buildAsyncListSection(String title, AsyncValue<CacheResult<List<Movie>>> moviesAsync) {
+
+  Widget _buildAsyncListSection(
+      String title, AsyncValue<CacheResult<List<Movie>>> moviesAsync) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1120,19 +1136,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Text(
                   title,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ),
               // View More button for sections with many items.
-              
+
               moviesAsync.when(
                 data: (cacheResult) {
                   if (cacheResult.data.length > 5) {
                     return TextButton(
-                      onPressed: () => _navigateToMovieCategory(title, cacheResult.data, fromCache: cacheResult.fromCache),
+                      onPressed: () => _navigateToMovieCategory(
+                          title, cacheResult.data,
+                          fromCache: cacheResult.fromCache),
                       style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
@@ -1154,7 +1173,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         moviesAsync.when(
-          data: (cacheResult) => _buildMovieListItems(cacheResult.data, cacheResult.fromCache),
+          data: (cacheResult) =>
+              _buildMovieListItems(cacheResult.data, cacheResult.fromCache),
           loading: () => const Padding(
             padding: EdgeInsets.all(32),
             child: Center(child: CircularProgressIndicator()),
@@ -1173,7 +1193,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build list items for To Watch movies.
-  
+
   Widget _buildToWatchListItems() {
     return StreamBuilder<List<Movie>>(
       stream: widget.favoritesService.toWatchMovies,
@@ -1203,7 +1223,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build list items for Watched movies.
-  
+
   Widget _buildWatchedListItems() {
     return StreamBuilder<List<Movie>>(
       stream: widget.favoritesService.watchedMovies,
@@ -1233,7 +1253,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build list items for a list of movies.
-  
+
   Widget _buildMovieListItems(List<Movie> movies, bool fromCache) {
     if (movies.isEmpty) {
       return const Padding(

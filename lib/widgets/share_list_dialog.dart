@@ -323,7 +323,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
                 ),
               ],
             ),
-                                  const SizedBox(width: 12),
+            const SizedBox(width: 12),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -350,7 +350,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
               ),
             ),
             if (movies.isNotEmpty && movies.length <= 3) ...[
-                                    const SizedBox(width: 12),
+              const SizedBox(width: 12),
               Text(
                 'Movies:',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(

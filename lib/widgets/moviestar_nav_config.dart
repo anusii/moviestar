@@ -274,7 +274,7 @@ screen.
   }
 
   // Helper method to get the appropriate icon for the current view mode.
-  
+
   static IconData _getViewModeIcon(HomeViewMode viewMode) {
     switch (viewMode) {
       case HomeViewMode.grid:

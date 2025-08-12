@@ -33,11 +33,11 @@ import 'package:moviestar/providers/view_mode_provider.dart';
 
 class ViewModeToggle extends ConsumerWidget {
   /// Whether to show as a compact single button or expanded row.
-  
+
   final bool compact;
-  
+
   /// Icon size for the buttons.
-  
+
   final double iconSize;
 
   const ViewModeToggle({
@@ -59,10 +59,10 @@ class ViewModeToggle extends ConsumerWidget {
   }
 
   // Build a compact toggle that shows current mode and cycles on tap.
-  
+
   Widget _buildCompactToggle(
-    BuildContext context, 
-    HomeViewMode currentMode, 
+    BuildContext context,
+    HomeViewMode currentMode,
     ViewModeNotifier notifier,
   ) {
     return IconButton(
@@ -77,10 +77,10 @@ class ViewModeToggle extends ConsumerWidget {
   }
 
   // Build an expanded toggle with separate buttons for each mode.
-  
+
   Widget _buildExpandedToggle(
-    BuildContext context, 
-    HomeViewMode currentMode, 
+    BuildContext context,
+    HomeViewMode currentMode,
     ViewModeNotifier notifier,
   ) {
     return Row(
@@ -94,9 +94,12 @@ class ViewModeToggle extends ConsumerWidget {
             icon: Icon(
               _getIconForMode(mode),
               size: iconSize,
-              color: isSelected 
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.6),
             ),
             tooltip: '${mode.displayName} View',
             splashRadius: 18,
@@ -107,7 +110,7 @@ class ViewModeToggle extends ConsumerWidget {
   }
 
   // Get the appropriate icon for each view mode.
-  
+
   IconData _getIconForMode(HomeViewMode mode) {
     switch (mode) {
       case HomeViewMode.grid:
@@ -149,7 +152,7 @@ class ViewModeSegmentedToggle extends ConsumerWidget {
   }
 
   // Get the appropriate icon for each view mode.
-  
+
   IconData _getIconForMode(HomeViewMode mode) {
     switch (mode) {
       case HomeViewMode.grid:

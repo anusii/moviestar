@@ -28,9 +28,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/widgets/movie_card.dart';
+
 import 'package:moviestar/screens/movie_details_screen.dart';
+
+import 'package:moviestar/services/favorites_service.dart';
+
+import 'package:moviestar/widgets/movie_card.dart';
 
 /// Screen that displays all movies in a specific category.
 
@@ -49,7 +52,8 @@ class MovieCategoryScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<MovieCategoryScreen> createState() => _MovieCategoryScreenState();
+  ConsumerState<MovieCategoryScreen> createState() =>
+      _MovieCategoryScreenState();
 }
 
 class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
@@ -63,10 +67,10 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
   }
 
   // Get sorted movies based on current sort option.
-  
+
   List<Movie> get _sortedMovies {
     final movies = List<Movie>.from(widget.movies);
-    
+
     switch (_sortBy) {
       case 'title':
         movies.sort((a, b) => a.title.compareTo(b.title));
@@ -80,15 +84,15 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
       case 'default':
       default:
         // Keep original order (e.g., popularity for API results).
-        
+
         break;
     }
-    
+
     return movies;
   }
 
   // Build the sort options.
-  
+
   Widget _buildSortOptions() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -105,8 +109,8 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
           Text(
             'Sort by:',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
+                  fontWeight: FontWeight.w500,
+                ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -131,7 +135,7 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
   }
 
   // Build a sort chip.
-  
+
   Widget _buildSortChip(String label, String value) {
     final isSelected = _sortBy == value;
     return FilterChip(
@@ -146,7 +150,7 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
       },
       selectedColor: Theme.of(context).colorScheme.primaryContainer,
       labelStyle: TextStyle(
-        color: isSelected 
+        color: isSelected
             ? Theme.of(context).colorScheme.onPrimaryContainer
             : Theme.of(context).colorScheme.onSurface,
         fontSize: 12,
@@ -157,10 +161,10 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
   }
 
   // Build the movie grid.
-  
+
   Widget _buildMovieGrid() {
     final movies = _sortedMovies;
-    
+
     if (movies.isEmpty) {
       return Center(
         child: Padding(
@@ -171,21 +175,30 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
               Icon(
                 Icons.movie_outlined,
                 size: 64,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.5),
               ),
               const SizedBox(height: 16),
               Text(
                 'No movies found',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                ),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
+                    ),
               ),
               const SizedBox(height: 8),
               Text(
                 'There are no movies in this category.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.6),
+                    ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -246,7 +259,7 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
         ),
         actions: [
           // Movie count indicator.
-          
+
           Container(
             margin: const EdgeInsets.only(right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -257,9 +270,9 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
             child: Text(
               '${widget.movies.length} movies',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-                fontWeight: FontWeight.w500,
-              ),
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w500,
+                  ),
             ),
           ),
         ],
@@ -267,21 +280,22 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
       body: Column(
         children: [
           // Sort options.
-          
+
           _buildSortOptions(),
-          
+
           // Movie grid.
-          
+
           Expanded(
             child: _buildMovieGrid(),
           ),
         ],
       ),
       // Floating action button to scroll to top.
-      
+
       floatingActionButton: ValueListenableBuilder<bool>(
-        valueListenable: ValueNotifier(false), // We'll implement scroll-to-top later if needed.
-        
+        valueListenable: ValueNotifier(
+            false), // We'll implement scroll-to-top later if needed.
+
         builder: (context, showScrollToTop, child) {
           return FloatingActionButton.small(
             onPressed: () {

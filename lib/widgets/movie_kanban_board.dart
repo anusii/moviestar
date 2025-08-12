@@ -28,11 +28,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moviestar/models/movie.dart';
+
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/widgets/movie_card.dart';
-import 'package:moviestar/screens/movie_details_screen.dart';
+
 import 'package:moviestar/screens/movie_category_screen.dart';
+
+import 'package:moviestar/screens/movie_details_screen.dart';
+
+import 'package:moviestar/services/favorites_service.dart';
+
+import 'package:moviestar/widgets/movie_card.dart';
 
 /// A movie item wrapper for kanban board usage.
 
@@ -73,8 +78,9 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }
 
   /// Build a movie item widget for the kanban board.
-  
-  Widget _buildMovieItem(Movie movie, String category, {bool fromCache = false}) {
+
+  Widget _buildMovieItem(Movie movie, String category,
+      {bool fromCache = false}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       child: MovieCard.poster(
@@ -101,7 +107,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }
 
   /// Build a kanban column.
-  
+
   Widget _buildKanbanColumn({
     required String title,
     required List<Movie> movies,
@@ -110,7 +116,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }) {
     final displayMovies = movies.take(_maxItemsPerColumn).toList();
     final hasMore = movies.length > _maxItemsPerColumn;
-    
+
     return Container(
       width: 220,
       margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -140,12 +146,13 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                   child: Text(
                     title,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(12),
@@ -153,43 +160,49 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                   child: Text(
                     '${movies.length}${hasMore ? '+' : ''}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      fontWeight: FontWeight.w500,
-                    ),
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.w500,
+                        ),
                   ),
                 ),
-                                  if (hasMore) ...[
+                if (hasMore) ...[
                   const SizedBox(width: 4),
                   TextButton(
-                    onPressed: () => _navigateToMovieCategory(title, movies, fromCache),
+                    onPressed: () =>
+                        _navigateToMovieCategory(title, movies, fromCache),
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                     child: Text(
                       'View More',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 11,
-                      ),
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 11,
+                          ),
                     ),
                   ),
                 ],
               ],
             ),
           ),
-          
+
           // Movie items.
-          
+
           Expanded(
             child: displayMovies.isEmpty
                 ? Center(
                     child: Text(
                       'No movies',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-                      ),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.5),
+                          ),
                     ),
                   )
                 : ListView.builder(
@@ -197,7 +210,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                     itemCount: displayMovies.length,
                     itemBuilder: (context, index) {
                       final movie = displayMovies[index];
-                      return _buildMovieItem(movie, categoryId, fromCache: fromCache);
+                      return _buildMovieItem(movie, categoryId,
+                          fromCache: fromCache);
                     },
                   ),
           ),
@@ -207,8 +221,9 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }
 
   // Navigate to a dedicated page for viewing all movies in a category.
-  
-  void _navigateToMovieCategory(String categoryName, List<Movie> movies, bool fromCache) {
+
+  void _navigateToMovieCategory(
+      String categoryName, List<Movie> movies, bool fromCache) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -227,8 +242,9 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     return Consumer(
       builder: (context, ref, child) {
         // Watch the popular movies data.
-        
-        final popularMoviesAsync = ref.watch(popularMoviesWithCacheInfoProvider);
+
+        final popularMoviesAsync =
+            ref.watch(popularMoviesWithCacheInfoProvider);
 
         return popularMoviesAsync.when(
           data: (popularCacheResult) {
@@ -248,7 +264,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Popular Movies Column.
-                          
+
                           _buildKanbanColumn(
                             title: 'Popular',
                             movies: popularMovies,
@@ -257,7 +273,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                           ),
 
                           // To Watch Column.
-                          
+
                           _buildKanbanColumn(
                             title: 'To Watch',
                             movies: toWatchMovies,
@@ -266,7 +282,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                           ),
 
                           // Watched Column.
-                          
+
                           _buildKanbanColumn(
                             title: 'Watched',
                             movies: watchedMovies,

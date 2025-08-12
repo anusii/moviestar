@@ -61,11 +61,11 @@ class _WatchedScreenState extends State<WatchedScreen> {
   MovieSortCriteria _sortCriteria = MovieSortCriteria.nameAsc;
 
   // Share the Watched list as a movie list.
-  
+
   Future<void> _shareWatchedList() async {
     try {
       // Check if the favorites service supports POD storage.
-      
+
       if (widget.favoritesService is! FavoritesServiceAdapter) {
         _showErrorSnackBar('POD storage is required for sharing lists');
         return;
@@ -78,22 +78,24 @@ class _WatchedScreenState extends State<WatchedScreen> {
       }
 
       // Create UserProfileService and get the standard Watched list ID.
-      
+
       final userProfileService = UserProfileService(context, widget);
-      final movieListService = MovieListService(context, widget, userProfileService);
-      final watchedListId = await movieListService.getOrCreateStandardMovieList('watched');
-      
+      final movieListService =
+          MovieListService(context, widget, userProfileService);
+      final watchedListId =
+          await movieListService.getOrCreateStandardMovieList('watched');
+
       if (watchedListId == null) {
         _showErrorSnackBar('Could not access Watched list');
         return;
       }
-      
+
       if (!mounted) {
         return;
       }
 
       // Show the share dialog.
-      
+
       final result = await ShareListDialog.show(
         context: context,
         listId: watchedListId,
@@ -105,7 +107,6 @@ class _WatchedScreenState extends State<WatchedScreen> {
 
       if (result == true) {
         // Additional success handling if needed.
-        
       }
     } catch (e) {
       _showErrorSnackBar('Error sharing list: $e');

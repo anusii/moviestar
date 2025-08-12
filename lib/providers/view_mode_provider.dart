@@ -39,7 +39,7 @@ enum HomeViewMode {
   final String value;
 
   // Get HomeViewMode from string value.
-  
+
   static HomeViewMode fromValue(String value) {
     switch (value) {
       case 'grid':
@@ -58,13 +58,13 @@ enum HomeViewMode {
 
 class ViewModeNotifier extends StateNotifier<HomeViewMode> {
   static const String _key = 'home_view_mode';
-  
+
   ViewModeNotifier() : super(HomeViewMode.grid) {
     _loadViewMode();
   }
 
   // Load the view mode from shared preferences.
-  
+
   Future<void> _loadViewMode() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -74,12 +74,11 @@ class ViewModeNotifier extends StateNotifier<HomeViewMode> {
       }
     } catch (e) {
       // If loading fails, keep the default.
-      
     }
   }
 
   // Set the view mode and persist it.
-  
+
   Future<void> setViewMode(HomeViewMode mode) async {
     state = mode;
     try {
@@ -87,12 +86,11 @@ class ViewModeNotifier extends StateNotifier<HomeViewMode> {
       await prefs.setString(_key, mode.value);
     } catch (e) {
       // If saving fails, at least the state is updated.
-      
     }
   }
 
   // Cycle to the next view mode.
-  
+
   Future<void> cycleViewMode() async {
     final modes = HomeViewMode.values;
     final currentIndex = modes.indexOf(state);
@@ -103,6 +101,7 @@ class ViewModeNotifier extends StateNotifier<HomeViewMode> {
 
 /// Provider for the view mode state.
 
-final viewModeProvider = StateNotifierProvider<ViewModeNotifier, HomeViewMode>((ref) {
+final viewModeProvider =
+    StateNotifierProvider<ViewModeNotifier, HomeViewMode>((ref) {
   return ViewModeNotifier();
 });

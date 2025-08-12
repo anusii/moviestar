@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang, Graham Williams, Ashley Tang
+/// Authors: Kevin Wang, Graham Williams, Ashley Tang, Tony Chen
 
 library;
 
@@ -29,11 +29,16 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:solidpod/solidpod.dart'
+    show getAppNameVersion, logoutPopup, getWebId;
+import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/features/file/service/page.dart';
+import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
+import 'package:moviestar/screens/search_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/screens/shared_movies_screen.dart';
 import 'package:moviestar/screens/to_watch_screen.dart';
@@ -45,9 +50,11 @@ import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/services/movie_service.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
+import 'package:moviestar/widgets/moviestar_nav_config.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   final SharedPreferences prefs;
+
   const MyHomePage({super.key, required this.title, required this.prefs});
 
   final String title;
@@ -63,6 +70,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   int _selectedIndex = 0;
   bool _isLoadingFolders = false;
+  String _appVersion = '';
+  bool _isVersionLoaded = false;
+  String? _webId;
+  String? _name;
 
   /// Service for managing favorite movies.
 
@@ -71,9 +82,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   late final ApiKeyService _apiKeyService;
   late final MovieService _movieService;
 
-  /// List of screens to display in the bottom navigation bar.
+  /// List of screens to display in the navigation rail.
 
   late List<Widget> _screens;
+
+  /// Navigation tabs configuration.
+
+  late List<SolidNavTab> _navTabs;
 
   @override
   void initState() {
@@ -91,6 +106,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     _apiKeyService.addListener(_onApiKeyChanged);
 
+    _loadAppInfo();
+    _loadUserInfo();
     _buildScreens();
   }
 
@@ -98,6 +115,69 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   void dispose() {
     _apiKeyService.removeListener(_onApiKeyChanged);
     super.dispose();
+  }
+
+  /// Loads the app name and version from package_info_plus.
+
+  Future<void> _loadAppInfo() async {
+    final appInfo = await getAppNameVersion();
+    if (mounted) {
+      setState(() {
+        _appVersion = appInfo.version;
+        _isVersionLoaded = true;
+      });
+    }
+  }
+
+  /// Loads user information from the POD.
+
+  Future<void> _loadUserInfo() async {
+    try {
+      final webId = await getWebId();
+      if (mounted && webId != null && webId.isNotEmpty) {
+        final name = _extractNameFromWebId(webId);
+        setState(() {
+          _webId = webId;
+          _name = name;
+        });
+      } else if (mounted) {
+        setState(() {
+          _webId = null;
+          _name = 'Not logged in';
+        });
+      }
+    } catch (e) {
+      // Handle error gracefully.
+
+      if (mounted) {
+        setState(() {
+          _webId = null;
+          _name = 'Not logged in';
+        });
+      }
+    }
+  }
+
+  /// Extracts a user-friendly name from the WebID.
+
+  String _extractNameFromWebId(String webId) {
+    try {
+      // Extract domain from WebID for a simple display name
+      final uri = Uri.parse(webId);
+      final domain = uri.host;
+
+      // Try to extract a meaningful part
+      if (domain.contains('.')) {
+        final parts = domain.split('.');
+        if (parts.isNotEmpty) {
+          return parts.first.toLowerCase();
+        }
+      }
+
+      return domain;
+    } catch (e) {
+      return 'User';
+    }
   }
 
   void _onApiKeyChanged() {
@@ -146,11 +226,21 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         favoritesServiceManager: _favoritesServiceManager,
       ),
     ];
+
+    // Configure navigation tabs using the MovieStar app configuration.
+
+    _navTabs = MovieStarNavConfig.createNavTabs();
+
     _initialiseAppData();
   }
 
   Future<void> _initialiseAppData() async {
     final loggedIn = await isLoggedIn();
+
+    // Refresh user info based on login status.
+
+    await _loadUserInfo();
+
     if (loggedIn) {
       if (mounted) {
         setState(() {
@@ -173,6 +263,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             }
 
             // Now reload POD data since folders are ready.
+
             await _favoritesServiceManager.reloadPodDataAfterInit();
 
             // Refresh UI streams to ensure latest data is displayed.
@@ -189,41 +280,129 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     }
   }
 
+  /// Handles the refresh action.
+
+  void _handleRefresh() {
+    // Invalidate all movie providers to force refresh.
+
+    ref.invalidate(popularMoviesWithCacheInfoProvider);
+    ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+    ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+    ref.invalidate(upcomingMoviesWithCacheInfoProvider);
+    ref.invalidate(configuredCachedMovieServiceProvider);
+  }
+
+  /// Handles the search action.
+
+  void _handleSearch() {
+    if (mounted) {
+      final movieService = ref.read(movieServiceProvider);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SearchScreen(
+            favoritesService: _favoritesService,
+            movieService: movieService,
+          ),
+        ),
+      );
+    }
+  }
+
+  /// Handles the settings action.
+
+  void _handleSettings() {
+    setState(() {
+      _selectedIndex = 6; // Settings screen index.
+    });
+  }
+
+  /// Handles the logout action.
+
+  void _handleLogout() {
+    logoutPopup(context, const MovieStar());
+  }
+
+  /// Handles the version info action.
+
+  void _handleVersionInfo() {
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Version Information'),
+          content: Text('Version: $_appVersion'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          _isLoadingFolders
-              ? const Center(child: CircularProgressIndicator())
-              : _screens[_selectedIndex],
-        ],
+    final theme = Theme.of(context);
+
+    // Create user info for the solid navigation.
+
+    final userConfig = MovieStarNavConfig.createUserConfig(
+      userName: _name ?? '',
+      webId: _webId,
+    );
+    final userInfo = SolidNavUtils.createUserInfo(userConfig);
+
+    // Create the main content with loading overlay.
+
+    final mainContent = Stack(
+      children: [
+        _isLoadingFolders
+            ? const Center(child: CircularProgressIndicator())
+            : _screens[_selectedIndex],
+      ],
+    );
+
+    // Create responsive AppBar.
+
+    final appBarConfig = MovieStarNavConfig.createAppBarConfig(
+      title: _navTabs[_selectedIndex].title,
+      appVersion: _appVersion,
+      isVersionLoaded: _isVersionLoaded,
+      onRefresh: _handleRefresh,
+      onSearch: _handleSearch,
+      onSettings: _handleSettings,
+      onLogout: _handleLogout,
+      onVersionInfo: _handleVersionInfo,
+      ref: ref,
+    );
+    final appBar = SolidNavUtils.createAppBar(
+      context: context,
+      config: appBarConfig,
+      ref: ref,
+    );
+
+    // Use the Solid Navigation Manager with configurable width threshold.
+
+    return SolidNavigationManager.movieStar(
+      config: const SolidNavigationConfig(
+        narrowScreenThreshold: 800.0,
+        autoSwitch: true,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.favorite), label: 'To Watch'),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Watched'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.upcoming),
-            label: 'Coming Soon',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.movie_outlined),
-            label: 'My Movies',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.folder), label: 'Files'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Settings'),
-        ],
-      ),
+      tabs: _navTabs,
+      selectedIndex: _selectedIndex,
+      onTabSelected: (index) {
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
+      content: mainContent,
+      userInfo: userInfo,
+      onLogout: (context) => _handleLogout(),
+      appBar: appBar,
+      backgroundColor: theme.colorScheme.surface,
     );
   }
 }

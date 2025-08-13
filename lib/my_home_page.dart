@@ -87,6 +87,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   late final ApiKeyService _apiKeyService;
   late final MovieService _movieService;
   late final SolidSecurityKeyService _securityKeyService;
+  
+  // Flag to prevent security key status update loops
+  bool _isUpdatingSecurityKeyStatus = false;
 
   /// List of screens to display in the navigation rail.
 
@@ -224,14 +227,42 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   /// Handles security key changes.
 
   void _onSecurityKeyChanged() {
-    // Reload security key status when it changes.
+    if (_isUpdatingSecurityKeyStatus) {
+      debugPrint('Security key update already in progress, skipping');
+      return;
+    }
+    
+    debugPrint('Security key status changed, updating UI state');
 
-    _loadSecurityKeyStatus();
+    _updateSecurityKeyStatusFromService();
+  }
+
+  /// Updates security key status from service without triggering reload.
+  
+  Future<void> _updateSecurityKeyStatusFromService() async {
+    if (_isUpdatingSecurityKeyStatus) return;
+    
+    _isUpdatingSecurityKeyStatus = true;
+    try {
+      final isKeySaved = await _securityKeyService.isKeySaved();
+      if (mounted) {
+        setState(() {
+          _isKeySaved = isKeySaved;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error updating security key status: $e');
+    } finally {
+      _isUpdatingSecurityKeyStatus = false;
+    }
   }
 
   /// Loads the current security key status.
 
   Future<void> _loadSecurityKeyStatus() async {
+    if (_isUpdatingSecurityKeyStatus) return;
+    
+    _isUpdatingSecurityKeyStatus = true;
     try {
       final isKeySaved = await _securityKeyService.fetchKeySavedStatus((bool hasKey) {
         if (mounted) {
@@ -253,6 +284,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           _isKeySaved = false;
         });
       }
+    } finally {
+      _isUpdatingSecurityKeyStatus = false;
     }
   }
 
@@ -385,11 +418,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       barrierColor: Theme.of(context).colorScheme.onSurface,
       builder: (BuildContext context) => SecurityKeyManagerDialog(
         onKeyStatusChanged: (bool hasKey) {
-          if (mounted) {
-            setState(() {
-              _isKeySaved = hasKey;
-            });
-          }
+          _updateSecurityKeyStatusFromService();
         },
       ),
     );

@@ -548,7 +548,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 loading: () => const SizedBox.shrink(),
                 error: (error, stack) => const SizedBox.shrink(),
               ),
-              const SizedBox(width: 8),
+              const Gap(8),
               _buildSectionCacheIndicator(moviesAsync, cacheOnlyMode),
             ],
           ),

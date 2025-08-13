@@ -24,6 +24,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -109,18 +110,18 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
                   fontWeight: FontWeight.w500,
                 ),
           ),
-          const SizedBox(width: 12),
+          const Gap(12),
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
                   _buildSortChip('Default', 'default'),
-                  const SizedBox(width: 8),
+                  const Gap(8),
                   _buildSortChip('Title', 'title'),
-                  const SizedBox(width: 8),
+                  const Gap(8),
                   _buildSortChip('Rating', 'rating'),
-                  const SizedBox(width: 8),
+                  const Gap(8),
                   _buildSortChip('Year', 'year'),
                 ],
               ),
@@ -177,7 +178,7 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
                     .onSurface
                     .withValues(alpha: 0.5),
               ),
-              const SizedBox(height: 16),
+              const Gap(16),
               Text(
                 'No movies found',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -187,7 +188,7 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
                           .withValues(alpha: 0.7),
                     ),
               ),
-              const SizedBox(height: 8),
+              const Gap(8),
               Text(
                 'There are no movies in this category.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(

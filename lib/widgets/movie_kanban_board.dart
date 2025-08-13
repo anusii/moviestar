@@ -24,6 +24,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -162,7 +163,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                   ),
                 ),
                 if (hasMore) ...[
-                  const SizedBox(width: 4),
+                  const Gap(4),
                   TextButton(
                     onPressed: () =>
                         _navigateToMovieCategory(title, movies, fromCache),

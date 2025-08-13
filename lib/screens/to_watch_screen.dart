@@ -47,6 +47,7 @@ import '../utils/movie_sort_util.dart';
 
 import '../utils/turtle_serializer.dart';
 
+import '../widgets/moviestar_batch_sharing_ui.dart';
 import '../widgets/sort_controls.dart';
 
 import 'movie_details_screen.dart';
@@ -222,7 +223,7 @@ Recipients will be able to:
     );
   }
 
-  // Shares the to-watch movies list.
+  // Shares the to-watch movies list using batch sharing UI.
 
   Future<void> _shareToWatchList(
     BuildContext context,
@@ -262,50 +263,35 @@ Recipients will be able to:
 
       if (!mounted) return;
 
-      // Share the movie list file - Use a simpler approach for now
+      // Ensure all individual movie files exist before sharing.
+      for (final movie in movies) {
+        try {
+          await _createMovieFileIfNotExists(movie);
+        } catch (e) {
+          // Continue with other movies - the batch UI will handle individual failures.
+        }
+      }
+
+      if (!mounted) return;
+
+      // Navigate to the batch sharing UI.
       await Navigator.push<bool>(
         context,
         MaterialPageRoute(
           fullscreenDialog: true,
-          builder: (navContext) => Theme(
-            data: Theme.of(context),
-            child: Scaffold(
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              appBar: AppBar(
-                title: const Text('Share "To Watch Movies"'),
-                backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-                foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
-              ),
-              body: GrantPermissionUi(
-                fileName: 'user_lists/MovieList-$listId.ttl',
-                title: '',
-                accessModeList: const ['read'],
-                recipientTypeList: const ['indi'],
-                showAppBar: false,
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                child: widget,
-                onPermissionGranted: () async {
-                  // After movie list sharing, chain individual movie sharing
-                  if (mounted) {
-                    Navigator.of(navContext).pop(true);
-
-                    // Show loading and start individual movie sharing
-                    await _shareIndividualMoviesSequentially(movies);
-                  }
-                },
-                onNavigateBack: () {
-                  // Handle back navigation
-                  if (mounted) {
-                    Navigator.of(navContext).pop(false);
-                  }
-                },
-              ),
-            ),
+          builder: (context) => MovieStarBatchSharingUi(
+            listId: listId,
+            listName: 'To Watch Movies',
+            movies: movies,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            onSharingComplete: () {
+              // Handle completion callback.
+            },
+            child: widget,
           ),
         ),
       );
     } catch (e) {
-      debugPrint('❌ Error sharing to-watch list: $e');
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -314,221 +300,39 @@ Recipients will be able to:
     }
   }
 
-  // Shares individual movie files sequentially using GrantPermissionUi.
-
-  Future<void> _shareIndividualMoviesSequentially(List<Movie> movies) async {
-    try {
-      if (movies.isEmpty) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Movie list shared successfully!')),
-          );
-        }
-        return;
-      }
-
-      // Show loading dialog
-      if (mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CircularProgressIndicator(),
-                const SizedBox(height: 16),
-                Text(
-                  'Preparing to share ${movies.length} individual movies with ratings and comments...',
-                ),
-              ],
-            ),
-          ),
-        );
-      }
-
-      // Wait a moment for the dialog to show
-      await Future.delayed(const Duration(seconds: 1));
-
-      if (mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
-      }
-
-      // Share each movie sequentially using GrantPermissionUi
-      await _shareMoviesOneByOne(movies, 0);
-    } catch (e) {
-      debugPrint('❌ Error in sequential movie sharing: $e');
-      if (mounted) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error sharing individual movies: $e')),
-        );
-      }
-    }
-  }
-
-  // Recursively shares movies one by one using GrantPermissionUi.
-
-  Future<void> _shareMoviesOneByOne(List<Movie> movies, int index) async {
-    if (index >= movies.length) {
-      // All movies shared, show completion message
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Successfully shared movie list and all ${movies.length} individual movies!',
-            ),
-            backgroundColor: Theme.of(context).colorScheme.tertiary,
-          ),
-        );
-      }
-      return;
-    }
-
-    final movie = movies[index];
-    final adapter = widget.favoritesService as FavoritesServiceAdapter;
-    final fullPath = adapter.getMovieFilePath(movie);
-    // Remove the 'moviestar/data/' prefix like the individual movie screen does
-    final movieFilePath = fullPath?.replaceFirst('moviestar/data/', '') ??
-        'movies/Movie-${movie.id}.ttl';
-
-    if (fullPath == null) {
-      // Skip this movie and continue with the next
-      await _shareMoviesOneByOne(movies, index + 1);
-      return;
-    }
-
-    // Ensure the individual movie file exists before sharing
-    try {
-      await _createMovieFileIfNotExists(movie);
-    } catch (e) {
-      debugPrint('❌ Failed to create movie file for ${movie.title}: $e');
-      // Skip this movie and continue with the next
-      await _shareMoviesOneByOne(movies, index + 1);
-      return;
-    }
-
-    if (!mounted) return;
-
-    // Navigate to GrantPermissionUi for this individual movie
-    await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (navContext) => Theme(
-          data: Theme.of(context),
-          child: Scaffold(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            appBar: AppBar(
-              title: Text(
-                'Share "${movie.title}" (${index + 1}/${movies.length})',
-              ),
-              backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-              foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
-            ),
-            body: GrantPermissionUi(
-              fileName: movieFilePath,
-              title: '',
-              accessModeList: const [
-                'read',
-              ], // Read-only for individual movies
-              recipientTypeList: const ['indi'],
-              showAppBar: false,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              child: widget,
-              onPermissionGranted: () async {
-                // Movie shared successfully, continue with next movie
-                if (mounted) {
-                  Navigator.of(navContext).pop(true);
-                  await _shareMoviesOneByOne(movies, index + 1);
-                }
-              },
-              onNavigateBack: () {
-                // User cancelled, ask if they want to continue or stop
-                if (mounted) {
-                  Navigator.of(navContext).pop(false);
-                  _showContinueSharingDialog(movies, index);
-                }
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Shows dialog asking user if they want to continue sharing remaining movies.
-
-  void _showContinueSharingDialog(List<Movie> movies, int currentIndex) {
-    final remainingCount = movies.length - currentIndex;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Continue Sharing?'),
-        content: Text(
-          'You have $remainingCount movies left to share. Do you want to continue?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // Show completion message for partial sharing
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Shared movie list and $currentIndex individual movies.',
-                  ),
-                ),
-              );
-            },
-            child: const Text('Stop'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _shareMoviesOneByOne(movies, currentIndex);
-            },
-            child: const Text('Continue'),
-          ),
-        ],
-      ),
-    );
-  }
-
   // Creates a movie file if it doesn't exist (needed before sharing).
 
   Future<void> _createMovieFileIfNotExists(Movie movie) async {
     try {
       final movieFileName = 'movies/Movie-${movie.id}.ttl';
 
-      // Check if the file already exists
+      // Check if the file already exists.
+
       try {
         final existingContent = await readPod(movieFileName, context, widget);
         if (existingContent.isNotEmpty) {
-          debugPrint('✅ Movie file already exists for: ${movie.title}');
           return;
         }
       } catch (e) {
-        // File doesn't exist, we'll create it
-        debugPrint(
-          '📝 Movie file doesn\'t exist, creating for: ${movie.title}',
-        );
+        // File doesn't exist, we'll create it.
       }
 
-      // Get current rating and comments from favorites service
+      // Get current rating and comments from favorites service.
+
       final adapter = widget.favoritesService as FavoritesServiceAdapter;
       final currentRating = await adapter.getPersonalRating(movie);
       final currentComments = await adapter.getMovieComments(movie);
 
-      // Create the movie TTL content with any existing user data
+      // Create the movie TTL content with any existing user data.
+
       final ttlContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
         movie,
         currentRating,
         currentComments,
       );
 
-      // Write the movie file to POD
+      // Write the movie file to POD.
+
       final result = await writePod(
         movieFileName,
         ttlContent,
@@ -537,13 +341,10 @@ Recipients will be able to:
         encrypted: false,
       );
 
-      if (result == SolidFunctionCallStatus.success) {
-        debugPrint('✅ Created individual movie file for: ${movie.title}');
-      } else {
+      if (result != SolidFunctionCallStatus.success) {
         throw Exception('Failed to write movie file to POD');
       }
     } catch (e) {
-      debugPrint('❌ Error creating movie file for ${movie.title}: $e');
       rethrow;
     }
   }

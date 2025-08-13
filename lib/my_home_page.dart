@@ -48,7 +48,7 @@ import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/services/movie_service.dart';
-import 'package:moviestar/services/security_key_service.dart';
+
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/widgets/moviestar_status_bar_config.dart';
@@ -85,7 +85,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   late final FavoritesService _favoritesService;
   late final ApiKeyService _apiKeyService;
   late final MovieService _movieService;
-  late final SecurityKeyService _securityKeyService;
+  late final SolidSecurityKeyService _securityKeyService;
 
   /// List of screens to display in the navigation rail.
 
@@ -106,7 +106,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     _favoritesService = FavoritesServiceAdapter(_favoritesServiceManager);
     _apiKeyService = ApiKeyService();
     _movieService = MovieService(_apiKeyService);
-    _securityKeyService = SecurityKeyService();
+    _securityKeyService = SolidSecurityKeyService();
 
     // Listen for API key changes.
 

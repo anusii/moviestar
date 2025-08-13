@@ -264,19 +264,29 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     
     _isUpdatingSecurityKeyStatus = true;
     try {
-      final isKeySaved = await _securityKeyService.fetchKeySavedStatus((bool hasKey) {
-        if (mounted) {
+      bool hasValidKey = false;
+      
+      // Check basic KeyManager status.
+
+      final hasKeyInMemory = await _securityKeyService.isKeySaved();
+      
+      if (hasKeyInMemory) {
+        hasValidKey = true;
+      }
+      
+      if (mounted) {
+        setState(() {
+          _isKeySaved = hasValidKey;
+        });
+      }
+
+      await _securityKeyService.fetchKeySavedStatus((bool hasKey) {
+        if (mounted && hasKey != _isKeySaved) {
           setState(() {
             _isKeySaved = hasKey;
           });
         }
       });
-      
-      if (mounted) {
-        setState(() {
-          _isKeySaved = isKeySaved;
-        });
-      }
     } catch (e) {
       debugPrint('Error loading security key status: $e');
       if (mounted) {

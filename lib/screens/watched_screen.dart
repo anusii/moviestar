@@ -225,6 +225,11 @@ Recipients will be able to:
       return;
     }
 
+    // Store context references before async operations.
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final theme = Theme.of(context);
+
     try {
       // Create MovieList service to create the list file first
       final userProfileService = UserProfileService(context, widget);
@@ -241,52 +246,48 @@ Recipients will be able to:
         description: 'Movies you have watched',
       );
 
+      if (!mounted) return;
+
       if (listId == null) {
         if (mounted) {
-          final messenger = ScaffoldMessenger.of(context);
-          messenger.showSnackBar(
+          scaffoldMessenger.showSnackBar(
             const SnackBar(content: Text('Failed to create movie list')),
           );
         }
         return;
       }
 
-      if (!mounted) return;
-
       // Ensure all individual movie files exist before sharing.
-
       for (final movie in movies) {
         try {
           await _createMovieFileIfNotExists(movie);
         } catch (e) {
           // Continue with other movies - the batch UI will handle individual failures.
         }
+        if (!mounted) return;
       }
 
-      if (!mounted) return;
-
       // Navigate to the batch sharing UI.
-      final navigator = Navigator.of(context);
-      final theme = Theme.of(context);
-      await navigator.push<bool>(
-        MaterialPageRoute(
-          fullscreenDialog: true,
-          builder: (context) => MovieStarBatchSharingUi(
-            listId: listId,
-            listName: 'Watched Movies',
-            movies: movies,
-            backgroundColor: theme.scaffoldBackgroundColor,
-            onSharingComplete: () {
-              // Handle completion callback.
-            },
-            child: widget,
+      if (mounted) {
+        await navigator.push<bool>(
+          MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (context) => MovieStarBatchSharingUi(
+              listId: listId,
+              listName: 'Watched Movies',
+              movies: movies,
+              backgroundColor: theme.scaffoldBackgroundColor,
+              onSharingComplete: () {
+                // Handle completion callback.
+              },
+              child: widget,
+            ),
           ),
-        ),
-      );
+        );
+      }
     } catch (e) {
       if (mounted) {
-        final messenger = ScaffoldMessenger.of(context);
-        messenger
+        scaffoldMessenger
             .showSnackBar(SnackBar(content: Text('Error sharing list: $e')));
       }
     }
@@ -299,8 +300,8 @@ Recipients will be able to:
       final movieFileName = 'movies/Movie-${movie.id}.ttl';
 
       // Check if the file already exists.
-
       try {
+        if (!mounted) return;
         final existingContent = await readPod(movieFileName, context, widget);
         if (existingContent.isNotEmpty) {
           return;
@@ -310,13 +311,11 @@ Recipients will be able to:
       }
 
       // Get current rating and comments from favorites service.
-
       final adapter = widget.favoritesService as FavoritesServiceAdapter;
       final currentRating = await adapter.getPersonalRating(movie);
       final currentComments = await adapter.getMovieComments(movie);
 
       // Create the movie TTL content with any existing user data.
-
       final ttlContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
         movie,
         currentRating,
@@ -324,6 +323,7 @@ Recipients will be able to:
       );
 
       // Write the movie file to POD.
+      if (!mounted) return;
       final result = await writePod(
         movieFileName,
         ttlContent,

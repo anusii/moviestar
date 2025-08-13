@@ -325,14 +325,16 @@ class _EnhancedMovieListSharingUiState
 
         // Write the updated movie list file
         debugPrint('💾 Writing updated movie list file...');
-        final contextRef = context;
+        if (!mounted) return;
         final result = await writePod(
           'user_lists/MovieList-${widget.listId}.ttl',
           updatedTtl,
-          contextRef,
+          context,
           widget.child,
           encrypted: false,
         );
+
+        if (!mounted) return;
 
         if (result == SolidFunctionCallStatus.success) {
           debugPrint(
@@ -349,11 +351,14 @@ class _EnhancedMovieListSharingUiState
           // Verify the file was written correctly by reading it back
           debugPrint('🔍 Verifying written file...');
           try {
+            if (!mounted) return;
             final verifyContent = await readPod(
               'user_lists/MovieList-${widget.listId}.ttl',
-              contextRef,
+              context,
               widget.child,
             );
+
+            if (!mounted) return;
 
             if (verifyContent.length == updatedTtl.length) {
               debugPrint('✅ File verification successful - lengths match');
@@ -389,8 +394,11 @@ class _EnhancedMovieListSharingUiState
   // Share the movie list and all individual movies.
 
   Future<void> _shareMovieListAndMovies() async {
+    // Store context reference before async operations.
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     if (selectedRecipient == RecipientType.none) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         const SnackBar(
           content: Text('Please select a recipient type'),
           backgroundColor: Colors.red,
@@ -400,7 +408,7 @@ class _EnhancedMovieListSharingUiState
     }
 
     if (selectedPermList.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         const SnackBar(
           content: Text('Please select at least one permission'),
           backgroundColor: Colors.red,
@@ -411,7 +419,7 @@ class _EnhancedMovieListSharingUiState
 
     // Validate recipient details
     if (webIdController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         const SnackBar(
           content: Text('Please enter a WebID for sharing'),
           backgroundColor: Colors.red,
@@ -468,6 +476,7 @@ class _EnhancedMovieListSharingUiState
             await _createMovieFileIfNotExists(movie);
 
             // Then share the movie file
+            if (!mounted) return;
             final movieResult = await grantPermission(
               'movies/Movie-${movie.id}.ttl',
               true, // fileFlag
@@ -478,6 +487,8 @@ class _EnhancedMovieListSharingUiState
               context,
               widget.child,
             );
+
+            if (!mounted) return;
 
             if (movieResult == SolidFunctionCallStatus.success) {
               sharedCount++;
@@ -500,7 +511,7 @@ class _EnhancedMovieListSharingUiState
 
       // Show success message
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text(
               'Successfully shared "${widget.listName}" and ${widget.movies.length} movies!',
@@ -522,7 +533,7 @@ class _EnhancedMovieListSharingUiState
     } catch (e) {
       debugPrint('Error sharing movie list and movies: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text('Error sharing: $e'),
             backgroundColor: Colors.red,
@@ -1109,14 +1120,16 @@ class _EnhancedMovieListSharingUiState
       );
 
       // Write the movie file to POD
-      final contextRef = context;
+      if (!mounted) return;
       final result = await writePod(
         movieFileName,
         ttlContent,
-        contextRef,
+        context,
         widget.child,
         encrypted: false,
       );
+
+      if (!mounted) return;
 
       if (result == SolidFunctionCallStatus.success) {
         debugPrint('✅ Created individual movie file for: ${movie.title}');

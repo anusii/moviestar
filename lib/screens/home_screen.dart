@@ -32,6 +32,8 @@ import 'package:gap/gap.dart';
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
+import 'package:moviestar/providers/view_mode_provider.dart';
+import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
@@ -39,6 +41,7 @@ import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 import 'package:moviestar/widgets/movie_card.dart';
+import 'package:moviestar/widgets/movie_kanban_board.dart';
 
 /// Main home screen of the Movie Star application, displaying featured and
 /// trending movies.
@@ -516,6 +519,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
               ),
+              // View More button for sections with many items.
+
+              moviesAsync.when(
+                data: (cacheResult) {
+                  if (cacheResult.data.length > 10) {
+                    return TextButton(
+                      onPressed: () => _navigateToMovieCategory(
+                          title, cacheResult.data,
+                          fromCache: cacheResult.fromCache),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Text(
+                        'View More',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 11,
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+                loading: () => const SizedBox.shrink(),
+                error: (error, stack) => const SizedBox.shrink(),
+              ),
+              const Gap(8),
               _buildSectionCacheIndicator(moviesAsync, cacheOnlyMode),
             ],
           ),
@@ -831,50 +864,414 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final nowPlayingMovies = ref.watch(nowPlayingMoviesWithCacheInfoProvider);
     final topRatedMovies = ref.watch(topRatedMoviesWithCacheInfoProvider);
     final upcomingMovies = ref.watch(upcomingMoviesWithCacheInfoProvider);
+    final currentViewMode = ref.watch(viewModeProvider);
 
     // Show performance feedback after initial load.
 
     _showCachePerformanceFeedback();
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: RefreshIndicator(
-        onRefresh: _forceRefresh,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return RefreshIndicator(
+      onRefresh: _forceRefresh,
+      child: _buildContentForViewMode(
+        currentViewMode,
+        popularMovies,
+        nowPlayingMovies,
+        topRatedMovies,
+        upcomingMovies,
+      ),
+    );
+  }
+
+  // Build content based on the selected view mode.
+
+  Widget _buildContentForViewMode(
+    HomeViewMode viewMode,
+    AsyncValue<CacheResult<List<Movie>>> popularMovies,
+    AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,
+    AsyncValue<CacheResult<List<Movie>>> topRatedMovies,
+    AsyncValue<CacheResult<List<Movie>>> upcomingMovies,
+  ) {
+    switch (viewMode) {
+      case HomeViewMode.grid:
+        return _buildGridView(
+          popularMovies,
+          nowPlayingMovies,
+          topRatedMovies,
+          upcomingMovies,
+        );
+      case HomeViewMode.kanban:
+        return _buildKanbanView(
+          popularMovies,
+          nowPlayingMovies,
+          topRatedMovies,
+          upcomingMovies,
+        );
+      case HomeViewMode.list:
+        return _buildListView(
+          popularMovies,
+          nowPlayingMovies,
+          topRatedMovies,
+          upcomingMovies,
+        );
+    }
+  }
+
+  // Navigate to a dedicated page for viewing all movies in a category.
+
+  void _navigateToMovieCategory(String categoryName, List<Movie> movies,
+      {bool fromCache = false}) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MovieCategoryScreen(
+          categoryName: categoryName,
+          movies: movies,
+          favoritesService: widget.favoritesService,
+          fromCache: fromCache,
+        ),
+      ),
+    );
+  }
+
+  // Build the traditional grid/horizontal scroll view (current implementation).
+
+  Widget _buildGridView(
+    AsyncValue<CacheResult<List<Movie>>> popularMovies,
+    AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,
+    AsyncValue<CacheResult<List<Movie>>> topRatedMovies,
+    AsyncValue<CacheResult<List<Movie>>> upcomingMovies,
+  ) {
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildToWatchMovieRow(),
+          _buildWatchedMovieRow(),
+          _buildMovieRow(
+            'Popular on Movie Star',
+            popularMovies,
+            'popular',
+            CacheCategory.popular,
+          ),
+          _buildMovieRow(
+            'Now Playing',
+            nowPlayingMovies,
+            'nowPlaying',
+            CacheCategory.nowPlaying,
+          ),
+          _buildMovieRow(
+            'Top Rated',
+            topRatedMovies,
+            'topRated',
+            CacheCategory.topRated,
+          ),
+          _buildMovieRow(
+            'Upcoming',
+            upcomingMovies,
+            'upcoming',
+            CacheCategory.upcoming,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Build the kanban view with AppFlowy Board.
+
+  Widget _buildKanbanView(
+    AsyncValue<CacheResult<List<Movie>>> popularMovies,
+    AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,
+    AsyncValue<CacheResult<List<Movie>>> topRatedMovies,
+    AsyncValue<CacheResult<List<Movie>>> upcomingMovies,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: MovieKanbanBoard(
+        favoritesService: widget.favoritesService,
+      ),
+    );
+  }
+
+  // Build a list view of movies.
+
+  Widget _buildListView(
+    AsyncValue<CacheResult<List<Movie>>> popularMovies,
+    AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,
+    AsyncValue<CacheResult<List<Movie>>> topRatedMovies,
+    AsyncValue<CacheResult<List<Movie>>> upcomingMovies,
+  ) {
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // To Watch and Watched sections.
+
+          _buildListSection('To Watch', _buildToWatchListItems()),
+          _buildListSection('Watched', _buildWatchedListItems()),
+
+          // API Movie sections.
+
+          _buildAsyncListSection('Popular on Movie Star', popularMovies),
+          _buildAsyncListSection('Now Playing', nowPlayingMovies),
+          _buildAsyncListSection('Top Rated', topRatedMovies),
+          _buildAsyncListSection('Upcoming', upcomingMovies),
+        ],
+      ),
+    );
+  }
+
+  // Build a list section with title and items.
+
+  Widget _buildListSection(String title, Widget content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
             children: [
-              _buildToWatchMovieRow(),
-              _buildWatchedMovieRow(),
-              _buildMovieRow(
-                'Popular on Movie Star',
-                popularMovies,
-                'popular',
-                CacheCategory.popular,
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
               ),
-              _buildMovieRow(
-                'Now Playing',
-                nowPlayingMovies,
-                'nowPlaying',
-                CacheCategory.nowPlaying,
+              // Add View More button based on section type.
+
+              _buildViewMoreForUserList(title),
+            ],
+          ),
+        ),
+        content,
+        const Gap(16),
+      ],
+    );
+  }
+
+  // Build View More button for user lists (To Watch/Watched).
+
+  Widget _buildViewMoreForUserList(String title) {
+    if (title == 'To Watch') {
+      return StreamBuilder<List<Movie>>(
+        stream: widget.favoritesService.toWatchMovies,
+        builder: (context, snapshot) {
+          final movies = snapshot.data ?? [];
+          if (movies.length > 5) {
+            return TextButton(
+              onPressed: () => _navigateToMovieCategory(title, movies),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              _buildMovieRow(
-                'Top Rated',
-                topRatedMovies,
-                'topRated',
-                CacheCategory.topRated,
+              child: Text(
+                'View More',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 11,
+                ),
               ),
-              _buildMovieRow(
-                'Upcoming',
-                upcomingMovies,
-                'upcoming',
-                CacheCategory.upcoming,
+            );
+          }
+          return const SizedBox.shrink();
+        },
+      );
+    } else if (title == 'Watched') {
+      return StreamBuilder<List<Movie>>(
+        stream: widget.favoritesService.watchedMovies,
+        builder: (context, snapshot) {
+          final movies = snapshot.data ?? [];
+          if (movies.length > 5) {
+            return TextButton(
+              onPressed: () => _navigateToMovieCategory(title, movies),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                'View More',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 11,
+                ),
+              ),
+            );
+          }
+          return const SizedBox.shrink();
+        },
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
+  // Build a list section for async movie data.
+
+  Widget _buildAsyncListSection(
+      String title, AsyncValue<CacheResult<List<Movie>>> moviesAsync) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ),
+              // View More button for sections with many items.
+
+              moviesAsync.when(
+                data: (cacheResult) {
+                  if (cacheResult.data.length > 5) {
+                    return TextButton(
+                      onPressed: () => _navigateToMovieCategory(
+                          title, cacheResult.data,
+                          fromCache: cacheResult.fromCache),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Text(
+                        'View More',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 11,
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+                loading: () => const SizedBox.shrink(),
+                error: (error, stack) => const SizedBox.shrink(),
               ),
             ],
           ),
         ),
-      ),
+        moviesAsync.when(
+          data: (cacheResult) =>
+              _buildMovieListItems(cacheResult.data, cacheResult.fromCache),
+          loading: () => const Padding(
+            padding: EdgeInsets.all(32),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+          error: (error, stack) => Padding(
+            padding: const EdgeInsets.all(16),
+            child: ErrorDisplayWidget(
+              message: 'Failed to load movies: $error',
+              onRetry: () => ref.invalidate(popularMoviesWithCacheInfoProvider),
+            ),
+          ),
+        ),
+        const Gap(16),
+      ],
+    );
+  }
+
+  // Build list items for To Watch movies.
+
+  Widget _buildToWatchListItems() {
+    return StreamBuilder<List<Movie>>(
+      stream: widget.favoritesService.toWatchMovies,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text('Error: ${snapshot.error}'),
+          );
+        }
+        if (!snapshot.hasData) {
+          return const Padding(
+            padding: EdgeInsets.all(32),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        final movies = snapshot.data!;
+        if (movies.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text('No movies in your watchlist'),
+          );
+        }
+        return _buildMovieListItems(movies.take(5).toList(), false);
+      },
+    );
+  }
+
+  // Build list items for Watched movies.
+
+  Widget _buildWatchedListItems() {
+    return StreamBuilder<List<Movie>>(
+      stream: widget.favoritesService.watchedMovies,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text('Error: ${snapshot.error}'),
+          );
+        }
+        if (!snapshot.hasData) {
+          return const Padding(
+            padding: EdgeInsets.all(32),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        final movies = snapshot.data!;
+        if (movies.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text('No watched movies yet'),
+          );
+        }
+        return _buildMovieListItems(movies.take(5).toList(), false);
+      },
+    );
+  }
+
+  // Build list items for a list of movies.
+
+  Widget _buildMovieListItems(List<Movie> movies, bool fromCache) {
+    if (movies.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(16),
+        child: Text('No movies available'),
+      );
+    }
+
+    return Column(
+      children: movies.take(5).map((movie) {
+        return MovieCard.listItem(
+          movie: movie,
+          fromCache: fromCache,
+          favoritesService: widget.favoritesService,
+          parentWidget: widget,
+          onTap: () {
+            if (mounted) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MovieDetailsScreen(
+                    movie: movie,
+                    favoritesService: widget.favoritesService,
+                  ),
+                ),
+              );
+            }
+          },
+        );
+      }).toList(),
     );
   }
 }

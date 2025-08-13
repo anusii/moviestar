@@ -36,6 +36,7 @@ import 'package:solidui/solidui.dart';
 import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
+import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/search_screen.dart';
@@ -364,6 +365,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     });
   }
 
+  /// Handles the view mode toggle action.
+
+  void _handleViewModeToggle() {
+    ref.read(viewModeProvider.notifier).cycleViewMode();
+  }
+
   /// Handles the logout action.
 
   void _handleLogout() {
@@ -441,6 +448,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       onSettings: _handleSettings,
       onLogout: _handleLogout,
       onVersionInfo: _handleVersionInfo,
+      onViewModeToggle: _handleViewModeToggle,
       ref: ref,
     );
     final appBar = SolidNavUtils.createAppBar(

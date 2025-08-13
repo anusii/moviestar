@@ -24,8 +24,8 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 
+import 'package:gap/gap.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/models/movie.dart';

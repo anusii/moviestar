@@ -47,7 +47,7 @@ class SecurityKeyManagerDialog extends StatelessWidget {
     return SolidSecurityKeyManager(
       config: SolidSecurityKeyManagerConfig(
         appWidget: const MovieStar(),
-        customTitle: 'MovieStar Security Key Management',
+        customTitle: 'Security Key Management',
       ),
       onKeyStatusChanged: onKeyStatusChanged,
     );

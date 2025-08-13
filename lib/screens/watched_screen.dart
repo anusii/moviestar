@@ -29,7 +29,6 @@ import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
-
 import 'package:solidpod/solidpod.dart';
 
 import '../models/movie.dart';
@@ -244,7 +243,8 @@ Recipients will be able to:
 
       if (listId == null) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          final messenger = ScaffoldMessenger.of(context);
+          messenger.showSnackBar(
             const SnackBar(content: Text('Failed to create movie list')),
           );
         }
@@ -254,7 +254,7 @@ Recipients will be able to:
       if (!mounted) return;
 
       // Ensure all individual movie files exist before sharing.
-      
+
       for (final movie in movies) {
         try {
           await _createMovieFileIfNotExists(movie);
@@ -266,16 +266,16 @@ Recipients will be able to:
       if (!mounted) return;
 
       // Navigate to the batch sharing UI.
-
-      await Navigator.push<bool>(
-        context,
+      final navigator = Navigator.of(context);
+      final theme = Theme.of(context);
+      await navigator.push<bool>(
         MaterialPageRoute(
           fullscreenDialog: true,
           builder: (context) => MovieStarBatchSharingUi(
             listId: listId,
             listName: 'Watched Movies',
             movies: movies,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            backgroundColor: theme.scaffoldBackgroundColor,
             onSharingComplete: () {
               // Handle completion callback.
             },
@@ -285,9 +285,9 @@ Recipients will be able to:
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error sharing list: $e')));
+        final messenger = ScaffoldMessenger.of(context);
+        messenger
+            .showSnackBar(SnackBar(content: Text('Error sharing list: $e')));
       }
     }
   }
@@ -324,7 +324,6 @@ Recipients will be able to:
       );
 
       // Write the movie file to POD.
-
       final result = await writePod(
         movieFileName,
         ttlContent,

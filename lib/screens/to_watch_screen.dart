@@ -28,28 +28,18 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:markdown_tooltip/markdown_tooltip.dart';
-
 import 'package:solidpod/solidpod.dart';
 
 import '../models/movie.dart';
-
 import '../services/favorites_service.dart';
-
 import '../services/favorites_service_adapter.dart';
-
 import '../services/movie_list_service.dart';
-
 import '../services/user_profile_service.dart';
-
 import '../utils/movie_sort_util.dart';
-
 import '../utils/turtle_serializer.dart';
-
 import '../widgets/moviestar_batch_sharing_ui.dart';
 import '../widgets/sort_controls.dart';
-
 import 'movie_details_screen.dart';
 
 /// A screen that displays the user's list of movies to watch.
@@ -254,7 +244,8 @@ Recipients will be able to:
 
       if (listId == null) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          final messenger = ScaffoldMessenger.of(context);
+          messenger.showSnackBar(
             const SnackBar(content: Text('Failed to create movie list')),
           );
         }
@@ -275,15 +266,16 @@ Recipients will be able to:
       if (!mounted) return;
 
       // Navigate to the batch sharing UI.
-      await Navigator.push<bool>(
-        context,
+      final navigator = Navigator.of(context);
+      final theme = Theme.of(context);
+      await navigator.push<bool>(
         MaterialPageRoute(
           fullscreenDialog: true,
           builder: (context) => MovieStarBatchSharingUi(
             listId: listId,
             listName: 'To Watch Movies',
             movies: movies,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            backgroundColor: theme.scaffoldBackgroundColor,
             onSharingComplete: () {
               // Handle completion callback.
             },
@@ -293,9 +285,9 @@ Recipients will be able to:
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error sharing list: $e')));
+        final messenger = ScaffoldMessenger.of(context);
+        messenger
+            .showSnackBar(SnackBar(content: Text('Error sharing list: $e')));
       }
     }
   }
@@ -332,7 +324,6 @@ Recipients will be able to:
       );
 
       // Write the movie file to POD.
-
       final result = await writePod(
         movieFileName,
         ttlContent,

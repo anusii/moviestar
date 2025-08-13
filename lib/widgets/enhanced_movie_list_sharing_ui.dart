@@ -26,17 +26,12 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:solidpod/solidpod.dart';
-
 import 'package:solidpod/src/solid/constants/web_acl.dart';
 
 import 'package:moviestar/models/movie.dart';
-
 import 'package:moviestar/services/movie_list_service.dart';
-
 import 'package:moviestar/services/user_profile_service.dart';
-
 import 'package:moviestar/utils/turtle_serializer.dart';
 
 /// Enhanced UI for sharing movie lists with all their individual movies.
@@ -330,10 +325,11 @@ class _EnhancedMovieListSharingUiState
 
         // Write the updated movie list file
         debugPrint('💾 Writing updated movie list file...');
+        final contextRef = context;
         final result = await writePod(
           'user_lists/MovieList-${widget.listId}.ttl',
           updatedTtl,
-          context,
+          contextRef,
           widget.child,
           encrypted: false,
         );
@@ -355,7 +351,7 @@ class _EnhancedMovieListSharingUiState
           try {
             final verifyContent = await readPod(
               'user_lists/MovieList-${widget.listId}.ttl',
-              context,
+              contextRef,
               widget.child,
             );
 
@@ -928,7 +924,7 @@ class _EnhancedMovieListSharingUiState
                 decoration: BoxDecoration(
                   color: Theme.of(
                     context,
-                  ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -962,7 +958,7 @@ class _EnhancedMovieListSharingUiState
                 decoration: BoxDecoration(
                   color: Theme.of(
                     context,
-                  ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -999,7 +995,7 @@ class _EnhancedMovieListSharingUiState
                 decoration: BoxDecoration(
                   color: Theme.of(
                     context,
-                  ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -1113,10 +1109,11 @@ class _EnhancedMovieListSharingUiState
       );
 
       // Write the movie file to POD
+      final contextRef = context;
       final result = await writePod(
         movieFileName,
         ttlContent,
-        context,
+        contextRef,
         widget.child,
         encrypted: false,
       );
@@ -1129,7 +1126,7 @@ class _EnhancedMovieListSharingUiState
       }
     } catch (e) {
       debugPrint('❌ Error creating movie file for ${movie.title}: $e');
-      throw e;
+      rethrow;
     }
   }
 }

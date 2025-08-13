@@ -26,7 +26,6 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:solidpod/solidpod.dart';
 import 'package:solidpod/src/solid/constants/web_acl.dart';
 
@@ -238,20 +237,21 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
         if (file.permissions.isEmpty) {
           setState(() {
             sharingProgress[file.fileName] = 'skipped';
-            currentOperation = 'Skipped ${file.displayName} (no permissions selected)';
+            currentOperation =
+                'Skipped ${file.displayName} (no permissions selected)';
           });
           continue;
         }
 
         setState(() {
-          currentOperation = 'Sharing ${file.displayName}... (${i + 1}/$totalCount)';
+          currentOperation =
+              'Sharing ${file.displayName}... (${i + 1}/$totalCount)';
           sharingProgress[file.fileName] = 'sharing';
         });
 
         try {
-
           if (!mounted) break;
-          
+
           final result = await grantPermission(
             file.fileName,
             true, // fileFlag
@@ -286,7 +286,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
 
       // Show completion message
       setState(() {
-        currentOperation = 'Completed! Shared $completedCount/$totalCount files';
+        currentOperation =
+            'Completed! Shared $completedCount/$totalCount files';
       });
 
       if (completedCount == totalCount) {
@@ -301,7 +302,6 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
 
       // Call completion callback
       widget.onSharingComplete?.call();
-
     } catch (e) {
       setState(() {
         currentOperation = 'Error: $e';
@@ -393,7 +393,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 16),
 
           // Files progress list
@@ -416,11 +416,12 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                         itemCount: shareableFiles.length,
                         itemBuilder: (context, index) {
                           final file = shareableFiles[index];
-                          final progress = sharingProgress[file.fileName] ?? 'pending';
-                          
+                          final progress =
+                              sharingProgress[file.fileName] ?? 'pending';
+
                           IconData icon;
                           Color iconColor;
-                          
+
                           switch (progress) {
                             case 'success':
                               icon = Icons.check_circle;
@@ -451,7 +452,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                                     height: 24,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(iconColor),
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          iconColor),
                                     ),
                                   )
                                 : Icon(icon, color: iconColor),
@@ -460,7 +462,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                               '${file.fileType} • ${file.permissions.join(", ")}',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
-                            trailing: file.movie != null && file.movie!.posterUrl.isNotEmpty
+                            trailing: file.movie != null &&
+                                    file.movie!.posterUrl.isNotEmpty
                                 ? SizedBox(
                                     width: 40,
                                     height: 60,
@@ -469,13 +472,17 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                                       child: CachedNetworkImage(
                                         imageUrl: file.movie!.posterUrl,
                                         fit: BoxFit.cover,
-                                        placeholder: (context, url) => Container(
+                                        placeholder: (context, url) =>
+                                            Container(
                                           color: Colors.grey[300],
-                                          child: const Icon(Icons.movie, size: 16),
+                                          child:
+                                              const Icon(Icons.movie, size: 16),
                                         ),
-                                        errorWidget: (context, url, error) => Container(
+                                        errorWidget: (context, url, error) =>
+                                            Container(
                                           color: Colors.grey[300],
-                                          child: const Icon(Icons.movie, size: 16),
+                                          child:
+                                              const Icon(Icons.movie, size: 16),
                                         ),
                                       ),
                                     ),
@@ -506,17 +513,17 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
           children: [
             // Collection overview
             _buildCollectionOverview(),
-            
+
             const SizedBox(height: 24),
 
             // Recipient section
             _buildRecipientSection(),
-            
+
             const SizedBox(height: 24),
 
             // Files and permissions section
             _buildFilesPermissionsSection(),
-            
+
             const SizedBox(height: 32),
 
             // Share button
@@ -540,7 +547,10 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -563,7 +573,10 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                       Text(
                         '${widget.movies.length + 1} files will be shared',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.7),
                             ),
                       ),
                     ],
@@ -599,7 +612,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                 hintText: 'https://example.solid.com/profile/card#me',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.person),
-                helperText: 'Enter the WebID of the person you want to share with',
+                helperText:
+                    'Enter the WebID of the person you want to share with',
               ),
               keyboardType: TextInputType.url,
               textInputAction: TextInputAction.done,
@@ -637,7 +651,10 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
             Text(
               'Configure permissions for each file individually:',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
                   ),
             ),
             const SizedBox(height: 4),
@@ -668,7 +685,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
               ),
             ),
             const SizedBox(height: 12),
-            
+
             // Reset button
             Align(
               alignment: Alignment.centerRight,
@@ -680,17 +697,18 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                   style: TextStyle(fontSize: 12),
                 ),
                 style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 ),
               ),
             ),
             const SizedBox(height: 8),
-            
+
             // Files list with permission controls
             ...shareableFiles.asMap().entries.map((entry) {
               final index = entry.key;
               final file = entry.value;
-              
+
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: _buildFilePermissionItem(index, file),
@@ -737,9 +755,14 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      file.fileType == 'movielist' ? 'Movie List' : 'Movie File',
+                      file.fileType == 'movielist'
+                          ? 'Movie List'
+                          : 'Movie File',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.6),
                           ),
                     ),
                   ],
@@ -767,9 +790,9 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                 ),
             ],
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Permission checkboxes
           Wrap(
             spacing: 16,
@@ -793,7 +816,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
     String label,
   ) {
     final isChecked = file.permissions.contains(permission);
-    
+
     return InkWell(
       onTap: () {
         final newPermissions = List<String>.from(file.permissions);
@@ -832,12 +855,14 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
   Widget _buildShareButton() {
     final totalFiles = shareableFiles.length;
     final hasRecipient = webIdController.text.trim().isNotEmpty;
-    final hasAnyPermissions = shareableFiles.any((file) => file.permissions.isNotEmpty);
+    final hasAnyPermissions =
+        shareableFiles.any((file) => file.permissions.isNotEmpty);
 
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: hasRecipient && hasAnyPermissions ? _startBatchSharing : null,
+        onPressed:
+            hasRecipient && hasAnyPermissions ? _startBatchSharing : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.primary,
           foregroundColor: Theme.of(context).colorScheme.onPrimary,

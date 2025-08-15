@@ -9,9 +9,7 @@
 
 ARCHIVE
 ignore
-output
 pubspec.yaml.*
-tmp
 
 installers/*.apk
 installers/*.exe
@@ -20,6 +18,8 @@ installers/*.tar.gz
 installers/*-linux.zip
 installers/*-macos.zip
 installers/*-windows.zip
+
+.Rhistory
 
 ########################################################################
 # From https://github.com/flutter/flutter/blob/master/.gitignore
@@ -166,6 +166,8 @@ unlinked_spec.ds
 **/android/**/GeneratedPluginRegistrant.java
 **/android/key.properties
 *.jks
+
+android/app/.cxx/
 
 #-----------------------------------------------------------------------
 # iOS/XCode related

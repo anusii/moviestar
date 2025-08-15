@@ -138,7 +138,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
         fileType: 'movielist',
         permissions: [], // Start with no permissions checked
       ),
-      // Individual movie files with read-only permissions by default
+      // Individual movie files with read-only permissions by default.
+
       ...widget.movies.map(
         (movie) => ShareableFile(
           fileName: 'movies/Movie-${movie.id}.ttl',
@@ -158,10 +159,12 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
     setState(() {
       final file = shareableFiles[index];
       if (file.fileType == 'movielist') {
-        // Update movie list permissions normally
+        // Update movie list permissions normally.
+
         shareableFiles[index] = file.copyWith(permissions: newPermissions);
       } else {
-        // Movie files always stay read-only
+        // Movie files always stay read-only.
+
         shareableFiles[index] = file.copyWith(permissions: ['read']);
       }
     });
@@ -175,10 +178,12 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
       for (int i = 0; i < shareableFiles.length; i++) {
         final file = shareableFiles[i];
         if (file.fileType == 'movielist') {
-          // Movie lists: read + write permissions by default
+          // Movie lists: read + write permissions by default.
+
           shareableFiles[i] = file.copyWith(permissions: ['read', 'write']);
         } else {
-          // Individual movies: always read-only for security
+          // Individual movies: always read-only for security.
+
           shareableFiles[i] = file.copyWith(permissions: ['read']);
         }
       }
@@ -241,7 +246,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
       for (int i = 0; i < shareableFiles.length; i++) {
         final file = shareableFiles[i];
 
-        // Skip files with no permissions selected (except movie files which always get read)
+        // Skip files with no permissions selected (except movie files which always get read).
+
         if (file.permissions.isEmpty && file.fileType == 'movielist') {
           setState(() {
             sharingProgress[file.fileName] = 'skipped';
@@ -260,7 +266,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
         try {
           if (!mounted) break;
 
-          // Determine permissions: movie files always get read-only
+          // Determine permissions: movie files always get read-only.
+
           final permissionsToUse =
               file.fileType == 'movie' ? ['read'] : file.permissions;
 
@@ -815,7 +822,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
 
           const SizedBox(height: 12),
 
-          // Permission checkboxes or read-only indicator
+          // Permission checkboxes or read-only indicator.
+
           if (isMovieFile)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

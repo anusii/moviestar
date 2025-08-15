@@ -478,6 +478,7 @@ class _EnhancedMovieListSharingUiState
 
             // Then share the movie file with read-only permissions.
             // Movie files are always shared with read-only access for security.
+
             if (!mounted) return;
             final movieResult = await grantPermission(
               'movies/Movie-${movie.id}.ttl',

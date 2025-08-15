@@ -37,6 +37,7 @@ import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
+import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/search_screen.dart';
@@ -52,7 +53,6 @@ import 'package:moviestar/services/movie_service.dart';
 
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
-import 'package:moviestar/widgets/moviestar_status_bar_config.dart';
 import 'package:moviestar/widgets/moviestar_nav_config.dart';
 import 'package:moviestar/widgets/security_key_manager_dialog.dart';
 
@@ -74,8 +74,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   int _selectedIndex = 0;
   bool _isLoadingFolders = false;
-  String _appVersion = '';
-  bool _isVersionLoaded = false;
   String? _webId;
   String? _name;
   bool _isKeySaved = false;
@@ -87,7 +85,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   late final ApiKeyService _apiKeyService;
   late final MovieService _movieService;
   late final SolidSecurityKeyService _securityKeyService;
-  
+
   // Flag to prevent security key status update loops
   bool _isUpdatingSecurityKeyStatus = false;
 
@@ -95,9 +93,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   late List<Widget> _screens;
 
-  /// Navigation tabs configuration.
+  /// Navigation menu items configuration.
 
-  late List<SolidNavTab> _navTabs;
+  late List<SolidMenuItem> _menuItems;
 
   @override
   void initState() {
@@ -136,13 +134,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   /// Loads the app name and version from package_info_plus.
 
   Future<void> _loadAppInfo() async {
-    final appInfo = await getAppNameVersion();
-    if (mounted) {
-      setState(() {
-        _appVersion = appInfo.version;
-        _isVersionLoaded = true;
-      });
-    }
+    await getAppNameVersion();
+
+    // Version loaded successfully.
   }
 
   /// Loads user information from the POD.
@@ -231,17 +225,17 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       debugPrint('Security key update already in progress, skipping');
       return;
     }
-    
+
     debugPrint('Security key status changed, updating UI state');
 
     _updateSecurityKeyStatusFromService();
   }
 
   /// Updates security key status from service without triggering reload.
-  
+
   Future<void> _updateSecurityKeyStatusFromService() async {
     if (_isUpdatingSecurityKeyStatus) return;
-    
+
     _isUpdatingSecurityKeyStatus = true;
     try {
       final isKeySaved = await _securityKeyService.isKeySaved();
@@ -261,19 +255,19 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   Future<void> _loadSecurityKeyStatus() async {
     if (_isUpdatingSecurityKeyStatus) return;
-    
+
     _isUpdatingSecurityKeyStatus = true;
     try {
       bool hasValidKey = false;
-      
+
       // Check basic KeyManager status.
 
       final hasKeyInMemory = await _securityKeyService.isKeySaved();
-      
+
       if (hasKeyInMemory) {
         hasValidKey = true;
       }
-      
+
       if (mounted) {
         setState(() {
           _isKeySaved = hasValidKey;
@@ -318,9 +312,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       ),
     ];
 
-    // Configure navigation tabs using the MovieStar app configuration.
+    // Configure navigation menu items using the MovieStar app configuration.
 
-    _navTabs = MovieStarNavConfig.createNavTabs();
+    _menuItems = MovieStarNavConfig.createMenuItems();
 
     _initialiseAppData();
   }
@@ -434,23 +428,16 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     );
   }
 
-  /// Handles the version info action.
+  /// Gets the appropriate icon for the current view mode.
 
-  void _handleVersionInfo() {
-    if (mounted) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Version Information'),
-          content: Text('Version: $_appVersion'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
+  IconData _getViewModeIcon(HomeViewMode viewMode) {
+    switch (viewMode) {
+      case HomeViewMode.grid:
+        return Icons.grid_view;
+      case HomeViewMode.kanban:
+        return Icons.view_kanban;
+      case HomeViewMode.list:
+        return Icons.view_list;
     }
   }
 
@@ -460,11 +447,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     // Create user info for the solid navigation.
 
-    final userConfig = MovieStarNavConfig.createUserConfig(
-      userName: _name ?? '',
+    final userInfo = SolidNavUserInfo(
+      userName: _name ?? 'Not logged in',
       webId: _webId,
+      showWebId: false, // Doesn't show WebID by default.
+      avatarIcon: Icons.account_circle,
     );
-    final userInfo = SolidNavUtils.createUserInfo(userConfig);
 
     // Create the main content with loading overlay.
 
@@ -476,56 +464,90 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       ],
     );
 
-    // Create responsive AppBar.
+    // Use SolidNavigator with inline configuration.
 
-    final appBarConfig = MovieStarNavConfig.createAppBarConfig(
-      title: _navTabs[_selectedIndex].title,
-      appVersion: _appVersion,
-      isVersionLoaded: _isVersionLoaded,
-      onRefresh: _handleRefresh,
-      onSearch: _handleSearch,
-      onSettings: _handleSettings,
-      onLogout: _handleLogout,
-      onVersionInfo: _handleVersionInfo,
-      onViewModeToggle: _handleViewModeToggle,
-      ref: ref,
-    );
-    final appBar = SolidNavUtils.createAppBar(
-      context: context,
-      config: appBarConfig,
-      ref: ref,
-    );
-
-    // Create status bar configuration.
-
-    final statusBarConfig = MovieStarStatusBarConfig.createStatusBarConfig(
-      webId: _webId,
-      onLoginTap: () => _handleLogout(),
-      isKeySaved: _isKeySaved,
-      onSecurityKeyTap: _handleSecurityKeyManagement,
-      showOnNarrowScreens: false, // Hide status bar on narrow screens.
-    );
-
-    // Use the Solid Navigation Manager with configurable width threshold.
-
-    return SolidNavigationManager.movieStar(
-      config: const SolidNavigationConfig(
-        narrowScreenThreshold: 800.0,
-        autoSwitch: true,
+    return SolidNavigator(
+      menu: _menuItems,
+      appBar: SolidAppBarConfig(
+        title: _menuItems[_selectedIndex].title,
+        actions: [
+          SolidAppBarAction(
+            icon: _getViewModeIcon(ref.watch(viewModeProvider)),
+            onPressed: _handleViewModeToggle,
+            tooltip:
+                'View Mode: Tap here to cycle between different view modes (Grid, Kanban, List).',
+          ),
+          SolidAppBarAction(
+            icon: Icons.refresh,
+            onPressed: _handleRefresh,
+            tooltip:
+                'Refresh: Tap here to refresh all movie data and reload the latest information from the movie database.',
+          ),
+          SolidAppBarAction(
+            icon: Icons.search,
+            onPressed: _handleSearch,
+            tooltip:
+                'Search: Tap here to search for movies by title, genre, or other criteria.',
+          ),
+        ],
+        overflowItems: [
+          SolidOverflowMenuItem(
+            id: 'theme',
+            icon: Icons.dark_mode,
+            label: 'Toggle Theme',
+            onSelected: () async {
+              await ref.read(themeModeProvider.notifier).toggleTheme();
+            },
+          ),
+          SolidOverflowMenuItem(
+            id: 'settings',
+            icon: Icons.settings,
+            label: 'Settings',
+            onSelected: _handleSettings,
+          ),
+          SolidOverflowMenuItem(
+            id: 'logout',
+            icon: Icons.logout,
+            label: 'Logout',
+            onSelected: _handleLogout,
+          ),
+        ],
       ),
-      tabs: _navTabs,
+      statusBar: SolidStatusBarConfig(
+        serverInfo: SolidServerInfo(
+          serverUri: _webId?.split('profile')[0] ?? 'Not connected',
+          displayText: _webId?.split('profile')[0] ?? 'Not connected',
+          tooltip:
+              'Server Information - Click to open server in browser. Manages your personal data pod. Your movie data is stored securely in your personal pod.',
+          isClickable: _webId != null,
+        ),
+        loginStatus: SolidLoginStatus(
+          webId: _webId,
+          onTap: _handleLogout,
+          loggedInTooltip:
+              'Currently Logged In - WebID: $_webId - Click to log out - Your data is secure. Your movie preferences and ratings are safely stored in your pod.',
+          loggedOutTooltip:
+              'Login Required - Current status: Not logged in - Click to log in to your pod - Access your personal movie data. Connect to your pod to save and sync your movie preferences.',
+        ),
+        securityKeyStatus: SolidSecurityKeyStatus(
+          isKeySaved: _isKeySaved,
+          onTap: _handleSecurityKeyManagement,
+          tooltip:
+              'Security Key Manager: Tap here to manage your security key settings. View your current security key status, save a new security key, or remove an existing security key. Your security key is essential for encrypting and protecting your movie data.',
+        ),
+        showOnNarrowScreens: false,
+      ),
+      userInfo: userInfo,
+      onLogout: (context) => _handleLogout(),
+      narrowScreenThreshold: 800.0,
+      backgroundColor: theme.colorScheme.surface,
       selectedIndex: _selectedIndex,
-      onTabSelected: (index) {
+      onMenuSelected: (index) {
         setState(() {
           _selectedIndex = index;
         });
       },
-      content: mainContent,
-      userInfo: userInfo,
-      onLogout: (context) => _handleLogout(),
-      appBar: appBar,
-      backgroundColor: theme.colorScheme.surface,
-      statusBarConfig: statusBarConfig,
+      child: mainContent,
     );
   }
 }

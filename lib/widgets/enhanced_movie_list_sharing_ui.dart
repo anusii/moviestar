@@ -460,7 +460,8 @@ class _EnhancedMovieListSharingUiState
       // Update the movie list TTL metadata for persistence using MovieListService
       await _updateMovieListWithSharingMetadataV2();
 
-      // Share individual movies with read-only permissions
+      // Share individual movies with read-only permissions by default.
+      // Movie files always get read-only access regardless of list permissions.
       if (widget.movies.isNotEmpty) {
         setState(() {
           sharingStatus = 'Sharing individual movies (read-only)...';
@@ -469,13 +470,14 @@ class _EnhancedMovieListSharingUiState
         int sharedCount = 0;
         for (final movie in widget.movies) {
           try {
-            // First, ensure the individual movie file exists
+            // First, ensure the individual movie file exists.
             debugPrint(
               '🎬 Ensuring movie file exists for: ${movie.title} (${movie.id})',
             );
             await _createMovieFileIfNotExists(movie);
 
-            // Then share the movie file
+            // Then share the movie file with read-only permissions.
+            // Movie files are always shared with read-only access for security.
             if (!mounted) return;
             final movieResult = await grantPermission(
               'movies/Movie-${movie.id}.ttl',
@@ -765,7 +767,7 @@ class _EnhancedMovieListSharingUiState
             ),
             const SizedBox(height: 8),
             Text(
-              'Select permissions for the movie list. Individual movies will be shared with read-only access.',
+              'Select permissions for the movie list. Individual movies will automatically be shared with read-only access.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(
                       context,

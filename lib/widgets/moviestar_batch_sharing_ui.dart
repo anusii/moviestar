@@ -127,6 +127,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
   }
 
   /// Initialize the list of files to be shared.
+  /// Movie files are automatically set to read-only permissions.
 
   void _initializeShareableFiles() {
     shareableFiles = [
@@ -137,40 +138,47 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
         fileType: 'movielist',
         permissions: [], // Start with no permissions checked
       ),
-      // Individual movie files
+      // Individual movie files with read-only permissions by default
       ...widget.movies.map(
         (movie) => ShareableFile(
           fileName: 'movies/Movie-${movie.id}.ttl',
           displayName: movie.title,
           fileType: 'movie',
           movie: movie,
-          permissions: [], // Start with no permissions checked
+          permissions: ['read'], // Movie files default to read-only
         ),
       ),
     ];
   }
 
   /// Update permissions for a specific file.
+  /// When updating movie list permissions, movie files stay read-only.
 
   void _updateFilePermissions(int index, List<String> newPermissions) {
     setState(() {
-      shareableFiles[index] = shareableFiles[index].copyWith(
-        permissions: newPermissions,
-      );
+      final file = shareableFiles[index];
+      if (file.fileType == 'movielist') {
+        // Update movie list permissions normally
+        shareableFiles[index] = file.copyWith(permissions: newPermissions);
+      } else {
+        // Movie files always stay read-only
+        shareableFiles[index] = file.copyWith(permissions: ['read']);
+      }
     });
   }
 
   /// Reset all file permissions to their defaults.
+  /// Movie lists get the selected permissions, movie files stay read-only.
 
   void _resetPermissionsToDefaults() {
     setState(() {
       for (int i = 0; i < shareableFiles.length; i++) {
         final file = shareableFiles[i];
         if (file.fileType == 'movielist') {
-          // Movie lists: read + write permissions
+          // Movie lists: read + write permissions by default
           shareableFiles[i] = file.copyWith(permissions: ['read', 'write']);
         } else {
-          // Individual movies: read-only
+          // Individual movies: always read-only for security
           shareableFiles[i] = file.copyWith(permissions: ['read']);
         }
       }
@@ -233,8 +241,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
       for (int i = 0; i < shareableFiles.length; i++) {
         final file = shareableFiles[i];
 
-        // Skip files with no permissions selected
-        if (file.permissions.isEmpty) {
+        // Skip files with no permissions selected (except movie files which always get read)
+        if (file.permissions.isEmpty && file.fileType == 'movielist') {
           setState(() {
             sharingProgress[file.fileName] = 'skipped';
             currentOperation =
@@ -252,10 +260,14 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
         try {
           if (!mounted) break;
 
+          // Determine permissions: movie files always get read-only
+          final permissionsToUse =
+              file.fileType == 'movie' ? ['read'] : file.permissions;
+
           final result = await grantPermission(
             file.fileName,
             true, // fileFlag
-            file.permissions,
+            permissionsToUse,
             recipientType,
             recipientList,
             ownerWebId,
@@ -649,7 +661,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Configure permissions for each file individually:',
+              'Configure permissions for the movie list. Movie files are automatically set to read-only:',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context)
                         .colorScheme
@@ -674,7 +686,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Tip: Select permissions for each file. Individual movies are typically shared as read-only.',
+                      'Movie files are automatically shared with read-only permissions for security. Only configure permissions for the movie list.',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Colors.blue[700],
                             fontSize: 12,
@@ -720,8 +732,12 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
     );
   }
 
-  /// Build individual file permission item
+  /// Build individual file permission item.
+  /// Movie files show read-only permissions that cannot be changed.
+
   Widget _buildFilePermissionItem(int index, ShareableFile file) {
+    final isMovieFile = file.fileType == 'movie';
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -729,6 +745,12 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
         ),
         borderRadius: BorderRadius.circular(8),
+        color: isMovieFile
+            ? Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withValues(alpha: 0.3)
+            : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -757,7 +779,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                     Text(
                       file.fileType == 'movielist'
                           ? 'Movie List'
-                          : 'Movie File',
+                          : 'Movie File (Read-only)',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context)
                                 .colorScheme
@@ -793,22 +815,52 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
 
           const SizedBox(height: 12),
 
-          // Permission checkboxes
-          Wrap(
-            spacing: 16,
-            children: [
-              _buildPermissionCheckbox(index, file, 'read', 'Read'),
-              _buildPermissionCheckbox(index, file, 'write', 'Write'),
-              _buildPermissionCheckbox(index, file, 'append', 'Append'),
-              _buildPermissionCheckbox(index, file, 'control', 'Control'),
-            ],
-          ),
+          // Permission checkboxes or read-only indicator
+          if (isMovieFile)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.green.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.lock_outline,
+                    size: 14,
+                    color: Colors.green[700],
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Read-only access (automatic)',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.green[700],
+                          fontSize: 12,
+                        ),
+                  ),
+                ],
+              ),
+            )
+          else
+            // Permission checkboxes for movie list only
+            Wrap(
+              spacing: 16,
+              children: [
+                _buildPermissionCheckbox(index, file, 'read', 'Read'),
+                _buildPermissionCheckbox(index, file, 'write', 'Write'),
+                _buildPermissionCheckbox(index, file, 'append', 'Append'),
+                _buildPermissionCheckbox(index, file, 'control', 'Control'),
+              ],
+            ),
         ],
       ),
     );
   }
 
-  /// Build permission checkbox
+  /// Build permission checkbox.
+  /// Only enables interaction for movie list files.
+
   Widget _buildPermissionCheckbox(
     int index,
     ShareableFile file,
@@ -816,35 +868,47 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
     String label,
   ) {
     final isChecked = file.permissions.contains(permission);
+    final isMovieFile = file.fileType == 'movie';
 
     return InkWell(
-      onTap: () {
-        final newPermissions = List<String>.from(file.permissions);
-        if (isChecked) {
-          newPermissions.remove(permission);
-        } else {
-          newPermissions.add(permission);
-        }
-        _updateFilePermissions(index, newPermissions);
-      },
+      onTap: isMovieFile
+          ? null
+          : () {
+              final newPermissions = List<String>.from(file.permissions);
+              if (isChecked) {
+                newPermissions.remove(permission);
+              } else {
+                newPermissions.add(permission);
+              }
+              _updateFilePermissions(index, newPermissions);
+            },
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Checkbox(
             value: isChecked,
-            onChanged: (value) {
-              final newPermissions = List<String>.from(file.permissions);
-              if (value == true) {
-                newPermissions.add(permission);
-              } else {
-                newPermissions.remove(permission);
-              }
-              _updateFilePermissions(index, newPermissions);
-            },
+            onChanged: isMovieFile
+                ? null
+                : (value) {
+                    final newPermissions = List<String>.from(file.permissions);
+                    if (value == true) {
+                      newPermissions.add(permission);
+                    } else {
+                      newPermissions.remove(permission);
+                    }
+                    _updateFilePermissions(index, newPermissions);
+                  },
           ),
           Text(
             label,
-            style: Theme.of(context).textTheme.bodySmall,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: isMovieFile
+                      ? Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.5)
+                      : null,
+                ),
           ),
         ],
       ),

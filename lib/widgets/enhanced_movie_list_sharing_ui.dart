@@ -457,11 +457,13 @@ class _EnhancedMovieListSharingUiState
         throw Exception('Failed to share movie list');
       }
 
-      // Update the movie list TTL metadata for persistence using MovieListService
+      // Update the movie list TTL metadata for persistence using MovieListService.
+
       await _updateMovieListWithSharingMetadataV2();
 
       // Share individual movies with read-only permissions by default.
       // Movie files always get read-only access regardless of list permissions.
+
       if (widget.movies.isNotEmpty) {
         setState(() {
           sharingStatus = 'Sharing individual movies (read-only)...';
@@ -471,9 +473,7 @@ class _EnhancedMovieListSharingUiState
         for (final movie in widget.movies) {
           try {
             // First, ensure the individual movie file exists.
-            debugPrint(
-              '🎬 Ensuring movie file exists for: ${movie.title} (${movie.id})',
-            );
+
             await _createMovieFileIfNotExists(movie);
 
             // Then share the movie file with read-only permissions.
@@ -494,7 +494,6 @@ class _EnhancedMovieListSharingUiState
 
             if (movieResult == SolidFunctionCallStatus.success) {
               sharedCount++;
-              debugPrint('✅ Successfully shared movie: ${movie.title}');
             } else {
               debugPrint(
                 '❌ Failed to share movie ${movie.title}: $movieResult',
@@ -1104,24 +1103,22 @@ class _EnhancedMovieListSharingUiState
           widget.child,
         );
         if (existingContent.isNotEmpty) {
-          debugPrint('✅ Movie file already exists for: ${movie.title}');
           return;
         }
       } catch (e) {
-        // File doesn't exist, we'll create it
-        debugPrint(
-          '📝 Movie file doesn\'t exist, creating for: ${movie.title}',
-        );
+        // File doesn't exist, we'll create it.
       }
 
-      // Create the movie TTL content with full data
+      // Create the movie TTL content with full data.
+
       final ttlContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
         movie,
         null, // No rating initially
         null, // No comment initially
       );
 
-      // Write the movie file to POD
+      // Write the movie file to POD.
+
       if (!mounted) return;
       final result = await writePod(
         movieFileName,
@@ -1133,14 +1130,10 @@ class _EnhancedMovieListSharingUiState
 
       if (!mounted) return;
 
-      if (result == SolidFunctionCallStatus.success) {
-        debugPrint('✅ Created individual movie file for: ${movie.title}');
-      } else {
-        debugPrint('❌ Failed to create movie file for: ${movie.title}');
+      if (result != SolidFunctionCallStatus.success) {
         throw Exception('Failed to create movie file');
       }
     } catch (e) {
-      debugPrint('❌ Error creating movie file for ${movie.title}: $e');
       rethrow;
     }
   }

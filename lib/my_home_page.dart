@@ -565,7 +565,8 @@ The version is automatically checked for updates.
 
 Switch between light and dark modes for optimal viewing experience.
 
-🌙 **Dark Mode**: Better for low-light viewing  
+🌙 **Dark Mode**: Better for low-light viewing
+
 ☀️ **Light Mode**: Better for bright environments
 
 ''',

@@ -464,9 +464,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       ],
     );
 
-    // Use SolidNavigator with inline configuration.
-
-    return SolidNavigator(
+    return SolidScaffold(
       menu: _menuItems,
       appBar: SolidAppBarConfig(
         title: _menuItems[_selectedIndex].title,

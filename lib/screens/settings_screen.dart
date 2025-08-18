@@ -752,7 +752,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                           ),
                           const Gap(4),
                           Text(
-                            'Use the theme toggle in the app bar to switch between light and dark mode',
+                            'Switch between light and dark mode',
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
@@ -761,7 +761,9 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                         builder: (context, ref, _) {
                           final themeMode = ref.watch(themeModeProvider);
                           return Icon(
-                            themeMode == ThemeMode.dark ? Icons.dark_mode : Icons.light_mode,
+                            themeMode == ThemeMode.dark
+                                ? Icons.dark_mode
+                                : Icons.light_mode,
                             color: Theme.of(context).colorScheme.primary,
                           );
                         },

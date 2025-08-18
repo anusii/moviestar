@@ -44,7 +44,7 @@ class MovieStarNavConfig {
   static List<SolidMenuItem> createMenuItems() {
     return [
       SolidMenuItem(
-        title: 'Home',
+        title: 'MOVIE STAR',
         icon: Icons.home,
         tooltip: '''
 
@@ -53,7 +53,7 @@ class MovieStarNavConfig {
 ''',
       ),
       SolidMenuItem(
-        title: 'Watch',
+        title: 'To Watch',
         icon: Icons.favorite,
         tooltip: '''
 
@@ -71,7 +71,7 @@ class MovieStarNavConfig {
 ''',
       ),
       SolidMenuItem(
-        title: 'Soon',
+        title: 'Coming Soon',
         icon: Icons.upcoming,
         tooltip: '''
 
@@ -80,7 +80,7 @@ class MovieStarNavConfig {
 ''',
       ),
       SolidMenuItem(
-        title: 'Shared',
+        title: 'Shared Movies',
         icon: Icons.movie_outlined,
         tooltip: '''
 
@@ -89,7 +89,7 @@ class MovieStarNavConfig {
 ''',
       ),
       SolidMenuItem(
-        title: 'Files',
+        title: 'File Management',
         icon: Icons.folder,
         tooltip: '''
 

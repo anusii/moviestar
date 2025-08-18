@@ -468,6 +468,21 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       menu: _menuItems,
       appBar: SolidAppBarConfig(
         title: _menuItems[_selectedIndex].title,
+        versionConfig: const SolidVersionConfig(
+          version: '0.0.9+6',
+          changelogUrl: 'https://github.com/anusii/moviestar/blob/dev/CHANGELOG'
+              '.md',
+          showDate: true,
+          tooltip: '''
+**Version Information**
+
+Current version: 0.0.9+6
+
+Click to view the changelog and see what's new in this version.
+The version is automatically checked for updates.
+
+''',
+        ),
         actions: [
           SolidAppBarAction(
             icon: _getViewModeIcon(ref.watch(viewModeProvider)),

@@ -505,14 +505,6 @@ The version is automatically checked for updates.
         ],
         overflowItems: [
           SolidOverflowMenuItem(
-            id: 'theme',
-            icon: Icons.dark_mode,
-            label: 'Toggle Theme',
-            onSelected: () async {
-              await ref.read(themeModeProvider.notifier).toggleTheme();
-            },
-          ),
-          SolidOverflowMenuItem(
             id: 'settings',
             icon: Icons.settings,
             label: 'Settings',
@@ -560,6 +552,24 @@ The version is automatically checked for updates.
           _selectedIndex = index;
         });
       },
+      themeToggle: SolidThemeToggleConfig(
+        enabled: true,
+        currentThemeMode: ref.watch(themeModeProvider),
+        onToggleTheme: () async {
+          await ref.read(themeModeProvider.notifier).toggleTheme();
+        },
+        showInAppBarActions: true,
+        hideOnVeryNarrowScreen: true,
+        tooltip: '''
+**Theme Toggle**
+
+Switch between light and dark modes for optimal viewing experience.
+
+🌙 **Dark Mode**: Better for low-light viewing  
+☀️ **Light Mode**: Better for bright environments
+
+''',
+      ),
       child: mainContent,
     );
   }

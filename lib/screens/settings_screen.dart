@@ -41,7 +41,6 @@ import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/utils/create_solid_login.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
-import 'package:moviestar/widgets/theme_toggle_button.dart';
 
 /// A screen that displays and manages user settings.
 
@@ -753,12 +752,20 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                           ),
                           const Gap(4),
                           Text(
-                            'Switch between light and dark mode',
+                            'Use the theme toggle in the app bar to switch between light and dark mode',
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
                       ),
-                      const ThemeToggleButton(isIconButton: true),
+                      Consumer(
+                        builder: (context, ref, _) {
+                          final themeMode = ref.watch(themeModeProvider);
+                          return Icon(
+                            themeMode == ThemeMode.dark ? Icons.dark_mode : Icons.light_mode,
+                            color: Theme.of(context).colorScheme.primary,
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ],

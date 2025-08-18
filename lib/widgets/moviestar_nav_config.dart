@@ -30,7 +30,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solidui/solidui.dart';
 
-import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 
 /// MovieStar-specific navigation configuration and factory methods.
@@ -160,14 +159,6 @@ criteria.
         ),
       ],
       overflowItems: [
-        SolidOverflowMenuItem(
-          id: 'theme',
-          icon: Icons.dark_mode,
-          label: 'Toggle Theme',
-          onSelected: () async {
-            await ref.read(themeModeProvider.notifier).toggleTheme();
-          },
-        ),
         SolidOverflowMenuItem(
           id: 'settings',
           icon: Icons.settings,

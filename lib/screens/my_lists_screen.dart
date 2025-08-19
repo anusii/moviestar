@@ -778,7 +778,7 @@ Edit list name and description, or delete this list.
       if (!mounted) return;
 
       // Create MovieList service to create the list file first.
-      
+
       final userProfileService = UserProfileService(context, widget);
       final movieListService = MovieListService(
         context,
@@ -812,7 +812,6 @@ Edit list name and description, or delete this list.
           await _createMovieFileIfNotExists(movie);
         } catch (e) {
           // Continue with other movies - the batch UI will handle individual failures.
-
         }
         if (!mounted) return;
       }
@@ -878,7 +877,7 @@ Edit list name and description, or delete this list.
       );
 
       // Write the movie file to POD.
-      
+
       if (!mounted) return;
       final result = await writePod(
         movieFileName,

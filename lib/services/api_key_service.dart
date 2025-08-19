@@ -36,9 +36,7 @@ class ApiKeyService extends ChangeNotifier {
     iOptions: const IOSOptions(
       accessibility: KeychainAccessibility.first_unlock_this_device,
     ),
-    mOptions: const MacOsOptions(
-      synchronizable: false,
-    ),
+    mOptions: const MacOsOptions(synchronizable: false),
   );
 
   ApiKeyService();

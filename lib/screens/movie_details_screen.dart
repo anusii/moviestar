@@ -33,6 +33,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
@@ -121,9 +122,38 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
   bool _hasMovieFile = false;
 
+  /// List of all custom lists.
+
+  List<CustomList> _customLists = [];
+
   // Indicates whether this is a shared movie (read-only view).
 
   bool get _isSharedMovie => widget.sharedMovieData != null;
+
+  // Gets the appropriate text for who shared the movie.
+
+  String _getSharedByText() {
+    if (!_isSharedMovie) return 'Unknown';
+
+    final sharedBy = widget.sharedMovieData!['sharedBy'] as String?;
+    final sharedByWebId = widget.sharedMovieData!['sharedByWebId'] as String?;
+
+    // Prefer the formatted name if available.
+
+    if (sharedBy != null && sharedBy.isNotEmpty && sharedBy != 'Unknown') {
+      return sharedBy;
+    }
+
+    // Fall back to WebID if formatted name is not available.
+
+    if (sharedByWebId != null && sharedByWebId.isNotEmpty) {
+      return sharedByWebId;
+    }
+
+    // Final fallback.
+
+    return 'Unknown';
+  }
 
   @override
   void initState() {
@@ -132,6 +162,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     _loadPersonalRating();
     _loadPersonalComments();
     _checkMovieFile();
+    _loadCustomLists();
   }
 
   @override
@@ -145,6 +176,16 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   /// Checks if the current movie is in either list.
 
   Future<void> _checkListStatus() async {
+    // Don't check list status for shared movies.
+
+    if (_isSharedMovie) {
+      setState(() {
+        _isInToWatch = false;
+        _isInWatched = false;
+      });
+      return;
+    }
+
     final isInToWatch = await widget.favoritesService.isInToWatch(widget.movie);
     final isInWatched = await widget.favoritesService.isInWatched(widget.movie);
     setState(() {
@@ -347,6 +388,15 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   /// Checks if the current movie has a file (user has rated or commented).
 
   Future<void> _checkMovieFile() async {
+    // Don't check movie file for shared movies.
+
+    if (_isSharedMovie) {
+      setState(() {
+        _hasMovieFile = false;
+      });
+      return;
+    }
+
     final hasFile = await widget.favoritesService.hasMovieFile(widget.movie);
     setState(() {
       _hasMovieFile = hasFile;
@@ -427,8 +477,9 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
         backgroundColor: Theme.of(context).colorScheme.errorContainer,
         title: Text(
           'Cannot Share Movie',
-          style:
-              TextStyle(color: Theme.of(context).colorScheme.onErrorContainer),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onErrorContainer,
+          ),
         ),
         content: Text(
           message,
@@ -439,10 +490,42 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'OK',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Loads all custom lists.
+
+  Future<void> _loadCustomLists() async {
+    if (_isSharedMovie) {
+      setState(() {
+        _customLists = [];
+      });
+      return;
+    }
+
+    final lists = await widget.favoritesService.getCustomLists();
+    setState(() {
+      _customLists = lists;
+    });
+  }
+
+  /// Shows a dialog to add the movie to custom lists.
+
+  Future<void> _showAddToCustomListsDialog() async {
+    await showDialog(
+      context: context,
+      builder: (context) => _AddToCustomListsDialog(
+        movie: widget.movie,
+        favoritesService: widget.favoritesService,
+        customLists: _customLists,
+        onListsUpdated: _loadCustomLists,
       ),
     );
   }
@@ -516,6 +599,25 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                                 ? 'Remove from Watched'
                                 : 'Add to Watched',
                           ),
+                          if (!_isSharedMovie)
+                            MarkdownTooltip(
+                              message: '''
+
+**Add to Custom List**
+
+Add this movie to one of your custom lists or create a new list.
+Organize your movies the way you want!
+
+                              ''',
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.playlist_add,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                                onPressed: _showAddToCustomListsDialog,
+                              ),
+                            ),
                           if (_hasMovieFile &&
                               widget.favoritesService
                                   is FavoritesServiceAdapter &&
@@ -532,10 +634,11 @@ Your shared movies will appear in their "Shared with Me" tab.
 
                               ''',
                               child: IconButton(
-                                icon: Icon(Icons.share,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
+                                icon: Icon(
+                                  Icons.share,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
                                 onPressed: _shareMovie,
                               ),
                             ),
@@ -591,30 +694,31 @@ Your shared movies will appear in their "Shared with Me" tab.
                   const SizedBox(height: 16),
 
                   // Shared Movie Indicator.
-
                   if (_isSharedMovie)
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withValues(alpha: 0.2),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                            color: Theme.of(context).colorScheme.primary,
-                            width: 1),
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 1,
+                        ),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.share,
-                              color: Theme.of(context).colorScheme.primary,
-                              size: 20),
+                          Icon(
+                            Icons.share,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Text(
-                            'This movie was shared by ${widget.sharedMovieData!['sharedBy'] ?? 'someone'}',
+                            'This movie was shared by ${_getSharedByText()}',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.w600,
@@ -666,21 +770,18 @@ Your shared movies will appear in their "Shared with Me" tab.
                               child: SliderTheme(
                                 data: SliderTheme.of(context).copyWith(
                                   // Track colors.
-
                                   activeTrackColor: _isSharedMovie
                                       ? Theme.of(context).colorScheme.primary
                                       : Colors.amber,
                                   inactiveTrackColor:
                                       Theme.of(context).colorScheme.outline,
-                                  disabledActiveTrackColor: Theme.of(context)
-                                      .colorScheme
-                                      .primary
-                                      .withValues(alpha: 0.7),
+                                  disabledActiveTrackColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.7),
                                   disabledInactiveTrackColor:
                                       Theme.of(context).colorScheme.outline,
 
                                   // Thumb colors.
-
                                   thumbColor: _isSharedMovie
                                       ? Theme.of(context).colorScheme.primary
                                       : Colors.amber,
@@ -688,16 +789,14 @@ Your shared movies will appear in their "Shared with Me" tab.
                                       Theme.of(context).colorScheme.primary,
 
                                   // Track height.
-
                                   trackHeight: 4.0,
 
                                   // Thumb size.
-
                                   thumbShape: const RoundSliderThumbShape(
-                                      enabledThumbRadius: 8.0),
+                                    enabledThumbRadius: 8.0,
+                                  ),
 
                                   // Overlay (when pressed).
-
                                   overlayColor: (_isSharedMovie
                                           ? Theme.of(context)
                                               .colorScheme
@@ -706,7 +805,6 @@ Your shared movies will appear in their "Shared with Me" tab.
                                       .withValues(alpha: 0.2),
 
                                   // Value indicator (tooltip).
-
                                   valueIndicatorColor: _isSharedMovie
                                       ? Theme.of(context).colorScheme.primary
                                       : Colors.amber,
@@ -731,10 +829,11 @@ Your shared movies will appear in their "Shared with Me" tab.
                             ),
                             if (!_isSharedMovie)
                               IconButton(
-                                icon: Icon(Icons.clear,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
+                                icon: Icon(
+                                  Icons.clear,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
                                 onPressed: _personalRating == null
                                     ? null
                                     : () => _updateRating(null),
@@ -751,8 +850,9 @@ Your shared movies will appear in their "Shared with Me" tab.
                             ? 'Shared rating: ${_personalRating!.toStringAsFixed(1)}/10'
                             : 'Your rating: ${_personalRating!.toStringAsFixed(1)}/10'),
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 16),
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 16,
+                    ),
                   ),
                   const SizedBox(height: 16),
 
@@ -818,8 +918,8 @@ Your shared movies will appear in their "Shared with Me" tab.
                             TextField(
                               controller: _commentsController,
                               style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface),
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                               maxLines: 4,
                               readOnly: _isSharedMovie,
                               decoration: InputDecoration(
@@ -827,17 +927,18 @@ Your shared movies will appear in their "Shared with Me" tab.
                                     ? 'No comments shared...'
                                     : 'Add your thoughts about this movie...',
                                 hintStyle: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
                                 filled: true,
                                 fillColor: _isSharedMovie
-                                    ? Theme.of(context)
-                                        .colorScheme
-                                        .surfaceContainerHigh
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .surfaceContainer,
+                                    ? Theme.of(
+                                        context,
+                                      ).colorScheme.surfaceContainerHigh
+                                    : Theme.of(
+                                        context,
+                                      ).colorScheme.surfaceContainer,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   borderSide: BorderSide.none,
@@ -879,9 +980,9 @@ Your shared movies will appear in their "Shared with Me" tab.
                                         backgroundColor: Theme.of(context)
                                             .colorScheme
                                             .primary,
-                                        foregroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary,
+                                        foregroundColor: Theme.of(
+                                          context,
+                                        ).colorScheme.onPrimary,
                                       ),
                                       onPressed: _saveComments,
                                     ),
@@ -894,16 +995,17 @@ Your shared movies will appear in their "Shared with Me" tab.
                                     TextButton.icon(
                                       icon: Icon(
                                         Icons.clear,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
                                       ),
                                       label: Text(
                                         'Clear Comments',
                                         style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface),
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ),
                                       ),
                                       onPressed: _clearComments,
                                     ),
@@ -936,5 +1038,435 @@ Your shared movies will appear in their "Shared with Me" tab.
         ],
       ),
     );
+  }
+}
+
+/// Dialog for adding a movie to custom lists.
+class _AddToCustomListsDialog extends StatefulWidget {
+  final Movie movie;
+  final FavoritesService favoritesService;
+  final List<CustomList> customLists;
+  final VoidCallback onListsUpdated;
+
+  const _AddToCustomListsDialog({
+    required this.movie,
+    required this.favoritesService,
+    required this.customLists,
+    required this.onListsUpdated,
+  });
+
+  @override
+  State<_AddToCustomListsDialog> createState() =>
+      _AddToCustomListsDialogState();
+}
+
+class _AddToCustomListsDialogState extends State<_AddToCustomListsDialog> {
+  final TextEditingController _newListController = TextEditingController();
+  final Set<String> _selectedListIds = {};
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMovieListStatus();
+  }
+
+  @override
+  void dispose() {
+    _newListController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadMovieListStatus() async {
+    for (final list in widget.customLists) {
+      final isInList = await widget.favoritesService.isMovieInCustomList(
+        list.id,
+        widget.movie.id,
+      );
+      if (isInList) {
+        _selectedListIds.add(list.id);
+      }
+    }
+    setState(() {});
+  }
+
+  Future<void> _toggleMovieInList(String listId, bool add) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      if (add) {
+        await widget.favoritesService
+            .addMovieToCustomList(listId, widget.movie);
+        _selectedListIds.add(listId);
+      } else {
+        await widget.favoritesService
+            .removeMovieFromCustomList(listId, widget.movie.id);
+        _selectedListIds.remove(listId);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error updating list: $e')),
+        );
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Container(
+        width: double.maxFinite,
+        constraints: const BoxConstraints(maxHeight: 500),
+        child: Column(
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .primaryContainer
+                    .withValues(alpha: 0.3),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.playlist_add,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Add to Lists',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        Text(
+                          widget.movie.title,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Theme.of(context)
+                          .colorScheme
+                          .surface
+                          .withValues(alpha: 0.8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Lists content
+            Expanded(
+              child: widget.customLists.isNotEmpty
+                  ? ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: widget.customLists.length,
+                      itemBuilder: (context, index) {
+                        final list = widget.customLists[index];
+                        final isSelected = _selectedListIds.contains(list.id);
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: isSelected
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .outline
+                                      .withValues(alpha: 0.2),
+                              width: isSelected ? 2 : 1,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            color: isSelected
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer
+                                    .withValues(alpha: 0.1)
+                                : null,
+                          ),
+                          child: CheckboxListTile(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            secondary: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Theme.of(context).colorScheme.primary,
+                                    Theme.of(context).colorScheme.secondary,
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  list.name.isNotEmpty
+                                      ? list.name[0].toUpperCase()
+                                      : 'L',
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            title: Text(
+                              list.name,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                            subtitle: Row(
+                              children: [
+                                Icon(
+                                  Icons.movie,
+                                  size: 14,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${list.movieCount} movies',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            value: isSelected,
+                            activeColor: Theme.of(context).colorScheme.primary,
+                            onChanged: _isLoading
+                                ? null
+                                : (value) =>
+                                    _toggleMovieInList(list.id, value ?? false),
+                          ),
+                        );
+                      },
+                    )
+                  : _buildEmptyListsState(),
+            ),
+
+            // Create new list button
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHighest
+                    .withValues(alpha: 0.3),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                ),
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _isLoading ? null : _showCreateNewListDialog,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Create New List'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    foregroundColor:
+                        Theme.of(context).colorScheme.onPrimaryContainer,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyListsState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.playlist_add_outlined,
+              size: 64,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurfaceVariant
+                  .withValues(alpha: 0.6),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No Custom Lists Yet',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Create your first custom list to organize your movies!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showCreateNewListDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Create New List'),
+        content: TextField(
+          controller: _newListController,
+          decoration: const InputDecoration(
+            labelText: 'List Name',
+            hintText: 'Enter a name for your list...',
+            border: OutlineInputBorder(),
+          ),
+          autofocus: true,
+          onSubmitted: (_) => _createNewListAndAdd(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: _createNewListAndAdd,
+            child: const Text('Create & Add'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _createNewListAndAdd() async {
+    final name = _newListController.text.trim();
+    if (name.isEmpty) return;
+
+    Navigator.pop(context); // Close create dialog
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final newList = await widget.favoritesService.createCustomList(name);
+      await widget.favoritesService
+          .addMovieToCustomList(newList.id, widget.movie);
+      _selectedListIds.add(newList.id);
+      _newListController.clear();
+      widget.onListsUpdated();
+
+      if (mounted) {
+        Navigator.pop(context); // Close main dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(
+                  Icons.check_circle_outline,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Created "$name" and added "${widget.movie.title}"',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            margin: const EdgeInsets.all(16),
+            elevation: 6,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error creating list: $e')),
+        );
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }

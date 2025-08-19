@@ -1,6 +1,6 @@
 /// Quick actions dialog for movie cards on hover.
 ///
-// Time-stamp: <Thursday 2025-01-19 12:00:00 +1000 Claude>
+// Time-stamp: <Monday 2025-08-18 10:00:00 +1000 Ashley Tang>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -108,12 +108,15 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
 
   Future<void> _loadMovieStatus() async {
     try {
-      final isInToWatch =
-          await widget.favoritesService.isInToWatch(widget.movie);
-      final isInWatched =
-          await widget.favoritesService.isInWatched(widget.movie);
-      final rating =
-          await widget.favoritesService.getPersonalRating(widget.movie);
+      final isInToWatch = await widget.favoritesService.isInToWatch(
+        widget.movie,
+      );
+      final isInWatched = await widget.favoritesService.isInWatched(
+        widget.movie,
+      );
+      final rating = await widget.favoritesService.getPersonalRating(
+        widget.movie,
+      );
       final hasFile = await widget.favoritesService.hasMovieFile(widget.movie);
 
       if (mounted) {
@@ -280,8 +283,9 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
         backgroundColor: Theme.of(context).colorScheme.errorContainer,
         title: Text(
           'Cannot Share Movie',
-          style:
-              TextStyle(color: Theme.of(context).colorScheme.onErrorContainer),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onErrorContainer,
+          ),
         ),
         content: Text(
           message,
@@ -292,7 +296,9 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'OK',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
           ),
         ],
@@ -321,8 +327,9 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
               ),
             ],
             border: Border.all(
-              color:
-                  Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.2),
             ),
           ),
           child: _isLoading
@@ -338,24 +345,22 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title.
-
                     Text(
                       widget.movie.title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 12),
 
                     // Quick action buttons.
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         // Bookmark (To Watch).
-
                         _buildActionButton(
                           icon: _isInToWatch
                               ? Icons.bookmark
@@ -370,7 +375,6 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                         ),
 
                         // Watched.
-
                         _buildActionButton(
                           icon: _isInWatched
                               ? Icons.check_circle
@@ -385,7 +389,6 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                         ),
 
                         // Share button (only if movie has rating/comment and POD is enabled).
-
                         if (_hasMovieFile &&
                             widget.favoritesService
                                 is FavoritesServiceAdapter &&
@@ -415,9 +418,10 @@ Your shared movies will appear in their "Shared with Me" tab.
                     // Rating section
                     Text(
                       'Your Rating',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelMedium
+                          ?.copyWith(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 8),
 
@@ -432,8 +436,11 @@ Your shared movies will appear in their "Shared with Me" tab.
                               thumbColor: Colors.amber,
                               trackHeight: 3.0,
                               thumbShape: const RoundSliderThumbShape(
-                                  enabledThumbRadius: 6.0),
-                              overlayColor: Colors.amber.withValues(alpha: 0.2),
+                                enabledThumbRadius: 6.0,
+                              ),
+                              overlayColor: Colors.amber.withValues(
+                                alpha: 0.2,
+                              ),
                               valueIndicatorColor: Colors.amber,
                               valueIndicatorTextStyle: TextStyle(
                                 color: Theme.of(context).colorScheme.onPrimary,
@@ -471,10 +478,9 @@ Your shared movies will appear in their "Shared with Me" tab.
                           ? 'No rating yet'
                           : '${_personalRating!.toStringAsFixed(1)}/10',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
                           ),
                     ),
                   ],

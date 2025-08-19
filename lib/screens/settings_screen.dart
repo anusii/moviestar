@@ -568,9 +568,11 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                 CircleAvatar(
                   radius: 50,
                   backgroundColor: Theme.of(context).colorScheme.secondary,
-                  child: Icon(Icons.person,
-                      size: 50,
-                      color: Theme.of(context).colorScheme.onSecondary),
+                  child: Icon(
+                    Icons.person,
+                    size: 50,
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
                 ),
                 Positioned(
                   bottom: 0,
@@ -610,10 +612,9 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                       Expanded(
                         child: Text(
                           'Required to fetch movie data and images',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontSize: 12),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(fontSize: 12),
                         ),
                       ),
                       if (widget.fromApiKeyPrompt)
@@ -648,12 +649,12 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                         fillColor:
                             Theme.of(context).inputDecorationTheme.fillColor,
                         border: Theme.of(context).inputDecorationTheme.border,
-                        enabledBorder: Theme.of(context)
-                            .inputDecorationTheme
-                            .enabledBorder,
-                        focusedBorder: Theme.of(context)
-                            .inputDecorationTheme
-                            .focusedBorder,
+                        enabledBorder: Theme.of(
+                          context,
+                        ).inputDecorationTheme.enabledBorder,
+                        focusedBorder: Theme.of(
+                          context,
+                        ).inputDecorationTheme.focusedBorder,
                         suffixIcon: IconButton(
                           icon: Icon(
                             _isApiKeyVisible
@@ -906,14 +907,13 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                                     ),
                                     Text(
                                       'Updated ${_getTimeAgo(stat['age'] as Duration)} ago',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyMedium
-                                                  ?.color),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium?.color,
+                                          ),
                                     ),
                                   ],
                                 ),

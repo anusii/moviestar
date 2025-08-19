@@ -321,9 +321,7 @@ final upcomingMoviesProvider = FutureProvider.autoDispose<List<Movie>>((
 /// Provider for cache statistics.
 
 final cacheStatsProvider =
-    FutureProvider<Map<CacheCategory, Map<String, dynamic>>>((
-  ref,
-) async {
+    FutureProvider<Map<CacheCategory, Map<String, dynamic>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
   return await cachedService.getCacheStats();
 });

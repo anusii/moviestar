@@ -61,8 +61,11 @@ class MovieListService {
 
   /// Creates a new MovieList with the given name and movies.
 
-  Future<String?> createMovieList(String listName,
-      {List<Movie>? movies, String? description}) async {
+  Future<String?> createMovieList(
+    String listName, {
+    List<Movie>? movies,
+    String? description,
+  }) async {
     try {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
@@ -110,8 +113,9 @@ class MovieListService {
 
         // Add to user profile.
 
-        final profileUpdated =
-            await _userProfileService.addMovieListToProfile(movieListId);
+        final profileUpdated = await _userProfileService.addMovieListToProfile(
+          movieListId,
+        );
         if (!profileUpdated) {
           debugPrint('❌ Failed to add movie list to user profile');
         }
@@ -129,8 +133,10 @@ class MovieListService {
 
   /// Gets a MovieList by ID and loads full movie data for each movie reference.
 
-  Future<Map<String, dynamic>?> getMovieList(String movieListId,
-      {bool forceRefresh = false}) async {
+  Future<Map<String, dynamic>?> getMovieList(
+    String movieListId, {
+    bool forceRefresh = false,
+  }) async {
     try {
       // Force refresh bypasses cache.
 
@@ -158,8 +164,11 @@ class MovieListService {
         final filePath = _getMovieListFilePath(movieListId);
 
         if (!_context.mounted) return null;
-        final result =
-            await readPod('moviestar/data/$filePath', _context, _child);
+        final result = await readPod(
+          'moviestar/data/$filePath',
+          _context,
+          _child,
+        );
 
         if (result.isNotEmpty) {
           // Parse the MovieList data using TurtleSerializer.
@@ -177,8 +186,9 @@ class MovieListService {
               try {
                 // Try to load full movie data from individual movie file.
 
-                final fullMovieData =
-                    await _loadFullMovieData(placeholderMovie.id);
+                final fullMovieData = await _loadFullMovieData(
+                  placeholderMovie.id,
+                );
                 if (fullMovieData != null) {
                   fullMovies.add(fullMovieData);
                 } else {
@@ -189,7 +199,8 @@ class MovieListService {
                 }
               } catch (e) {
                 debugPrint(
-                    '❌ Failed to load full data for movie ${placeholderMovie.id}: $e');
+                  '❌ Failed to load full data for movie ${placeholderMovie.id}: $e',
+                );
                 // Keep placeholder as fallback.
 
                 fullMovies.add(placeholderMovie);
@@ -259,7 +270,9 @@ class MovieListService {
   /// This is more efficient than relying on potentially stale profile data.
 
   Future<String?> _findExistingMovieListInDirectory(
-      String listType, String displayName) async {
+    String listType,
+    String displayName,
+  ) async {
     try {
       // Get the list of resources in the user_lists directory.
 
@@ -281,8 +294,11 @@ class MovieListService {
             final filePath = 'user_lists/$fileName';
             if (!_context.mounted) return null;
 
-            final result =
-                await readPod('moviestar/data/$filePath', _context, _child);
+            final result = await readPod(
+              'moviestar/data/$filePath',
+              _context,
+              _child,
+            );
 
             if (result.isNotEmpty) {
               // Check for the specific sdo:name and sdo:description patterns.
@@ -432,7 +448,8 @@ class MovieListService {
         debugPrint('✅ Created individual movie file for ${movie.title}');
       } else {
         debugPrint(
-            '❌ Failed to create individual movie file for ${movie.title}');
+          '❌ Failed to create individual movie file for ${movie.title}',
+        );
       }
     } catch (e) {
       debugPrint('❌ Error creating movie file for ${movie.title}: $e');
@@ -507,14 +524,18 @@ class MovieListService {
       final displayName = listType
           .replaceAll('_', ' ')
           .split(' ')
-          .map((word) =>
-              word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1))
+          .map(
+            (word) =>
+                word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1),
+          )
           .join(' ');
 
       // Scan the user_lists directory for existing MovieLists instead of relying on profile data.
 
-      final existingMovieListId =
-          await _findExistingMovieListInDirectory(listType, displayName);
+      final existingMovieListId = await _findExistingMovieListInDirectory(
+        listType,
+        displayName,
+      );
       if (existingMovieListId != null) {
         return existingMovieListId;
       }
@@ -688,6 +709,75 @@ class MovieListService {
     }
   }
 
+  /// Shares a MovieList and all its associated movie files with another user.
+  /// This is a comprehensive sharing method that ensures the recipient
+  /// can access both the list structure and all individual movie data.
+  ///
+  /// [listId] - The ID of the MovieList to share.
+  /// [permissions] - List of permissions (e.g., ['read', 'write']).
+  /// [customTitle] - Optional custom title for the sharing dialog.
+  ///
+  /// Returns true if the sharing was successful.
+
+  Future<bool> shareMovieListWithMovies(
+    String listId,
+    List<String> permissions, {
+    String? customTitle,
+  }) async {
+    try {
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        debugPrint('❌ User not logged in, cannot share movie list with movies');
+        return false;
+      }
+
+      // Get the movie list data.
+
+      final movieList = await getMovieList(listId);
+      if (movieList == null) {
+        debugPrint('❌ MovieList $listId not found, cannot share');
+        return false;
+      }
+
+      final listName = movieList['name'] ?? 'Movie List';
+
+      if (!_context.mounted) return false;
+
+      // Navigate directly to GrantPermissionUi for sharing
+      final result = await Navigator.push<bool>(
+        _context,
+        MaterialPageRoute(
+          fullscreenDialog: true,
+          builder: (navContext) => Theme(
+            data: Theme.of(_context),
+            child: Scaffold(
+              backgroundColor: Theme.of(_context).scaffoldBackgroundColor,
+              appBar: AppBar(
+                title: Text('Share "$listName"'),
+                backgroundColor: Theme.of(_context).appBarTheme.backgroundColor,
+                foregroundColor: Theme.of(_context).appBarTheme.foregroundColor,
+              ),
+              body: GrantPermissionUi(
+                fileName: 'user_lists/MovieList-$listId.ttl',
+                title: '',
+                accessModeList: const ['read'],
+                recipientTypeList: const ['indi'],
+                showAppBar: false,
+                backgroundColor: Theme.of(_context).scaffoldBackgroundColor,
+                child: _child,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      return result ?? false;
+    } catch (e) {
+      debugPrint('❌ Failed to share movie list with movies: $e');
+      return false;
+    }
+  }
+
   /// Gets movie lists that have been shared with the current user.
   ///
   /// Returns a list of SharedMovieList objects representing lists shared with the user.
@@ -728,14 +818,18 @@ class MovieListService {
 
             // Read the MovieList file content.
 
-            final listContent =
-                await readExternalPod(resourceUrl, _context, _child);
+            final listContent = await readExternalPod(
+              resourceUrl,
+              _context,
+              _child,
+            );
 
             if (listContent != null && listContent.isNotEmpty) {
               // Parse the TTL content.
 
-              final parsedList =
-                  TurtleSerializer.movieListFromTurtle(listContent);
+              final parsedList = TurtleSerializer.movieListFromTurtle(
+                listContent,
+              );
 
               if (parsedList != null) {
                 final sharedMovieList = SharedMovieList.fromMap(resourceUrl, {
@@ -792,8 +886,9 @@ class MovieListService {
 
         // Extract list ID from filename.
 
-        final listIdMatch =
-            RegExp(r'MovieList-(\w+)\.ttl').firstMatch(fileName);
+        final listIdMatch = RegExp(
+          r'MovieList-(\w+)\.ttl',
+        ).firstMatch(fileName);
         if (listIdMatch == null) continue;
 
         final listId = listIdMatch.group(1)!;
@@ -851,12 +946,14 @@ class MovieListService {
 
       // Get current sharing metadata.
 
-      final sharedWith =
-          Map<String, String>.from(movieList['sharedWith'] ?? {});
+      final sharedWith = Map<String, String>.from(
+        movieList['sharedWith'] ?? {},
+      );
 
       if (!sharedWith.containsKey(webId)) {
         debugPrint(
-            '⚠️ WebId $webId not found in shared users for list $listId');
+          '⚠️ WebId $webId not found in shared users for list $listId',
+        );
         return true; // Already not shared with this user.
       }
 
@@ -940,7 +1037,9 @@ class MovieListService {
   /// Checks if the current user can perform a specific operation on a MovieList.
 
   Future<bool> canUserPerformOperation(
-      String listId, MovieListOperation operation) async {
+    String listId,
+    MovieListOperation operation,
+  ) async {
     try {
       final currentWebId = await getWebId();
       if (currentWebId == null) return false;

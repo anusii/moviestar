@@ -261,7 +261,8 @@ class HiveMovieCacheService {
       );
     } catch (e) {
       debugPrint(
-          'Error getting movies with cache info for ${category.value}: $e');
+        'Error getting movies with cache info for ${category.value}: $e',
+      );
       return null;
     }
   }

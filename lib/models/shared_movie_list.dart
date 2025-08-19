@@ -59,7 +59,9 @@ class SharedMovieList {
   /// Creates a SharedMovieList from a `Map<String, dynamic>` (for migration).
 
   factory SharedMovieList.fromMap(
-      String resourceUrl, Map<String, dynamic> map) {
+    String resourceUrl,
+    Map<String, dynamic> map,
+  ) {
     return SharedMovieList(
       id: map['id'] ?? '',
       name: map['name'] ?? 'Unknown List',

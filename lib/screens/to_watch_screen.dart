@@ -28,10 +28,17 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:markdown_tooltip/markdown_tooltip.dart';
+import 'package:solidpod/solidpod.dart';
 
 import '../models/movie.dart';
 import '../services/favorites_service.dart';
+import '../services/favorites_service_adapter.dart';
+import '../services/movie_list_service.dart';
+import '../services/user_profile_service.dart';
 import '../utils/movie_sort_util.dart';
+import '../utils/turtle_serializer.dart';
+import '../widgets/moviestar_batch_sharing_ui.dart';
 import '../widgets/sort_controls.dart';
 import 'movie_details_screen.dart';
 
@@ -63,8 +70,50 @@ class _ToWatchScreenState extends State<ToWatchScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        title: Text('To Watch',
-            style: Theme.of(context).appBarTheme.titleTextStyle),
+        title: Text(
+          'To Watch',
+          style: Theme.of(context).appBarTheme.titleTextStyle,
+        ),
+        actions: [
+          StreamBuilder<List<Movie>>(
+            stream: widget.favoritesService.toWatchMovies,
+            builder: (context, snapshot) {
+              final hasMovies = snapshot.hasData && snapshot.data!.isNotEmpty;
+              final isPodEnabled =
+                  widget.favoritesService is FavoritesServiceAdapter &&
+                      (widget.favoritesService as FavoritesServiceAdapter)
+                          .isPodStorageEnabled;
+
+              return Padding(
+                padding: const EdgeInsets.only(
+                  right: 60.0,
+                ), // Add space to avoid debug banner
+                child: MarkdownTooltip(
+                  message: '''
+
+**📤 Share To-Watch List**
+
+Share your **to-watch movies list** with others through your POD.
+
+Recipients will be able to:
+- View your list of movies to watch
+- See movie details and ratings
+- Access through secure POD sharing
+
+*Requires POD storage to be enabled*
+
+                  ''',
+                  child: IconButton(
+                    icon: const Icon(Icons.share),
+                    onPressed: (hasMovies && isPodEnabled)
+                        ? () => _shareToWatchList(context, snapshot.data!)
+                        : null,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -84,10 +133,9 @@ class _ToWatchScreenState extends State<ToWatchScreen> {
                   return Center(
                     child: Text(
                       'Error: ${snapshot.error}',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(color: Colors.red),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyLarge?.copyWith(color: Colors.red),
                     ),
                   );
                 }
@@ -163,5 +211,133 @@ class _ToWatchScreenState extends State<ToWatchScreen> {
         ],
       ),
     );
+  }
+
+  // Shares the to-watch movies list using batch sharing UI.
+
+  Future<void> _shareToWatchList(
+    BuildContext context,
+    List<Movie> movies,
+  ) async {
+    if (movies.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No movies to share')));
+      return;
+    }
+
+    // Store context references before async operations.
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final theme = Theme.of(context);
+
+    try {
+      // Create MovieList service to create the list file first
+      final userProfileService = UserProfileService(context, widget);
+      final movieListService = MovieListService(
+        context,
+        widget,
+        userProfileService,
+      );
+
+      // Create the MovieList TTL file
+      final listId = await movieListService.createMovieList(
+        'To Watch Movies',
+        movies: movies,
+        description: 'Movies you want to watch',
+      );
+
+      if (!mounted) return;
+
+      if (listId == null) {
+        if (mounted) {
+          scaffoldMessenger.showSnackBar(
+            const SnackBar(content: Text('Failed to create movie list')),
+          );
+        }
+        return;
+      }
+
+      // Ensure all individual movie files exist before sharing.
+      for (final movie in movies) {
+        try {
+          await _createMovieFileIfNotExists(movie);
+        } catch (e) {
+          // Continue with other movies - the batch UI will handle individual failures.
+        }
+        if (!mounted) return;
+      }
+
+      // Navigate to the batch sharing UI.
+      if (mounted) {
+        await navigator.push<bool>(
+          MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (context) => MovieStarBatchSharingUi(
+              listId: listId,
+              listName: 'To Watch Movies',
+              movies: movies,
+              backgroundColor: theme.scaffoldBackgroundColor,
+              onSharingComplete: () {
+                // Handle completion callback.
+              },
+              child: widget,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        scaffoldMessenger
+            .showSnackBar(SnackBar(content: Text('Error sharing list: $e')));
+      }
+    }
+  }
+
+  // Creates a movie file if it doesn't exist (needed before sharing).
+
+  Future<void> _createMovieFileIfNotExists(Movie movie) async {
+    try {
+      final movieFileName = 'movies/Movie-${movie.id}.ttl';
+
+      // Check if the file already exists.
+      try {
+        if (!mounted) return;
+        final existingContent = await readPod(movieFileName, context, widget);
+        if (existingContent.isNotEmpty) {
+          return;
+        }
+      } catch (e) {
+        // File doesn't exist, we'll create it.
+      }
+
+      // Get current rating and comments from favorites service.
+      final adapter = widget.favoritesService as FavoritesServiceAdapter;
+      final currentRating = await adapter.getPersonalRating(movie);
+      final currentComments = await adapter.getMovieComments(movie);
+
+      // Create the movie TTL content with any existing user data.
+      final ttlContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
+        movie,
+        currentRating,
+        currentComments,
+      );
+
+      // Write the movie file to POD.
+      if (!mounted) return;
+      final result = await writePod(
+        movieFileName,
+        ttlContent,
+        context,
+        widget,
+        encrypted: false,
+      );
+
+      if (result != SolidFunctionCallStatus.success) {
+        throw Exception('Failed to write movie file to POD');
+      }
+    } catch (e) {
+      rethrow;
+    }
   }
 }

@@ -32,6 +32,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/theme_provider.dart';
@@ -60,6 +61,7 @@ void main() async {
   // Register Hive type adapters.
 
   Hive.registerAdapter(MovieAdapter());
+  Hive.registerAdapter(CustomListAdapter());
 
   // Globally remove [debugPrint] messages.
 
@@ -81,11 +83,9 @@ void main() async {
       // apps on the desktop so that it is visible (otherwise, with GNOME on
       // Ubuntu the app is often lost below other windows on startup).
       // We later turn it off as we don't want to force it always on top.
-
       alwaysOnTop: true,
 
       // The [title] is used for the window manager's window title.
-
       title: 'Movie Star - Manage and share ratings through private PODs',
     );
 

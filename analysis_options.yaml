@@ -25,6 +25,3 @@ linter:
      # Only until we stop using solidpod/src files!!!
      implementation_imports: false
 
-
-
-

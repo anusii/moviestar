@@ -150,8 +150,9 @@ class _ShareListDialogState extends State<ShareListDialog> {
 
     try {
       // Check if the movie list can be shared
-      final canShare =
-          await widget.movieListService.canShareMovieList(widget.listId);
+      final canShare = await widget.movieListService.canShareMovieList(
+        widget.listId,
+      );
       if (!canShare) {
         setState(() {
           _errorMessage = 'Movie list not found or cannot be shared';
@@ -161,8 +162,9 @@ class _ShareListDialogState extends State<ShareListDialog> {
       }
 
       // Get the file path for sharing
-      final filePath =
-          widget.movieListService.getMovieListFilePath(widget.listId);
+      final filePath = widget.movieListService.getMovieListFilePath(
+        widget.listId,
+      );
       if (filePath == null) {
         setState(() {
           _errorMessage = 'Unable to get file path for sharing';
@@ -253,9 +255,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
               Expanded(
                 child: Text(
                   'Failed to load list data',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ),
             ],
@@ -281,10 +281,9 @@ class _ShareListDialogState extends State<ShareListDialog> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -300,22 +299,22 @@ class _ShareListDialogState extends State<ShareListDialog> {
                     children: [
                       Text(
                         listName,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       if (description != null && description.isNotEmpty) ...[
                         const SizedBox(height: 4),
                         Text(
                           description,
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.7),
-                                  ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.7),
+                              ),
                         ),
                       ],
                     ],
@@ -355,37 +354,37 @@ class _ShareListDialogState extends State<ShareListDialog> {
                 'Movies:',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w500,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.7),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
               ),
               const SizedBox(height: 8),
-              ...movies.map((movie) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.circle,
-                          size: 6,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.5),
+              ...movies.map(
+                (movie) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.circle,
+                        size: 6,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          movie.title,
+                          style: Theme.of(context).textTheme.bodySmall,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            movie.title,
-                            style: Theme.of(context).textTheme.bodySmall,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ],
         ),
@@ -400,16 +399,17 @@ class _ShareListDialogState extends State<ShareListDialog> {
       children: [
         Text(
           'Permission Level',
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color:
-                  Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.5),
             ),
             borderRadius: BorderRadius.circular(8),
           ),
@@ -426,10 +426,9 @@ class _ShareListDialogState extends State<ShareListDialog> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withValues(alpha: 0.1)
+                        ? Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.1)
                         : null,
                     borderRadius:
                         permission == SharePermissionLevel.values.first
@@ -464,25 +463,25 @@ class _ShareListDialogState extends State<ShareListDialog> {
                           children: [
                             Text(
                               permission.displayName,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.copyWith(
                                     fontWeight: isSelected
                                         ? FontWeight.w600
                                         : FontWeight.w500,
                                     color: isSelected
-                                        ? Theme.of(context).colorScheme.primary
+                                        ? Theme.of(
+                                            context,
+                                          ).colorScheme.primary
                                         : null,
                                   ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               permission.description,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(
                                     color: Theme.of(context)
                                         .colorScheme
                                         .onSurface
@@ -508,9 +507,9 @@ class _ShareListDialogState extends State<ShareListDialog> {
     return AlertDialog(
       title: Text(
         'Share Movie List',
-        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
       ),
       content: SizedBox(
         width: double.maxFinite,
@@ -526,9 +525,9 @@ class _ShareListDialogState extends State<ShareListDialog> {
             // WebID Input
             Text(
               'Recipient WebID',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 8),
             TextField(
@@ -575,10 +574,9 @@ class _ShareListDialogState extends State<ShareListDialog> {
           child: Text(
             'Cancel',
             style: TextStyle(
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.7),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
         ),

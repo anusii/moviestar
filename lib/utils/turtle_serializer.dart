@@ -40,10 +40,12 @@ import 'package:moviestar/models/movie.dart';
 class TurtleSerializer {
   // Define namespaces based on the ontology design.
 
-  static final moviestarOntoNS =
-      Namespace(ns: 'https://sii.anu.edu.au/onto/moviestar#');
-  static final moviestarDataNS =
-      Namespace(ns: 'https://sii.anu.edu.au/data/moviestar/');
+  static final moviestarOntoNS = Namespace(
+    ns: 'https://sii.anu.edu.au/onto/moviestar#',
+  );
+  static final moviestarDataNS = Namespace(
+    ns: 'https://sii.anu.edu.au/data/moviestar/',
+  );
   static final movieNS = Namespace(ns: 'http://schema.org/');
   static final xsdNS = Namespace(ns: 'http://www.w3.org/2001/XMLSchema#');
   static final rdfsNS = Namespace(ns: 'http://www.w3.org/2000/01/rdf-schema#');
@@ -82,8 +84,9 @@ class TurtleSerializer {
   static final aggregateRating = movieNS.withAttr('aggregateRating');
   static final datePublished = movieNS.withAttr('datePublished');
   static final genre = movieNS.withAttr('genre');
-  static final contentRating =
-      movieNS.withAttr('contentRating'); // Changed to sdo: prefix
+  static final contentRating = movieNS.withAttr(
+    'contentRating',
+  ); // Changed to sdo: prefix
   static final comment = movieNS.withAttr('comment'); // Changed to sdo: prefix
   static final keyValue = moviestarOntoNS.withAttr('keyValue');
   static final source = moviestarOntoNS.withAttr('source');
@@ -240,7 +243,10 @@ class TurtleSerializer {
   /// This creates a unified file containing both movie metadata and user's personal data.
 
   static String movieWithUserDataToTurtle(
-      Movie movie, double? rating, String? comment) {
+    Movie movie,
+    double? rating,
+    String? comment,
+  ) {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
     // Create the movie resource with all movie metadata.
@@ -254,8 +260,10 @@ class TurtleSerializer {
       image: Literal(_escapeString(movie.posterUrl)),
       thumbnailUrl: Literal(_escapeString(movie.backdropUrl)),
       aggregateRating: Literal('${movie.voteAverage}', datatype: XSD.double),
-      datePublished:
-          Literal(movie.releaseDate.toIso8601String(), datatype: XSD.dateTime),
+      datePublished: Literal(
+        movie.releaseDate.toIso8601String(),
+        datatype: XSD.dateTime,
+      ),
       genre: Literal(movie.genreIds.join(',')),
     };
 
@@ -298,13 +306,12 @@ class TurtleSerializer {
     // Add JSON backup for compatibility.
 
     final movieJson = jsonEncode(movie.toJson());
-    final userDataJson = jsonEncode({
-      'rating': rating,
-      'comment': comment,
-    });
+    final userDataJson = jsonEncode({'rating': rating, 'comment': comment});
 
-    final ttlContent =
-        tripleMapToTurtle(triples, bindNamespaces: bindNamespaces);
+    final ttlContent = tripleMapToTurtle(
+      triples,
+      bindNamespaces: bindNamespaces,
+    );
     final withJsonBackup =
         '$ttlContent\n\n# JSON_MOVIE_DATA: $movieJson\n# JSON_USER_DATA: $userDataJson';
 
@@ -622,15 +629,18 @@ class TurtleSerializer {
     // Add API key if provided.
 
     if (apiKey != null && apiKey.isNotEmpty) {
-      triples[userResource]![hasApiKey] =
-          moviestarDataNS.withAttr('ApiKey-$apiKey');
+      triples[userResource]![hasApiKey] = moviestarDataNS.withAttr(
+        'ApiKey-$apiKey',
+      );
     }
 
     // Add DOB if provided.
 
     if (dobString != null && dobString.isNotEmpty) {
-      triples[userResource]![dob] =
-          Literal(dobString, datatype: xsdNS.withAttr('date'));
+      triples[userResource]![dob] = Literal(
+        dobString,
+        datatype: xsdNS.withAttr('date'),
+      );
     }
 
     // Add gender if provided.
@@ -666,16 +676,19 @@ class TurtleSerializer {
 
     // Create the MovieList resource.
 
-    final movieListResource =
-        moviestarDataNS.withAttr('MovieList-$movieListId');
+    final movieListResource = moviestarDataNS.withAttr(
+      'MovieList-$movieListId',
+    );
     triples[movieListResource] = {
       rdfType: [owlNS.withAttr('NamedIndividual'), movieListType],
       TurtleSerializer.identifier: Literal(movieListId),
       TurtleSerializer.name: Literal(_escapeAndSanitizeString(listName)),
       TurtleSerializer.description: Literal(
-          _escapeAndSanitizeString(description ?? 'List of movies: $listName')),
-      rdfsLabel:
-          Literal('|filePath=moviestar/data/MovieList-$movieListId.ttl|'),
+        _escapeAndSanitizeString(description ?? 'List of movies: $listName'),
+      ),
+      rdfsLabel: Literal(
+        '|filePath=moviestar/data/MovieList-$movieListId.ttl|',
+      ),
     };
 
     // Add sharing metadata if provided.
@@ -691,16 +704,20 @@ class TurtleSerializer {
       // Add permissions as JSON string for flexibility.
 
       final permissionsJson = jsonEncode(sharedWith);
-      triples[movieListResource]![moviestarOntoNS.withAttr('permissions')] =
-          Literal(permissionsJson);
+      triples[movieListResource]![moviestarOntoNS.withAttr(
+        'permissions',
+      )] = Literal(permissionsJson);
     }
 
     // Add shared date if provided.
 
     if (sharedDate != null) {
-      triples[movieListResource]![moviestarOntoNS.withAttr('sharedDate')] =
-          Literal(sharedDate.toIso8601String(),
-              datatype: xsdNS.withAttr('dateTime'));
+      triples[movieListResource]![moviestarOntoNS.withAttr(
+        'sharedDate',
+      )] = Literal(
+        sharedDate.toIso8601String(),
+        datatype: xsdNS.withAttr('dateTime'),
+      );
     }
 
     // Add movie references (not full movie data) if provided.
@@ -719,8 +736,9 @@ class TurtleSerializer {
         triples[movieResource] = {
           rdfType: [owlNS.withAttr('NamedIndividual'), movieType],
           filePath: Literal('moviestar/data/movies/Movie-${movie.id}.ttl'),
-          rdfsLabel:
-              Literal('|filePath=moviestar/data/movies/Movie-${movie.id}.ttl|'),
+          rdfsLabel: Literal(
+            '|filePath=moviestar/data/movies/Movie-${movie.id}.ttl|',
+          ),
         };
       }
     }
@@ -733,7 +751,10 @@ class TurtleSerializer {
   /// Updates a single movie with user's personal rating and comment following the ontology structure.
 
   static String movieWithUserDataToTurtleOntology(
-      Movie movie, double? rating, String? comment) {
+    Movie movie,
+    double? rating,
+    String? comment,
+  ) {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
     // Create the movie resource with all movie metadata.
@@ -741,18 +762,28 @@ class TurtleSerializer {
     final movieResource = moviestarDataNS.withAttr('movie-${movie.id}');
     triples[movieResource] = {
       rdfType: [owlNS.withAttr('NamedIndividual'), movieType],
-      identifier:
-          Literal('${movie.id}', datatype: xsdNS.withAttr('positiveInteger')),
+      identifier: Literal(
+        '${movie.id}',
+        datatype: xsdNS.withAttr('positiveInteger'),
+      ),
       name: Literal(_escapeAndSanitizeString(movie.title)),
       description: Literal(_escapeAndSanitizeString(movie.overview)),
-      image: Literal(_escapeAndSanitizeString(movie.posterUrl),
-          datatype: xsdNS.withAttr('anyURI')),
-      thumbnailUrl: Literal(_escapeAndSanitizeString(movie.backdropUrl),
-          datatype: xsdNS.withAttr('anyURI')),
-      aggregateRating:
-          Literal('${movie.voteAverage}', datatype: xsdNS.withAttr('double')),
-      datePublished: Literal(movie.releaseDate.toIso8601String(),
-          datatype: xsdNS.withAttr('date')),
+      image: Literal(
+        _escapeAndSanitizeString(movie.posterUrl),
+        datatype: xsdNS.withAttr('anyURI'),
+      ),
+      thumbnailUrl: Literal(
+        _escapeAndSanitizeString(movie.backdropUrl),
+        datatype: xsdNS.withAttr('anyURI'),
+      ),
+      aggregateRating: Literal(
+        '${movie.voteAverage}',
+        datatype: xsdNS.withAttr('double'),
+      ),
+      datePublished: Literal(
+        movie.releaseDate.toIso8601String(),
+        datatype: xsdNS.withAttr('date'),
+      ),
       genre: Literal(movie.genreIds.join(',')),
       rdfsLabel: Literal('|name=${_escapeAndSanitizeString(movie.title)}|'),
     };
@@ -760,27 +791,29 @@ class TurtleSerializer {
     // Add user's personal rating if it exists.
 
     if (rating != null) {
-      triples[movieResource]![contentRating] =
-          Literal('$rating', datatype: xsdNS.withAttr('double'));
+      triples[movieResource]![contentRating] = Literal(
+        '$rating',
+        datatype: xsdNS.withAttr('double'),
+      );
     }
 
     // Add user's personal comment if it exists.
 
     if (comment != null && comment.isNotEmpty) {
-      triples[movieResource]![TurtleSerializer.comment] =
-          Literal(_escapeAndSanitizeString(comment));
+      triples[movieResource]![TurtleSerializer.comment] = Literal(
+        _escapeAndSanitizeString(comment),
+      );
     }
 
     // Add JSON backup for compatibility.
     final movieJson = jsonEncode(movie.toJson());
-    final userDataJson = jsonEncode({
-      'rating': rating,
-      'comment': comment,
-    });
+    final userDataJson = jsonEncode({'rating': rating, 'comment': comment});
 
     // Use ontology-compliant namespace bindings.
-    final ttlContent =
-        tripleMapToTurtle(triples, bindNamespaces: _getOntologyNamespaces());
+    final ttlContent = tripleMapToTurtle(
+      triples,
+      bindNamespaces: _getOntologyNamespaces(),
+    );
     final withJsonBackup =
         '$ttlContent\n\n# JSON_MOVIE_DATA: $movieJson\n# JSON_USER_DATA: $userDataJson';
 
@@ -845,9 +878,11 @@ class TurtleSerializer {
 
         // Check for MovieList.
 
-        final isMovieList = typeValues.any((type) =>
-            type.toString().contains('MovieList') ||
-            type == 'https://sii.anu.edu.au/onto/moviestar#MovieList');
+        final isMovieList = typeValues.any(
+          (type) =>
+              type.toString().contains('MovieList') ||
+              type == 'https://sii.anu.edu.au/onto/moviestar#MovieList',
+        );
 
         if (isMovieList) {
           // Extract MovieList metadata.
@@ -881,8 +916,9 @@ class TurtleSerializer {
                 try {
                   final permissionsMap =
                       jsonDecode(value) as Map<String, dynamic>;
-                  sharedWith = permissionsMap
-                      .map((key, value) => MapEntry(key, value.toString()));
+                  sharedWith = permissionsMap.map(
+                    (key, value) => MapEntry(key, value.toString()),
+                  );
                 } catch (e) {
                   debugPrint('⚠️ Failed to parse permissions JSON: $e');
                 }
@@ -901,8 +937,9 @@ class TurtleSerializer {
                   final movieRefStr = movieRef.toString();
                   // Extract movie ID from resource URI like "movie-12345" (lowercase).
 
-                  final movieIdMatch =
-                      RegExp(r'movie-(\d+)').firstMatch(movieRefStr);
+                  final movieIdMatch = RegExp(
+                    r'movie-(\d+)',
+                  ).firstMatch(movieRefStr);
                   if (movieIdMatch != null) {
                     movieResourceIds.add(movieIdMatch.group(1)!);
                   }
@@ -972,10 +1009,12 @@ class TurtleSerializer {
     try {
       // First try to parse from JSON backup for compatibility.
 
-      final movieJsonMatch =
-          RegExp(r'# JSON_MOVIE_DATA: (.+)').firstMatch(ttlContent);
-      final userDataJsonMatch =
-          RegExp(r'# JSON_USER_DATA: (.+)').firstMatch(ttlContent);
+      final movieJsonMatch = RegExp(
+        r'# JSON_MOVIE_DATA: (.+)',
+      ).firstMatch(ttlContent);
+      final userDataJsonMatch = RegExp(
+        r'# JSON_USER_DATA: (.+)',
+      ).firstMatch(ttlContent);
 
       if (movieJsonMatch != null && userDataJsonMatch != null) {
         final movieJsonData = movieJsonMatch.group(1)!;
@@ -1077,11 +1116,7 @@ class TurtleSerializer {
       }
 
       if (movie != null) {
-        return {
-          'movie': movie,
-          'rating': rating,
-          'comment': comment,
-        };
+        return {'movie': movie, 'rating': rating, 'comment': comment};
       }
 
       return null;

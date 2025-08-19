@@ -241,11 +241,12 @@ class UserProfileService {
         // Parse the TTL content to extract API key and MovieList references.
         // Note: The TTL now uses static prefixes (moviestar-data:) to match ontology structure.
 
-        final apiKeyMatch =
-            RegExp(r'moviestar-data:ApiKey-([a-zA-Z0-9]+)').firstMatch(result);
-        final movieListMatches =
-            RegExp(r'moviestar-data:MovieList-([a-zA-Z0-9]+)')
-                .allMatches(result);
+        final apiKeyMatch = RegExp(
+          r'moviestar-data:ApiKey-([a-zA-Z0-9]+)',
+        ).firstMatch(result);
+        final movieListMatches = RegExp(
+          r'moviestar-data:MovieList-([a-zA-Z0-9]+)',
+        ).allMatches(result);
 
         final extractedData = <String, dynamic>{};
 
@@ -297,9 +298,9 @@ class UserProfileService {
           if (webId != null) {
             // Extract MovieList IDs from profile TTL.
 
-            final movieListMatches =
-                RegExp(r'moviestar-data:MovieList-([a-zA-Z0-9]+)')
-                    .allMatches(result);
+            final movieListMatches = RegExp(
+              r'moviestar-data:MovieList-([a-zA-Z0-9]+)',
+            ).allMatches(result);
             final movieListIds =
                 movieListMatches.map((m) => m.group(1)!).toList();
 

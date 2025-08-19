@@ -50,8 +50,9 @@ final hiveCacheServiceProvider = Provider<HiveMovieCacheService>((ref) {
 /// Provider for accessing the Hive cache service as a FutureProvider.
 /// This ensures the service is fully initialised before use.
 
-final hiveCacheServiceFutureProvider =
-    FutureProvider<HiveMovieCacheService>((ref) async {
+final hiveCacheServiceFutureProvider = FutureProvider<HiveMovieCacheService>((
+  ref,
+) async {
   final service = HiveMovieCacheService();
   await service.initialize();
 

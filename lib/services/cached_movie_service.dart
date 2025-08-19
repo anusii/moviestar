@@ -393,7 +393,8 @@ class CachedMovieService {
   /// Gets cache metadata for a specific category.
 
   Future<Map<String, dynamic>?> getCacheStatsForCategory(
-      CacheCategory category) async {
+    CacheCategory category,
+  ) async {
     return await _cacheService.getCacheMetadata(category);
   }
 

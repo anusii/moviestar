@@ -27,17 +27,26 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
+import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/models/custom_list.dart';
+import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/add_movies_to_list_screen.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/services/favorites_service_adapter.dart';
+import 'package:moviestar/services/movie_list_service.dart';
+import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
+import 'package:moviestar/utils/turtle_serializer.dart';
+import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 
 /// A screen that displays all custom movie lists.
 
-class MyListsScreen extends StatefulWidget {
+class MyListsScreen extends ConsumerStatefulWidget {
   /// Service for managing favorite movies and lists.
 
   final FavoritesService favoritesService;
@@ -50,12 +59,12 @@ class MyListsScreen extends StatefulWidget {
   });
 
   @override
-  State<MyListsScreen> createState() => _MyListsScreenState();
+  ConsumerState<MyListsScreen> createState() => _MyListsScreenState();
 }
 
 /// State class for the my lists screen.
 
-class _MyListsScreenState extends State<MyListsScreen> {
+class _MyListsScreenState extends ConsumerState<MyListsScreen> {
   // List of all custom lists.
 
   List<CustomList> _customLists = [];
@@ -185,9 +194,14 @@ class _MyListsScreenState extends State<MyListsScreen> {
     descriptionController.dispose();
   }
 
-  // Shows options for a custom list (edit, delete).
+  // Shows options for a custom list (edit, share, delete).
 
   Future<void> _showListOptions(CustomList list) async {
+    final hasMovies = list.movieIds.isNotEmpty;
+    final isPodEnabled = widget.favoritesService is FavoritesServiceAdapter &&
+        (widget.favoritesService as FavoritesServiceAdapter)
+            .isPodStorageEnabled;
+
     await showModalBottomSheet(
       context: context,
       builder: (context) => Column(
@@ -200,6 +214,34 @@ class _MyListsScreenState extends State<MyListsScreen> {
               Navigator.pop(context);
               _showEditListDialog(list);
             },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.share,
+              color: (hasMovies && isPodEnabled)
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.38),
+            ),
+            title: Text(
+              'Share List',
+              style: TextStyle(
+                color: (hasMovies && isPodEnabled)
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.38),
+              ),
+            ),
+            onTap: (hasMovies && isPodEnabled)
+                ? () {
+                    Navigator.pop(context);
+                    _shareCustomList(list);
+                  }
+                : null,
           ),
           ListTile(
             leading: const Icon(Icons.delete, color: Colors.red),
@@ -687,5 +729,169 @@ Edit list name and description, or delete this list.
         },
       ),
     );
+  }
+
+  // Shares the custom list and all movies using batch sharing UI.
+
+  Future<void> _shareCustomList(CustomList list) async {
+    if (list.movieIds.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No movies to share')),
+      );
+      return;
+    }
+
+    // Store context references before async operations.
+
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final theme = Theme.of(context);
+
+    try {
+      // Get movie details for all movies in the list.
+
+      final movieService = ref.read(cachedMovieServiceProvider);
+      final moviesToShare = <Movie>[];
+
+      // Load all movies from the list.
+
+      for (final movieId in list.movieIds) {
+        try {
+          final movie = await movieService.getMovieDetails(movieId);
+          moviesToShare.add(movie);
+        } catch (e) {
+          // Skip movies that can't be loaded.
+
+          continue;
+        }
+      }
+
+      if (moviesToShare.isEmpty) {
+        if (mounted) {
+          scaffoldMessenger.showSnackBar(
+            const SnackBar(content: Text('Unable to load movies for sharing')),
+          );
+        }
+        return;
+      }
+
+      if (!mounted) return;
+
+      // Create MovieList service to create the list file first.
+
+      final userProfileService = UserProfileService(context, widget);
+      final movieListService = MovieListService(
+        context,
+        widget,
+        userProfileService,
+      );
+
+      // Create the MovieList TTL file.
+
+      final listId = await movieListService.createMovieList(
+        list.name,
+        movies: moviesToShare,
+        description: list.description ?? 'Custom movie list',
+      );
+
+      if (!mounted) return;
+
+      if (listId == null) {
+        if (mounted) {
+          scaffoldMessenger.showSnackBar(
+            const SnackBar(content: Text('Failed to create movie list')),
+          );
+        }
+        return;
+      }
+
+      // Ensure all individual movie files exist before sharing.
+
+      for (final movie in moviesToShare) {
+        try {
+          await _createMovieFileIfNotExists(movie);
+        } catch (e) {
+          // Continue with other movies - the batch UI will handle individual failures.
+        }
+        if (!mounted) return;
+      }
+
+      // Navigate to the batch sharing UI.
+
+      if (mounted) {
+        await navigator.push<bool>(
+          MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (context) => MovieStarBatchSharingUi(
+              listId: listId,
+              listName: list.name,
+              movies: moviesToShare,
+              backgroundColor: theme.scaffoldBackgroundColor,
+              onSharingComplete: () {
+                // Handle completion callback.
+              },
+              child: widget,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(content: Text('Error sharing list: $e')),
+        );
+      }
+    }
+  }
+
+  // Creates a movie file if it doesn't exist (needed before sharing).
+
+  Future<void> _createMovieFileIfNotExists(Movie movie) async {
+    try {
+      final movieFileName = 'movies/Movie-${movie.id}.ttl';
+
+      // Check if the file already exists.
+
+      try {
+        if (!mounted) return;
+        final existingContent = await readPod(movieFileName, context, widget);
+        if (existingContent.isNotEmpty) {
+          return;
+        }
+      } catch (e) {
+        // File doesn't exist, we'll create it.
+      }
+
+      // Get current rating and comments from favorites service.
+
+      final adapter = widget.favoritesService as FavoritesServiceAdapter;
+      final currentRating = await adapter.getPersonalRating(movie);
+      final currentComments = await adapter.getMovieComments(movie);
+
+      // Create the movie TTL content with any existing user data.
+
+      final ttlContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
+        movie,
+        currentRating,
+        currentComments,
+      );
+
+      // Write the movie file to POD.
+
+      if (!mounted) return;
+      final result = await writePod(
+        movieFileName,
+        ttlContent,
+        context,
+        widget,
+        encrypted: false,
+      );
+
+      if (result != SolidFunctionCallStatus.success) {
+        throw Exception('Failed to write movie file to POD');
+      }
+    } catch (e) {
+      rethrow;
+    }
   }
 }

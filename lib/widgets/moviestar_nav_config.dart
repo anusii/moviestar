@@ -30,68 +30,67 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solidui/solidui.dart';
 
-import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 
 /// MovieStar-specific navigation configuration and factory methods.
 
 class MovieStarNavConfig {
-  /// Creates the MovieStar app navigation tabs.
+  /// Creates the MovieStar app navigation menu items.
   ///
-  /// Returns a list of navigation tabs configured specifically for the
+  /// Returns a list of menu items configured specifically for the
   /// MovieStar application with proper titles, icons, and tooltips.
 
-  static List<SolidNavTab> createNavTabs() {
-    return SolidNavUtils.createNavTabs([
-      {
-        'title': 'Home',
-        'icon': Icons.home,
-        'tooltip': '''
+  static List<SolidMenuItem> createMenuItems() {
+    return [
+      SolidMenuItem(
+        title: 'MOVIE STAR',
+        icon: Icons.home,
+        tooltip: '''
 
 **Home:** Tap here to view your movie dashboard and discover new films.
 
 ''',
-      },
-      {
-        'title': 'Watch',
-        'icon': Icons.favorite,
-        'tooltip': '''
+      ),
+      SolidMenuItem(
+        title: 'To Watch',
+        icon: Icons.favorite,
+        tooltip: '''
 
 **To Watch:** Tap here to view your watchlist of movies you want to see.
 
 ''',
-      },
-      {
-        'title': 'Watched',
-        'icon': Icons.history,
-        'tooltip': '''
+      ),
+      SolidMenuItem(
+        title: 'Watched',
+        icon: Icons.history,
+        tooltip: '''
 
 **Watched:** Tap here to view movies you have already watched and rated.
 
 ''',
-      },
-      {
-        'title': 'Soon',
-        'icon': Icons.upcoming,
-        'tooltip': '''
+      ),
+      SolidMenuItem(
+        title: 'Coming Soon',
+        icon: Icons.upcoming,
+        tooltip: '''
 
 **Coming Soon:** Tap here to discover upcoming movie releases.
 
 ''',
-      },
-      {
-        'title': 'Shared',
-        'icon': Icons.movie_outlined,
-        'tooltip': '''
+      ),
+      SolidMenuItem(
+        title: 'Shared Movies',
+        icon: Icons.movie_outlined,
+        tooltip: '''
 
 **Shared Movies:** Tap here to view movies shared from your POD.
 
 ''',
-      },
-      {
-        'title': 'Files',
-        'icon': Icons.folder,
-        'tooltip': '''
+      ),
+      SolidMenuItem(
+        title: 'File Management',
+        icon: Icons.folder,
+        tooltip: '''
 
 **File Management:** Tap here to access file management features for your POD.
 
@@ -99,52 +98,32 @@ You can browse POD storage, upload files, download files, and manage
 your movie data files.
 
 ''',
-      },
-      {
-        'title': 'Settings',
-        'icon': Icons.person,
-        'tooltip': '''
+      ),
+      SolidMenuItem(
+        title: 'Settings',
+        icon: Icons.person,
+        tooltip: '''
 
 **Settings:** Tap here to configure your movie preferences and account settings.
 
 ''',
-      },
-    ]);
+      ),
+    ];
   }
 
-  /// Creates a MovieStar-specific AppBar configuration.
+  /// Creates a MovieStar-specific AppBar configuration for the SolidScaffold.
 
-  static SolidAppBarConfig createAppBarConfig({
+  static SolidAppBarConfig createSimpleAppBarConfig({
     required String title,
-    required String appVersion,
-    required bool isVersionLoaded,
     required VoidCallback onRefresh,
     required VoidCallback onSearch,
     required VoidCallback onSettings,
     required VoidCallback onLogout,
     required WidgetRef ref,
-    VoidCallback? onVersionInfo,
     VoidCallback? onViewModeToggle,
   }) {
     return SolidAppBarConfig(
       title: title,
-      narrowScreenThreshold: NavigationConstants.narrowScreenThreshold,
-      veryNarrowScreenThreshold: NavigationConstants.veryNarrowScreenThreshold,
-      versionConfig: isVersionLoaded
-          ? SolidVersionConfig(
-              version: appVersion,
-              changelogUrl:
-                  'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
-              tooltip: '''
-
-**Version:** This is the current version of the MovieStar app. If
-the version is out of date then the text will be red. You can tap on
-the version to view the app's Change Log to determine if it is worth
-updating your version.
-
-''',
-            )
-          : null,
       actions: [
         if (onViewModeToggle != null)
           SolidAppBarAction(
@@ -176,67 +155,14 @@ criteria.
 
 ''',
         ),
-        SolidAppBarAction(
-          icon: Icons.settings,
-          onPressed: onSettings,
-          hideOnVeryNarrowScreen: true,
-          tooltip: '''
-
-**Settings:** Tap here to view and manage your MovieStar account
-settings.
-
-''',
-        ),
-        SolidAppBarAction(
-          icon: Icons.logout,
-          onPressed: onLogout,
-          hideOnVeryNarrowScreen: true,
-          tooltip: '''
-
-**Logout:** Tap here to securely log out of your MovieStar account.
-This will clear your current session and return you to the login
-screen.
-
-''',
-        ),
       ],
-      themeConfig: SolidThemeConfig(
-        lightModeTooltip: '''
-
-**Theme Toggle:** Tap here to switch to light theme.
-
-''',
-        darkModeTooltip: '''
-
-**Theme Toggle:** Tap here to switch to dark theme.
-
-''',
-        onToggle: () async {
-          await ref.read(themeModeProvider.notifier).toggleTheme();
-        },
-      ),
       overflowItems: [
-        SolidOverflowMenuItem(
-          id: 'theme',
-          icon: Icons.dark_mode,
-          label: 'Toggle Theme',
-          onSelected: () async {
-            await ref.read(themeModeProvider.notifier).toggleTheme();
-          },
-        ),
         SolidOverflowMenuItem(
           id: 'settings',
           icon: Icons.settings,
           label: 'Settings',
           onSelected: onSettings,
         ),
-        if (isVersionLoaded && onVersionInfo != null)
-          SolidOverflowMenuItem(
-            id: 'version',
-            icon: Icons.info,
-            label: 'Version Info',
-            onSelected: onVersionInfo,
-          ),
         SolidOverflowMenuItem(
           id: 'logout',
           icon: Icons.logout,
@@ -244,32 +170,6 @@ screen.
           onSelected: onLogout,
         ),
       ],
-    );
-  }
-
-  /// Creates a MovieStar-specific user configuration.
-
-  static SolidNavUserConfig createUserConfig({
-    required String userName,
-    String? webId,
-  }) {
-    return SolidNavUserConfig(
-      userName: userName.isNotEmpty ? userName : 'Not logged in',
-      userId: webId,
-      showUserId: false, // MovieStar doesn't show WebID by default.
-      avatarIcon: Icons.account_circle,
-    );
-  }
-
-  /// Creates a MovieStar-specific logout configuration.
-
-  static SolidLogoutConfig createLogoutConfig({
-    required void Function(BuildContext) onLogout,
-  }) {
-    return SolidLogoutConfig(
-      onLogout: onLogout,
-      text: 'Logout',
-      icon: Icons.logout,
     );
   }
 

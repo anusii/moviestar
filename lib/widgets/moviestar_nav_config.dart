@@ -111,8 +111,6 @@ your movie data files.
     ];
   }
 
-
-
   /// Creates a MovieStar-specific AppBar configuration for the SolidScaffold.
 
   static SolidAppBarConfig createSimpleAppBarConfig({

@@ -34,6 +34,7 @@ import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
+import 'package:moviestar/screens/my_lists_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/screens/shared_movies_screen.dart';
 import 'package:moviestar/screens/to_watch_screen.dart';
@@ -134,6 +135,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       ToWatchScreen(favoritesService: _favoritesService),
       WatchedScreen(favoritesService: _favoritesService),
       ComingSoonScreen(favoritesService: _favoritesService),
+      MyListsScreen(favoritesService: _favoritesService),
       const SharedMoviesScreen(),
       const FileService(),
       SettingsScreen(
@@ -213,6 +215,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.upcoming),
             label: 'Coming Soon',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.playlist_play),
+            label: 'My Lists',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.movie_outlined),

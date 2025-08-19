@@ -32,6 +32,7 @@ import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// A service class that manages the user's movie lists.
@@ -49,6 +50,10 @@ class FavoritesService extends ChangeNotifier {
 
   static const String _ratingsKey = 'ratings';
 
+  /// Key used to store custom lists in shared preferences.
+
+  static const String _customListsKey = 'custom_lists';
+
   /// Shared preferences instance for storing movie lists.
 
   final SharedPreferences _prefs;
@@ -61,6 +66,10 @@ class FavoritesService extends ChangeNotifier {
 
   final _watchedController = BehaviorSubject<List<Movie>>();
 
+  /// Stream controller for custom lists.
+
+  final _customListsController = BehaviorSubject<List<CustomList>>();
+
   /// Stream of to-watch movies.
 
   Stream<List<Movie>> get toWatchMovies => _toWatchController.stream;
@@ -69,19 +78,25 @@ class FavoritesService extends ChangeNotifier {
 
   Stream<List<Movie>> get watchedMovies => _watchedController.stream;
 
+  /// Stream of custom lists.
+
+  Stream<List<CustomList>> get customLists => _customListsController.stream;
+
   /// Creates a new [FavoritesService] instance.
 
   FavoritesService(this._prefs) {
     _loadMovies();
   }
 
-  /// Loads both movie lists and emits them to their respective streams.
+  /// Loads both movie lists and custom lists and emits them to their respective streams.
 
   Future<void> _loadMovies() async {
     final toWatch = await getToWatch();
     final watched = await getWatched();
+    final customLists = await getCustomLists();
     _toWatchController.add(toWatch);
     _watchedController.add(watched);
+    _customListsController.add(customLists);
   }
 
   /// Retrieves the list of to-watch movies.
@@ -244,6 +259,160 @@ class FavoritesService extends ChangeNotifier {
     return null; // Local storage doesn't support file sharing
   }
 
+  /// Custom Lists Methods
+
+  /// Retrieves all custom lists.
+
+  Future<List<CustomList>> getCustomLists() async {
+    final String? listsJson = _prefs.getString(_customListsKey);
+    if (listsJson == null) return [];
+
+    final List<dynamic> decoded = jsonDecode(listsJson);
+    return decoded.map((list) => CustomList.fromJson(list)).toList();
+  }
+
+  /// Creates a new custom list.
+
+  Future<CustomList> createCustomList(String name,
+      {String? description}) async {
+    final lists = await getCustomLists();
+    final newList = CustomList(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: name,
+      description: description,
+      movieIds: [],
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    lists.add(newList);
+    await _saveCustomLists(lists);
+    _customListsController.add(lists);
+    return newList;
+  }
+
+  /// Updates an existing custom list.
+
+  Future<void> updateCustomList(CustomList updatedList) async {
+    final lists = await getCustomLists();
+    final index = lists.indexWhere((list) => list.id == updatedList.id);
+    if (index != -1) {
+      lists[index] = updatedList.copyWith(updatedAt: DateTime.now());
+      await _saveCustomLists(lists);
+      _customListsController.add(lists);
+    }
+  }
+
+  /// Deletes a custom list.
+
+  Future<void> deleteCustomList(String listId) async {
+    final lists = await getCustomLists();
+    lists.removeWhere((list) => list.id == listId);
+    await _saveCustomLists(lists);
+    _customListsController.add(lists);
+  }
+
+  /// Adds a movie to a custom list.
+
+  Future<void> addMovieToCustomList(String listId, Movie movie) async {
+    final lists = await getCustomLists();
+    final listIndex = lists.indexWhere((list) => list.id == listId);
+    if (listIndex != -1) {
+      final currentList = lists[listIndex];
+      if (!currentList.movieIds.contains(movie.id)) {
+        final updatedMovieIds = [...currentList.movieIds, movie.id];
+        lists[listIndex] = currentList.copyWith(
+          movieIds: updatedMovieIds,
+          updatedAt: DateTime.now(),
+        );
+        await _saveCustomLists(lists);
+        _customListsController.add(lists);
+      }
+    }
+  }
+
+  /// Removes a movie from a custom list.
+
+  Future<void> removeMovieFromCustomList(String listId, int movieId) async {
+    final lists = await getCustomLists();
+    final listIndex = lists.indexWhere((list) => list.id == listId);
+    if (listIndex != -1) {
+      final currentList = lists[listIndex];
+      final updatedMovieIds =
+          currentList.movieIds.where((id) => id != movieId).toList();
+      lists[listIndex] = currentList.copyWith(
+        movieIds: updatedMovieIds,
+        updatedAt: DateTime.now(),
+      );
+      await _saveCustomLists(lists);
+      _customListsController.add(lists);
+    }
+  }
+
+  /// Checks if a movie is in a specific custom list.
+
+  Future<bool> isMovieInCustomList(String listId, int movieId) async {
+    final lists = await getCustomLists();
+    final list = lists.firstWhere((list) => list.id == listId,
+        orElse: () => CustomList(
+              id: '',
+              name: '',
+              movieIds: [],
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ));
+    return list.movieIds.contains(movieId);
+  }
+
+  /// Gets all custom lists that contain a specific movie.
+
+  Future<List<CustomList>> getCustomListsContainingMovie(int movieId) async {
+    final lists = await getCustomLists();
+    return lists.where((list) => list.movieIds.contains(movieId)).toList();
+  }
+
+  /// Gets movies in a specific custom list.
+  /// Note: This base implementation returns empty list.
+  /// The adapter implementation should override this to load from cache.
+
+  Future<List<Movie>> getMoviesInCustomList(String listId) async {
+    final lists = await getCustomLists();
+    final list = lists.firstWhere((list) => list.id == listId,
+        orElse: () => CustomList(
+              id: '',
+              name: '',
+              movieIds: [],
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ));
+
+    // Base implementation returns empty list
+    // This should be overridden in the adapter to load from cache
+    return [];
+  }
+
+  /// Gets movie IDs in a specific custom list.
+
+  Future<List<int>> getMovieIdsInCustomList(String listId) async {
+    final lists = await getCustomLists();
+    final list = lists.firstWhere((list) => list.id == listId,
+        orElse: () => CustomList(
+              id: '',
+              name: '',
+              movieIds: [],
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ));
+    return list.movieIds;
+  }
+
+  /// Saves custom lists to shared preferences.
+
+  Future<void> _saveCustomLists(List<CustomList> lists) async {
+    final encoded = jsonEncode(lists.map((list) => list.toJson()).toList());
+    await _prefs.setString(_customListsKey, encoded);
+  }
+
   /// Disposes the stream controllers.
 
   @override
@@ -251,5 +420,6 @@ class FavoritesService extends ChangeNotifier {
     super.dispose();
     _toWatchController.close();
     _watchedController.close();
+    _customListsController.close();
   }
 }

@@ -969,7 +969,8 @@ Recipients will be able to:
       return;
     }
 
-    // Get all loaded movies from the current list
+    // Get all loaded movies from the current list.
+
     final moviesToShare = <Movie>[];
     for (final movieId in _currentList.movieIds) {
       final movie = _moviesMap[movieId];
@@ -986,12 +987,14 @@ Recipients will be able to:
     }
 
     // Store context references before async operations.
+
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     final theme = Theme.of(context);
 
     try {
-      // Create MovieList service to create the list file first
+      // Create MovieList service to create the list file first.
+
       final userProfileService = UserProfileService(context, widget);
       final movieListService = MovieListService(
         context,
@@ -999,7 +1002,8 @@ Recipients will be able to:
         userProfileService,
       );
 
-      // Create the MovieList TTL file
+      // Create the MovieList TTL file.
+
       final listId = await movieListService.createMovieList(
         _currentList.name,
         movies: moviesToShare,
@@ -1018,6 +1022,7 @@ Recipients will be able to:
       }
 
       // Ensure all individual movie files exist before sharing.
+
       for (final movie in moviesToShare) {
         try {
           await _createMovieFileIfNotExists(movie);
@@ -1028,6 +1033,7 @@ Recipients will be able to:
       }
 
       // Navigate to the batch sharing UI.
+
       if (mounted) {
         await navigator.push<bool>(
           MaterialPageRoute(
@@ -1061,6 +1067,7 @@ Recipients will be able to:
       final movieFileName = 'movies/Movie-${movie.id}.ttl';
 
       // Check if the file already exists.
+
       try {
         if (!mounted) return;
         final existingContent = await readPod(movieFileName, context, widget);
@@ -1072,11 +1079,13 @@ Recipients will be able to:
       }
 
       // Get current rating and comments from favorites service.
+
       final adapter = widget.favoritesService as FavoritesServiceAdapter;
       final currentRating = await adapter.getPersonalRating(movie);
       final currentComments = await adapter.getMovieComments(movie);
 
       // Create the movie TTL content with any existing user data.
+
       final ttlContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
         movie,
         currentRating,
@@ -1084,6 +1093,7 @@ Recipients will be able to:
       );
 
       // Write the movie file to POD.
+      
       if (!mounted) return;
       final result = await writePod(
         movieFileName,

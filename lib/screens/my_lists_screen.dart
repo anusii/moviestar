@@ -742,22 +742,26 @@ Edit list name and description, or delete this list.
     }
 
     // Store context references before async operations.
+
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     final theme = Theme.of(context);
 
     try {
-      // Get movie details for all movies in the list
+      // Get movie details for all movies in the list.
+
       final movieService = ref.read(cachedMovieServiceProvider);
       final moviesToShare = <Movie>[];
 
-      // Load all movies from the list
+      // Load all movies from the list.
+
       for (final movieId in list.movieIds) {
         try {
           final movie = await movieService.getMovieDetails(movieId);
           moviesToShare.add(movie);
         } catch (e) {
-          // Skip movies that can't be loaded
+          // Skip movies that can't be loaded.
+
           continue;
         }
       }
@@ -771,7 +775,10 @@ Edit list name and description, or delete this list.
         return;
       }
 
-      // Create MovieList service to create the list file first
+      if (!mounted) return;
+
+      // Create MovieList service to create the list file first.
+      
       final userProfileService = UserProfileService(context, widget);
       final movieListService = MovieListService(
         context,
@@ -779,7 +786,8 @@ Edit list name and description, or delete this list.
         userProfileService,
       );
 
-      // Create the MovieList TTL file
+      // Create the MovieList TTL file.
+
       final listId = await movieListService.createMovieList(
         list.name,
         movies: moviesToShare,
@@ -798,16 +806,19 @@ Edit list name and description, or delete this list.
       }
 
       // Ensure all individual movie files exist before sharing.
+
       for (final movie in moviesToShare) {
         try {
           await _createMovieFileIfNotExists(movie);
         } catch (e) {
           // Continue with other movies - the batch UI will handle individual failures.
+
         }
         if (!mounted) return;
       }
 
       // Navigate to the batch sharing UI.
+
       if (mounted) {
         await navigator.push<bool>(
           MaterialPageRoute(
@@ -841,6 +852,7 @@ Edit list name and description, or delete this list.
       final movieFileName = 'movies/Movie-${movie.id}.ttl';
 
       // Check if the file already exists.
+
       try {
         if (!mounted) return;
         final existingContent = await readPod(movieFileName, context, widget);
@@ -852,11 +864,13 @@ Edit list name and description, or delete this list.
       }
 
       // Get current rating and comments from favorites service.
+
       final adapter = widget.favoritesService as FavoritesServiceAdapter;
       final currentRating = await adapter.getPersonalRating(movie);
       final currentComments = await adapter.getMovieComments(movie);
 
       // Create the movie TTL content with any existing user data.
+
       final ttlContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
         movie,
         currentRating,
@@ -864,6 +878,7 @@ Edit list name and description, or delete this list.
       );
 
       // Write the movie file to POD.
+      
       if (!mounted) return;
       final result = await writePod(
         movieFileName,

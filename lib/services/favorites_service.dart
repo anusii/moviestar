@@ -377,7 +377,7 @@ class FavoritesService extends ChangeNotifier {
 
   Future<List<Movie>> getMoviesInCustomList(String listId) async {
     final lists = await getCustomLists();
-    final list = lists.firstWhere((list) => list.id == listId,
+    lists.firstWhere((list) => list.id == listId,
         orElse: () => CustomList(
               id: '',
               name: '',

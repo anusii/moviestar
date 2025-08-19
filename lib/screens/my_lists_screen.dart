@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Claude Code Assistant
+/// Authors: Ashley Tang
 
 library;
 
@@ -36,11 +36,14 @@ import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 
 /// A screen that displays all custom movie lists.
+
 class MyListsScreen extends StatefulWidget {
   /// Service for managing favorite movies and lists.
+
   final FavoritesService favoritesService;
 
   /// Creates a new [MyListsScreen] widget.
+
   const MyListsScreen({
     super.key,
     required this.favoritesService,
@@ -51,11 +54,14 @@ class MyListsScreen extends StatefulWidget {
 }
 
 /// State class for the my lists screen.
+
 class _MyListsScreenState extends State<MyListsScreen> {
-  /// List of all custom lists.
+  // List of all custom lists.
+
   List<CustomList> _customLists = [];
 
-  /// Indicates whether the lists are being loaded.
+  // Indicates whether the lists are being loaded.
+
   bool _isLoading = true;
 
   @override
@@ -64,6 +70,7 @@ class _MyListsScreenState extends State<MyListsScreen> {
     _loadCustomLists();
 
     // Listen to changes in custom lists.
+
     widget.favoritesService.customLists.listen((lists) {
       if (mounted) {
         setState(() {
@@ -74,7 +81,8 @@ class _MyListsScreenState extends State<MyListsScreen> {
     });
   }
 
-  /// Loads all custom lists.
+  // Loads all custom lists.
+
   Future<void> _loadCustomLists() async {
     final lists = await widget.favoritesService.getCustomLists();
     setState(() {
@@ -83,7 +91,8 @@ class _MyListsScreenState extends State<MyListsScreen> {
     });
   }
 
-  /// Shows a dialog to create a new custom list.
+  // Shows a dialog to create a new custom list.
+
   Future<void> _showCreateListDialog() async {
     final TextEditingController nameController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
@@ -130,7 +139,7 @@ class _MyListsScreenState extends State<MyListsScreen> {
                   name,
                   description: description.isEmpty ? null : description,
                 );
-                if (mounted) {
+                if (context.mounted) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -176,7 +185,8 @@ class _MyListsScreenState extends State<MyListsScreen> {
     descriptionController.dispose();
   }
 
-  /// Shows options for a custom list (edit, delete).
+  // Shows options for a custom list (edit, delete).
+
   Future<void> _showListOptions(CustomList list) async {
     await showModalBottomSheet(
       context: context,
@@ -204,7 +214,8 @@ class _MyListsScreenState extends State<MyListsScreen> {
     );
   }
 
-  /// Shows a dialog to edit an existing custom list.
+  // Shows a dialog to edit an existing custom list.
+
   Future<void> _showEditListDialog(CustomList list) async {
     final TextEditingController nameController =
         TextEditingController(text: list.name);
@@ -252,7 +263,7 @@ class _MyListsScreenState extends State<MyListsScreen> {
                   description: description.isEmpty ? null : description,
                 );
                 await widget.favoritesService.updateCustomList(updatedList);
-                if (mounted) {
+                if (context.mounted) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -298,7 +309,8 @@ class _MyListsScreenState extends State<MyListsScreen> {
     descriptionController.dispose();
   }
 
-  /// Shows a confirmation dialog before deleting a list.
+  // Shows a confirmation dialog before deleting a list.
+
   Future<void> _showDeleteConfirmation(CustomList list) async {
     await showDialog(
       context: context,
@@ -318,7 +330,7 @@ class _MyListsScreenState extends State<MyListsScreen> {
             ),
             onPressed: () async {
               await widget.favoritesService.deleteCustomList(list.id);
-              if (mounted) {
+              if (context.mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -363,7 +375,8 @@ class _MyListsScreenState extends State<MyListsScreen> {
     );
   }
 
-  /// Navigates to the detail screen for a custom list.
+  // Navigates to the detail screen for a custom list.
+
   void _openListDetail(CustomList list) {
     Navigator.push(
       context,
@@ -376,7 +389,8 @@ class _MyListsScreenState extends State<MyListsScreen> {
     );
   }
 
-  /// Navigates to the add movies screen for a custom list.
+  // Navigates to the add movies screen for a custom list.
+
   void _openAddMoviesScreen(CustomList list) {
     Navigator.push(
       context,
@@ -414,7 +428,8 @@ class _MyListsScreenState extends State<MyListsScreen> {
     );
   }
 
-  /// Builds the empty state when there are no custom lists.
+  // Builds the empty state when there are no custom lists.
+
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
@@ -489,7 +504,8 @@ class _MyListsScreenState extends State<MyListsScreen> {
     );
   }
 
-  /// Builds the list view when there are custom lists.
+  // Builds the list view when there are custom lists.
+
   Widget _buildListView() {
     return RefreshIndicator(
       onRefresh: _loadCustomLists,
@@ -512,6 +528,7 @@ class _MyListsScreenState extends State<MyListsScreen> {
                 child: Row(
                   children: [
                     // List avatar with gradient background.
+
                     Container(
                       width: 60,
                       height: 60,
@@ -542,6 +559,7 @@ class _MyListsScreenState extends State<MyListsScreen> {
                     const SizedBox(width: 16),
 
                     // List details.
+
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

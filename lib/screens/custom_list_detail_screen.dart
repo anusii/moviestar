@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Claude Code Assistant.
+/// Authors: Ashley Tang
 
 library;
 
@@ -38,14 +38,18 @@ import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 
 /// A screen that displays the detailed view of a custom movie list.
+
 class CustomListDetailScreen extends ConsumerStatefulWidget {
   /// The custom list to display.
+
   final CustomList customList;
 
   /// Service for managing favorite movies and lists.
+
   final FavoritesService favoritesService;
 
   /// Creates a new [CustomListDetailScreen] widget.
+
   const CustomListDetailScreen({
     super.key,
     required this.customList,
@@ -57,19 +61,24 @@ class CustomListDetailScreen extends ConsumerStatefulWidget {
       _CustomListDetailScreenState();
 }
 
-/// State class for the custom list detail screen.
+// State class for the custom list detail screen.
+
 class _CustomListDetailScreenState
     extends ConsumerState<CustomListDetailScreen> {
-  /// Current custom list (may be updated).
+  // Current custom list (may be updated).
+
   late CustomList _currentList;
 
-  /// Map of movie ID to Movie object for movies in this list.
+  // Map of movie ID to Movie object for movies in this list.
+
   final Map<int, Movie> _moviesMap = {};
 
-  /// Set of movie IDs that are currently being loaded.
+  // Set of movie IDs that are currently being loaded.
+
   final Set<int> _loadingMovieIds = {};
 
-  /// Set of movie IDs that failed to load.
+  // Set of movie IDs that failed to load.
+
   final Set<int> _failedMovieIds = {};
 
   @override
@@ -79,7 +88,8 @@ class _CustomListDetailScreenState
     _loadMovies();
   }
 
-  /// Loads movies in this custom list from cache.
+  // Loads movies in this custom list from cache.
+
   Future<void> _loadMovies() async {
     final movieService = ref.read(cachedMovieServiceProvider);
 
@@ -114,7 +124,8 @@ class _CustomListDetailScreenState
     }
   }
 
-  /// Shows options for the custom list (edit, delete).
+  // Shows options for the custom list (edit, delete).
+
   Future<void> _showListOptions() async {
     await showModalBottomSheet(
       context: context,
@@ -142,7 +153,8 @@ class _CustomListDetailScreenState
     );
   }
 
-  /// Shows a dialog to edit the custom list.
+  // Shows a dialog to edit the custom list.
+
   Future<void> _showEditListDialog() async {
     final TextEditingController nameController =
         TextEditingController(text: _currentList.name);
@@ -193,7 +205,7 @@ class _CustomListDetailScreenState
                 setState(() {
                   _currentList = updatedList;
                 });
-                if (mounted) {
+                if (context.mounted) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -239,7 +251,8 @@ class _CustomListDetailScreenState
     descriptionController.dispose();
   }
 
-  /// Shows a confirmation dialog before deleting the list.
+  // Shows a confirmation dialog before deleting the list.
+
   Future<void> _showDeleteConfirmation() async {
     await showDialog(
       context: context,
@@ -259,7 +272,7 @@ class _CustomListDetailScreenState
             ),
             onPressed: () async {
               await widget.favoritesService.deleteCustomList(_currentList.id);
-              if (mounted) {
+              if (context.mounted) {
                 Navigator.pop(context); // Close dialog.
                 Navigator.pop(context); // Go back to lists screen.
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -305,7 +318,8 @@ class _CustomListDetailScreenState
     );
   }
 
-  /// Removes a movie from the custom list.
+  // Removes a movie from the custom list.
+
   Future<void> _removeMovieFromList(int movieId) async {
     final movie = _moviesMap[movieId];
     final movieTitle = movie?.title ?? 'Movie';
@@ -361,7 +375,8 @@ class _CustomListDetailScreenState
     }
   }
 
-  /// Navigates to the movie details screen.
+  // Navigates to the movie details screen.
+
   void _openMovieDetails(Movie movie) {
     Navigator.push(
       context,
@@ -500,7 +515,8 @@ class _CustomListDetailScreenState
     );
   }
 
-  /// Builds the empty state when there are no movies in the list.
+  // Builds the empty state when there are no movies in the list.
+
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -534,11 +550,13 @@ class _CustomListDetailScreenState
     );
   }
 
-  /// Builds the movies list view.
+  // Builds the movies list view.
+
   Widget _buildMoviesList() {
     return RefreshIndicator(
       onRefresh: () async {
         // Clear cache and reload.
+
         setState(() {
           _moviesMap.clear();
           _loadingMovieIds.clear();
@@ -557,15 +575,19 @@ class _CustomListDetailScreenState
 
           if (movie != null) {
             // Movie is loaded - show full movie card.
+
             return _buildLoadedMovieCard(movie);
           } else if (isLoading) {
             // Movie is loading - show loading card.
+
             return _buildLoadingMovieCard(movieId);
           } else if (hasFailed) {
             // Movie failed to load - show error card with retry.
+
             return _buildFailedMovieCard(movieId);
           } else {
             // This shouldn't happen, but show loading as fallback.
+
             return _buildLoadingMovieCard(movieId);
           }
         },
@@ -573,7 +595,8 @@ class _CustomListDetailScreenState
     );
   }
 
-  /// Builds a card for a successfully loaded movie.
+  // Builds a card for a successfully loaded movie.
+
   Widget _buildLoadedMovieCard(Movie movie) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -587,6 +610,7 @@ class _CustomListDetailScreenState
           child: Row(
             children: [
               // Movie poster.
+
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: CachedNetworkImage(
@@ -613,6 +637,7 @@ class _CustomListDetailScreenState
               const SizedBox(width: 12),
 
               // Movie details.
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -669,6 +694,7 @@ class _CustomListDetailScreenState
               ),
 
               // Actions menu.
+
               PopupMenuButton<String>(
                 icon: Icon(
                   Icons.more_vert,
@@ -699,7 +725,8 @@ class _CustomListDetailScreenState
     );
   }
 
-  /// Builds a card for a movie that is currently loading.
+  // Builds a card for a movie that is currently loading.
+
   Widget _buildLoadingMovieCard(int movieId) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -710,6 +737,7 @@ class _CustomListDetailScreenState
         child: Row(
           children: [
             // Loading placeholder for poster.
+
             Container(
               width: 60,
               height: 90,
@@ -724,6 +752,7 @@ class _CustomListDetailScreenState
             const SizedBox(width: 12),
 
             // Loading content.
+
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -764,7 +793,8 @@ class _CustomListDetailScreenState
     );
   }
 
-  /// Builds a card for a movie that failed to load.
+  // Builds a card for a movie that failed to load.
+
   Widget _buildFailedMovieCard(int movieId) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -775,6 +805,7 @@ class _CustomListDetailScreenState
         child: Row(
           children: [
             // Error placeholder for poster.
+
             Container(
               width: 60,
               height: 90,
@@ -790,6 +821,7 @@ class _CustomListDetailScreenState
             const SizedBox(width: 12),
 
             // Error content.
+
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -831,6 +863,7 @@ class _CustomListDetailScreenState
             ),
 
             // Remove option.
+
             PopupMenuButton<String>(
               icon: Icon(
                 Icons.more_vert,

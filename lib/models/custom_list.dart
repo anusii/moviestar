@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Claude Code Assistant.
+/// Authors: Ashley Tang
 
 library;
 
@@ -30,33 +30,41 @@ import 'package:hive/hive.dart';
 part 'custom_list.g.dart';
 
 /// A class representing a custom movie list.
+
 @HiveType(typeId: 1)
 class CustomList extends HiveObject {
   /// Unique identifier for the custom list.
+
   @HiveField(0)
   final String id;
 
   /// Name of the custom list.
+
   @HiveField(1)
   final String name;
 
   /// Description of the custom list (optional).
+
   @HiveField(2)
   final String? description;
 
   /// List of movie IDs in this custom list.
+
   @HiveField(3)
   final List<int> movieIds;
 
   /// Date when the list was created.
+
   @HiveField(4)
   final DateTime createdAt;
 
   /// Date when the list was last modified.
+
   @HiveField(5)
   final DateTime updatedAt;
 
   /// Creates a new [CustomList] instance.
+
   CustomList({
     required this.id,
     required this.name,
@@ -67,6 +75,7 @@ class CustomList extends HiveObject {
   });
 
   /// Creates a [CustomList] instance from a JSON map.
+
   factory CustomList.fromJson(Map<String, dynamic> json) {
     return CustomList(
       id: json['id'] ?? '',
@@ -81,6 +90,7 @@ class CustomList extends HiveObject {
   }
 
   /// Converts the [CustomList] instance to a JSON map.
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -93,6 +103,7 @@ class CustomList extends HiveObject {
   }
 
   /// Creates a copy of this custom list with optional field updates.
+
   CustomList copyWith({
     String? id,
     String? name,
@@ -112,5 +123,6 @@ class CustomList extends HiveObject {
   }
 
   /// Returns the number of movies in this list.
+
   int get movieCount => movieIds.length;
 }

@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Claude Code Assistant
+/// Authors: Ashley Tang
 
 library;
 
@@ -39,14 +39,18 @@ import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 
 /// Screen for adding movies to a custom list with search functionality.
+
 class AddMoviesToListScreen extends ConsumerStatefulWidget {
   /// The custom list to add movies to.
+
   final CustomList customList;
 
   /// Service for managing favorite movies and lists.
+
   final FavoritesService favoritesService;
 
   /// Creates a new [AddMoviesToListScreen] widget.
+
   const AddMoviesToListScreen({
     super.key,
     required this.customList,
@@ -59,36 +63,47 @@ class AddMoviesToListScreen extends ConsumerStatefulWidget {
 }
 
 /// State class for the add movies to list screen.
+
 class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     with TickerProviderStateMixin {
-  /// Controller for the search text field.
+  // Controller for the search text field.
+
   final TextEditingController _searchController = TextEditingController();
 
-  /// Loading state indicator for search.
+  // Loading state indicator for search.
+
   bool _isSearchLoading = false;
 
-  /// Loading state indicator for suggestions.
+  // Loading state indicator for suggestions.
+
   bool _isSuggestionsLoading = true;
 
-  /// Error message if any.
+  // Error message if any.
+
   String? _error;
 
-  /// Search results categorized by search type.
+  // Search results categorized by search type.
+
   Map<String, List<Movie>> _searchResults = {};
 
-  /// Suggested movies (popular, trending, etc.)
+  // Suggested movies (popular, trending, etc.)
+
   List<Movie> _suggestedMovies = [];
 
-  /// Timer for debouncing search requests.
+  // Timer for debouncing search requests.
+
   Timer? _debounceTimer;
 
-  /// Tab controller for switching between search and suggestions.
+  // Tab controller for switching between search and suggestions.
+
   late TabController _tabController;
 
-  /// Set of movie IDs that are already in the list.
+  // Set of movie IDs that are already in the list.
+
   Set<int> _moviesInList = {};
 
-  /// Duration to wait before executing search after user stops typing.
+  // Duration to wait before executing search after user stops typing.
+
   static const Duration _debounceDuration = Duration(milliseconds: 500);
 
   @override
@@ -109,14 +124,16 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     super.dispose();
   }
 
-  /// Loads the list of movies already in this custom list.
+  // Loads the list of movies already in this custom list.
+
   Future<void> _loadMoviesInList() async {
     setState(() {
       _moviesInList = Set.from(widget.customList.movieIds);
     });
   }
 
-  /// Loads suggested movies from popular/trending categories.
+  // Loads suggested movies from popular/trending categories.
+
   Future<void> _loadSuggestedMovies() async {
     setState(() {
       _isSuggestionsLoading = true;
@@ -130,11 +147,13 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
           await ref.read(topRatedMoviesWithCacheInfoProvider.future);
 
       // Combine popular and top-rated movies, remove duplicates.
+
       final allSuggestions = <Movie>[];
       allSuggestions.addAll(popularMoviesWithCacheInfo.data);
       allSuggestions.addAll(topRatedMoviesWithCacheInfo.data);
 
       // Remove duplicates and movies already in the list.
+
       final uniqueSuggestions = <int, Movie>{};
       for (final movie in allSuggestions) {
         if (!_moviesInList.contains(movie.id)) {
@@ -154,7 +173,8 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     }
   }
 
-  /// Called when search text changes.
+  // Called when search text changes.
+
   void _onSearchChanged() {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(_debounceDuration, () {
@@ -162,7 +182,8 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     });
   }
 
-  /// Searches for movies based on the provided query.
+  // Searches for movies based on the provided query.
+
   Future<void> _searchMovies(String query) async {
     if (query.isEmpty) {
       setState(() {
@@ -210,7 +231,8 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     }
   }
 
-  /// Adds a movie to the custom list.
+  // Adds a movie to the custom list.
+
   Future<void> _addMovieToList(Movie movie) async {
     try {
       await widget.favoritesService
@@ -289,7 +311,8 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     }
   }
 
-  /// Builds a movie item card.
+  // Builds a movie item card.
+
   Widget _buildMovieCard(Movie movie) {
     final isInList = _moviesInList.contains(movie.id);
 
@@ -382,7 +405,8 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     );
   }
 
-  /// Builds the search tab content.
+  // Builds the search tab content.
+
   Widget _buildSearchTab() {
     if (_isSearchLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -456,7 +480,8 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     );
   }
 
-  /// Builds a search results section.
+  // Builds a search results section.
+
   Widget _buildSearchSection(String title, List<Movie> movies, IconData icon) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,7 +526,8 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     );
   }
 
-  /// Builds the suggestions tab content.
+  // Builds the suggestions tab content.
+
   Widget _buildSuggestionsTab() {
     if (_isSuggestionsLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -571,7 +597,8 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     );
   }
 
-  /// Check if all search result categories are empty.
+  // Check if all search result categories are empty.
+
   bool _hasNoSearchResults() {
     return (_searchResults['title']?.isEmpty ?? true) &&
         (_searchResults['actor']?.isEmpty ?? true) &&

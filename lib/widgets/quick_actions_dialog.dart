@@ -1,6 +1,6 @@
 /// Quick actions dialog for movie cards on hover.
 ///
-// Time-stamp: <Thursday 2025-01-19 12:00:00 +1000 Claude>
+// Time-stamp: <Monday 2025-08-18 10:00:00 +1000 Ashley Tang>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

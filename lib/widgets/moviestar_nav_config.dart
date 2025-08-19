@@ -27,12 +27,9 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solidui/solidui.dart';
 
-import 'package:moviestar/providers/view_mode_provider.dart';
-
-/// MovieStar-specific navigation configuration and factory methods.
+/// MovieStar-specific navigation configuration.
 
 class MovieStarNavConfig {
   /// Creates the MovieStar app navigation menu items.
@@ -109,80 +106,5 @@ your movie data files.
 ''',
       ),
     ];
-  }
-
-  /// Creates a MovieStar-specific AppBar configuration for the SolidScaffold.
-
-  static SolidAppBarConfig createSimpleAppBarConfig({
-    required String title,
-    required VoidCallback onRefresh,
-    required VoidCallback onSearch,
-    required VoidCallback onSettings,
-    required VoidCallback onLogout,
-    required WidgetRef ref,
-    VoidCallback? onViewModeToggle,
-  }) {
-    return SolidAppBarConfig(
-      title: title,
-      actions: [
-        if (onViewModeToggle != null)
-          SolidAppBarAction(
-            icon: _getViewModeIcon(ref.watch(viewModeProvider)),
-            onPressed: onViewModeToggle,
-            tooltip: '''
-
-**View Mode:** Tap here to cycle between different view modes (Grid, Kanban, List).
-
-''',
-          ),
-        SolidAppBarAction(
-          icon: Icons.refresh,
-          onPressed: onRefresh,
-          tooltip: '''
-
-**Refresh:** Tap here to refresh all movie data and reload the latest
-information from the movie database.
-
-''',
-        ),
-        SolidAppBarAction(
-          icon: Icons.search,
-          onPressed: onSearch,
-          tooltip: '''
-
-**Search:** Tap here to search for movies by title, genre, or other
-criteria.
-
-''',
-        ),
-      ],
-      overflowItems: [
-        SolidOverflowMenuItem(
-          id: 'settings',
-          icon: Icons.settings,
-          label: 'Settings',
-          onSelected: onSettings,
-        ),
-        SolidOverflowMenuItem(
-          id: 'logout',
-          icon: Icons.logout,
-          label: 'Logout',
-          onSelected: onLogout,
-        ),
-      ],
-    );
-  }
-
-  // Helper method to get the appropriate icon for the current view mode.
-
-  static IconData _getViewModeIcon(HomeViewMode viewMode) {
-    switch (viewMode) {
-      case HomeViewMode.grid:
-        return Icons.grid_view;
-      case HomeViewMode.kanban:
-        return Icons.view_kanban;
-      case HomeViewMode.list:
-        return Icons.view_list;
-    }
   }
 }

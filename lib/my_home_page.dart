@@ -543,7 +543,6 @@ The version is automatically checked for updates.
       ),
       userInfo: userInfo,
       onLogout: (context) => _handleLogout(),
-      narrowScreenThreshold: NavigationConstants.narrowScreenThreshold,
       backgroundColor: theme.colorScheme.surface,
       selectedIndex: _selectedIndex,
       onMenuSelected: (index) {

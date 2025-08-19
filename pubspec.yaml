@@ -41,8 +41,7 @@ dependencies:
   solidui:
     git:
       url: https://github.com/anusii/solidui.git
-      ref: tony/1_initialisation
-#    path: ../solidui
+      ref: dev
   universal_io: ^2.2.2
   url_launcher: ^6.3.1
   version_widget: ^1.0.4

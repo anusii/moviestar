@@ -1,0 +1,691 @@
+/// Screen displaying all custom movie lists created by the user.
+///
+// Time-stamp: <Monday 2025-08-18 10:00:00 +1000 Ashley Tang>
+///
+/// Copyright (C) 2025, Software Innovation Institute, ANU.
+///
+/// Licensed under the GNU General Public License, Version 3 (the "License").
+///
+/// License: https://www.gnu.org/licenses/gpl-3.0.en.html.
+//
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+// details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <https://www.gnu.org/licenses/>.
+///
+/// Authors: Ashley Tang
+
+library;
+
+import 'package:flutter/material.dart';
+
+import 'package:markdown_tooltip/markdown_tooltip.dart';
+
+import 'package:moviestar/models/custom_list.dart';
+import 'package:moviestar/screens/add_movies_to_list_screen.dart';
+import 'package:moviestar/screens/custom_list_detail_screen.dart';
+import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/utils/date_format_util.dart';
+
+/// A screen that displays all custom movie lists.
+
+class MyListsScreen extends StatefulWidget {
+  /// Service for managing favorite movies and lists.
+
+  final FavoritesService favoritesService;
+
+  /// Creates a new [MyListsScreen] widget.
+
+  const MyListsScreen({
+    super.key,
+    required this.favoritesService,
+  });
+
+  @override
+  State<MyListsScreen> createState() => _MyListsScreenState();
+}
+
+/// State class for the my lists screen.
+
+class _MyListsScreenState extends State<MyListsScreen> {
+  // List of all custom lists.
+
+  List<CustomList> _customLists = [];
+
+  // Indicates whether the lists are being loaded.
+
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCustomLists();
+
+    // Listen to changes in custom lists.
+
+    widget.favoritesService.customLists.listen((lists) {
+      if (mounted) {
+        setState(() {
+          _customLists = lists;
+          _isLoading = false;
+        });
+      }
+    });
+  }
+
+  // Loads all custom lists.
+
+  Future<void> _loadCustomLists() async {
+    final lists = await widget.favoritesService.getCustomLists();
+    setState(() {
+      _customLists = lists;
+      _isLoading = false;
+    });
+  }
+
+  // Shows a dialog to create a new custom list.
+
+  Future<void> _showCreateListDialog() async {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController descriptionController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Create New List'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'List Name',
+                hintText: 'Enter a name for your list...',
+                border: OutlineInputBorder(),
+              ),
+              autofocus: true,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Description (Optional)',
+                hintText: 'Enter a description for your list...',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final name = nameController.text.trim();
+              if (name.isNotEmpty) {
+                final description = descriptionController.text.trim();
+                await widget.favoritesService.createCustomList(
+                  name,
+                  description: description.isEmpty ? null : description,
+                );
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          Icon(
+                            Icons.check_circle_outline,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Created "$name" list',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      margin: const EdgeInsets.all(16),
+                      elevation: 6,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Create'),
+          ),
+        ],
+      ),
+    );
+
+    nameController.dispose();
+    descriptionController.dispose();
+  }
+
+  // Shows options for a custom list (edit, delete).
+
+  Future<void> _showListOptions(CustomList list) async {
+    await showModalBottomSheet(
+      context: context,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.edit),
+            title: const Text('Edit List'),
+            onTap: () {
+              Navigator.pop(context);
+              _showEditListDialog(list);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete, color: Colors.red),
+            title: const Text('Delete List'),
+            onTap: () {
+              Navigator.pop(context);
+              _showDeleteConfirmation(list);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Shows a dialog to edit an existing custom list.
+
+  Future<void> _showEditListDialog(CustomList list) async {
+    final TextEditingController nameController =
+        TextEditingController(text: list.name);
+    final TextEditingController descriptionController =
+        TextEditingController(text: list.description ?? '');
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit List'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'List Name',
+                border: OutlineInputBorder(),
+              ),
+              autofocus: true,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Description (Optional)',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final name = nameController.text.trim();
+              if (name.isNotEmpty) {
+                final description = descriptionController.text.trim();
+                final updatedList = list.copyWith(
+                  name: name,
+                  description: description.isEmpty ? null : description,
+                );
+                await widget.favoritesService.updateCustomList(updatedList);
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          Icon(
+                            Icons.edit_outlined,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Updated "$name" list',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      margin: const EdgeInsets.all(16),
+                      elevation: 6,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+
+    nameController.dispose();
+    descriptionController.dispose();
+  }
+
+  // Shows a confirmation dialog before deleting a list.
+
+  Future<void> _showDeleteConfirmation(CustomList list) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete List'),
+        content: Text(
+            'Are you sure you want to delete "${list.name}"? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () async {
+              await widget.favoritesService.deleteCustomList(list.id);
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        Icon(
+                          Icons.delete_outline,
+                          color: Theme.of(context).colorScheme.onErrorContainer,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Deleted "${list.name}" list',
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onErrorContainer,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    backgroundColor:
+                        Theme.of(context).colorScheme.errorContainer,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    margin: const EdgeInsets.all(16),
+                    elevation: 6,
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
+              }
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Navigates to the detail screen for a custom list.
+
+  void _openListDetail(CustomList list) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CustomListDetailScreen(
+          customList: list,
+          favoritesService: widget.favoritesService,
+        ),
+      ),
+    );
+  }
+
+  // Navigates to the add movies screen for a custom list.
+
+  void _openAddMoviesScreen(CustomList list) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddMoviesToListScreen(
+          customList: list,
+          favoritesService: widget.favoritesService,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('My Lists'),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
+      ),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _customLists.isEmpty
+              ? _buildEmptyState()
+              : _buildListView(),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showCreateListDialog,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('New List'),
+        elevation: 4,
+      ),
+    );
+  }
+
+  // Builds the empty state when there are no custom lists.
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.2),
+                    Theme.of(context)
+                        .colorScheme
+                        .secondary
+                        .withValues(alpha: 0.2),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.playlist_add_outlined,
+                size: 64,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'No Custom Lists Yet',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Create your first custom list to organize\nyour movies the way you want!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: _showCreateListDialog,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Create Your First List'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Builds the list view when there are custom lists.
+
+  Widget _buildListView() {
+    return RefreshIndicator(
+      onRefresh: _loadCustomLists,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: _customLists.length,
+        itemBuilder: (context, index) {
+          final list = _customLists[index];
+          return Card(
+            margin: const EdgeInsets.only(bottom: 16),
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () => _openListDetail(list),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    // List avatar with gradient background.
+
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Theme.of(context).colorScheme.primary,
+                            Theme.of(context).colorScheme.secondary,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          list.name.isNotEmpty
+                              ? list.name[0].toUpperCase()
+                              : 'L',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+
+                    // List details.
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            list.name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                          if (list.description != null &&
+                              list.description!.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              list.description!,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.movie,
+                                      size: 14,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '${list.movieCount}',
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimaryContainer,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Updated ${DateFormatUtil.formatShort(list.updatedAt)}',
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Action buttons.
+                    Column(
+                      children: [
+                        MarkdownTooltip(
+                          message: '''
+
+**Add Movies**
+
+Search for movies and add them to "${list.name}".
+Browse popular suggestions or search by title, actor, or genre.
+
+                          ''',
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.add_circle_outline,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            onPressed: () => _openAddMoviesScreen(list),
+                          ),
+                        ),
+                        MarkdownTooltip(
+                          message: '''
+
+**List Options**
+
+Edit list name and description, or delete this list.
+
+                          ''',
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.more_vert,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                            onPressed: () => _showListOptions(list),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

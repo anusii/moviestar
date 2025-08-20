@@ -28,8 +28,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
+import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
@@ -233,6 +235,219 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
+  /// Build a custom list column that loads and displays movies from a CustomList.
+  Widget _buildCustomListColumn(CustomList customList) {
+    final movieIds = customList.movieIds;
+    final displayMovieIds = movieIds.take(_maxItemsPerColumn).toList();
+
+    return Container(
+      width: 220,
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Column header
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainer,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _navigateToCustomListDetail(customList),
+                    child: Text(
+                      customList.name,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${movieIds.length}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                ),
+                if (movieIds.length > _maxItemsPerColumn) ...[
+                  const Gap(4),
+                  TextButton(
+                    onPressed: () => _navigateToCustomListDetail(customList),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      'View More',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 11,
+                          ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+
+          // Movie items.
+          Expanded(
+            child: movieIds.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        'No movies',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.5),
+                            ),
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(8),
+                    itemCount: displayMovieIds.length,
+                    itemBuilder: (context, index) {
+                      final movieId = displayMovieIds[index];
+                      return _buildCustomListMovieItem(movieId, customList.id);
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build a movie item for a custom list (loading movie details on demand).
+  Widget _buildCustomListMovieItem(int movieId, String categoryId) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final cachedMovieService = ref.read(cachedMovieServiceProvider);
+
+        return FutureBuilder<Movie>(
+          future: cachedMovieService.getMovieDetails(movieId),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                width: 100,
+                height: 150,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.errorContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      color: Theme.of(context).colorScheme.onErrorContainer,
+                      size: 24,
+                    ),
+                    const Gap(4),
+                    Text(
+                      'Error',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            if (snapshot.connectionState == ConnectionState.waiting ||
+                !snapshot.hasData) {
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                width: 100,
+                height: 150,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ),
+                    const Gap(8),
+                    Text(
+                      'Loading...',
+                      style: TextStyle(
+                        color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.7),
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            final movie = snapshot.data!;
+            return _buildMovieItem(movie, categoryId, fromCache: false);
+          },
+        );
+      },
+    );
+  }
+
+  // Navigate to custom list detail screen.
+  void _navigateToCustomListDetail(CustomList customList) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CustomListDetailScreen(
+          customList: customList,
+          favoritesService: widget.favoritesService,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer(
@@ -250,43 +465,55 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                 return StreamBuilder<List<Movie>>(
                   stream: widget.favoritesService.watchedMovies,
                   builder: (context, watchedSnapshot) {
-                    final popularMovies = popularCacheResult.data;
-                    final toWatchMovies = toWatchSnapshot.data ?? [];
-                    final watchedMovies = watchedSnapshot.data ?? [];
+                    return StreamBuilder<List<CustomList>>(
+                      stream: widget.favoritesService.customLists,
+                      builder: (context, customListsSnapshot) {
+                        final popularMovies = popularCacheResult.data;
+                        final toWatchMovies = toWatchSnapshot.data ?? [];
+                        final watchedMovies = watchedSnapshot.data ?? [];
+                        final customLists = customListsSnapshot.data ?? [];
 
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Popular Movies Column.
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Popular Movies Column.
 
-                          _buildKanbanColumn(
-                            title: 'Popular',
-                            movies: popularMovies,
-                            categoryId: 'popular',
-                            fromCache: popularCacheResult.fromCache,
+                              _buildKanbanColumn(
+                                title: 'Popular',
+                                movies: popularMovies,
+                                categoryId: 'popular',
+                                fromCache: popularCacheResult.fromCache,
+                              ),
+
+                              // To Watch Column.
+
+                              _buildKanbanColumn(
+                                title: 'To Watch',
+                                movies: toWatchMovies,
+                                categoryId: 'towatch',
+                                fromCache: false,
+                              ),
+
+                              // Watched Column.
+
+                              _buildKanbanColumn(
+                                title: 'Watched',
+                                movies: watchedMovies,
+                                categoryId: 'watched',
+                                fromCache: false,
+                              ),
+
+                              // Custom List Columns.
+                              ...customLists.map(
+                                (customList) =>
+                                    _buildCustomListColumn(customList),
+                              ),
+                            ],
                           ),
-
-                          // To Watch Column.
-
-                          _buildKanbanColumn(
-                            title: 'To Watch',
-                            movies: toWatchMovies,
-                            categoryId: 'towatch',
-                            fromCache: false,
-                          ),
-
-                          // Watched Column.
-
-                          _buildKanbanColumn(
-                            title: 'Watched',
-                            movies: watchedMovies,
-                            categoryId: 'watched',
-                            fromCache: false,
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     );
                   },
                 );

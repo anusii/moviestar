@@ -41,6 +41,8 @@ import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/my_lists_screen.dart';
+import 'package:moviestar/screens/my_movies_screen.dart';
+import 'package:moviestar/screens/search_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/screens/shared_movies_screen.dart';
 import 'package:moviestar/screens/to_watch_screen.dart';
@@ -298,6 +300,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       ToWatchScreen(favoritesService: _favoritesService),
       WatchedScreen(favoritesService: _favoritesService),
       ComingSoonScreen(favoritesService: _favoritesService),
+      MyMoviesScreen(favoritesService: _favoritesService),
       MyListsScreen(favoritesService: _favoritesService),
       const SharedMoviesScreen(),
       const FileService(),

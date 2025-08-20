@@ -850,8 +850,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                             : 'Your rating: ${_personalRating!.toStringAsFixed(1)}/10'),
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 16
-                      ),
+                        fontSize: 16),
                   ),
                   const Gap(16),
 

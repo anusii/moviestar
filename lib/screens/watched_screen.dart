@@ -138,7 +138,6 @@ class _WatchedScreenState extends State<WatchedScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Watched'),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         actions: [
           IconButton(

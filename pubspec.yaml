@@ -30,9 +30,8 @@ dependencies:
   http: ^1.1.0
   intl: any
   markdown_tooltip: ^0.0.7
-  package_info_plus: ^8.3.1
+
   path: ^1.9.1
-  path_provider: ^2.0.15
   pdf: ^3.11.3
   printing: ^5.14.2
   rdflib: ^0.2.12
@@ -46,7 +45,6 @@ dependencies:
 #    path: ../solidui
   universal_io: ^2.2.2
   url_launcher: ^6.3.1
-  version_widget: ^1.0.4
   window_manager: ^0.5.0
 
 dev_dependencies:

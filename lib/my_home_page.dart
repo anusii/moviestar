@@ -28,10 +28,8 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:solidpod/solidpod.dart'
-    show getAppNameVersion, logoutPopup, getWebId;
+import 'package:solidpod/solidpod.dart' show logoutPopup, getWebId;
 import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/features/file/service/page.dart';
@@ -75,8 +73,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   bool _isLoadingFolders = false;
   String? _webId;
   String? _name;
-  String _appVersion = '0.0.0+0'; // Default version
-  bool _isAppVersionLoaded = false; // Track if version has been loaded
 
   /// Service for managing favorite movies.
 
@@ -109,7 +105,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     _apiKeyService.addListener(_onApiKeyChanged);
 
-    _loadAppInfo();
     _loadUserInfo();
     _buildScreens();
   }
@@ -118,26 +113,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   void dispose() {
     _apiKeyService.removeListener(_onApiKeyChanged);
     super.dispose();
-  }
-
-  /// Loads the app name and version.
-
-  Future<void> _loadAppInfo() async {
-    try {
-      final packageInfo = await PackageInfo.fromPlatform();
-      final version = '${packageInfo.version}+${packageInfo.buildNumber}';
-
-      if (mounted) {
-        setState(() {
-          _appVersion = version;
-          _isAppVersionLoaded = true; // Mark version as loaded
-        });
-      }
-    } catch (e) {
-      debugPrint('Error loading app version: $e');
-    }
-
-    await getAppNameVersion();
   }
 
   /// Loads user information from the POD.
@@ -365,14 +340,11 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       menu: _menuItems,
       appBar: SolidAppBarConfig(
         title: _menuItems[_selectedIndex].title,
-        versionConfig: _isAppVersionLoaded 
-            ? SolidVersionConfig(
-                version: _appVersion,
-                changelogUrl: 'https://github.com/anusii/moviestar/blob/dev/CHANGELOG'
-                    '.md',
-                showDate: true,
-              )
-            : null, // Don't show version until it's properly loaded from pubspec.yaml
+        versionConfig: SolidVersionConfig(
+          changelogUrl:
+              'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
+          showDate: true,
+        ),
         actions: SolidScaffoldConfig.createAppBarActions(
           ref: ref,
           onViewModeToggle: _handleViewModeToggle,
@@ -388,32 +360,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         serverInfo: SolidServerInfo(
           serverUri: _webId?.split('profile')[0] ?? 'Not connected',
           displayText: _webId?.split('profile')[0] ?? 'Not connected',
-          tooltip: 'Server Information - Click to open server in browser. '
-              'Manages your personal data pod. Your movie data is stored '
-              'securely in your personal pod.',
           isClickable: _webId != null,
         ),
         loginStatus: SolidLoginStatus(
           webId: _webId,
           onTap: _handleLogout,
-          loggedInTooltip:
-              'Currently Logged In - WebID: $_webId - Click to log out - '
-              'Your data is secure. Your movie preferences and ratings are '
-              'safely stored in your pod.',
-          loggedOutTooltip:
-              'Login Required - Current status: Not logged in - Click to '
-              'log in to your pod - Access your personal movie data. '
-              'Connect to your pod to save and sync your movie preferences.',
         ),
-        securityKeyStatus: SolidSecurityKeyStatus(
-          isKeySaved: false, // Initial value
-          tooltip: 'Security Key Manager: Tap here to manage your security key '
-              'settings. View your current security key status, save a '
-              'new security key, or remove an existing security key. '
-              'Your security key is essential for encrypting and '
-              'protecting your movie data.',
-          autoManage: true,
-        ),
+        securityKeyStatus: SolidSecurityKeyStatus(),
         showOnNarrowScreens: false,
       ),
       userInfo: userInfo,

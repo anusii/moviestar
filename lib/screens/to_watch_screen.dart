@@ -139,7 +139,6 @@ class _ToWatchScreenState extends State<ToWatchScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('To Watch'),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         actions: [
           IconButton(

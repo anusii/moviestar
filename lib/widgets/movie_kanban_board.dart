@@ -94,10 +94,18 @@ class MovieKanbanBoard extends ConsumerStatefulWidget {
 
 class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   final int _maxItemsPerColumn = 8;
+  late ScrollController _horizontalScrollController;
 
   @override
   void initState() {
     super.initState();
+    _horizontalScrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _horizontalScrollController.dispose();
+    super.dispose();
   }
 
   // Show context menu for movie copy operations.
@@ -445,8 +453,6 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }) {
     // All movies can be dragged, but Popular will be copy operations.
 
-    final canDrag = true;
-
     final movieCard = Container(
       margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       child: MovieCard.poster(
@@ -483,12 +489,6 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       ),
       child: movieCard,
     );
-
-    // If not draggable, just return the context menu version.
-
-    if (!canDrag) {
-      return contextMenuCard;
-    }
 
     // Wrap in Draggable for drag operations.
 
@@ -1015,47 +1015,55 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                         final watchedMovies = watchedSnapshot.data ?? [];
                         final customLists = customListsSnapshot.data ?? [];
 
-                        return SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Popular Movies Column.
+                        return Scrollbar(
+                          controller: _horizontalScrollController,
+                          thumbVisibility: true,
+                          trackVisibility: true,
+                          thickness: 8,
+                          radius: const Radius.circular(4),
+                          child: SingleChildScrollView(
+                            controller: _horizontalScrollController,
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Popular Movies Column.
 
-                              _buildKanbanColumn(
-                                title: 'Popular',
-                                movies: popularMovies,
-                                categoryId: 'popular',
-                                fromCache: popularCacheResult.fromCache,
-                                columnType: KanbanColumnType.popular,
-                              ),
+                                _buildKanbanColumn(
+                                  title: 'Popular',
+                                  movies: popularMovies,
+                                  categoryId: 'popular',
+                                  fromCache: popularCacheResult.fromCache,
+                                  columnType: KanbanColumnType.popular,
+                                ),
 
-                              // To Watch Column.
+                                // To Watch Column.
 
-                              _buildKanbanColumn(
-                                title: 'To Watch',
-                                movies: toWatchMovies,
-                                categoryId: 'towatch',
-                                fromCache: false,
-                                columnType: KanbanColumnType.toWatch,
-                              ),
+                                _buildKanbanColumn(
+                                  title: 'To Watch',
+                                  movies: toWatchMovies,
+                                  categoryId: 'towatch',
+                                  fromCache: false,
+                                  columnType: KanbanColumnType.toWatch,
+                                ),
 
-                              // Watched Column.
+                                // Watched Column.
 
-                              _buildKanbanColumn(
-                                title: 'Watched',
-                                movies: watchedMovies,
-                                categoryId: 'watched',
-                                fromCache: false,
-                                columnType: KanbanColumnType.watched,
-                              ),
+                                _buildKanbanColumn(
+                                  title: 'Watched',
+                                  movies: watchedMovies,
+                                  categoryId: 'watched',
+                                  fromCache: false,
+                                  columnType: KanbanColumnType.watched,
+                                ),
 
-                              // Custom List Columns.
-                              ...customLists.map(
-                                (customList) =>
-                                    _buildCustomListColumn(customList),
-                              ),
-                            ],
+                                // Custom List Columns.
+                                ...customLists.map(
+                                  (customList) =>
+                                      _buildCustomListColumn(customList),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },

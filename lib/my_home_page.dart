@@ -53,7 +53,7 @@ import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/services/movie_service.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
-import 'package:moviestar/widgets/moviestar_nav_config.dart';
+import 'package:moviestar/widgets/solid_scaffold_config.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   final SharedPreferences prefs;
@@ -125,7 +125,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     try {
       final packageInfo = await PackageInfo.fromPlatform();
       final version = '${packageInfo.version}+${packageInfo.buildNumber}';
-      
+
       if (mounted) {
         setState(() {
           _appVersion = version;
@@ -236,9 +236,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       ),
     ];
 
-    // Configure navigation menu items using the MovieStar app configuration.
-
-    _menuItems = MovieStarNavConfig.createMenuItems();
+    _menuItems = SolidScaffoldConfig.createMenuItems();
 
     _initialiseAppData();
   }
@@ -338,19 +336,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     logoutPopup(context, const MovieStar());
   }
 
-  /// Gets the appropriate icon for the current view mode.
-
-  IconData _getViewModeIcon(HomeViewMode viewMode) {
-    switch (viewMode) {
-      case HomeViewMode.grid:
-        return Icons.grid_view;
-      case HomeViewMode.kanban:
-        return Icons.view_kanban;
-      case HomeViewMode.list:
-        return Icons.view_list;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -383,71 +368,46 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           changelogUrl: 'https://github.com/anusii/moviestar/blob/dev/CHANGELOG'
               '.md',
           showDate: true,
-          tooltip: '''
-**Version Information**
-
-Current version: $_appVersion
-
-Click to view the changelog and see what's new in this version.
-The version is automatically checked for updates.
-
-''',
         ),
-        actions: [
-          SolidAppBarAction(
-            icon: _getViewModeIcon(ref.watch(viewModeProvider)),
-            onPressed: _handleViewModeToggle,
-            tooltip:
-                'View Mode: Tap here to cycle between different view modes (Grid, Kanban, List).',
-          ),
-          SolidAppBarAction(
-            icon: Icons.refresh,
-            onPressed: _handleRefresh,
-            tooltip:
-                'Refresh: Tap here to refresh all movie data and reload the latest information from the movie database.',
-          ),
-          SolidAppBarAction(
-            icon: Icons.search,
-            onPressed: _handleSearch,
-            tooltip:
-                'Search: Tap here to search for movies by title, genre, or other criteria.',
-          ),
-        ],
-        overflowItems: [
-          SolidOverflowMenuItem(
-            id: 'settings',
-            icon: Icons.settings,
-            label: 'Settings',
-            onSelected: _handleSettings,
-          ),
-          SolidOverflowMenuItem(
-            id: 'logout',
-            icon: Icons.logout,
-            label: 'Logout',
-            onSelected: _handleLogout,
-          ),
-        ],
+        actions: SolidScaffoldConfig.createAppBarActions(
+          ref: ref,
+          onViewModeToggle: _handleViewModeToggle,
+          onRefresh: _handleRefresh,
+          onSearch: _handleSearch,
+        ),
+        overflowItems: SolidScaffoldConfig.createOverflowItems(
+          onSettings: _handleSettings,
+          onLogout: _handleLogout,
+        ),
       ),
       statusBar: SolidStatusBarConfig(
         serverInfo: SolidServerInfo(
           serverUri: _webId?.split('profile')[0] ?? 'Not connected',
           displayText: _webId?.split('profile')[0] ?? 'Not connected',
-          tooltip:
-              'Server Information - Click to open server in browser. Manages your personal data pod. Your movie data is stored securely in your personal pod.',
+          tooltip: 'Server Information - Click to open server in browser. '
+              'Manages your personal data pod. Your movie data is stored '
+              'securely in your personal pod.',
           isClickable: _webId != null,
         ),
         loginStatus: SolidLoginStatus(
           webId: _webId,
           onTap: _handleLogout,
           loggedInTooltip:
-              'Currently Logged In - WebID: $_webId - Click to log out - Your data is secure. Your movie preferences and ratings are safely stored in your pod.',
+              'Currently Logged In - WebID: $_webId - Click to log out - '
+              'Your data is secure. Your movie preferences and ratings are '
+              'safely stored in your pod.',
           loggedOutTooltip:
-              'Login Required - Current status: Not logged in - Click to log in to your pod - Access your personal movie data. Connect to your pod to save and sync your movie preferences.',
+              'Login Required - Current status: Not logged in - Click to '
+              'log in to your pod - Access your personal movie data. '
+              'Connect to your pod to save and sync your movie preferences.',
         ),
         securityKeyStatus: SolidSecurityKeyStatus(
           isKeySaved: false, // default value
-          tooltip:
-              'Security Key Manager: Tap here to manage your security key settings. View your current security key status, save a new security key, or remove an existing security key. Your security key is essential for encrypting and protecting your movie data.',
+          tooltip: 'Security Key Manager: Tap here to manage your security key '
+              'settings. View your current security key status, save a '
+              'new security key, or remove an existing security key. '
+              'Your security key is essential for encrypting and '
+              'protecting your movie data.',
         ),
         showOnNarrowScreens: false,
       ),
@@ -468,16 +428,6 @@ The version is automatically checked for updates.
         },
         showInAppBarActions: true,
         hideOnVeryNarrowScreen: true,
-        tooltip: '''
-**Theme Toggle**
-
-Switch between light and dark modes for optimal viewing experience.
-
-🌙 **Dark Mode**: Better for low-light viewing
-
-☀️ **Light Mode**: Better for bright environments
-
-''',
       ),
       child: mainContent,
     );

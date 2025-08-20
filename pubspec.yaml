@@ -40,10 +40,10 @@ dependencies:
   shared_preferences: ^2.2.2
   solidpod: ^0.7.8
   solidui:
-#    git:
-#      url: https://github.com/anusii/solidui.git
-#      ref: dev
-    path: ../solidui
+    git:
+      url: https://github.com/anusii/solidui.git
+      ref: tony/154_migrate
+#    path: ../solidui
   universal_io: ^2.2.2
   url_launcher: ^6.3.1
   version_widget: ^1.0.4

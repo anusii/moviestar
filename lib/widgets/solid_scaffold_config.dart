@@ -1,4 +1,4 @@
-/// MovieStar Navigation Configuration - App-specific navigation setup.
+/// MovieStar SolidScaffold Configuration.
 ///
 // Time-stamp: <Sunday 2025-08-10 08:13:23 +1000 Graham Williams>
 ///
@@ -27,11 +27,18 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solidui/solidui.dart';
 
-/// MovieStar-specific navigation configuration.
+import 'package:moviestar/providers/view_mode_provider.dart';
 
-class MovieStarNavConfig {
+/// MovieStar-specific SolidScaffold configuration.
+///
+/// Provides centralised configuration for all SolidScaffold components
+/// including navigation menu, app bar actions, and overflow items.
+/// This ensures consistent UI patterns throughout the application.
+
+class SolidScaffoldConfig {
   /// Creates the MovieStar app navigation menu items.
   ///
   /// Returns a list of menu items configured specifically for the
@@ -106,5 +113,77 @@ your movie data files.
 ''',
       ),
     ];
+  }
+
+  /// Creates the MovieStar app bar actions.
+  ///
+  /// Returns a list of action buttons configured for the MovieStar application.
+  /// Requires a WidgetRef to access view mode state and callback functions for
+  /// handling actions.
+
+  static List<SolidAppBarAction> createAppBarActions({
+    required WidgetRef ref,
+    required VoidCallback onViewModeToggle,
+    required VoidCallback onRefresh,
+    required VoidCallback onSearch,
+  }) {
+    return [
+      SolidAppBarAction(
+        icon: _getViewModeIcon(ref.watch(viewModeProvider)),
+        onPressed: onViewModeToggle,
+        tooltip:
+            'View Mode: Tap here to cycle between different view modes (Grid, Kanban, List).',
+      ),
+      SolidAppBarAction(
+        icon: Icons.refresh,
+        onPressed: onRefresh,
+        tooltip:
+            'Refresh: Tap here to refresh all movie data and reload the latest information from the movie database.',
+      ),
+      SolidAppBarAction(
+        icon: Icons.search,
+        onPressed: onSearch,
+        tooltip:
+            'Search: Tap here to search for movies by title, genre, or other criteria.',
+      ),
+    ];
+  }
+
+  /// Creates the MovieStar app bar overflow items.
+  ///
+  /// Returns a list of overflow menu items configured for the MovieStar
+  /// application.
+
+  static List<SolidOverflowMenuItem> createOverflowItems({
+    required VoidCallback onSettings,
+    required VoidCallback onLogout,
+  }) {
+    return [
+      SolidOverflowMenuItem(
+        id: 'settings',
+        icon: Icons.settings,
+        label: 'Settings',
+        onSelected: onSettings,
+      ),
+      SolidOverflowMenuItem(
+        id: 'logout',
+        icon: Icons.logout,
+        label: 'Logout',
+        onSelected: onLogout,
+      ),
+    ];
+  }
+
+  /// Gets the appropriate icon for the current view mode.
+
+  static IconData _getViewModeIcon(HomeViewMode viewMode) {
+    switch (viewMode) {
+      case HomeViewMode.grid:
+        return Icons.grid_view;
+      case HomeViewMode.kanban:
+        return Icons.view_kanban;
+      case HomeViewMode.list:
+        return Icons.view_list;
+    }
   }
 }

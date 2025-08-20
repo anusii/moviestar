@@ -79,6 +79,24 @@ class MovieStarNavConfig {
 ''',
       ),
       SolidMenuItem(
+        title: 'My Movies',
+        icon: Icons.star,
+        tooltip: '''
+
+**My Movies:** Tap here to view movies you have rated and reviewed.
+
+''',
+      ),
+      SolidMenuItem(
+        title: 'My Lists',
+        icon: Icons.playlist_play,
+        tooltip: '''
+
+**My Lists:** Tap here to view and manage your custom movie lists.
+
+''',
+      ),
+      SolidMenuItem(
         title: 'Shared Movies',
         icon: Icons.movie_outlined,
         tooltip: '''

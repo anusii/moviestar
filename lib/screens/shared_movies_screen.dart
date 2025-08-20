@@ -40,16 +40,13 @@ class SharedMoviesScreen extends StatefulWidget {
 }
 
 class _SharedMoviesScreenState extends State<SharedMoviesScreen>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+    with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  late TabController _tabController;
   Future<Map<String, dynamic>?>? _sharedWithMeData;
-  Future<Map<String, dynamic>?>? _mySharedData;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     WidgetsBinding.instance.addObserver(this);
     _refreshData();
   }
@@ -57,7 +54,6 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _tabController.dispose();
     super.dispose();
   }
 
@@ -84,11 +80,10 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
   void _refreshData() {
     setState(() {
       _sharedWithMeData = _getMoviesSharedWithMe();
-      _mySharedData = _getMyRatedMovies();
     });
   }
 
-  // Fetch movies that others have shared with me.
+  // Fetch movies and movie lists that others have shared with me.
 
   Future<Map<String, dynamic>?> _getMoviesSharedWithMe() async {
     try {
@@ -109,42 +104,85 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
       }
 
       final Map<String, dynamic> movieData = {};
+      final Map<String, dynamic> movieListData = {};
 
-      // Filter for movie files and fetch their content.
+      // Filter for movie files and movie list files, then fetch their content.
 
       for (final entry in sharedResourcesResult.entries) {
         final resourceUrl = entry.key as String;
         final resourceInfo = entry.value as Map;
 
-        // Check if this is a movie file.
+        try {
+          if (!mounted) break;
 
-        if (resourceUrl.contains('/movies/') && resourceUrl.endsWith('.ttl')) {
-          try {
-            if (!mounted) break;
+          // Check if this is a movie file.
 
+          if (resourceUrl.contains('/movies/') &&
+              resourceUrl.endsWith('.ttl')) {
             // Read the movie file content.
 
-            final movieContent =
-                await readExternalPod(resourceUrl, context, widget);
+            final movieContent = await readExternalPod(
+              resourceUrl,
+              context,
+              widget,
+            );
 
             if (movieContent != null &&
                 movieContent != SolidFunctionCallStatus.notLoggedIn) {
               // Parse the movie data from TTL content.
 
               final movieInfo = await _parseMovieData(
-                  movieContent, resourceUrl, resourceInfo);
+                movieContent,
+                resourceUrl,
+                resourceInfo,
+              );
               if (movieInfo != null) {
                 movieData[resourceUrl] = movieInfo;
               }
             }
-          } catch (e) {
-            debugPrint('Error reading movie file $resourceUrl: $e');
-            // Continue with other files even if one fails.
           }
+          // Check if this is a movie list file.
+          else if (resourceUrl.contains('user_lists/MovieList-') &&
+              resourceUrl.endsWith('.ttl')) {
+            // Read the movie list file content.
+
+            final listContent = await readExternalPod(
+              resourceUrl,
+              context,
+              widget,
+            );
+
+            if (listContent != null &&
+                listContent != SolidFunctionCallStatus.notLoggedIn) {
+              // Parse the movie list data from TTL content.
+
+              final listInfo = await _parseMovieListData(
+                listContent,
+                resourceUrl,
+                resourceInfo,
+              );
+              if (listInfo != null) {
+                movieListData[resourceUrl] = listInfo;
+              }
+            }
+          }
+        } catch (e) {
+          debugPrint('Error reading resource file $resourceUrl: $e');
+          // Continue with other files even if one fails.
         }
       }
 
-      return movieData.isNotEmpty ? movieData : null;
+      // Combine movie data and movie list data.
+
+      final combinedData = <String, dynamic>{};
+      if (movieData.isNotEmpty) {
+        combinedData['movies'] = movieData;
+      }
+      if (movieListData.isNotEmpty) {
+        combinedData['movieLists'] = movieListData;
+      }
+
+      return combinedData.isNotEmpty ? combinedData : null;
     } catch (e) {
       debugPrint('Error fetching shared movies: $e');
       return null;
@@ -168,21 +206,13 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
     return webId.length > 20 ? '${webId.substring(0, 20)}...' : webId;
   }
 
-  // Extract movie ID from resource URL.
-
-  String _extractMovieIdFromUrl(String resourceUrl) {
-    // Extract from URLs like "https://pods.dev.solidcommunity.au/my-moviestar/moviestar/data/movies/Movie-846422.ttl".
-
-    final fileName = resourceUrl.split('/').last;
-    final match =
-        RegExp(r'Movie-(\w+)\.ttl', caseSensitive: false).firstMatch(fileName);
-    return match?.group(1) ?? 'unknown';
-  }
-
   // Parse movie data from TTL content.
 
   Future<Map<String, dynamic>?> _parseMovieData(
-      String ttlContent, String resourceUrl, Map resourceInfo) async {
+    String ttlContent,
+    String resourceUrl,
+    Map resourceInfo,
+  ) async {
     try {
       String? movieTitle;
       String? movieId;
@@ -199,18 +229,22 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
 
       final urlParts = resourceUrl.split('/');
       final fileName = urlParts.last;
-      final idMatch = RegExp(r'Movie-(\w+)\.ttl', caseSensitive: false)
-          .firstMatch(fileName);
+      final idMatch = RegExp(
+        r'Movie-(\w+)\.ttl',
+        caseSensitive: false,
+      ).firstMatch(fileName);
       if (idMatch != null) {
         movieId = idMatch.group(1);
       }
 
       // Try to parse JSON backup data first (more reliable).
 
-      final movieJsonMatch =
-          RegExp(r'# JSON_MOVIE_DATA: (.+)').firstMatch(ttlContent);
-      final userJsonMatch =
-          RegExp(r'# JSON_USER_DATA: (.+)').firstMatch(ttlContent);
+      final movieJsonMatch = RegExp(
+        r'# JSON_MOVIE_DATA: (.+)',
+      ).firstMatch(ttlContent);
+      final userJsonMatch = RegExp(
+        r'# JSON_USER_DATA: (.+)',
+      ).firstMatch(ttlContent);
 
       if (movieJsonMatch != null) {
         final movieJsonData = movieJsonMatch.group(1)!;
@@ -337,10 +371,35 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
       final rawSharedBy =
           resourceInfo['granter'] ?? resourceInfo['granterWebId'];
 
+      // Try to extract owner from resource URL if not found in resourceInfo.
+
+      String finalOwner = rawOwner?.toString() ?? '';
+      String finalSharedBy = rawSharedBy?.toString() ?? '';
+
+      // Extract from resource URL for both owner and shared by if not found in metadata.
+
+      final ownerMatch = RegExp(r'://[^/]+/([^/]+)/').firstMatch(resourceUrl);
+      if (ownerMatch != null) {
+        final username = ownerMatch.group(1);
+        final webId =
+            'https://pods.dev.solidcommunity.au/$username/profile/card#me';
+
+        if (finalOwner.isEmpty) {
+          finalOwner = webId;
+        }
+        if (finalSharedBy.isEmpty) {
+          finalSharedBy =
+              webId; // Use same WebID for shared by when not available.
+        }
+      }
+
       final result = {
         'fileName': movieTitle,
-        'owner': _formatWebId(rawOwner),
-        'sharedBy': _formatWebId(rawSharedBy),
+        'owner': _formatWebId(finalOwner),
+        'ownerWebId': finalOwner, // Store full WebID for URL construction.
+        'sharedBy': _formatWebId(finalSharedBy),
+        'sharedByWebId':
+            finalSharedBy, // Store full WebID for URL construction.
         'permissions': resourceInfo['permissions'] ??
             resourceInfo['permissionList'] ??
             'read',
@@ -365,141 +424,149 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
     }
   }
 
-  // Fetch movies that I have rated or commented on.
-  // Shows all movies with user data (rating/comments) that can be shared.
+  // Parse movie list data from TTL content.
 
-  Future<Map<String, dynamic>?> _getMyRatedMovies() async {
+  Future<Map<String, dynamic>?> _parseMovieListData(
+    String ttlContent,
+    String resourceUrl,
+    Map resourceInfo,
+  ) async {
     try {
-      if (!mounted) return null;
+      String? listName;
+      String? listId;
+      String? description;
+      List<String> movieIds = [];
 
-      // Get current user's WebID.
+      // Extract list ID from URL (e.g. MovieList-abc123.ttl -> abc123).
 
-      final currentWebId = await getWebId();
-
-      if (currentWebId == null) {
-        debugPrint('❌ No WebID found - user not logged in');
-        return {};
+      final urlParts = resourceUrl.split('/');
+      final fileName = urlParts.last;
+      final idMatch = RegExp(
+        r'MovieList-(\w+)\.ttl',
+        caseSensitive: false,
+      ).firstMatch(fileName);
+      if (idMatch != null) {
+        listId = idMatch.group(1);
       }
 
-      // List all movie files in our POD that have ratings/comments.
+      // Parse TTL content for movie list information.
 
-      Map<String, dynamic> ratedMoviesMap = {};
+      final lines = ttlContent.split('\n');
+      for (final line in lines) {
+        final trimmedLine = line.trim();
 
-      try {
-        // Get the movies directory URL.
+        // Extract list name (schema:name or sdo:name predicate).
 
-        final webIdWithoutCard =
-            currentWebId.replaceAll('/profile/card#me', '');
-        final moviesDir = '$webIdWithoutCard/moviestar/data/movies/';
-
-        // Try to get resources in the movies container.
-
-        final resources = await getResourcesInContainer(moviesDir);
-
-        // Process each movie file.
-
-        for (final fileName in resources.files) {
-          if (!fileName.endsWith('.ttl') || !fileName.contains('Movie-')) {
-            continue;
+        if (listName == null &&
+            (trimmedLine.contains('sdo:name') ||
+                trimmedLine.contains('schema:name') ||
+                trimmedLine.contains(':name'))) {
+          final match = RegExp(r'"([^"]*)"').firstMatch(trimmedLine);
+          if (match != null) {
+            listName = match.group(1);
           }
+        }
 
-          final resourceUrl = '$moviesDir$fileName';
+        // Extract description (sdo:description predicate).
 
-          try {
-            // Read the movie file content.
+        if (description == null &&
+            (trimmedLine.contains('sdo:description') ||
+                trimmedLine.contains('schema:description') ||
+                trimmedLine.contains(':description'))) {
+          final match = RegExp(r'"([^"]*)"').firstMatch(trimmedLine);
+          if (match != null) {
+            description = match.group(1);
+          }
+        }
 
-            if (!mounted) break;
+        // Extract movie references (moviestar-onto:hasMovie predicate).
 
-            final movieContent = await readPod(
-                'moviestar/data/movies/$fileName', context, widget);
+        if (trimmedLine.contains('moviestar-onto:hasMovie') ||
+            trimmedLine.contains(':hasMovie')) {
+          // Extract movie IDs from the line like: moviestar-data:movie-5fc3b7da690126.
 
-            if (movieContent.isNotEmpty &&
-                movieContent !=
-                    SolidFunctionCallStatus.notLoggedIn.toString() &&
-                movieContent != SolidFunctionCallStatus.fail.toString()) {
-              // Create movie entry for display.
-
-              ratedMoviesMap[resourceUrl] = {
-                'movieContent': movieContent,
-                'movieFileName': fileName,
-                'movieUrl': resourceUrl,
-                'isUserRatedMovie': true,
-              };
+          final movieMatches = RegExp(
+            r'moviestar-data:movie-(\w+)',
+          ).allMatches(trimmedLine);
+          for (final match in movieMatches) {
+            final movieId = match.group(1);
+            if (movieId != null && !movieIds.contains(movieId)) {
+              movieIds.add(movieId);
             }
-          } catch (e) {
-            debugPrint('⚠️ Could not read movie file $fileName: $e');
           }
         }
-      } catch (e) {
-        debugPrint('⚠️ Could not enumerate movie files: $e');
-        return {};
       }
 
-      if (ratedMoviesMap.isEmpty) {
-        return {};
-      }
+      // Use fallback values if not found.
 
-      // Now process the rated movies to get full movie metadata.
+      listName ??= 'Movie List ${listId ?? 'Unknown'}';
+      description ??= 'A shared movie list';
 
-      Map<String, dynamic> enrichedMoviesMap = {};
+      final rawOwner = resourceInfo['owner'] ??
+          resourceInfo['ownerWebId'] ??
+          resourceInfo['webId'] ??
+          resourceInfo['ownerId'];
+      final rawSharedBy = resourceInfo['granter'] ??
+          resourceInfo['granterWebId'] ??
+          resourceInfo['sharedBy'] ??
+          resourceInfo['sharer'];
 
-      for (final entry in ratedMoviesMap.entries) {
-        final resourceUrl = entry.key;
-        final movieEntry = entry.value as Map<String, dynamic>;
-        final movieContent = movieEntry['movieContent'] as String;
-        final fileName = movieEntry['movieFileName'] as String;
+      // Try to extract owner from resource URL if not found in resourceInfo.
 
-        try {
-          // Create a basic resource info for parsing.
+      String finalOwner = rawOwner?.toString() ?? '';
+      String finalSharedBy = rawSharedBy?.toString() ?? '';
 
-          final basicResourceInfo = {
-            'movieUrl': resourceUrl,
-            'movieFileName': fileName,
-            'owner': currentWebId,
-            'granter': currentWebId,
-          };
+      // Extract from resource URL for both owner and shared by if not found in metadata.
 
-          // Parse the movie data from TTL content.
+      final ownerMatch = RegExp(r'://[^/]+/([^/]+)/').firstMatch(resourceUrl);
+      if (ownerMatch != null) {
+        final username = ownerMatch.group(1);
+        final webId =
+            'https://pods.dev.solidcommunity.au/$username/profile/card#me';
 
-          final movieData = await _parseMovieData(
-              movieContent, resourceUrl, basicResourceInfo);
-
-          if (movieData != null) {
-            // Update to show this is user's own rated movie.
-
-            movieData['owner'] = 'ME';
-            movieData['sharedBy'] = 'ME';
-            movieData['isUserRatedMovie'] = true;
-            movieData['canShare'] = true;
-            movieData['recipient'] = 'Not shared yet';
-
-            enrichedMoviesMap[resourceUrl] = movieData;
-          }
-        } catch (e) {
-          debugPrint('❌ Error processing movie file $fileName: $e');
-
-          // Create a fallback entry.
-
-          enrichedMoviesMap[resourceUrl] = {
-            'fileName':
-                fileName.replaceAll('.ttl', '').replaceAll('Movie-', 'Movie '),
-            'owner': 'ME',
-            'sharedBy': 'ME',
-            'permissions': 'read',
-            'movieId': _extractMovieIdFromUrl(resourceUrl),
-            'rating': null,
-            'comments': '',
-            'resourceUrl': resourceUrl,
-            'isUserRatedMovie': true,
-            'canShare': true,
-            'recipient': 'Not shared yet',
-          };
+        if (finalOwner.isEmpty) {
+          finalOwner = webId;
+        }
+        if (finalSharedBy.isEmpty) {
+          finalSharedBy =
+              webId; // Use same WebID for shared by when not available.
         }
       }
 
-      return enrichedMoviesMap;
+      final result = {
+        'listId': listId ?? 'unknown',
+        'listName': listName,
+        'description': description,
+        'movieCount': movieIds.length, // Use extracted movie IDs count.
+
+        'movieIds': movieIds,
+        'movies': movieIds
+            .map(
+              (movieIdStr) => {
+                'movieId': movieIdStr,
+                'fileName':
+                    'Movie $movieIdStr', // Placeholder - will fetch details on-demand.
+                'owner': _formatWebId(finalOwner),
+                'ownerWebId': finalOwner, // Inherit from parent list.
+
+                'sharedBy': _formatWebId(finalSharedBy),
+                'sharedByWebId': finalSharedBy, // Inherit from parent list
+              },
+            )
+            .toList(),
+        'owner': _formatWebId(finalOwner),
+        'ownerWebId': finalOwner, // Store full WebID for URL construction
+        'sharedBy': _formatWebId(finalSharedBy),
+        'sharedByWebId': finalSharedBy, // Store full WebID for URL construction
+        'permissions': resourceInfo['permissions'] ??
+            resourceInfo['permissionList'] ??
+            'read',
+        'resourceUrl': resourceUrl,
+      };
+
+      return result;
     } catch (e) {
-      debugPrint('❌ Error fetching movies I shared: $e');
+      debugPrint('❌ Error parsing movie list data: $e');
       return null;
     }
   }
@@ -524,20 +591,18 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
             Icon(
               Icons.movie_outlined,
               size: 64,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             const Gap(16),
             Text(
               'No Shared Movies',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
             ),
             const Gap(8),
@@ -545,10 +610,9 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
               'Movies shared with you will appear here.\nStart sharing movies with friends to see them!\n\nMake sure you have POD storage enabled in Settings.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
             ),
           ],
@@ -582,10 +646,9 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
               'Please check your connection and try again.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
             ),
             const Gap(16),
@@ -605,33 +668,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Column(
-        children: [
-          Container(
-            color: Theme.of(context).appBarTheme.backgroundColor,
-            child: TabBar(
-              controller: _tabController,
-              tabs: const [
-                Tab(text: 'Shared with Me'),
-                Tab(text: 'My Rated Movies'),
-              ],
-            ),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                // Tab 1: Movies shared with me.
-
-                _buildSharedWithMeTab(),
-                // Tab 2: My rated movies.
-
-                _buildMySharedTab(),
-              ],
-            ),
-          ),
-        ],
-      ),
+      body: _buildSharedWithMeTab(),
     );
   }
 
@@ -660,77 +697,6 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
           return _buildLoadedScreen(snapshot.data!);
         }
       },
-    );
-  }
-
-  Widget _buildMySharedTab() {
-    return FutureBuilder<Map<String, dynamic>?>(
-      future: _mySharedData,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                Gap(16),
-                Text('Loading your shared movies...'),
-              ],
-            ),
-          );
-        } else if (snapshot.hasError) {
-          return _buildErrorState();
-        } else if (!snapshot.hasData ||
-            snapshot.data == null ||
-            snapshot.data!.isEmpty) {
-          return _buildMySharedEmptyState();
-        } else {
-          return _buildLoadedScreen(snapshot.data!);
-        }
-      },
-    );
-  }
-
-  Widget _buildMySharedEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.star_rate_outlined,
-              size: 64,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.5),
-            ),
-            const Gap(16),
-            Text(
-              'No Rated Movies Yet',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
-                  ),
-            ),
-            const Gap(8),
-            Text(
-              'Movies you\'ve rated or commented on will appear here.\n\nTo rate a movie:\n1. Go to any movie details\n2. Add a rating or comment\n3. Save your review\n\nYou can then share your rated movies with friends.',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.5),
-                  ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

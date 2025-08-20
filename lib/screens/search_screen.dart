@@ -139,8 +139,9 @@ class _SearchScreenState extends State<SearchScreen> {
     });
 
     try {
-      final results =
-          await widget.movieService.searchMoviesComprehensive(query);
+      final results = await widget.movieService.searchMoviesComprehensive(
+        query,
+      );
 
       // Only update state if this search is still relevant.
 
@@ -238,24 +239,24 @@ class _SearchScreenState extends State<SearchScreen> {
                   width: 50,
                   height: 75,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  placeholder: (context, url) =>
+                      const Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
               title: Text(
                 movie.title,
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               subtitle: Text(
                 '⭐ ${movie.voteAverage.toStringAsFixed(1)}',
                 style: TextStyle(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.6)),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
               ),
               onTap: () {
                 Navigator.push(
@@ -286,18 +287,19 @@ class _SearchScreenState extends State<SearchScreen> {
           decoration: InputDecoration(
             hintText: 'Search by title, actor, or genre...',
             hintStyle: TextStyle(
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withValues(alpha: 0.6)),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
             border: InputBorder.none,
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
-                    icon: Icon(Icons.clear,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.6)),
+                    icon: Icon(
+                      Icons.clear,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                     onPressed: () {
                       _searchController.clear();
                     },
@@ -344,10 +346,9 @@ class _SearchScreenState extends State<SearchScreen> {
                                     ? 'Type at least 2 characters'
                                     : 'No results found',
                             style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.6),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.6),
                               fontSize: 18,
                             ),
                           ),
@@ -355,10 +356,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           Text(
                             'Find movies by title, actor, or genre',
                             style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withValues(alpha: 0.4)),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.4),
+                            ),
                           ),
                         ],
                       ),
@@ -368,11 +369,17 @@ class _SearchScreenState extends State<SearchScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildResultsSection(
-                              'title', _searchResults['title'] ?? []),
+                            'title',
+                            _searchResults['title'] ?? [],
+                          ),
                           _buildResultsSection(
-                              'actor', _searchResults['actor'] ?? []),
+                            'actor',
+                            _searchResults['actor'] ?? [],
+                          ),
                           _buildResultsSection(
-                              'genre', _searchResults['genre'] ?? []),
+                            'genre',
+                            _searchResults['genre'] ?? [],
+                          ),
                         ],
                       ),
                     ),

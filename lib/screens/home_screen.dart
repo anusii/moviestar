@@ -133,10 +133,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         Text(
                           'To Watch',
                           style: TextStyle(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.color,
+                            color: Theme.of(
+                              context,
+                            ).textTheme.headlineMedium?.color,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -150,9 +149,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             child: CircularProgressIndicator(
                               strokeWidth: 1.5,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                Theme.of(context)
-                                    .primaryColor
-                                    .withValues(alpha: 0.6),
+                                Theme.of(
+                                  context,
+                                ).primaryColor.withValues(alpha: 0.6),
                               ),
                             ),
                           ),
@@ -160,8 +159,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ],
                     ),
                   ),
-                  // Show cache indicator for user data if cached.
 
+                  // Show cache indicator for user data if cached.
                   if (fromCache && cacheAge != null)
                     _buildCacheAgeBadge(cacheAge),
                 ],
@@ -170,7 +169,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             SizedBox(
               height: 200,
               child: _buildToWatchMovieContent(
-                  snapshot, cacheResult, cacheOnlyMode),
+                snapshot,
+                cacheResult,
+                cacheOnlyMode,
+              ),
             ),
           ],
         );
@@ -222,11 +224,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Text(
               'Loading To Watch movies...',
               style: TextStyle(
-                color: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.color
-                    ?.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
             ),
@@ -335,10 +335,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         Text(
                           'Watched',
                           style: TextStyle(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.color,
+                            color: Theme.of(
+                              context,
+                            ).textTheme.headlineMedium?.color,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -352,9 +351,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             child: CircularProgressIndicator(
                               strokeWidth: 1.5,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                Theme.of(context)
-                                    .primaryColor
-                                    .withValues(alpha: 0.6),
+                                Theme.of(
+                                  context,
+                                ).primaryColor.withValues(alpha: 0.6),
                               ),
                             ),
                           ),
@@ -362,8 +361,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ],
                     ),
                   ),
-                  // Show cache indicator for user data if cached.
 
+                  // Show cache indicator for user data if cached.
                   if (fromCache && cacheAge != null)
                     _buildCacheAgeBadge(cacheAge),
                 ],
@@ -372,7 +371,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             SizedBox(
               height: 200,
               child: _buildWatchedMovieContent(
-                  snapshot, cacheResult, cacheOnlyMode),
+                snapshot,
+                cacheResult,
+                cacheOnlyMode,
+              ),
             ),
           ],
         );
@@ -424,11 +426,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Text(
               'Loading Watched movies...',
               style: TextStyle(
-                color: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.color
-                    ?.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
             ),

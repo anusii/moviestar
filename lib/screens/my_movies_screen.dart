@@ -1,6 +1,6 @@
-/// Screen for managing the user's list of watched movies.
+/// Screen for managing movies the user has rated and reviewed.
 ///
-// Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
+// Time-stamp: <Tuesday 2025-08-20 21:52:00 +1000 Ashley Tang>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang
+/// Authors: Ashley Tang
 
 library;
 
@@ -42,26 +42,58 @@ import '../widgets/moviestar_batch_sharing_ui.dart';
 import '../widgets/sort_controls.dart';
 import 'movie_details_screen.dart';
 
-/// A screen that displays the user's list of watched movies.
+/// A screen that displays movies the user has rated and reviewed.
 
-class WatchedScreen extends StatefulWidget {
+class MyMoviesScreen extends StatefulWidget {
   /// Service for managing favorite movies.
 
   final FavoritesService favoritesService;
 
-  /// Creates a new [WatchedScreen] widget.
+  /// Creates a new [MyMoviesScreen] widget.
 
-  const WatchedScreen({super.key, required this.favoritesService});
+  const MyMoviesScreen({super.key, required this.favoritesService});
 
   @override
-  State<WatchedScreen> createState() => _WatchedScreenState();
+  State<MyMoviesScreen> createState() => _MyMoviesScreenState();
 }
 
-/// State class for the watched screen.
+/// State class for the my movies screen.
 
-class _WatchedScreenState extends State<WatchedScreen> {
+class _MyMoviesScreenState extends State<MyMoviesScreen> {
   /// Currently selected sort criteria.
   MovieSortCriteria _sortCriteria = MovieSortCriteria.nameAsc;
+
+  /// Gets movies that the user has rated (combines both to watch and watched movies with ratings).
+  Stream<List<Movie>> get _ratedMovies async* {
+    await for (final toWatch in widget.favoritesService.toWatchMovies) {
+      await for (final watched in widget.favoritesService.watchedMovies) {
+        final allMovies = <Movie>[...toWatch, ...watched];
+        final uniqueMovies = <int, Movie>{};
+
+        for (final movie in allMovies) {
+          uniqueMovies[movie.id] = movie;
+        }
+
+        // Filter to only movies with user ratings if using adapter
+        if (widget.favoritesService is FavoritesServiceAdapter) {
+          final adapter = widget.favoritesService as FavoritesServiceAdapter;
+          final ratedMovies = <Movie>[];
+
+          for (final movie in uniqueMovies.values) {
+            final rating = await adapter.getPersonalRating(movie);
+            if (rating != null && rating > 0) {
+              ratedMovies.add(movie);
+            }
+          }
+
+          yield ratedMovies;
+        } else {
+          yield uniqueMovies.values.toList();
+        }
+        break;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,12 +102,12 @@ class _WatchedScreenState extends State<WatchedScreen> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         title: Text(
-          'Watched',
+          'My Movies',
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
         actions: [
           StreamBuilder<List<Movie>>(
-            stream: widget.favoritesService.watchedMovies,
+            stream: _ratedMovies,
             builder: (context, snapshot) {
               final hasMovies = snapshot.hasData && snapshot.data!.isNotEmpty;
               final isPodEnabled =
@@ -86,17 +118,17 @@ class _WatchedScreenState extends State<WatchedScreen> {
               return Padding(
                 padding: const EdgeInsets.only(
                   right: 60.0,
-                ), // Add space to avoid debug banner
+                ),
                 child: MarkdownTooltip(
                   message: '''
 
-**📤 Share Watched List**
+**📤 Share My Movies**
 
-Share your **watched movies list** with others through your POD.
+Share your **rated movies collection** with others through your POD.
 
 Recipients will be able to:
-- View your list of watched movies
-- See your ratings and reviews
+- View your movie ratings and reviews  
+- See which movies you've enjoyed
 - Access through secure POD sharing
 
 *Requires POD storage to be enabled*
@@ -105,7 +137,7 @@ Recipients will be able to:
                   child: IconButton(
                     icon: const Icon(Icons.share),
                     onPressed: (hasMovies && isPodEnabled)
-                        ? () => _shareWatchedList(context, snapshot.data!)
+                        ? () => _shareMyMovies(context, snapshot.data!)
                         : null,
                   ),
                 ),
@@ -126,7 +158,7 @@ Recipients will be able to:
           ),
           Expanded(
             child: StreamBuilder<List<Movie>>(
-              stream: widget.favoritesService.watchedMovies,
+              stream: _ratedMovies,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(
@@ -148,7 +180,7 @@ Recipients will be able to:
                 if (movies.isEmpty) {
                   return Center(
                     child: Text(
-                      'Your watched list is empty',
+                      'You haven\'t rated any movies yet',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   );
@@ -158,47 +190,66 @@ Recipients will be able to:
                   itemCount: movies.length,
                   itemBuilder: (context, index) {
                     final movie = movies[index];
-                    return ListTile(
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: CachedNetworkImage(
-                          imageUrl: movie.posterUrl,
-                          width: 50,
-                          height: 75,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                        ),
-                      ),
-                      title: Text(
-                        movie.title,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                      subtitle: Text(
-                        '⭐ ${movie.voteAverage.toStringAsFixed(1)}',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(
-                          Icons.remove_circle_outline,
-                          color: Colors.red,
-                        ),
-                        onPressed: () {
-                          widget.favoritesService.removeFromWatched(movie);
-                        },
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MovieDetailsScreen(
-                              movie: movie,
-                              favoritesService: widget.favoritesService,
+                    return FutureBuilder<double?>(
+                      future: widget.favoritesService is FavoritesServiceAdapter
+                          ? (widget.favoritesService as FavoritesServiceAdapter)
+                              .getPersonalRating(movie)
+                          : Future.value(null),
+                      builder: (context, ratingSnapshot) {
+                        final userRating = ratingSnapshot.data;
+
+                        return ListTile(
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: CachedNetworkImage(
+                              imageUrl: movie.posterUrl,
+                              width: 50,
+                              height: 75,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
                             ),
                           ),
+                          title: Text(
+                            movie.title,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '⭐ ${movie.voteAverage.toStringAsFixed(1)}',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                              if (userRating != null)
+                                Text(
+                                  '🎯 My Rating: ${userRating.toStringAsFixed(1)}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                ),
+                            ],
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MovieDetailsScreen(
+                                  movie: movie,
+                                  favoritesService: widget.favoritesService,
+                                ),
+                              ),
+                            );
+                          },
                         );
                       },
                     );
@@ -212,9 +263,9 @@ Recipients will be able to:
     );
   }
 
-  // Shares the watched movies list and all individual movies using batch sharing UI.
+  // Shares the user's rated movies using batch sharing UI.
 
-  Future<void> _shareWatchedList(
+  Future<void> _shareMyMovies(
     BuildContext context,
     List<Movie> movies,
   ) async {
@@ -241,9 +292,9 @@ Recipients will be able to:
 
       // Create the MovieList TTL file
       final listId = await movieListService.createMovieList(
-        'Watched Movies',
+        'My Rated Movies',
         movies: movies,
-        description: 'Movies you have watched',
+        description: 'Movies I have rated and reviewed',
       );
 
       if (!mounted) return;
@@ -274,7 +325,7 @@ Recipients will be able to:
             fullscreenDialog: true,
             builder: (context) => MovieStarBatchSharingUi(
               listId: listId,
-              listName: 'Watched Movies',
+              listName: 'My Rated Movies',
               movies: movies,
               backgroundColor: theme.scaffoldBackgroundColor,
               onSharingComplete: () {

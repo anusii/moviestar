@@ -26,8 +26,12 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:solidpod/solidpod.dart';
-import 'package:solidpod/src/solid/constants/web_acl.dart';
+import 'package:solidpod/solidpod.dart' show 
+    SolidFunctionCallStatus, grantPermission, getWebId, loginIfRequired, 
+    getKeyFromUserIfRequired;
+// ignore: implementation_imports
+import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
+
 
 import 'package:moviestar/models/movie.dart';
 

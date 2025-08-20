@@ -26,8 +26,11 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:solidpod/solidpod.dart';
-import 'package:solidpod/src/solid/constants/web_acl.dart';
+import 'package:solidpod/solidpod.dart' show 
+    SolidFunctionCallStatus, readPod, writePod, grantPermission, 
+    getWebId;
+// ignore: implementation_imports
+import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/movie_list_service.dart';
@@ -446,7 +449,7 @@ class _EnhancedMovieListSharingUiState
         'user_lists/MovieList-${widget.listId}.ttl',
         true, // fileFlag
         selectedPermList,
-        selectedRecipient,
+        RecipientType.individual,
         recipientList,
         ownerWebId,
         context,
@@ -484,7 +487,7 @@ class _EnhancedMovieListSharingUiState
               'movies/Movie-${movie.id}.ttl',
               true, // fileFlag
               ['read'], // Only read permission for movies
-              selectedRecipient,
+              RecipientType.individual,
               recipientList,
               ownerWebId,
               context,

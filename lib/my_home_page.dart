@@ -76,6 +76,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   String? _webId;
   String? _name;
   String _appVersion = '0.0.0+0'; // Default version
+  bool _isAppVersionLoaded = false; // Track if version has been loaded
 
   /// Service for managing favorite movies.
 
@@ -129,6 +130,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       if (mounted) {
         setState(() {
           _appVersion = version;
+          _isAppVersionLoaded = true; // Mark version as loaded
         });
       }
     } catch (e) {
@@ -363,12 +365,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       menu: _menuItems,
       appBar: SolidAppBarConfig(
         title: _menuItems[_selectedIndex].title,
-        versionConfig: SolidVersionConfig(
-          version: _appVersion,
-          changelogUrl: 'https://github.com/anusii/moviestar/blob/dev/CHANGELOG'
-              '.md',
-          showDate: true,
-        ),
+        versionConfig: _isAppVersionLoaded 
+            ? SolidVersionConfig(
+                version: _appVersion,
+                changelogUrl: 'https://github.com/anusii/moviestar/blob/dev/CHANGELOG'
+                    '.md',
+                showDate: true,
+              )
+            : null, // Don't show version until it's properly loaded from pubspec.yaml
         actions: SolidScaffoldConfig.createAppBarActions(
           ref: ref,
           onViewModeToggle: _handleViewModeToggle,

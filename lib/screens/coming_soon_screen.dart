@@ -29,12 +29,9 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 import 'package:moviestar/widgets/movie_card.dart';
@@ -77,53 +74,6 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        title: Row(
-          children: [
-            Text(
-              'Coming Soon',
-              style: Theme.of(context).appBarTheme.titleTextStyle,
-            ),
-            const SizedBox(width: 8),
-            _buildCacheIndicator(upcomingMoviesAsync, cacheOnlyMode),
-          ],
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 60.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.refresh),
-                  onPressed: _forceRefresh,
-                  tooltip: 'Refresh upcoming movies',
-                ),
-                Consumer(
-                  builder: (context, ref, child) {
-                    final themeMode = ref.watch(themeModeProvider);
-                    final isDarkMode = themeMode == ThemeMode.dark;
-                    return IconButton(
-                      icon: Icon(
-                        isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                      ),
-                      onPressed: () async {
-                        await ref
-                            .read(themeModeProvider.notifier)
-                            .toggleTheme();
-                      },
-                      tooltip: isDarkMode
-                          ? 'Switch to light mode'
-                          : 'Switch to dark mode',
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
       body: RefreshIndicator(
         onRefresh: _forceRefresh,
         child: upcomingMoviesAsync.when(
@@ -163,71 +113,6 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  /// Builds cache indicator for the app bar.
-
-  Widget _buildCacheIndicator(
-    AsyncValue<CacheResult<List<Movie>>> upcomingMoviesAsync,
-    bool cacheOnlyMode,
-  ) {
-    return upcomingMoviesAsync.when(
-      data: (cacheResult) {
-        if (cacheOnlyMode) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.orange,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.offline_pin, size: 12, color: Colors.white),
-                SizedBox(width: 4),
-                Text(
-                  'OFFLINE',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-
-        final color = cacheResult.fromCache ? Colors.green : Colors.blue;
-        final icon = cacheResult.fromCache ? Icons.offline_bolt : Icons.wifi;
-        final text = cacheResult.fromCache ? 'CACHED' : 'LIVE';
-
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 12, color: Colors.white),
-              const SizedBox(width: 4),
-              Text(
-                text,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

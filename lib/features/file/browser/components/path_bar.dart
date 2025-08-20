@@ -27,6 +27,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:gap/gap.dart';
+
 import 'package:moviestar/theme/app_theme.dart';
 
 /// A path bar widget that displays the current directory path and provides
@@ -109,7 +111,7 @@ class PathBar extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
-            if (pathHistory.length > 1) const SizedBox(width: 12),
+            if (pathHistory.length > 1) const Gap(12),
 
             // Path text display.
             Expanded(
@@ -131,7 +133,7 @@ class PathBar extends StatelessWidget {
                 fontSize: 12,
               ),
             ),
-            const SizedBox(width: 12),
+            const Gap(12),
 
             // Refresh button.
             IconButton(

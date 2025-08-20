@@ -10,12 +10,13 @@ on:
     types: [opened, reopened, synchronize]
 
 env:
-  FLUTTER_VERSION: '3.32.5'
+  FLUTTER_VERSION: '3.32.8'
 
 jobs:
 
   analyze:
     runs-on: ubuntu-latest
+    if: github.event.repository.private == false
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -27,6 +28,7 @@ jobs:
 
   format:
     runs-on: ubuntu-latest
+    if: github.event.repository.private == false
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -38,6 +40,7 @@ jobs:
 
   import_order:
     runs-on: ubuntu-latest
+    if: github.event.repository.private == false
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -45,21 +48,24 @@ jobs:
           channel: 'stable'
           flutter-version: ${{env.FLUTTER_VERSION}}
       - run: flutter pub get
-      - run: dart run import_order_lint:import_order --set-exit-if-changed
+      - run: dart pub global activate import_order_lint
+      - run: import_order --check
 
   markdown:
     runs-on: ubuntu-latest
+    if: github.event.repository.private == false
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 18
       - run: npm install -g markdownlint-cli
-      - run: markdownlint assets/markdown
+      - run: markdownlint --disable MD036 -- assets/markdown
         # -p .markdownlintignore -c .markdownlint.yaml
 
   copyright:
     runs-on: ubuntu-latest
+    if: github.event.repository.private == false
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -90,6 +96,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    if: github.event.repository.private == false
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2

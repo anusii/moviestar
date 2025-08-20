@@ -27,6 +27,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:gap/gap.dart';
+
 /// Utility class for showing cache performance feedback to users.
 
 class CacheFeedbackWidget {
@@ -64,7 +66,7 @@ class CacheFeedbackWidget {
         content: Row(
           children: [
             Icon(icon, color: Colors.white, size: 16),
-            const SizedBox(width: 8),
+            const Gap(8),
             Expanded(
               child: Text(message, style: const TextStyle(color: Colors.white)),
             ),
@@ -118,7 +120,7 @@ class CacheFeedbackWidget {
               color: Colors.white,
               size: 16,
             ),
-            const SizedBox(width: 8),
+            const Gap(8),
             Expanded(
               child: Text(message, style: const TextStyle(color: Colors.white)),
             ),
@@ -151,7 +153,7 @@ class CacheFeedbackWidget {
         content: Row(
           children: [
             Icon(icon, color: Colors.white, size: 16),
-            const SizedBox(width: 8),
+            const Gap(8),
             Expanded(
               child: Text(message, style: const TextStyle(color: Colors.white)),
             ),

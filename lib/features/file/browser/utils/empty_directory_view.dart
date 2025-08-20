@@ -27,6 +27,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:gap/gap.dart';
+
 import 'package:moviestar/theme/app_theme.dart';
 
 /// A widget that displays when a directory is empty.
@@ -54,7 +56,7 @@ class EmptyDirectoryView extends StatelessWidget {
             color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
           ),
 
-          const SizedBox(height: 16),
+          const Gap(16),
 
           // Display empty state message.
           Container(

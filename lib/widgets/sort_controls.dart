@@ -27,6 +27,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:gap/gap.dart';
+
 /// Enum representing different sort criteria for movies.
 enum MovieSortCriteria {
   nameAsc,
@@ -60,7 +62,7 @@ class SortControls extends StatelessWidget {
       child: Row(
         children: [
           Text('Sort by:', style: Theme.of(context).textTheme.bodyLarge),
-          const SizedBox(width: 8),
+          const Gap(8),
           DropdownButton<MovieSortCriteria>(
             value: selectedCriteria,
             dropdownColor: Theme.of(context).cardTheme.color,

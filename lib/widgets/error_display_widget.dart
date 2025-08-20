@@ -27,6 +27,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:gap/gap.dart';
+
 /// A reusable widget for displaying error states with consistent styling.
 ///
 /// This widget provides a standard way to display errors across the app,
@@ -107,14 +109,14 @@ class ErrorDisplayWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.error_outline, size: iconSize, color: errorColor),
-            SizedBox(height: isCompact ? 8.0 : 16.0),
+            Gap(isCompact ? 8.0 : 16.0),
             Text(
               message,
               style: TextStyle(color: errorColor, fontSize: textSize),
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[
-              SizedBox(height: isCompact ? 8.0 : 16.0),
+              Gap(isCompact ? 8.0 : 16.0),
               ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
             ],
           ],

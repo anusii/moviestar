@@ -28,6 +28,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gap/gap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart';
 
@@ -163,7 +164,7 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
                 'To use MovieStar, you need to set up a MovieDB API key.',
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
-              const SizedBox(height: 12),
+              const Gap(12),
               Text(
                 'You can get your free API key from The Movie Database (TMDB) website.',
                 style: Theme.of(

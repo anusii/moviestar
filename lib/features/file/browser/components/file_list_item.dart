@@ -29,6 +29,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
+import 'package:gap/gap.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:solidpod/solidpod.dart';
@@ -128,7 +129,7 @@ class FileListItem extends StatelessWidget {
 
                   // Responsive spacing after icon.
                   if (constraints.maxWidth > 40)
-                    SizedBox(width: constraints.maxWidth < 100 ? 4 : 12),
+                    Gap(constraints.maxWidth < 100 ? 4 : 12),
 
                   // File information column.
                   Expanded(
@@ -163,7 +164,7 @@ class FileListItem extends StatelessWidget {
 
                   // Action buttons shown only if sufficient width.
                   if (showButtons) ...[
-                    const SizedBox(width: 8),
+                    const Gap(8),
 
                     // Preview button for PDF files.
                     if (file.name.toLowerCase().contains('.pdf.enc.ttl'))
@@ -236,7 +237,7 @@ class FileListItem extends StatelessWidget {
                         ),
                       ),
                     if (file.name.toLowerCase().contains('.pdf.enc.ttl'))
-                      const SizedBox(width: 10),
+                      const Gap(10),
 
                     // Download button.
                     IconButton(
@@ -255,7 +256,7 @@ class FileListItem extends StatelessWidget {
                         minimumSize: const Size(35, 35),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const Gap(10),
 
                     // Delete button.
                     IconButton(

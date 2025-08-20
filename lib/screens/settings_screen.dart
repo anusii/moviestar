@@ -28,6 +28,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gap/gap.dart';
 import 'package:solidpod/solidpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -40,7 +41,6 @@ import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/utils/create_solid_login.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
-import 'package:moviestar/widgets/theme_toggle_button.dart';
 
 /// A screen that displays and manages user settings.
 
@@ -312,7 +312,7 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
                 ),
-                SizedBox(width: 16),
+                Gap(16),
                 Text('Refreshing all movie data...'),
               ],
             ),
@@ -376,7 +376,7 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               ),
-              SizedBox(width: 16),
+              Gap(16),
               Text('Enabling POD storage...'),
             ],
           ),
@@ -550,16 +550,9 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        title: Text(
-          'Settings',
-          style: Theme.of(context).appBarTheme.titleTextStyle,
-        ),
-      ),
       body: ListView(
         children: [
-          const SizedBox(height: 20),
+          const Gap(20),
 
           // Profile Picture.
           Center(
@@ -593,7 +586,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const Gap(20),
 
           // Settings Sections.
           _buildSection('API Configuration', [
@@ -606,7 +599,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                     'MovieDB API Key',
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
-                  const SizedBox(height: 4),
+                  const Gap(4),
                   Row(
                     children: [
                       Expanded(
@@ -634,7 +627,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                         ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const Gap(8),
                   SizedBox(
                     width: 420,
                     child: TextField(
@@ -675,7 +668,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                       obscureText: !_isApiKeyVisible,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const Gap(8),
                   GestureDetector(
                     onTap: () {
                       // Launch TMDB website to get API key.
@@ -693,7 +686,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const Gap(16),
                   ElevatedButton(
                     onPressed: () async {
                       await widget.apiKeyService.setApiKey(
@@ -758,14 +751,24 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                             'Theme',
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
-                          const SizedBox(height: 4),
+                          const Gap(4),
                           Text(
                             'Switch between light and dark mode',
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
                       ),
-                      const ThemeToggleButton(isIconButton: true),
+                      Consumer(
+                        builder: (context, ref, _) {
+                          final themeMode = ref.watch(themeModeProvider);
+                          return Icon(
+                            themeMode == ThemeMode.dark
+                                ? Icons.dark_mode
+                                : Icons.light_mode,
+                            color: Theme.of(context).colorScheme.primary,
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ],
@@ -876,14 +879,14 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                         Row(
                           children: [
                             const Icon(Icons.storage, size: 16),
-                            const SizedBox(width: 8),
+                            const Gap(8),
                             Text(
                               'Cache Statistics',
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+                        const Gap(12),
                         ...stats.entries.map((entry) {
                           final category = entry.key;
                           final stat = entry.value;
@@ -928,7 +931,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                                           ? Colors.green
                                           : Colors.orange,
                                     ),
-                                    const SizedBox(width: 4),
+                                    const Gap(4),
                                     Text(
                                       (stat['isValid'] as bool)
                                           ? '${stat['movieCount']} movies'

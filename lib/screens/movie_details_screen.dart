@@ -30,6 +30,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:gap/gap.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
@@ -646,7 +647,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const Gap(8),
                   Row(
                     children: [
                       Icon(
@@ -656,7 +657,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                             : Colors.amber,
                         size: 20,
                       ),
-                      const SizedBox(width: 4),
+                      const Gap(4),
                       Text(
                         _isSharedMovie && _personalRating != null
                             ? _personalRating!.toStringAsFixed(1)
@@ -675,13 +676,13 @@ Your shared movies will appear in their "Shared with Me" tab.
                             fontStyle: FontStyle.italic,
                           ),
                         ),
-                      const SizedBox(width: 16),
+                      const Gap(16),
                       Icon(
                         Icons.calendar_today,
                         color: Theme.of(context).colorScheme.onSurface,
                         size: 20,
                       ),
-                      const SizedBox(width: 4),
+                      const Gap(4),
                       Text(
                         DateFormatUtil.formatShort(widget.movie.releaseDate),
                         style: TextStyle(
@@ -691,7 +692,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const Gap(16),
 
                   // Shared Movie Indicator.
                   if (_isSharedMovie)
@@ -711,12 +712,10 @@ Your shared movies will appear in their "Shared with Me" tab.
                       ),
                       child: Row(
                         children: [
-                          Icon(
-                            Icons.share,
-                            color: Theme.of(context).colorScheme.primary,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
+                          Icon(Icons.share,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 20),
+                          const Gap(8),
                           Text(
                             'This movie was shared by ${_getSharedByText()}',
                             style: TextStyle(
@@ -761,7 +760,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                         ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const Gap(8),
                   _isLoadingRating
                       ? const Center(child: CircularProgressIndicator())
                       : Row(
@@ -850,11 +849,11 @@ Your shared movies will appear in their "Shared with Me" tab.
                             ? 'Shared rating: ${_personalRating!.toStringAsFixed(1)}/10'
                             : 'Your rating: ${_personalRating!.toStringAsFixed(1)}/10'),
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 16,
-                    ),
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 16
+                      ),
                   ),
-                  const SizedBox(height: 16),
+                  const Gap(16),
 
                   // Personal Comments Section
                   Row(
@@ -909,7 +908,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                         ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const Gap(8),
                   _isLoadingComments
                       ? const Center(child: CircularProgressIndicator())
                       : Column(
@@ -967,7 +966,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                                       }
                                     },
                             ),
-                            const SizedBox(height: 8),
+                            const Gap(8),
                             if (!_isSharedMovie)
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -989,7 +988,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                                   if (_commentsModified &&
                                       (_personalComments != null &&
                                           _personalComments!.isNotEmpty))
-                                    const SizedBox(width: 8),
+                                    const Gap(8),
                                   if (_personalComments != null &&
                                       _personalComments!.isNotEmpty)
                                     TextButton.icon(
@@ -1013,7 +1012,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                               ),
                           ],
                         ),
-                  const SizedBox(height: 16),
+                  const Gap(16),
                   Text(
                     'Overview',
                     style: TextStyle(
@@ -1022,7 +1021,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const Gap(8),
                   Text(
                     widget.movie.overview,
                     style: TextStyle(

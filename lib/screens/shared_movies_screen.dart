@@ -27,6 +27,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
+import 'package:gap/gap.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/widgets/list_shared_movies.dart';
@@ -424,8 +425,8 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
         'rating': rating,
         'comments': comments ?? '',
         'resourceUrl': resourceUrl,
-
         // Movie metadata fields.
+
         'posterUrl': posterUrl ?? '',
         'backdropUrl': backdropUrl ?? posterUrl ?? '',
         'overview': overview ?? 'Shared movie',
@@ -759,7 +760,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
                 context,
               ).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
-            const SizedBox(height: 16),
+            const Gap(16),
             Text(
               'No Shared Movies',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -769,7 +770,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
                     ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
             ),
-            const SizedBox(height: 8),
+            const Gap(8),
             Text(
               'Movies shared with you will appear here.\nStart sharing movies with friends to see them!\n\nMake sure you have POD storage enabled in Settings.',
               textAlign: TextAlign.center,
@@ -797,7 +798,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
               size: 64,
               color: Theme.of(context).colorScheme.error,
             ),
-            const SizedBox(height: 16),
+            const Gap(16),
             Text(
               'Unable to Load Shared Movies',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -805,7 +806,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
                     color: Theme.of(context).colorScheme.error,
                   ),
             ),
-            const SizedBox(height: 8),
+            const Gap(8),
             Text(
               'Please check your connection and try again.',
               textAlign: TextAlign.center,
@@ -815,7 +816,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
                     ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
             ),
-            const SizedBox(height: 16),
+            const Gap(16),
             ElevatedButton.icon(
               onPressed: _refreshData,
               icon: const Icon(Icons.refresh),
@@ -831,33 +832,32 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        title: const Text('Shared Movies'),
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Shared with Me'),
-            Tab(text: 'My Rated Movies'),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _refreshData,
-            tooltip: 'Refresh',
-          ),
-        ],
-      ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: TabBarView(
-        controller: _tabController,
+      body: Column(
         children: [
-          // Tab 1: Movies shared with me.
-          _buildSharedWithMeTab(),
+          Container(
+            color: Theme.of(context).appBarTheme.backgroundColor,
+            child: TabBar(
+              controller: _tabController,
+              tabs: const [
+                Tab(text: 'Shared with Me'),
+                Tab(text: 'My Rated Movies'),
+              ],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                // Tab 1: Movies shared with me.
 
-          // Tab 2: My rated movies.
-          _buildMySharedTab(),
+                _buildSharedWithMeTab(),
+                // Tab 2: My rated movies.
+
+                _buildMySharedTab(),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -873,7 +873,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircularProgressIndicator(),
-                SizedBox(height: 16),
+                Gap(16),
                 Text('Loading shared movies...'),
               ],
             ),
@@ -901,7 +901,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircularProgressIndicator(),
-                SizedBox(height: 16),
+                Gap(16),
                 Text('Loading your shared movies...'),
               ],
             ),
@@ -933,7 +933,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
                 context,
               ).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
-            const SizedBox(height: 16),
+            const Gap(16),
             Text(
               'No Rated Movies Yet',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -943,7 +943,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
                     ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
             ),
-            const SizedBox(height: 8),
+            const Gap(8),
             Text(
               'Movies you\'ve rated or commented on will appear here.\n\nTo rate a movie:\n1. Go to any movie details\n2. Add a rating or comment\n3. Save your review\n\nYou can then share your rated movies with friends.',
               textAlign: TextAlign.center,

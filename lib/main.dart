@@ -87,6 +87,10 @@ void main() async {
 
       // The [title] is used for the window manager's window title.
       title: 'Movie Star - Manage and share ratings through private PODs',
+
+      // Set minimum window size to prevent UI element overlap.
+
+      minimumSize: Size(500, 400),
     );
 
     // Once the window manager is ready we reconfigure it a little.

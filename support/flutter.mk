@@ -75,7 +75,7 @@ help::
 
 .PHONY: chrome
 chrome:
-	flutter run -d chrome
+	flutter run -d chrome --release
 
 # 20220503 gjw The following fails if the target files already exist -
 # just needs to be run once.
@@ -143,6 +143,7 @@ pubspec:
 
 .PHONY: pubspec.local
 pubspec.local:
+	cp --backup pubspec.yaml pubspec.yaml.actual
 	cp --backup pubspec.yaml.local pubspec.yaml
 
 .PHONY: pubspec.actual
@@ -181,7 +182,8 @@ tests:: test qtest
 .PHONY: analyze
 analyze:
 	@echo "Futter ANALYZE"
-	-flutter analyze lib
+	-flutter analyze
+#	dart run custom_lint
 	@echo $(SEPARATOR)
 
 # dart pub global activate dependency_validator
@@ -217,6 +219,8 @@ riverpod:
 	flutter pub add riverpod_annotation
 	flutter pub add dev:riverpod_generator
 	flutter pub add dev:build_runner
+	flutter pub add dev:custom_lint
+	flutter pub add dev:riverpod_lint
 
 .PHONY: runner
 runner:
@@ -380,7 +384,7 @@ endif
 publish:
 	dart pub publish
 
-# import_order_lint is now a standalone tool, no global activation needed
+# dart pub global activate import_order_lint
 
 .PHONY: import_order
 import_order:

@@ -19,13 +19,14 @@ environment:
 dependencies:
   cached_network_image: ^3.3.0
   file_picker: ^10.1.9
-  # Database dependencies for local caching  
+  # Database dependencies for local caching
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
   flutter_secure_storage: ^10.0.0-beta.4
+  gap: ^3.0.1
   http: ^1.1.0
   intl: any
   markdown_tooltip: ^0.0.7
@@ -36,9 +37,14 @@ dependencies:
   rdflib: ^0.2.12
   rxdart: ^0.28.0
   shared_preferences: ^2.2.2
-  solidpod: ^0.7.5
+  solidpod: ^0.7.8
+  solidui:
+    git:
+      url: https://github.com/anusii/solidui.git
+      ref: dev
   universal_io: ^2.2.2
   url_launcher: ^6.3.1
+  version_widget: ^1.0.4
   window_manager: ^0.5.0
 
 dev_dependencies:
@@ -49,7 +55,7 @@ dev_dependencies:
   # Database code generation dependencies
   build_runner: ^2.4.7
   hive_generator: ^2.0.1
-  import_order_lint: ^0.2.0
+  import_order_lint: ^0.2.2
   test: ^1.25.15
   ubuntu_lints: ^0.4.0
 

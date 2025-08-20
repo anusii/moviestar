@@ -30,9 +30,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
+import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
@@ -79,6 +81,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _scrollControllers['nowPlaying'] = ScrollController();
     _scrollControllers['topRated'] = ScrollController();
     _scrollControllers['upcoming'] = ScrollController();
+
+    // Listen to custom list changes to create scroll controllers.
+
+    widget.favoritesService.customLists.listen((customLists) {
+      for (final customList in customLists) {
+        if (!_scrollControllers.containsKey(customList.id)) {
+          _scrollControllers[customList.id] = ScrollController();
+        }
+      }
+    });
   }
 
   @override
@@ -948,6 +960,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: [
           _buildToWatchMovieRow(),
           _buildWatchedMovieRow(),
+          _buildCustomListRows(),
           _buildMovieRow(
             'Popular on Movie Star',
             popularMovies,
@@ -1010,6 +1023,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
           _buildListSection('To Watch', _buildToWatchListItems()),
           _buildListSection('Watched', _buildWatchedListItems()),
+
+          // Custom List sections.
+
+          _buildCustomListListSections(),
 
           // API Movie sections.
 
@@ -1272,6 +1289,439 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           },
         );
       }).toList(),
+    );
+  }
+
+  // Build custom list rows for grid view.
+
+  Widget _buildCustomListRows() {
+    return StreamBuilder<List<CustomList>>(
+      stream: widget.favoritesService.customLists,
+      builder: (context, snapshot) {
+        final customLists = snapshot.data ?? [];
+        if (customLists.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          children: customLists.map((customList) {
+            return _buildCustomListMovieRow(customList);
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  // Build a horizontal scrollable row for a custom list.
+
+  Widget _buildCustomListMovieRow(CustomList customList) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _navigateToCustomListDetail(customList),
+                  child: Text(
+                    customList.name,
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.headlineMedium?.color,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              // Custom list count badge.
+
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${customList.movieCount}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+              ),
+              const Gap(8),
+              if (customList.movieCount > 5)
+                TextButton(
+                  onPressed: () => _navigateToCustomListDetail(customList),
+                  style: TextButton.styleFrom(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    'View More',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 200,
+          child: _buildCustomListContent(customList),
+        ),
+      ],
+    );
+  }
+
+  // Build content for a custom list.
+
+  Widget _buildCustomListContent(CustomList customList) {
+    // Get movie IDs from the custom list.
+
+    final movieIds = customList.movieIds;
+
+    if (movieIds.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text(
+            'No movies in ${customList.name} yet',
+            style: const TextStyle(color: Colors.grey),
+          ),
+        ),
+      );
+    }
+
+    return Scrollbar(
+      controller: _scrollControllers[customList.id] ?? ScrollController(),
+      thickness: 6,
+      radius: const Radius.circular(3),
+      thumbVisibility: true,
+      child: ListView.builder(
+        controller: _scrollControllers[customList.id],
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        itemCount: movieIds.length,
+        itemBuilder: (context, index) {
+          final movieId = movieIds[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: _buildCustomListMovieCard(movieId),
+          );
+        },
+      ),
+    );
+  }
+
+  // Build a movie card for a custom list movie (loading movie details on demand).
+
+  Widget _buildCustomListMovieCard(int movieId) {
+    final cachedMovieService = ref.read(cachedMovieServiceProvider);
+
+    return FutureBuilder<Movie>(
+      future: cachedMovieService.getMovieDetails(movieId),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Container(
+            width: 100,
+            height: 150,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.errorContainer,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  color: Theme.of(context).colorScheme.onErrorContainer,
+                  size: 24,
+                ),
+                const Gap(4),
+                Text(
+                  'Error',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting ||
+            !snapshot.hasData) {
+          return Container(
+            width: 100,
+            height: 150,
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ),
+                const Gap(8),
+                Text(
+                  'Loading...',
+                  style: TextStyle(
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7),
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final movie = snapshot.data!;
+        return MovieCard.poster(
+          movie: movie,
+          fromCache: false,
+          favoritesService: widget.favoritesService,
+          parentWidget: widget,
+          onTap: () {
+            if (mounted) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MovieDetailsScreen(
+                    movie: movie,
+                    favoritesService: widget.favoritesService,
+                  ),
+                ),
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+
+  // Build custom list sections for list view.
+
+  Widget _buildCustomListListSections() {
+    return StreamBuilder<List<CustomList>>(
+      stream: widget.favoritesService.customLists,
+      builder: (context, snapshot) {
+        final customLists = snapshot.data ?? [];
+        if (customLists.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          children: customLists.map((customList) {
+            return _buildCustomListSection(customList);
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  // Build a list section for a custom list.
+
+  Widget _buildCustomListSection(CustomList customList) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _navigateToCustomListDetail(customList),
+                  child: Text(
+                    customList.name,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+              ),
+              if (customList.movieCount > 5)
+                TextButton(
+                  onPressed: () => _navigateToCustomListDetail(customList),
+                  style: TextButton.styleFrom(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    'View More',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        _buildCustomListItems(customList),
+        const Gap(16),
+      ],
+    );
+  }
+
+  // Build list items for a custom list.
+
+  Widget _buildCustomListItems(CustomList customList) {
+    final movieIds = customList.movieIds;
+
+    if (movieIds.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text('No movies in ${customList.name}'),
+      );
+    }
+
+    final displayMovieIds = movieIds.take(5).toList();
+
+    return Column(
+      children: displayMovieIds.map((movieId) {
+        return _buildCustomListMovieListItem(movieId);
+      }).toList(),
+    );
+  }
+
+  // Build a list item for a custom list movie.
+
+  Widget _buildCustomListMovieListItem(int movieId) {
+    final cachedMovieService = ref.read(cachedMovieServiceProvider);
+
+    return FutureBuilder<Movie>(
+      future: cachedMovieService.getMovieDetails(movieId),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.errorContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                  ),
+                  const Gap(16),
+                  Expanded(
+                    child: Text(
+                      'Error loading movie $movieId',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting ||
+            !snapshot.hasData) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+                  const Gap(16),
+                  Expanded(
+                    child: Text(
+                      'Loading movie...',
+                      style: TextStyle(
+                        color: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.color
+                            ?.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        final movie = snapshot.data!;
+        return MovieCard.listItem(
+          movie: movie,
+          fromCache: false,
+          favoritesService: widget.favoritesService,
+          parentWidget: widget,
+          onTap: () {
+            if (mounted) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MovieDetailsScreen(
+                    movie: movie,
+                    favoritesService: widget.favoritesService,
+                  ),
+                ),
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+
+  // Navigate to custom list detail screen.
+
+  void _navigateToCustomListDetail(CustomList customList) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CustomListDetailScreen(
+          customList: customList,
+          favoritesService: widget.favoritesService,
+        ),
+      ),
     );
   }
 }

@@ -402,12 +402,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               'Connect to your pod to save and sync your movie preferences.',
         ),
         securityKeyStatus: SolidSecurityKeyStatus(
-          isKeySaved: false, // default value
+          isKeySaved: false, // Initial value
           tooltip: 'Security Key Manager: Tap here to manage your security key '
               'settings. View your current security key status, save a '
               'new security key, or remove an existing security key. '
               'Your security key is essential for encrypting and '
               'protecting your movie data.',
+          autoManage: true,
         ),
         showOnNarrowScreens: false,
       ),

@@ -82,7 +82,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _scrollControllers['topRated'] = ScrollController();
     _scrollControllers['upcoming'] = ScrollController();
 
-    // Listen to custom list changes to create scroll controllers
+    // Listen to custom list changes to create scroll controllers.
+
     widget.favoritesService.customLists.listen((customLists) {
       for (final customList in customLists) {
         if (!_scrollControllers.containsKey(customList.id)) {
@@ -959,7 +960,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: [
           _buildToWatchMovieRow(),
           _buildWatchedMovieRow(),
-          _buildCustomListRows(), // Add custom list rows
+          _buildCustomListRows(),
           _buildMovieRow(
             'Popular on Movie Star',
             popularMovies,
@@ -1024,6 +1025,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           _buildListSection('Watched', _buildWatchedListItems()),
 
           // Custom List sections.
+
           _buildCustomListListSections(),
 
           // API Movie sections.
@@ -1291,6 +1293,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build custom list rows for grid view.
+
   Widget _buildCustomListRows() {
     return StreamBuilder<List<CustomList>>(
       stream: widget.favoritesService.customLists,
@@ -1310,6 +1313,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build a horizontal scrollable row for a custom list.
+
   Widget _buildCustomListMovieRow(CustomList customList) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1331,7 +1335,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
               ),
-              // Custom list count badge
+              // Custom list count badge.
+
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
@@ -1376,8 +1381,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build content for a custom list.
+
   Widget _buildCustomListContent(CustomList customList) {
-    // Get movie IDs from the custom list
+    // Get movie IDs from the custom list.
+
     final movieIds = customList.movieIds;
 
     if (movieIds.isEmpty) {
@@ -1414,6 +1421,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build a movie card for a custom list movie (loading movie details on demand).
+
   Widget _buildCustomListMovieCard(int movieId) {
     final cachedMovieService = ref.read(cachedMovieServiceProvider);
 
@@ -1513,6 +1521,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build custom list sections for list view.
+
   Widget _buildCustomListListSections() {
     return StreamBuilder<List<CustomList>>(
       stream: widget.favoritesService.customLists,
@@ -1532,6 +1541,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build a list section for a custom list.
+
   Widget _buildCustomListSection(CustomList customList) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1578,6 +1588,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build list items for a custom list.
+
   Widget _buildCustomListItems(CustomList customList) {
     final movieIds = customList.movieIds;
 
@@ -1598,6 +1609,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Build a list item for a custom list movie.
+
   Widget _buildCustomListMovieListItem(int movieId) {
     final cachedMovieService = ref.read(cachedMovieServiceProvider);
 
@@ -1700,6 +1712,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // Navigate to custom list detail screen.
+
   void _navigateToCustomListDetail(CustomList customList) {
     Navigator.push(
       context,

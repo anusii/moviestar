@@ -236,6 +236,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }
 
   /// Build a custom list column that loads and displays movies from a CustomList.
+
   Widget _buildCustomListColumn(CustomList customList) {
     final movieIds = customList.movieIds;
     final displayMovieIds = movieIds.take(_maxItemsPerColumn).toList();
@@ -253,7 +254,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Column header
+          // Column header.
+
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -318,6 +320,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           ),
 
           // Movie items.
+
           Expanded(
             child: movieIds.isEmpty
                 ? Center(
@@ -348,7 +351,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
-  /// Build a movie item for a custom list (loading movie details on demand).
+  // Build a movie item for a custom list (loading movie details on demand).
+
   Widget _buildCustomListMovieItem(int movieId, String categoryId) {
     return Consumer(
       builder: (context, ref, child) {
@@ -436,6 +440,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }
 
   // Navigate to custom list detail screen.
+
   void _navigateToCustomListDetail(CustomList customList) {
     Navigator.push(
       context,

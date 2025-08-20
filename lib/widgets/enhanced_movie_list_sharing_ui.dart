@@ -26,9 +26,8 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:solidpod/solidpod.dart' show 
-    SolidFunctionCallStatus, readPod, writePod, grantPermission, 
-    getWebId;
+import 'package:solidpod/solidpod.dart'
+    show SolidFunctionCallStatus, readPod, writePod, grantPermission, getWebId;
 // ignore: implementation_imports
 import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
 

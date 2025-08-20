@@ -206,19 +206,6 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
     return webId.length > 20 ? '${webId.substring(0, 20)}...' : webId;
   }
 
-  // Extract movie ID from resource URL.
-
-  String _extractMovieIdFromUrl(String resourceUrl) {
-    // Extract from URLs like "https://pods.dev.solidcommunity.au/my-moviestar/moviestar/data/movies/Movie-846422.ttl".
-
-    final fileName = resourceUrl.split('/').last;
-    final match = RegExp(
-      r'Movie-(\w+)\.ttl',
-      caseSensitive: false,
-    ).firstMatch(fileName);
-    return match?.group(1) ?? 'unknown';
-  }
-
   // Parse movie data from TTL content.
 
   Future<Map<String, dynamic>?> _parseMovieData(

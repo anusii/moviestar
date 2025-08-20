@@ -39,7 +39,6 @@ import '../services/user_profile_service.dart';
 import '../utils/movie_sort_util.dart';
 import '../utils/turtle_serializer.dart';
 import '../widgets/moviestar_batch_sharing_ui.dart';
-import '../widgets/share_list_dialog.dart';
 import '../widgets/sort_controls.dart';
 import 'movie_details_screen.dart';
 
@@ -63,26 +62,6 @@ class MyMoviesScreen extends StatefulWidget {
 class _MyMoviesScreenState extends State<MyMoviesScreen> {
   /// Currently selected sort criteria.
   MovieSortCriteria _sortCriteria = MovieSortCriteria.nameAsc;
-
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  void _showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
 
   /// Gets movies that the user has rated (combines both to watch and watched movies with ratings).
   Stream<List<Movie>> get _ratedMovies async* {

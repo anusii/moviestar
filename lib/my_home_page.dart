@@ -28,6 +28,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart'
     show getAppNameVersion, logoutPopup, getWebId;
@@ -53,7 +54,6 @@ import 'package:moviestar/services/movie_service.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/widgets/moviestar_nav_config.dart';
-import 'package:moviestar/widgets/security_key_manager_dialog.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   final SharedPreferences prefs;
@@ -75,7 +75,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   bool _isLoadingFolders = false;
   String? _webId;
   String? _name;
-  bool _isKeySaved = false;
+  String _appVersion = '0.0.0+0'; // Default version
 
   /// Service for managing favorite movies.
 
@@ -83,10 +83,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   late final FavoritesService _favoritesService;
   late final ApiKeyService _apiKeyService;
   late final MovieService _movieService;
-  late final SolidSecurityKeyService _securityKeyService;
-
-  // Flag to prevent security key status update loops
-  bool _isUpdatingSecurityKeyStatus = false;
 
   /// List of screens to display in the navigation rail.
 
@@ -107,35 +103,39 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     _favoritesService = FavoritesServiceAdapter(_favoritesServiceManager);
     _apiKeyService = ApiKeyService();
     _movieService = MovieService(_apiKeyService);
-    _securityKeyService = SolidSecurityKeyService();
 
     // Listen for API key changes.
 
     _apiKeyService.addListener(_onApiKeyChanged);
 
-    // Listen for security key changes.
-
-    _securityKeyService.addListener(_onSecurityKeyChanged);
-
     _loadAppInfo();
     _loadUserInfo();
-    _loadSecurityKeyStatus();
     _buildScreens();
   }
 
   @override
   void dispose() {
     _apiKeyService.removeListener(_onApiKeyChanged);
-    _securityKeyService.removeListener(_onSecurityKeyChanged);
     super.dispose();
   }
 
-  /// Loads the app name and version from package_info_plus.
+  /// Loads the app name and version.
 
   Future<void> _loadAppInfo() async {
-    await getAppNameVersion();
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      final version = '${packageInfo.version}+${packageInfo.buildNumber}';
+      
+      if (mounted) {
+        setState(() {
+          _appVersion = version;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading app version: $e');
+    }
 
-    // Version loaded successfully.
+    await getAppNameVersion();
   }
 
   /// Loads user information from the POD.
@@ -214,81 +214,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       // Force refresh by rebuilding.
 
       setState(() {});
-    }
-  }
-
-  /// Handles security key changes.
-
-  void _onSecurityKeyChanged() {
-    if (_isUpdatingSecurityKeyStatus) {
-      debugPrint('Security key update already in progress, skipping');
-      return;
-    }
-
-    debugPrint('Security key status changed, updating UI state');
-
-    _updateSecurityKeyStatusFromService();
-  }
-
-  /// Updates security key status from service without triggering reload.
-
-  Future<void> _updateSecurityKeyStatusFromService() async {
-    if (_isUpdatingSecurityKeyStatus) return;
-
-    _isUpdatingSecurityKeyStatus = true;
-    try {
-      final isKeySaved = await _securityKeyService.isKeySaved();
-      if (mounted) {
-        setState(() {
-          _isKeySaved = isKeySaved;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error updating security key status: $e');
-    } finally {
-      _isUpdatingSecurityKeyStatus = false;
-    }
-  }
-
-  /// Loads the current security key status.
-
-  Future<void> _loadSecurityKeyStatus() async {
-    if (_isUpdatingSecurityKeyStatus) return;
-
-    _isUpdatingSecurityKeyStatus = true;
-    try {
-      bool hasValidKey = false;
-
-      // Check basic KeyManager status.
-
-      final hasKeyInMemory = await _securityKeyService.isKeySaved();
-
-      if (hasKeyInMemory) {
-        hasValidKey = true;
-      }
-
-      if (mounted) {
-        setState(() {
-          _isKeySaved = hasValidKey;
-        });
-      }
-
-      await _securityKeyService.fetchKeySavedStatus((bool hasKey) {
-        if (mounted && hasKey != _isKeySaved) {
-          setState(() {
-            _isKeySaved = hasKey;
-          });
-        }
-      });
-    } catch (e) {
-      debugPrint('Error loading security key status: $e');
-      if (mounted) {
-        setState(() {
-          _isKeySaved = false;
-        });
-      }
-    } finally {
-      _isUpdatingSecurityKeyStatus = false;
     }
   }
 
@@ -413,20 +338,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     logoutPopup(context, const MovieStar());
   }
 
-  /// Handles the security key management action.
-
-  void _handleSecurityKeyManagement() {
-    showDialog(
-      context: context,
-      barrierColor: Theme.of(context).colorScheme.onSurface,
-      builder: (BuildContext context) => SecurityKeyManagerDialog(
-        onKeyStatusChanged: (bool hasKey) {
-          _updateSecurityKeyStatusFromService();
-        },
-      ),
-    );
-  }
-
   /// Gets the appropriate icon for the current view mode.
 
   IconData _getViewModeIcon(HomeViewMode viewMode) {
@@ -467,15 +378,15 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       menu: _menuItems,
       appBar: SolidAppBarConfig(
         title: _menuItems[_selectedIndex].title,
-        versionConfig: const SolidVersionConfig(
-          version: '0.0.9+6',
+        versionConfig: SolidVersionConfig(
+          version: _appVersion,
           changelogUrl: 'https://github.com/anusii/moviestar/blob/dev/CHANGELOG'
               '.md',
           showDate: true,
           tooltip: '''
 **Version Information**
 
-Current version: 0.0.9+6
+Current version: $_appVersion
 
 Click to view the changelog and see what's new in this version.
 The version is automatically checked for updates.
@@ -534,8 +445,7 @@ The version is automatically checked for updates.
               'Login Required - Current status: Not logged in - Click to log in to your pod - Access your personal movie data. Connect to your pod to save and sync your movie preferences.',
         ),
         securityKeyStatus: SolidSecurityKeyStatus(
-          isKeySaved: _isKeySaved,
-          onTap: _handleSecurityKeyManagement,
+          isKeySaved: false, // default value
           tooltip:
               'Security Key Manager: Tap here to manage your security key settings. View your current security key status, save a new security key, or remove an existing security key. Your security key is essential for encrypting and protecting your movie data.',
         ),

@@ -375,7 +375,7 @@ Licensed under the GNU General Public License v3.0
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 
-Visit https://github.com/anusii/moviestar for more information.'''
+Visit https://github.com/anusii/moviestar for more information.''',
       ),
       statusBar: SolidStatusBarConfig(
         serverInfo: SolidServerInfo(

@@ -93,7 +93,7 @@ class ThemeService {
   Future<ThemeMode> toggleTheme() async {
     final currentMode = getThemeMode();
     ThemeMode newMode;
-    
+
     switch (currentMode) {
       case ThemeMode.light:
         newMode = ThemeMode.dark;

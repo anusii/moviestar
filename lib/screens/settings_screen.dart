@@ -808,18 +808,23 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
             _buildListTile('Help & Support', Icons.help_outline, () {
               // TODO: Navigate to Help & Support.
             }),
-            _buildListTile('Sign Out', Icons.logout, () async {
-              // Show logout confirmation dialog and handle logout.
+            _buildListTile(
+              'Sign Out',
+              Icons.logout,
+              () async {
+                // Show logout confirmation dialog and handle logout.
 
-              final prefs = ref.read(sharedPreferencesProvider);
+                final prefs = ref.read(sharedPreferencesProvider);
 
-              // Create a properly configured SolidLogin widget using the same function
-              // that creates the initial login screen to maintain consistent branding.
+                // Create a properly configured SolidLogin widget using the same function
+                // that creates the initial login screen to maintain consistent branding.
 
-              final solidLoginWidget = createSolidLogin(context, prefs);
+                final solidLoginWidget = createSolidLogin(context, prefs);
 
-              await logoutPopup(context, solidLoginWidget);
-            }, isDestructive: true),
+                await logoutPopup(context, solidLoginWidget);
+              },
+              isDestructive: true,
+            ),
           ]),
         ],
       ),
@@ -958,9 +963,14 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
         _buildListTile('Force Refresh All', Icons.refresh, () async {
           await _showForceRefreshDialog(cachingEnabled, cacheOnlyMode);
         }),
-        _buildListTile('Clear All Cache', Icons.delete_sweep, () async {
-          await _showClearCacheDialog(cachingEnabled, cacheOnlyMode);
-        }, isDestructive: true),
+        _buildListTile(
+          'Clear All Cache',
+          Icons.delete_sweep,
+          () async {
+            await _showClearCacheDialog(cachingEnabled, cacheOnlyMode);
+          },
+          isDestructive: true,
+        ),
         Divider(color: Theme.of(context).dividerColor),
       ],
     );
@@ -1038,7 +1048,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
               }
             }
           : null,
-      activeColor: Theme.of(context).colorScheme.primary,
+      activeThumbColor: Theme.of(context).colorScheme.primary,
     );
   }
 
@@ -1078,7 +1088,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
       subtitle: Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
       value: value,
       onChanged: onChanged,
-      activeColor: Theme.of(context).colorScheme.primary,
+      activeThumbColor: Theme.of(context).colorScheme.primary,
     );
   }
 

@@ -273,8 +273,10 @@ class FavoritesService extends ChangeNotifier {
 
   /// Creates a new custom list.
 
-  Future<CustomList> createCustomList(String name,
-      {String? description}) async {
+  Future<CustomList> createCustomList(
+    String name, {
+    String? description,
+  }) async {
     final lists = await getCustomLists();
     final newList = CustomList(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -353,14 +355,16 @@ class FavoritesService extends ChangeNotifier {
 
   Future<bool> isMovieInCustomList(String listId, int movieId) async {
     final lists = await getCustomLists();
-    final list = lists.firstWhere((list) => list.id == listId,
-        orElse: () => CustomList(
-              id: '',
-              name: '',
-              movieIds: [],
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now(),
-            ));
+    final list = lists.firstWhere(
+      (list) => list.id == listId,
+      orElse: () => CustomList(
+        id: '',
+        name: '',
+        movieIds: [],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
     return list.movieIds.contains(movieId);
   }
 
@@ -377,14 +381,16 @@ class FavoritesService extends ChangeNotifier {
 
   Future<List<Movie>> getMoviesInCustomList(String listId) async {
     final lists = await getCustomLists();
-    lists.firstWhere((list) => list.id == listId,
-        orElse: () => CustomList(
-              id: '',
-              name: '',
-              movieIds: [],
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now(),
-            ));
+    lists.firstWhere(
+      (list) => list.id == listId,
+      orElse: () => CustomList(
+        id: '',
+        name: '',
+        movieIds: [],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
 
     // Base implementation returns empty list
     // This should be overridden in the adapter to load from cache
@@ -395,14 +401,16 @@ class FavoritesService extends ChangeNotifier {
 
   Future<List<int>> getMovieIdsInCustomList(String listId) async {
     final lists = await getCustomLists();
-    final list = lists.firstWhere((list) => list.id == listId,
-        orElse: () => CustomList(
-              id: '',
-              name: '',
-              movieIds: [],
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now(),
-            ));
+    final list = lists.firstWhere(
+      (list) => list.id == listId,
+      orElse: () => CustomList(
+        id: '',
+        name: '',
+        movieIds: [],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
     return list.movieIds;
   }
 

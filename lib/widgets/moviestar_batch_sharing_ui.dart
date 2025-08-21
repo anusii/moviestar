@@ -479,7 +479,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                          iconColor),
+                                        iconColor,
+                                      ),
                                     ),
                                   )
                                 : Icon(icon, color: iconColor),

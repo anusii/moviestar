@@ -299,7 +299,8 @@ class _CustomListDetailScreenState
       builder: (context) => AlertDialog(
         title: const Text('Delete List'),
         content: Text(
-            'Are you sure you want to delete "${_currentList.name}"? This action cannot be undone.'),
+          'Are you sure you want to delete "${_currentList.name}"? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -921,7 +922,9 @@ Recipients will be able to:
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(80, 32),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
                     ),
                   ),
                 ],

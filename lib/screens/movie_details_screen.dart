@@ -712,9 +712,11 @@ Your shared movies will appear in their "Shared with Me" tab.
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.share,
-                              color: Theme.of(context).colorScheme.primary,
-                              size: 20),
+                          Icon(
+                            Icons.share,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 20,
+                          ),
                           const Gap(8),
                           Text(
                             'This movie was shared by ${_getSharedByText()}',
@@ -849,8 +851,9 @@ Your shared movies will appear in their "Shared with Me" tab.
                             ? 'Shared rating: ${_personalRating!.toStringAsFixed(1)}/10'
                             : 'Your rating: ${_personalRating!.toStringAsFixed(1)}/10'),
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 16),
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 16,
+                    ),
                   ),
                   const Gap(16),
 
@@ -1229,7 +1232,9 @@ class _AddToCustomListsDialogState extends State<_AddToCustomListsDialog> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
                             secondary: Container(
                               width: 40,
                               height: 40,

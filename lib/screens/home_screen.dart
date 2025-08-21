@@ -538,11 +538,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   if (cacheResult.data.length > 10) {
                     return TextButton(
                       onPressed: () => _navigateToMovieCategory(
-                          title, cacheResult.data,
-                          fromCache: cacheResult.fromCache),
+                        title,
+                        cacheResult.data,
+                        fromCache: cacheResult.fromCache,
+                      ),
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
@@ -930,8 +934,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   // Navigate to a dedicated page for viewing all movies in a category.
 
-  void _navigateToMovieCategory(String categoryName, List<Movie> movies,
-      {bool fromCache = false}) {
+  void _navigateToMovieCategory(
+    String categoryName,
+    List<Movie> movies, {
+    bool fromCache = false,
+  }) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -1129,7 +1136,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   // Build a list section for async movie data.
 
   Widget _buildAsyncListSection(
-      String title, AsyncValue<CacheResult<List<Movie>>> moviesAsync) {
+    String title,
+    AsyncValue<CacheResult<List<Movie>>> moviesAsync,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1152,11 +1161,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   if (cacheResult.data.length > 5) {
                     return TextButton(
                       onPressed: () => _navigateToMovieCategory(
-                          title, cacheResult.data,
-                          fromCache: cacheResult.fromCache),
+                        title,
+                        cacheResult.data,
+                        fromCache: cacheResult.fromCache,
+                      ),
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),

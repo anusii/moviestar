@@ -466,15 +466,24 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
       children: [
         if (_searchResults['title']?.isNotEmpty ?? false) ...[
           _buildSearchSection(
-              'Title Matches', _searchResults['title']!, Icons.movie),
+            'Title Matches',
+            _searchResults['title']!,
+            Icons.movie,
+          ),
         ],
         if (_searchResults['actor']?.isNotEmpty ?? false) ...[
           _buildSearchSection(
-              'Actor Matches', _searchResults['actor']!, Icons.person),
+            'Actor Matches',
+            _searchResults['actor']!,
+            Icons.person,
+          ),
         ],
         if (_searchResults['genre']?.isNotEmpty ?? false) ...[
           _buildSearchSection(
-              'Genre Matches', _searchResults['genre']!, Icons.category),
+            'Genre Matches',
+            _searchResults['genre']!,
+            Icons.category,
+          ),
         ],
       ],
     );
@@ -490,8 +499,11 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
           child: Row(
             children: [
-              Icon(icon,
-                  color: Theme.of(context).colorScheme.primary, size: 20),
+              Icon(
+                icon,
+                color: Theme.of(context).colorScheme.primary,
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 title,
@@ -645,7 +657,8 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
                   child: TextField(
                     controller: _searchController,
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface),
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Search by title, actor, or genre...',
                       hintStyle: TextStyle(

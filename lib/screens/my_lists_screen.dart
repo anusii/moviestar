@@ -359,7 +359,8 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen> {
       builder: (context) => AlertDialog(
         title: const Text('Delete List'),
         content: Text(
-            'Are you sure you want to delete "${list.name}"? This action cannot be undone.'),
+          'Are you sure you want to delete "${list.name}"? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -634,7 +635,9 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen> {
                             children: [
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Theme.of(context)
                                       .colorScheme

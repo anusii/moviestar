@@ -196,8 +196,11 @@ class _SearchScreenState extends State<SearchScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              Icon(categoryIcon,
-                  color: Theme.of(context).colorScheme.primary, size: 20),
+              Icon(
+                categoryIcon,
+                color: Theme.of(context).colorScheme.primary,
+                size: 20,
+              ),
               const Gap(8),
               Text(
                 categoryTitle,
@@ -332,12 +335,14 @@ class _SearchScreenState extends State<SearchScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.search,
-                              size: 64,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.4)),
+                          Icon(
+                            Icons.search,
+                            size: 64,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.4),
+                          ),
                           const Gap(16),
                           Text(
                             _searchController.text.isEmpty

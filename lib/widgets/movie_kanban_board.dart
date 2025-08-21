@@ -169,29 +169,33 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     // Add "Copy to..." options.
 
     if (sourceType != KanbanColumnType.toWatch) {
-      items.add(const PopupMenuItem(
-        value: 'copy_to_watch',
-        child: Row(
-          children: [
-            Icon(Icons.bookmark_add_outlined),
-            Gap(8),
-            Text('Copy to To Watch'),
-          ],
+      items.add(
+        const PopupMenuItem(
+          value: 'copy_to_watch',
+          child: Row(
+            children: [
+              Icon(Icons.bookmark_add_outlined),
+              Gap(8),
+              Text('Copy to To Watch'),
+            ],
+          ),
         ),
-      ));
+      );
     }
 
     if (sourceType != KanbanColumnType.watched) {
-      items.add(const PopupMenuItem(
-        value: 'copy_watched',
-        child: Row(
-          children: [
-            Icon(Icons.check_circle_outline),
-            Gap(8),
-            Text('Copy to Watched'),
-          ],
+      items.add(
+        const PopupMenuItem(
+          value: 'copy_watched',
+          child: Row(
+            children: [
+              Icon(Icons.check_circle_outline),
+              Gap(8),
+              Text('Copy to Watched'),
+            ],
+          ),
         ),
-      ));
+      );
     }
 
     // Add custom list options.
@@ -204,21 +208,23 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         continue;
       }
 
-      items.add(PopupMenuItem(
-        value: 'copy_custom_${customList.id}',
-        child: Row(
-          children: [
-            const Icon(Icons.playlist_add),
-            const Gap(8),
-            Expanded(
-              child: Text(
-                'Copy to ${customList.name}',
-                overflow: TextOverflow.ellipsis,
+      items.add(
+        PopupMenuItem(
+          value: 'copy_custom_${customList.id}',
+          child: Row(
+            children: [
+              const Icon(Icons.playlist_add),
+              const Gap(8),
+              Expanded(
+                child: Text(
+                  'Copy to ${customList.name}',
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ));
+      );
     }
 
     // Add divider before remove option (only for non-Popular movies).
@@ -227,20 +233,24 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       if (items.isNotEmpty) {
         items.add(const PopupMenuDivider());
       }
-      items.add(PopupMenuItem(
-        value: 'remove',
-        child: Row(
-          children: [
-            Icon(Icons.remove_circle_outline,
-                color: Theme.of(context).colorScheme.error),
-            const Gap(8),
-            Text(
-              'Remove from this list',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ],
+      items.add(
+        PopupMenuItem(
+          value: 'remove',
+          child: Row(
+            children: [
+              Icon(
+                Icons.remove_circle_outline,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              const Gap(8),
+              Text(
+                'Remove from this list',
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ],
+          ),
         ),
-      ));
+      );
     }
 
     return items;
@@ -290,7 +300,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                    content: Text('Added "${movie.title}" to custom list')),
+                  content: Text('Added "${movie.title}" to custom list'),
+                ),
               );
             }
           }
@@ -337,7 +348,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text('Removed "${movie.title}" from custom list')),
+              content: Text('Removed "${movie.title}" from custom list'),
+            ),
           );
         }
         break;
@@ -392,7 +404,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
       if (!isCopyOperation) {
         await _removeFromCurrentList(
-            dragData.movie, dragData.sourceType, dragData.sourceId);
+          dragData.movie,
+          dragData.sourceType,
+          dragData.sourceId,
+        );
       }
 
       if (mounted) {
@@ -409,7 +424,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Error ${isCopyOperation ? "copying" : "moving"} movie: ${e.toString()}'),
+              'Error ${isCopyOperation ? "copying" : "moving"} movie: ${e.toString()}',
+            ),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -437,7 +453,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       // If checking fails, continue anyway - the favorites service should handle creation.
 
       debugPrint(
-          'Warning: Could not verify movie file existence for ${movie.title}: $e');
+        'Warning: Could not verify movie file existence for ${movie.title}: $e',
+      );
     }
   }
 
@@ -634,7 +651,9 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                         _navigateToMovieCategory(title, movies, fromCache),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -719,7 +738,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   // Navigate to a dedicated page for viewing all movies in a category.
 
   void _navigateToMovieCategory(
-      String categoryName, List<Movie> movies, bool fromCache) {
+    String categoryName,
+    List<Movie> movies,
+    bool fromCache,
+  ) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -800,7 +822,9 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                     onPressed: () => _navigateToCustomListDetail(customList),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -841,7 +865,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                     itemBuilder: (context, index) {
                       final movieId = displayMovieIds[index];
                       return _buildCustomListMovieItem(
-                          movieId, customList.id, customList);
+                        movieId,
+                        customList.id,
+                        customList,
+                      );
                     },
                   ),
           ),
@@ -883,7 +910,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   // Build a movie item for a custom list (loading movie details on demand).
 
   Widget _buildCustomListMovieItem(
-      int movieId, String categoryId, CustomList customList) {
+    int movieId,
+    String categoryId,
+    CustomList customList,
+  ) {
     return Consumer(
       builder: (context, ref, child) {
         final cachedMovieService = ref.read(cachedMovieServiceProvider);

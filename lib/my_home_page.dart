@@ -1,6 +1,6 @@
 /// Moviestar - Manage and share ratings through private PODs.
 ///
-// Time-stamp: <Wednesday 2025-07-23 16:53:30 +1000 Graham Williams>
+// Time-stamp: <Friday 2025-08-22 05:42:44 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU
 ///
@@ -341,7 +341,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       appBar: SolidAppBarConfig(
         title: _menuItems[_selectedIndex].title,
         versionConfig: SolidVersionConfig(
-          version: '0.0.12+7',
           changelogUrl:
               'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
           showDate: true,

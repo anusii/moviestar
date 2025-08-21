@@ -32,6 +32,7 @@ import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/movie_list_service.dart';
@@ -40,7 +41,6 @@ import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
-import 'package:moviestar/screens/movie_details_screen.dart';
 
 /// A screen that displays movies the user has rated and reviewed.
 
@@ -101,10 +101,6 @@ class _MyMoviesScreenState extends State<MyMoviesScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        title: Text(
-          'My Movies',
-          style: Theme.of(context).appBarTheme.titleTextStyle,
-        ),
         actions: [
           StreamBuilder<List<Movie>>(
             stream: _ratedMovies,

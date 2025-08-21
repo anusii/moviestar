@@ -27,6 +27,7 @@ library;
 
 import 'package:hive/hive.dart';
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/utils/tmdb_image_util.dart';
 
 part 'movie.g.dart';
@@ -129,5 +130,37 @@ class Movie extends HiveObject {
       'release_date': releaseDate.toIso8601String(),
       'genre_ids': genreIds,
     };
+  }
+
+  /// Converts this Movie to a ContentItem for unified handling.
+  ContentItem toContentItem() {
+    return ContentItem(
+      id: id,
+      title: title,
+      overview: overview,
+      posterUrl: posterUrl,
+      backdropUrl: backdropUrl,
+      voteAverage: voteAverage,
+      releaseDate: releaseDate,
+      genreIds: genreIds,
+      contentType: ContentType.movie,
+    );
+  }
+
+  /// Creates a Movie from a ContentItem (for backward compatibility).
+  factory Movie.fromContentItem(ContentItem contentItem) {
+    if (contentItem.contentType != ContentType.movie) {
+      throw ArgumentError('ContentItem must be of type movie');
+    }
+    return Movie(
+      id: contentItem.id,
+      title: contentItem.title,
+      overview: contentItem.overview,
+      posterUrl: contentItem.posterUrl,
+      backdropUrl: contentItem.backdropUrl,
+      voteAverage: contentItem.voteAverage,
+      releaseDate: contentItem.releaseDate,
+      genreIds: contentItem.genreIds,
+    );
   }
 }

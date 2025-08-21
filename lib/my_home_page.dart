@@ -41,7 +41,7 @@ import 'package:moviestar/screens/coming_soon_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/my_lists_screen.dart';
 import 'package:moviestar/screens/my_movies_screen.dart';
-import 'package:moviestar/screens/search_screen.dart';
+import 'package:moviestar/screens/enhanced_search_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/screens/shared_movies_screen.dart';
 import 'package:moviestar/screens/to_watch_screen.dart';
@@ -280,13 +280,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   void _handleSearch() {
     if (mounted) {
-      final movieService = ref.read(movieServiceProvider);
+      final contentService = ref.read(contentServiceProvider);
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SearchScreen(
+          builder: (context) => EnhancedSearchScreen(
             favoritesService: _favoritesService,
-            movieService: movieService,
+            contentService: contentService,
           ),
         ),
       );
@@ -341,6 +341,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       appBar: SolidAppBarConfig(
         title: _menuItems[_selectedIndex].title,
         versionConfig: SolidVersionConfig(
+          version: '0.0.12+7',
           changelogUrl:
               'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
           showDate: true,
@@ -361,12 +362,24 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           serverUri: _webId?.split('profile')[0] ?? 'Not connected',
           displayText: _webId?.split('profile')[0] ?? 'Not connected',
           isClickable: _webId != null,
+          tooltip:
+              'Server connection status - shows your Solid server information',
         ),
         loginStatus: SolidLoginStatus(
           webId: _webId,
           onTap: _handleLogout,
+          loggedInTooltip: 'Click to logout from your Solid server',
+          loggedOutTooltip: 'Click to login to your Solid server',
         ),
-        securityKeyStatus: SolidSecurityKeyStatus(),
+        securityKeyStatus: SolidSecurityKeyStatus(
+          isKeySaved: true,
+          onTap: () => {
+            // Handle security key tap - could show key management dialog
+            //print('Security key status tapped')
+          },
+          tooltip:
+              'Security key status - shows if your encryption key is saved',
+        ),
         showOnNarrowScreens: false,
       ),
       userInfo: userInfo,

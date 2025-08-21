@@ -32,6 +32,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/moviestar.dart';
@@ -62,6 +63,8 @@ void main() async {
 
   Hive.registerAdapter(MovieAdapter());
   Hive.registerAdapter(CustomListAdapter());
+  Hive.registerAdapter(ContentItemAdapter());
+  Hive.registerAdapter(ContentTypeAdapter());
 
   // Globally remove [debugPrint] messages.
 

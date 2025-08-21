@@ -27,7 +27,7 @@ library;
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/api_key_service.dart';
-import 'package:moviestar/services/movie_search_service.dart';
+import 'package:moviestar/services/content_service.dart';
 import 'package:moviestar/utils/network_client.dart';
 
 /// A service class that handles movie-related API requests.
@@ -41,9 +41,9 @@ class MovieService {
 
   NetworkClient? _client;
 
-  /// Service for movie search operations.
+  /// Content service for handling both movies and TV shows.
 
-  MovieSearchService? _searchService;
+  ContentService? _contentService;
 
   /// Service for managing the API key.
 
@@ -60,17 +60,18 @@ class MovieService {
   Future<void> _initializeClient() async {
     final apiKey = await _apiKeyService.getApiKey();
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
-    _searchService = MovieSearchService(_client!);
+    _contentService = ContentService(_apiKeyService);
   }
 
   /// Updates the API key and recreates the network client.
 
   Future<void> updateApiKey() async {
     _client?.dispose();
+    _contentService?.dispose();
     // Reset to null to force recreation.
 
     _client = null;
-    _searchService = null;
+    _contentService = null;
     await _initializeClient();
   }
 
@@ -86,53 +87,53 @@ class MovieService {
 
   Future<List<Movie>> getPopularMovies() async {
     await _ensureClientInitialized();
-    final results = await _client!.getJsonList('movie/popular');
-    return results.map((movie) => Movie.fromJson(movie)).toList();
+    final contentItems = await _contentService!.getPopularMovies();
+    return contentItems.map((content) => Movie.fromContentItem(content)).toList();
   }
 
   /// Gets a list of movies currently playing in theaters.
 
   Future<List<Movie>> getNowPlayingMovies() async {
     await _ensureClientInitialized();
-    final results = await _client!.getJsonList('movie/now_playing');
-    return results.map((movie) => Movie.fromJson(movie)).toList();
+    final contentItems = await _contentService!.getNowPlayingMovies();
+    return contentItems.map((content) => Movie.fromContentItem(content)).toList();
   }
 
   /// Gets a list of top rated movies.
 
   Future<List<Movie>> getTopRatedMovies() async {
     await _ensureClientInitialized();
-    final results = await _client!.getJsonList('movie/top_rated');
-    return results.map((movie) => Movie.fromJson(movie)).toList();
+    final contentItems = await _contentService!.getTopRatedMovies();
+    return contentItems.map((content) => Movie.fromContentItem(content)).toList();
   }
 
   /// Gets a list of upcoming movies.
 
   Future<List<Movie>> getUpcomingMovies() async {
     await _ensureClientInitialized();
-    final results = await _client!.getJsonList('movie/upcoming');
-    return results.map((movie) => Movie.fromJson(movie)).toList();
+    final contentItems = await _contentService!.getUpcomingMovies();
+    return contentItems.map((content) => Movie.fromContentItem(content)).toList();
   }
 
   /// Searches for movies matching the given query.
 
   Future<List<Movie>> searchMovies(String query) async {
     await _ensureClientInitialized();
-    return await _searchService!.searchMovies(query);
+    return await _contentService!.searchMovies(query);
   }
 
   /// Searches for movies by actor/person name.
 
   Future<List<Movie>> searchMoviesByActor(String actorName) async {
     await _ensureClientInitialized();
-    return await _searchService!.searchMoviesByActor(actorName);
+    return await _contentService!.searchMoviesByActor(actorName);
   }
 
   /// Searches for movies by genre name.
 
   Future<List<Movie>> searchMoviesByGenre(String genreName) async {
     await _ensureClientInitialized();
-    return await _searchService!.searchMoviesByGenre(genreName);
+    return await _contentService!.searchMoviesByGenre(genreName);
   }
 
   /// Comprehensive search that searches by title, actor, and genre.
@@ -141,24 +142,25 @@ class MovieService {
     String query,
   ) async {
     await _ensureClientInitialized();
-    return await _searchService!.searchMoviesComprehensive(query);
+    return await _contentService!.searchMoviesComprehensive(query);
   }
 
   /// Gets detailed information about a specific movie.
 
   Future<Movie> getMovieDetails(int movieId) async {
     await _ensureClientInitialized();
-    final data = await _client!.getJson('movie/$movieId');
-    return Movie.fromJson(data);
+    final contentItem = await _contentService!.getMovieDetails(movieId);
+    return Movie.fromContentItem(contentItem);
   }
 
   /// Disposes the network client.
 
   void dispose() {
     _client?.dispose();
+    _contentService?.dispose();
     // Reset to null after disposal.
 
     _client = null;
-    _searchService = null;
+    _contentService = null;
   }
 }

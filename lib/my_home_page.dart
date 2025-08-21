@@ -1,6 +1,6 @@
 /// Moviestar - Manage and share ratings through private PODs.
 ///
-// Time-stamp: <Wednesday 2025-07-23 16:53:30 +1000 Graham Williams>
+// Time-stamp: <Friday 2025-08-22 08:24:40 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU
 ///
@@ -28,6 +28,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:markdown_tooltip/markdown_tooltip.dart' show wordWrap;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart' show logoutPopup, getWebId;
 import 'package:solidui/solidui.dart';
@@ -362,20 +363,22 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           Icons.movie,
           size: 64,
         ),
-        applicationLegalese:
-            '''© ${DateTime.now().year} Software Innovation Institute, ANU
+        applicationLegalese: wordWrap('''
 
-MovieStar is a movie discovery and management application built with Flutter,
-which helps you discover, track, and manage your favourite
-movies using the power of Solid PODs for decentralised data
-storage.
+          © ${DateTime.now().year} Software Innovation Institute, ANU
 
-Licensed under the GNU General Public License v3.0
+          MovieStar is a movie discovery and management application built with
+          Flutter, which helps you discover, track, and manage your favourite
+          movies using the power of Solid PODs for decentralised data storage.
 
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
+          Licensed under the GNU General Public License v3.0
 
-Visit https://github.com/anusii/moviestar for more information.''',
+          This is free software: you are free to change and redistribute it.
+          There is NO WARRANTY, to the extent permitted by law.
+
+          Visit https://github.com/anusii/moviestar for more information.
+
+          '''),
       ),
       statusBar: SolidStatusBarConfig(
         serverInfo: SolidServerInfo(

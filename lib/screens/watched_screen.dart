@@ -31,16 +31,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
-import '../models/movie.dart';
-import '../services/favorites_service.dart';
-import '../services/favorites_service_adapter.dart';
-import '../services/movie_list_service.dart';
-import '../services/user_profile_service.dart';
-import '../utils/movie_sort_util.dart';
-import '../utils/turtle_serializer.dart';
-import '../widgets/moviestar_batch_sharing_ui.dart';
-import '../widgets/sort_controls.dart';
-import 'movie_details_screen.dart';
+import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/services/favorites_service_adapter.dart';
+import 'package:moviestar/services/movie_list_service.dart';
+import 'package:moviestar/services/user_profile_service.dart';
+import 'package:moviestar/utils/movie_sort_util.dart';
+import 'package:moviestar/utils/turtle_serializer.dart';
+import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
+import 'package:moviestar/widgets/sort_controls.dart';
+import 'package:moviestar/screens/movie_details_screen.dart';
 
 /// A screen that displays the user's list of watched movies.
 

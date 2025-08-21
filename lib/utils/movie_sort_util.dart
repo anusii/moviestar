@@ -25,8 +25,8 @@
 
 library;
 
-import '../models/movie.dart';
-import '../widgets/sort_controls.dart';
+import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/widgets/sort_controls.dart';
 
 /// Sorts a list of movies based on the specified criteria.
 

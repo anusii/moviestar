@@ -233,7 +233,8 @@ class ContentSearchService {
         );
 
         allContent.addAll(
-            movieResults.map((movie) => ContentItem.fromMovieJson(movie)),);
+          movieResults.map((movie) => ContentItem.fromMovieJson(movie)),
+        );
       }
     } catch (e) {
       // Continue even if movie genre search fails.

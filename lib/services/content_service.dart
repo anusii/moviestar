@@ -231,7 +231,9 @@ class ContentService {
   // Gets detailed information about content (auto-detects type).
 
   Future<ContentItem> getContentDetails(
-      int contentId, ContentType contentType,) async {
+    int contentId,
+    ContentType contentType,
+  ) async {
     if (contentType == ContentType.movie) {
       return getMovieDetails(contentId);
     } else {

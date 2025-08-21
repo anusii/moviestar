@@ -447,8 +447,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
                   ),
                   child: Row(
                     children: [
-                      Radio<SharePermissionLevel>(
-                        value: permission,
+                      RadioGroup<SharePermissionLevel>(
                         groupValue: _selectedPermission,
                         onChanged: (value) {
                           if (value != null) {
@@ -457,6 +456,7 @@ class _ShareListDialogState extends State<ShareListDialog> {
                             });
                           }
                         },
+                        child: Radio<SharePermissionLevel>(value: permission),
                       ),
                       const Gap(12),
                       Expanded(

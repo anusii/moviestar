@@ -447,16 +447,29 @@ class _ShareListDialogState extends State<ShareListDialog> {
                   ),
                   child: Row(
                     children: [
-                      Radio<SharePermissionLevel>(
-                        value: permission,
-                        groupValue: _selectedPermission,
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              _selectedPermission = value;
-                            });
-                          }
-                        },
+                      Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.primary,
+                            width: 2,
+                          ),
+                        ),
+                        child: isSelected
+                            ? Center(
+                                child: Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
+                              )
+                            : null,
                       ),
                       const Gap(12),
                       Expanded(

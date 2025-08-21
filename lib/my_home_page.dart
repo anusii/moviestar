@@ -341,6 +341,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       appBar: SolidAppBarConfig(
         title: _menuItems[_selectedIndex].title,
         versionConfig: SolidVersionConfig(
+          version: '0.0.12+7',
           changelogUrl:
               'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
           showDate: true,
@@ -361,12 +362,24 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           serverUri: _webId?.split('profile')[0] ?? 'Not connected',
           displayText: _webId?.split('profile')[0] ?? 'Not connected',
           isClickable: _webId != null,
+          tooltip:
+              'Server connection status - shows your Solid server information',
         ),
         loginStatus: SolidLoginStatus(
           webId: _webId,
           onTap: _handleLogout,
+          loggedInTooltip: 'Click to logout from your Solid server',
+          loggedOutTooltip: 'Click to login to your Solid server',
         ),
-        securityKeyStatus: SolidSecurityKeyStatus(),
+        securityKeyStatus: SolidSecurityKeyStatus(
+          isKeySaved: true,
+          onTap: () => {
+            // Handle security key tap - could show key management dialog
+            //print('Security key status tapped')
+          },
+          tooltip:
+              'Security key status - shows if your encryption key is saved',
+        ),
         showOnNarrowScreens: false,
       ),
       userInfo: userInfo,

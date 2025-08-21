@@ -88,7 +88,9 @@ class MovieService {
   Future<List<Movie>> getPopularMovies() async {
     await _ensureClientInitialized();
     final contentItems = await _contentService!.getPopularMovies();
-    return contentItems.map((content) => Movie.fromContentItem(content)).toList();
+    return contentItems
+        .map((content) => Movie.fromContentItem(content))
+        .toList();
   }
 
   /// Gets a list of movies currently playing in theaters.
@@ -96,7 +98,9 @@ class MovieService {
   Future<List<Movie>> getNowPlayingMovies() async {
     await _ensureClientInitialized();
     final contentItems = await _contentService!.getNowPlayingMovies();
-    return contentItems.map((content) => Movie.fromContentItem(content)).toList();
+    return contentItems
+        .map((content) => Movie.fromContentItem(content))
+        .toList();
   }
 
   /// Gets a list of top rated movies.
@@ -104,7 +108,9 @@ class MovieService {
   Future<List<Movie>> getTopRatedMovies() async {
     await _ensureClientInitialized();
     final contentItems = await _contentService!.getTopRatedMovies();
-    return contentItems.map((content) => Movie.fromContentItem(content)).toList();
+    return contentItems
+        .map((content) => Movie.fromContentItem(content))
+        .toList();
   }
 
   /// Gets a list of upcoming movies.
@@ -112,7 +118,9 @@ class MovieService {
   Future<List<Movie>> getUpcomingMovies() async {
     await _ensureClientInitialized();
     final contentItems = await _contentService!.getUpcomingMovies();
-    return contentItems.map((content) => Movie.fromContentItem(content)).toList();
+    return contentItems
+        .map((content) => Movie.fromContentItem(content))
+        .toList();
   }
 
   /// Searches for movies matching the given query.

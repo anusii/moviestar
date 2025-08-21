@@ -135,14 +135,17 @@ final movieServiceProvider = Provider<MovieService>((ref) {
 });
 
 /// Provider for the content service (handles both movies and TV shows).
+
 final contentServiceProvider = Provider<ContentService>((ref) {
   final apiKeyService = ref.watch(apiKeyServiceProvider);
   // Watch the API key to trigger recreation when it changes.
+
   ref.watch(apiKeyProvider);
 
   final contentService = ContentService(apiKeyService);
 
   // Ensure proper disposal.
+
   ref.onDispose(() {
     contentService.dispose();
   });

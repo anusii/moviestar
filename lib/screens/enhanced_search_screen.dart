@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Assistant
+/// Authors: Ashley Tang
 
 library;
 
@@ -40,12 +40,15 @@ import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 
 /// Enhanced search screen that supports both movies and TV shows.
+
 class EnhancedSearchScreen extends StatefulWidget {
   /// Service for managing favorite movies.
+
   final FavoritesService favoritesService;
   final ContentService contentService;
 
   /// Creates a new [EnhancedSearchScreen] widget.
+
   const EnhancedSearchScreen({
     super.key,
     required this.favoritesService,
@@ -56,30 +59,37 @@ class EnhancedSearchScreen extends StatefulWidget {
   State<EnhancedSearchScreen> createState() => _EnhancedSearchScreenState();
 }
 
-/// State class for the enhanced search screen.
+//
 class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
-  /// Controller for the search text field.
+  // Controller for the search text field.
+
   final TextEditingController _searchController = TextEditingController();
 
-  /// Loading state indicator.
+  // Loading state indicator.
+
   bool _isLoading = false;
 
-  /// Error message if any.
+  // Error message if any.
+
   String? _error;
 
-  /// Comprehensive search results categorised by search type.
+  // Comprehensive search results categorised by search type.
+
   Map<String, List<ContentItem>> _searchResults = {};
 
-  /// Timer for debouncing search requests.
+  // Timer for debouncing search requests.
+
   Timer? _debounceTimer;
 
-  /// Duration to wait before executing search after user stops typing.
+  // Duration to wait before executing search after user stops typing.
+
   static const Duration _debounceDuration = Duration(milliseconds: 500);
 
   @override
   void initState() {
     super.initState();
     // Listen to text changes for dynamic search.
+
     _searchController.addListener(_onSearchChanged);
   }
 
@@ -91,18 +101,22 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
     super.dispose();
   }
 
-  /// Called when search text changes.
+  // Called when search text changes.
+
   void _onSearchChanged() {
     // Cancel previous timer if it exists.
+
     _debounceTimer?.cancel();
 
     // Start new timer for debouncing.
+
     _debounceTimer = Timer(_debounceDuration, () {
       _searchContent(_searchController.text);
     });
   }
 
-  /// Searches for content based on the provided query.
+  // Searches for content based on the provided query.
+
   Future<void> _searchContent(String query) async {
     if (query.isEmpty) {
       setState(() {
@@ -114,6 +128,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
     }
 
     // Don't search if query is too short.
+
     if (query.length < 2) {
       return;
     }
@@ -129,6 +144,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
       );
 
       // Only update state if this search is still relevant.
+
       if (_searchController.text == query) {
         setState(() {
           _searchResults = results;
@@ -137,6 +153,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
       }
     } catch (e) {
       // Only update state if this search is still relevant.
+
       if (_searchController.text == query) {
         setState(() {
           _error = e.toString();
@@ -146,7 +163,8 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
     }
   }
 
-  /// Builds a section of search results for a specific category.
+  // Builds a section of search results for a specific category.
+
   Widget _buildResultsSection(String category, List<ContentItem> content) {
     if (content.isEmpty) return const SizedBox.shrink();
 
@@ -294,7 +312,8 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
     );
   }
 
-  /// Shows a dialog with basic TV show information.
+  // Shows a dialog with basic TV show information.
+
   void _showTVShowDialog(ContentItem tvShow) {
     showDialog(
       context: context,
@@ -316,7 +335,8 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
                       fit: BoxFit.cover,
                       placeholder: (context, url) =>
                           const Center(child: CircularProgressIndicator()),
-                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
                     ),
                   ),
                 ),
@@ -384,10 +404,12 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
           onChanged: (value) {
             // Dynamic search is handled by the listener.
             // This rebuild is just to show/hide the clear button.
+
             setState(() {});
           },
           onSubmitted: (value) {
             // Immediate search when user presses Enter.
+
             _debounceTimer?.cancel();
             _searchContent(value);
           },
@@ -461,7 +483,8 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
     );
   }
 
-  /// Check if all search result categories are empty.
+  // Check if all search result categories are empty.
+
   bool _hasNoResults() {
     return (_searchResults['title']?.isEmpty ?? true) &&
         (_searchResults['actor']?.isEmpty ?? true) &&

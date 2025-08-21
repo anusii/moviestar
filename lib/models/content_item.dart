@@ -32,6 +32,7 @@ import 'package:moviestar/utils/tmdb_image_util.dart';
 part 'content_item.g.dart';
 
 /// Enum representing the type of content.
+
 @HiveType(typeId: 3)
 enum ContentType {
   @HiveField(0)
@@ -41,45 +42,56 @@ enum ContentType {
 }
 
 /// A class representing a content item (movie or TV show) with its details.
+
 @HiveType(typeId: 2)
 class ContentItem extends HiveObject {
   /// Unique identifier for the content.
+
   @HiveField(0)
   final int id;
 
   /// Title of the content (movie title or TV show name).
+
   @HiveField(1)
   final String title;
 
   /// Overview or description of the content.
+
   @HiveField(2)
   final String overview;
 
   /// URL for the content's poster image.
+
   @HiveField(3)
   final String posterUrl;
 
   /// URL for the content's backdrop image.
+
   @HiveField(4)
   final String backdropUrl;
 
   /// Average rating of the content.
+
   @HiveField(5)
   final double voteAverage;
 
   /// Release date of the content (movie release or TV show first air date).
+
   @HiveField(6)
   final DateTime releaseDate;
 
   /// List of genre IDs associated with the content.
+
   @HiveField(7)
   final List<int> genreIds;
 
   /// Type of content (movie or TV show).
+
   @HiveField(8)
   final ContentType contentType;
 
   /// Creates a new [ContentItem] instance.
+
   ContentItem({
     required this.id,
     required this.title,
@@ -93,6 +105,7 @@ class ContentItem extends HiveObject {
   });
 
   /// Creates a [ContentItem] instance from a JSON map for movies.
+
   factory ContentItem.fromMovieJson(Map<String, dynamic> json) {
     return ContentItem(
       id: json['id'] ?? 0,
@@ -108,24 +121,29 @@ class ContentItem extends HiveObject {
   }
 
   /// Creates a [ContentItem] instance from a JSON map for TV shows.
+
   factory ContentItem.fromTVJson(Map<String, dynamic> json) {
     return ContentItem(
       id: json['id'] ?? 0,
-      title: json['name'] ?? 'Unknown Title', // TV shows use 'name' not 'title'
+      title:
+          json['name'] ?? 'Unknown Title', // TV shows use 'name' not 'title'.
       overview: json['overview'] ?? '',
       posterUrl: TmdbImageUtil.getPosterUrl(json['poster_path'] ?? ''),
       backdropUrl: TmdbImageUtil.getBackdropUrl(json['backdrop_path'] ?? ''),
       voteAverage: (json['vote_average'] as num?)?.toDouble() ?? 0.0,
-      releaseDate: _parseReleaseDate(json['first_air_date']), // TV shows use 'first_air_date'
+      releaseDate: _parseReleaseDate(
+          json['first_air_date']), // TV shows use 'first_air_date'.
       genreIds: List<int>.from(json['genre_ids'] ?? []),
       contentType: ContentType.tvShow,
     );
   }
 
   /// Helper function to safely parse release date.
+
   static DateTime _parseReleaseDate(dynamic dateValue) {
     if (dateValue == null || dateValue.toString().isEmpty) {
       // Default to current date if no release date.
+
       return DateTime.now();
     }
 
@@ -133,11 +151,13 @@ class ContentItem extends HiveObject {
       return DateTime.parse(dateValue.toString());
     } catch (e) {
       // If parsing fails, return current date as fallback.
+
       return DateTime.now();
     }
   }
 
   /// Converts the [ContentItem] instance to a JSON map.
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -160,11 +180,15 @@ class ContentItem extends HiveObject {
   }
 
   /// Gets a display-friendly release year.
+
   String get releaseYear => releaseDate.year.toString();
 
   /// Gets a display-friendly content type label.
-  String get contentTypeLabel => contentType == ContentType.movie ? 'Movie' : 'TV Show';
+
+  String get contentTypeLabel =>
+      contentType == ContentType.movie ? 'Movie' : 'TV Show';
 
   /// Gets an appropriate icon for the content type.
+
   String get contentTypeIcon => contentType == ContentType.movie ? '🎬' : '📺';
 }

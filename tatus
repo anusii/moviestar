@@ -1,8 +1,0 @@
-[33mcommit 72b10e6b6546e83bbe963522ad37fa83194b09ac[m
-Author: Graham Williams <graham.williams@togaware.com>
-Date:   Thu Aug 21 17:05:29 2025 +1000
-
-    Update deprecated widget.
-
-lib/screens/settings_screen.dart
-support/flutter.mk

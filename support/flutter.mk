@@ -199,8 +199,9 @@ depend:
 
 .PHONY: markdown
 markdown:
-	@echo "Markdown: LINT CHECK."
+	@echo "Markdown: MARKDOWN FORMAT CHECK."
 	-markdownlint --disable MD036 -- *.md lib assets installers
+	@echo
 	@echo $(SEPARATOR)
 
 .PHONY: ignore

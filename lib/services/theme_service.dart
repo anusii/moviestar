@@ -86,13 +86,25 @@ class ThemeService {
     await _prefs.setString(_themeModeKey, themeModeString);
   }
 
-  /// Toggles between light and dark theme modes.
+  /// Toggles between light, dark, and system theme modes.
+  /// Cycles: Light → Dark → System → Light
   /// Returns the new theme mode.
 
   Future<ThemeMode> toggleTheme() async {
     final currentMode = getThemeMode();
-    final newMode =
-        currentMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    ThemeMode newMode;
+    
+    switch (currentMode) {
+      case ThemeMode.light:
+        newMode = ThemeMode.dark;
+        break;
+      case ThemeMode.dark:
+        newMode = ThemeMode.system;
+        break;
+      case ThemeMode.system:
+        newMode = ThemeMode.light;
+        break;
+    }
 
     await setThemeMode(newMode);
     return newMode;

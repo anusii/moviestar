@@ -2,7 +2,7 @@
 
 **An ANU Software Innovation Institute demonstrator for your Data Vault**.
 
-*Time-stamp: <Tuesday 2025-07-22 21:12:27 +1000 Graham Williams>*
+*Time-stamp: <Thursday 2025-08-21 10:28:42 +1000 Graham Williams>*
 
 *Authors: Kevin Wang, Ashley Tang, Zheyuan Xu, Graham Williams*
 
@@ -40,8 +40,9 @@ au](https://solidcommunity.au/docs/moviestar)
 
 A personal movies (and TV series) database and recommender.
 
-
-Visit https://moviestar.solidcommunity.au/ to run the app online.
+Visit
+[moviestar.solidcommunity.au](https://moviestar.solidcommunity.au/) to
+run the app online.
 
 See [installers](installers/README.md) for instructions to install on
 your device.
@@ -99,7 +100,7 @@ As a user I can
 - [ ] Add private (not shared) views of other users sharing movies
   - [ ] Includes a weighting for each user (0-5, default 2)
 - [ ] Add to summarise movies across users
-   - [ ] Weighted ratings of movies - user rating * their movie rating
+  - [ ] Weighted ratings of movies - user rating * their movie rating
 
 Add support for recommendation engine - review
-https://github.com/recommenders-team/recommenders.
+[recommenders](https://github.com/recommenders-team/recommenders).

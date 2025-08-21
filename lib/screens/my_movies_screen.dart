@@ -101,10 +101,6 @@ class _MyMoviesScreenState extends State<MyMoviesScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        title: Text(
-          'My Movies',
-          style: Theme.of(context).appBarTheme.titleTextStyle,
-        ),
         actions: [
           StreamBuilder<List<Movie>>(
             stream: _ratedMovies,

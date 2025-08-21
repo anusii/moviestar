@@ -25,6 +25,7 @@ au](https://solidcommunity.au/docs/moviestar)
 
 ## 0.1 First stable release
 
++ Updated home screen layout options [0.0.10 20250821 atangster]
 + Move to using SolidScaffold [0.0.9 20250819 tonypioneer]
 + Bug fix light/dark mode [0.0.8 20250716 atangster]
 + Add WATCHED and TOWATCHED to home page [0.0.7 20250716 zheyxu]

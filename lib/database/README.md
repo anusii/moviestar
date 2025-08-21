@@ -1,10 +1,13 @@
 # Database Foundation - Drift Implementation
 
-This directory contains the Drift database foundation for local movie data caching in the Movie Star application.
+This directory contains the Drift database foundation for local movie data
+caching in the Movie Star application.
 
 ## Overview
 
-The database foundation implements a three-table schema designed to efficiently cache movie data retrieved from TMDB API, reducing unnecessary network calls and improving app performance.
+The database foundation implements a three-table schema designed to
+efficiently cache movie data retrieved from TMDB API, reducing unnecessary
+network calls and improving app performance.
 
 ## Database Schema
 
@@ -36,24 +39,48 @@ The database foundation implements a three-table schema designed to efficiently 
 ## Key Features
 
 ### Cache Management
-- **Category-based caching**: Each movie category (popular, now_playing, etc.) is cached separately
-- **Position preservation**: Movies maintain their API order within categories
-- **Expiration checking**: Built-in cache validity checking with configurable duration
-- **Atomic updates**: All cache operations use database transactions
 
-### Performance Optimizations
-- **Conflict resolution**: `insertOnConflictUpdate` prevents duplicate entries
-- **Efficient queries**: Uses proper JOIN operations for category retrieval
-- **Background database**: Uses `NativeDatabase.createInBackground()` for performance
+- **Category-based caching**:
+Each movie category (popular, now_playing, etc.)
+is cached separately
+
+- **Position preservation**:
+Movies maintain their API order within categories
+
+- **Expiration checking**:
+Built-in cache validity checking with configurable
+duration
+
+- **Atomic updates**:
+All cache operations use database transactions
+
+### Performance Optimisations
+
+- **Conflict resolution**:
+`insertOnConflictUpdate` prevents duplicate entries
+
+- **Efficient queries**:
+Uses proper JOIN operations for category retrieval
+
+- **Background database**:
+Uses `NativeDatabase.createInBackground()` for
+performance
 
 ### Data Integrity
-- **Foreign keys**: Proper relationships between movies and categories
-- **JSON encoding**: Genre IDs stored as JSON for flexible querying
-- **Timestamp tracking**: Automatic timestamps for cache management
+
+- **Foreign keys**:
+Proper relationships between movies and categories
+
+- **JSON encoding**:
+Genre IDs stored as JSON for flexible querying
+
+- **Timestamp tracking**:
+Automatic timestamps for cache management
 
 ## Usage
 
 ### Database Access
+
 ```dart
 // Using Riverpod provider
 final database = ref.read(databaseProvider);
@@ -69,6 +96,7 @@ final isValid = await database.isCacheValid('popular', Duration(hours: 1));
 ```
 
 ### Cache Constants
+
 ```dart
 // Use predefined category constants
 MovieCategories.popular
@@ -85,12 +113,17 @@ CacheDuration.longDuration     // 24 hours
 ## Database File Location
 
 The SQLite database file is stored at:
-- **Path**: `{ApplicationDocumentsDirectory}/moviestar.db`
-- **Platform-specific**: Uses `path_provider` for cross-platform compatibility
+
+- **Path**:
+`{ApplicationDocumentsDirectory}/moviestar.db`
+
+- **Platform-specific**:
+Uses `path_provider` for cross-platform compatibility
 
 ## Code Generation
 
-This implementation uses Drift's code generation. To regenerate files after schema changes:
+This implementation uses Drift's code generation. To regenerate files after
+schema changes:
 
 ```bash
 flutter pub run build_runner build
@@ -99,9 +132,15 @@ flutter pub run build_runner build
 ## Integration Points
 
 The database foundation is designed to integrate with:
-1. **Movie Service**: The next ticket will implement cached layer
-2. **Riverpod Providers**: Database provider is ready for dependency injection
-3. **Existing Models**: Works seamlessly with current `Movie` model
+
+1. **Movie Service**:
+The next ticket will implement cached layer
+
+2. **Riverpod Providers**:
+Database provider is ready for dependency injection
+
+3. **Existing Models**:
+Works seamlessly with current `Movie` model
 
 ## Files
 
@@ -115,4 +154,4 @@ The database foundation is designed to integrate with:
 1. **Cached Movie Service** - Implement service layer that uses this database
 2. **Cache Statistics** - Add cache hit/miss tracking
 3. **Cache Cleanup** - Implement automatic old data cleanup
-4. **Performance Monitoring** - Add database performance metrics 
+4. **Performance Monitoring** - Add database performance metrics

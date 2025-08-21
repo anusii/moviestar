@@ -1,6 +1,6 @@
 /// Reusable movie card widget with cache status indicators.
 ///
-// Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
+// Time-stamp: <Friday 2025-08-22 05:51:08 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -306,7 +306,7 @@ class _MovieCardState extends State<MovieCard> {
     // This prevents popups from appearing immediately when quickly moving the mouse.
 
     _showTimer?.cancel();
-    _showTimer = Timer(const Duration(milliseconds: 500), () {
+    _showTimer = Timer(const Duration(milliseconds: 1000), () {
       _showQuickActions(context);
     });
   }

@@ -138,7 +138,8 @@ class MovieService {
   /// Comprehensive search that searches by title, actor, and genre.
 
   Future<Map<String, List<Movie>>> searchMoviesComprehensive(
-      String query) async {
+    String query,
+  ) async {
     await _ensureClientInitialized();
     return await _searchService!.searchMoviesComprehensive(query);
   }

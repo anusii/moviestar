@@ -292,7 +292,8 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
 
       floatingActionButton: ValueListenableBuilder<bool>(
         valueListenable: ValueNotifier(
-            false), // We'll implement scroll-to-top later if needed.
+          false,
+        ), // We'll implement scroll-to-top later if needed.
 
         builder: (context, showScrollToTop, child) {
           return FloatingActionButton.small(

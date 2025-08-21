@@ -167,10 +167,9 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
               const Gap(12),
               Text(
                 'You can get your free API key from The Movie Database (TMDB) website.',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(fontSize: 13),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontSize: 13),
               ),
             ],
           ),
@@ -180,8 +179,8 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
                 Navigator.of(context).pop();
               },
               style: TextButton.styleFrom(
-                  foregroundColor:
-                      Theme.of(context).textTheme.bodyMedium?.color),
+                foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
+              ),
               child: const Text('Later'),
             ),
             ElevatedButton(

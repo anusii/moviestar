@@ -78,7 +78,8 @@ Future<void> initialiseAppFolders({
 
         if (e.toString().contains('Duplicated encryption key')) {
           debugPrint(
-              'Encryption key conflict detected (attempt $attempt/3) - this is caused by orphaned encryption keys from deleted files');
+            'Encryption key conflict detected (attempt $attempt/3) - this is caused by orphaned encryption keys from deleted files',
+          );
 
           if (attempt < 3) {
             // Wait with exponential backoff before retrying.
@@ -88,7 +89,8 @@ Future<void> initialiseAppFolders({
             continue;
           } else {
             debugPrint(
-                'Max retries reached - continuing with empty folder list');
+              'Max retries reached - continuing with empty folder list',
+            );
             // Continue with empty list - we'll try to create all folders.
 
             existingFolders = [];

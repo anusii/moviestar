@@ -561,9 +561,11 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                 CircleAvatar(
                   radius: 50,
                   backgroundColor: Theme.of(context).colorScheme.secondary,
-                  child: Icon(Icons.person,
-                      size: 50,
-                      color: Theme.of(context).colorScheme.onSecondary),
+                  child: Icon(
+                    Icons.person,
+                    size: 50,
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
                 ),
                 Positioned(
                   bottom: 0,
@@ -603,10 +605,9 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                       Expanded(
                         child: Text(
                           'Required to fetch movie data and images',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontSize: 12),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(fontSize: 12),
                         ),
                       ),
                       if (widget.fromApiKeyPrompt)
@@ -641,12 +642,12 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                         fillColor:
                             Theme.of(context).inputDecorationTheme.fillColor,
                         border: Theme.of(context).inputDecorationTheme.border,
-                        enabledBorder: Theme.of(context)
-                            .inputDecorationTheme
-                            .enabledBorder,
-                        focusedBorder: Theme.of(context)
-                            .inputDecorationTheme
-                            .focusedBorder,
+                        enabledBorder: Theme.of(
+                          context,
+                        ).inputDecorationTheme.enabledBorder,
+                        focusedBorder: Theme.of(
+                          context,
+                        ).inputDecorationTheme.focusedBorder,
                         suffixIcon: IconButton(
                           icon: Icon(
                             _isApiKeyVisible
@@ -807,18 +808,23 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
             _buildListTile('Help & Support', Icons.help_outline, () {
               // TODO: Navigate to Help & Support.
             }),
-            _buildListTile('Sign Out', Icons.logout, () async {
-              // Show logout confirmation dialog and handle logout.
+            _buildListTile(
+              'Sign Out',
+              Icons.logout,
+              () async {
+                // Show logout confirmation dialog and handle logout.
 
-              final prefs = ref.read(sharedPreferencesProvider);
+                final prefs = ref.read(sharedPreferencesProvider);
 
-              // Create a properly configured SolidLogin widget using the same function
-              // that creates the initial login screen to maintain consistent branding.
+                // Create a properly configured SolidLogin widget using the same function
+                // that creates the initial login screen to maintain consistent branding.
 
-              final solidLoginWidget = createSolidLogin(context, prefs);
+                final solidLoginWidget = createSolidLogin(context, prefs);
 
-              await logoutPopup(context, solidLoginWidget);
-            }, isDestructive: true),
+                await logoutPopup(context, solidLoginWidget);
+              },
+              isDestructive: true,
+            ),
           ]),
         ],
       ),
@@ -909,14 +915,13 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                                     ),
                                     Text(
                                       'Updated ${_getTimeAgo(stat['age'] as Duration)} ago',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyMedium
-                                                  ?.color),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium?.color,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -958,9 +963,14 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
         _buildListTile('Force Refresh All', Icons.refresh, () async {
           await _showForceRefreshDialog(cachingEnabled, cacheOnlyMode);
         }),
-        _buildListTile('Clear All Cache', Icons.delete_sweep, () async {
-          await _showClearCacheDialog(cachingEnabled, cacheOnlyMode);
-        }, isDestructive: true),
+        _buildListTile(
+          'Clear All Cache',
+          Icons.delete_sweep,
+          () async {
+            await _showClearCacheDialog(cachingEnabled, cacheOnlyMode);
+          },
+          isDestructive: true,
+        ),
         Divider(color: Theme.of(context).dividerColor),
       ],
     );
@@ -1038,7 +1048,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
               }
             }
           : null,
-      activeColor: Theme.of(context).colorScheme.primary,
+      activeThumbColor: Theme.of(context).colorScheme.primary,
     );
   }
 
@@ -1078,7 +1088,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
       subtitle: Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
       value: value,
       onChanged: onChanged,
-      activeColor: Theme.of(context).colorScheme.primary,
+      activeThumbColor: Theme.of(context).colorScheme.primary,
     );
   }
 

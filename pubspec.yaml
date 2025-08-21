@@ -29,7 +29,7 @@ dependencies:
   gap: ^3.0.1
   http: ^1.1.0
   intl: any
-  markdown_tooltip: ^0.0.7
+  markdown_tooltip: ^0.0.8
 
   path: ^1.9.1
   pdf: ^3.11.3

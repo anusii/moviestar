@@ -1,4 +1,4 @@
-/// MovieStar Navigation Configuration - App-specific navigation setup.
+/// MovieStar SolidScaffold Configuration.
 ///
 // Time-stamp: <Sunday 2025-08-10 08:13:23 +1000 Graham Williams>
 ///
@@ -32,9 +32,13 @@ import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/providers/view_mode_provider.dart';
 
-/// MovieStar-specific navigation configuration and factory methods.
+/// MovieStar-specific SolidScaffold configuration.
+///
+/// Provides centralised configuration for all SolidScaffold components
+/// including navigation menu, app bar actions, and overflow items.
+/// This ensures consistent UI patterns throughout the application.
 
-class MovieStarNavConfig {
+class SolidScaffoldConfig {
   /// Creates the MovieStar app navigation menu items.
   ///
   /// Returns a list of menu items configured specifically for the
@@ -129,69 +133,66 @@ your movie data files.
     ];
   }
 
-  /// Creates a MovieStar-specific AppBar configuration for the SolidScaffold.
+  /// Creates the MovieStar app bar actions.
+  ///
+  /// Returns a list of action buttons configured for the MovieStar application.
+  /// Requires a WidgetRef to access view mode state and callback functions for
+  /// handling actions.
 
-  static SolidAppBarConfig createSimpleAppBarConfig({
-    required String title,
+  static List<SolidAppBarAction> createAppBarActions({
+    required WidgetRef ref,
+    required VoidCallback onViewModeToggle,
     required VoidCallback onRefresh,
     required VoidCallback onSearch,
-    required VoidCallback onSettings,
-    required VoidCallback onLogout,
-    required WidgetRef ref,
-    VoidCallback? onViewModeToggle,
   }) {
-    return SolidAppBarConfig(
-      title: title,
-      actions: [
-        if (onViewModeToggle != null)
-          SolidAppBarAction(
-            icon: _getViewModeIcon(ref.watch(viewModeProvider)),
-            onPressed: onViewModeToggle,
-            tooltip: '''
-
-**View Mode:** Tap here to cycle between different view modes (Grid, Kanban, List).
-
-''',
-          ),
-        SolidAppBarAction(
-          icon: Icons.refresh,
-          onPressed: onRefresh,
-          tooltip: '''
-
-**Refresh:** Tap here to refresh all movie data and reload the latest
-information from the movie database.
-
-''',
-        ),
-        SolidAppBarAction(
-          icon: Icons.search,
-          onPressed: onSearch,
-          tooltip: '''
-
-**Search:** Tap here to search for movies by title, genre, or other
-criteria.
-
-''',
-        ),
-      ],
-      overflowItems: [
-        SolidOverflowMenuItem(
-          id: 'settings',
-          icon: Icons.settings,
-          label: 'Settings',
-          onSelected: onSettings,
-        ),
-        SolidOverflowMenuItem(
-          id: 'logout',
-          icon: Icons.logout,
-          label: 'Logout',
-          onSelected: onLogout,
-        ),
-      ],
-    );
+    return [
+      SolidAppBarAction(
+        icon: _getViewModeIcon(ref.watch(viewModeProvider)),
+        onPressed: onViewModeToggle,
+        tooltip:
+            'View Mode: Tap here to cycle between different view modes (Grid, Kanban, List).',
+      ),
+      SolidAppBarAction(
+        icon: Icons.refresh,
+        onPressed: onRefresh,
+        tooltip:
+            'Refresh: Tap here to refresh all movie data and reload the latest information from the movie database.',
+      ),
+      SolidAppBarAction(
+        icon: Icons.search,
+        onPressed: onSearch,
+        tooltip:
+            'Search: Tap here to search for movies by title, genre, or other criteria.',
+      ),
+    ];
   }
 
-  // Helper method to get the appropriate icon for the current view mode.
+  /// Creates the MovieStar app bar overflow items.
+  ///
+  /// Returns a list of overflow menu items configured for the MovieStar
+  /// application.
+
+  static List<SolidOverflowMenuItem> createOverflowItems({
+    required VoidCallback onSettings,
+    required VoidCallback onLogout,
+  }) {
+    return [
+      SolidOverflowMenuItem(
+        id: 'settings',
+        icon: Icons.settings,
+        label: 'Settings',
+        onSelected: onSettings,
+      ),
+      SolidOverflowMenuItem(
+        id: 'logout',
+        icon: Icons.logout,
+        label: 'Logout',
+        onSelected: onLogout,
+      ),
+    ];
+  }
+
+  /// Gets the appropriate icon for the current view mode.
 
   static IconData _getViewModeIcon(HomeViewMode viewMode) {
     switch (viewMode) {

@@ -132,7 +132,7 @@ class ContentItem extends HiveObject {
       backdropUrl: TmdbImageUtil.getBackdropUrl(json['backdrop_path'] ?? ''),
       voteAverage: (json['vote_average'] as num?)?.toDouble() ?? 0.0,
       releaseDate: _parseReleaseDate(
-          json['first_air_date']), // TV shows use 'first_air_date'.
+          json['first_air_date'],), // TV shows use 'first_air_date'
       genreIds: List<int>.from(json['genre_ids'] ?? []),
       contentType: ContentType.tvShow,
     );

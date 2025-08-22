@@ -29,6 +29,7 @@ import 'package:flutter/material.dart';
 
 import 'package:gap/gap.dart';
 import 'package:solidpod/solidpod.dart';
+import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/widgets/list_shared_movies.dart';
 
@@ -665,7 +666,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SolidScaffold(
       key: _scaffoldKey,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: _buildSharedWithMeTab(),

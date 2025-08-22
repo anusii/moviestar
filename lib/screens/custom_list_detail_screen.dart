@@ -31,6 +31,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
+import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
@@ -432,7 +433,7 @@ class _CustomListDetailScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SolidScaffold(
       appBar: AppBar(
         title: Text(_currentList.name),
         backgroundColor: Theme.of(context).colorScheme.surface,

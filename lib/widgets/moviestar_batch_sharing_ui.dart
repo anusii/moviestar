@@ -35,6 +35,7 @@ import 'package:solidpod/solidpod.dart'
         getKeyFromUserIfRequired;
 // ignore: implementation_imports
 import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
+import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/models/movie.dart';
 
@@ -378,7 +379,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SolidScaffold(
       backgroundColor: widget.backgroundColor,
       appBar: widget.customAppBar ??
           AppBar(

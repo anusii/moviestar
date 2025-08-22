@@ -28,6 +28,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:gap/gap.dart';
+import 'package:solidui/solidui.dart';
 
 /// A placeholder home page widget.
 
@@ -38,7 +39,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SolidScaffold(
       appBar: AppBar(title: const Text('Movie Star'), centerTitle: true),
       body: Center(
         child: Column(

@@ -28,6 +28,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/features/file/service/components/file_service_widget.dart';
 import 'package:moviestar/theme/app_theme.dart';
@@ -42,7 +43,7 @@ class FileService extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
+    return SolidScaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: const Padding(
         padding: EdgeInsets.all(AppTheme.defaultPadding),

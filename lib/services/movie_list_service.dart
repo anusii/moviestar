@@ -28,6 +28,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:solidpod/solidpod.dart';
+import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/models/movie_list_operation.dart';
@@ -750,7 +751,7 @@ class MovieListService {
           fullscreenDialog: true,
           builder: (navContext) => Theme(
             data: Theme.of(_context),
-            child: Scaffold(
+            child: SolidScaffold(
               backgroundColor: Theme.of(_context).scaffoldBackgroundColor,
               appBar: AppBar(
                 title: Text('Share "$listName"'),

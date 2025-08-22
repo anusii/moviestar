@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart';
+import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
@@ -67,7 +68,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
           fullscreenDialog: true,
           builder: (navContext) => Theme(
             data: Theme.of(currentContext).copyWith(),
-            child: Scaffold(
+            child: SolidScaffold(
               backgroundColor: Theme.of(currentContext).scaffoldBackgroundColor,
               appBar: AppBar(
                 title: Text('Share "${movie.title}"'),

@@ -25,6 +25,8 @@ au](https://solidcommunity.au/docs/moviestar)
 
 ## 0.1 First stable release
 
++ Add ABOUT [0.0.14 20250822 tonypioneer]
++ Add TV Shows [0.0.13 20250822 atangster]
 + Lint fixes and deprecation update [0.0.12 20250821 gjw]
 + Scaffold and markdown cleanup [0.0.11 20250821 tonypioneer]
 + Updated home screen layout options [0.0.10 20250821 atangster]

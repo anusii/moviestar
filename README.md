@@ -1,4 +1,13 @@
-# Movie Star &mdash; Encrypted Movie Preferences in your Data Vault
+[![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
+
+[![GitHub License](https://img.shields.io/github/license/anusii/moviestar)](https://github.com/anusii/moviestar/blob/dev/LICENSE)
+[![Flutter Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/anusii/moviestar/master/pubspec.yaml&query=$.version&label=version)](https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md)
+[![Last Updated](https://img.shields.io/github/last-commit/anusii/moviestar?label=last%20updated)](https://github.com/anusii/moviestar/commits/dev/)
+[![GitHub commit activity (dev)](https://img.shields.io/github/commit-activity/w/anusii/moviestar/dev)](https://github.com/anusii/moviestar/commits/dev/)
+[![GitHub Issues](https://img.shields.io/github/issues/anusii/moviestar)](https://github.com/anusii/moviestar/issues)
+
+# Movie Star - Movie Rating and Sharing
 
 **An ANU Software Innovation Institute demonstrator for your Data Vault**.
 
@@ -9,15 +18,6 @@
 *[ANU Software Innovation Institute](https://sii.anu.edu.au)*
 
 *License: GNU GPL V3*
-
-[![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
-
-[![GitHub License](https://img.shields.io/github/license/anusii/moviestar)](https://github.com/anusii/moviestar/blob/dev/LICENSE)
-[![Flutter Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/anusii/moviestar/master/pubspec.yaml&query=$.version&label=version)](https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md)
-[![Last Updated](https://img.shields.io/github/last-commit/anusii/moviestar?label=last%20updated)](https://github.com/anusii/moviestar/commits/dev/)
-[![GitHub commit activity (dev)](https://img.shields.io/github/commit-activity/w/anusii/moviestar/dev)](https://github.com/anusii/moviestar/commits/dev/)
-[![GitHub Issues](https://img.shields.io/github/issues/anusii/moviestar)](https://github.com/anusii/moviestar/issues)
 
 Run the app online: [**web**](https://moviestar.solidcommunity.au).
 
@@ -69,26 +69,26 @@ As a user I can
   - [X] Description
   - [X] Rating
 - [X] View all movies in the GUI using movie art work
-- [ ] Settings to store my API key
-- [ ] New lists with names that I choose (e.g., Watched and To Watch)
-- [ ] Have any number of lists
-- [ ] Add movies to my Watched list or my To Watch list
-- [ ] Have the lists stored in my POD encrypted including the meta data
-- [ ] Retrieved the two lists from my POD on startup
-- [ ] Add my own comments to a movie (text)
-- [ ] Add a rating with a movie (0-5?)
-- [ ] My Movie Lists can be sorted by
-  - [ ] name
-  - [ ] rating
-  - [ ] release date
+- [X] Settings to store my API key
+- [x] New lists with names that I choose (e.g., Watched and To Watch)
+- [x] Have any number of lists
+- [x] Add movies to my Watched list or my To Watch list
+- [x] Have the lists stored in my POD encrypted including the meta data
+- [x] Retrieved the two lists from my POD on startup
+- [x] Add my own comments to a movie (text)
+- [x] Add a rating with a movie (0-5?)
+- [x] My Movie Lists can be sorted by
+  - [x] name
+  - [x] rating
+  - [x] release date
 
 ### Sharing my Movies
 
 As a user I can
 
-- [ ] Share all my movies data with another user
-- [ ] See who has shared their movies with me
-- [ ] Switch to a view of another user's movies - perhaps on HOME
+- [x] Share all my movies data with another user
+- [x] See who has shared their movies with me
+- [x] Switch to a view of another user's movies - perhaps on HOME
 - [ ] Summarise movies across users
   - [ ] Frequency count
   - [ ] Total ratings count

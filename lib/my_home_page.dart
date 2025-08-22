@@ -415,7 +415,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           await ref.read(themeModeProvider.notifier).toggleTheme();
         },
         showInAppBarActions: true,
-        hideOnVeryNarrowScreen: true,
       ),
       child: mainContent,
     );

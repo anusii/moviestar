@@ -1,6 +1,6 @@
 /// Moviestar - Manage and share ratings through private PODs.
 ///
-// Time-stamp: <Friday 2025-08-22 05:47:52 +1000 Graham Williams>
+// Time-stamp: <Friday 2025-08-22 13:18:28 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU
 ///
@@ -361,17 +361,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           serverUri: _webId?.split('profile')[0] ?? 'Not connected',
           displayText: _webId?.split('profile')[0] ?? 'Not connected',
           isClickable: _webId != null,
-          // If the default tooltips are not sutiable then let's discuss
-          // changing them. 20250822 gjw
-          //
-          //          tooltip:
-          //              'Server connection status - shows your Solid server information',
         ),
         loginStatus: SolidLoginStatus(
           webId: _webId,
           onTap: _handleLogout,
-          // loggedInTooltip: 'Click to logout from your Solid server',
-          // loggedOutTooltip: 'Click to login to your Solid server',
         ),
         securityKeyStatus: SolidSecurityKeyStatus(
           isKeySaved: true,
@@ -379,8 +372,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             // Handle security key tap - could show key management dialog
             //print('Security key status tapped')
           },
-          // tooltip:
-          //     'Security key status - shows if your encryption key is saved',
         ),
         showOnNarrowScreens: false,
       ),

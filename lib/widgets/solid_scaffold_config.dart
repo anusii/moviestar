@@ -1,6 +1,6 @@
 /// MovieStar SolidScaffold Configuration.
 ///
-// Time-stamp: <Sunday 2025-08-10 08:13:23 +1000 Graham Williams>
+// Time-stamp: <Friday 2025-08-22 13:25:10 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -47,7 +47,7 @@ class SolidScaffoldConfig {
   static List<SolidMenuItem> createMenuItems() {
     return [
       SolidMenuItem(
-        title: 'MOVIE STAR',
+        title: 'Home',
         icon: Icons.home,
         tooltip: '''
 
@@ -110,7 +110,7 @@ class SolidScaffoldConfig {
 ''',
       ),
       SolidMenuItem(
-        title: 'File Management',
+        title: 'Pod Files',
         icon: Icons.folder,
         tooltip: '''
 

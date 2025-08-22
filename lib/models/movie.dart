@@ -27,42 +27,52 @@ library;
 
 import 'package:hive/hive.dart';
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/utils/tmdb_image_util.dart';
 
 part 'movie.g.dart';
 
 /// A class representing a movie with its details.
+
 @HiveType(typeId: 0)
 class Movie extends HiveObject {
   /// Unique identifier for the movie.
+
   @HiveField(0)
   final int id;
 
   /// Title of the movie.
+
   @HiveField(1)
   final String title;
 
   /// Overview or description of the movie.
+
   @HiveField(2)
   final String overview;
 
   /// URL for the movie's poster image.
+
   @HiveField(3)
   final String posterUrl;
 
   /// URL for the movie's backdrop image.
+
   @HiveField(4)
   final String backdropUrl;
 
   /// Average rating of the movie.
+
   @HiveField(5)
   final double voteAverage;
 
   /// Release date of the movie.
+
   @HiveField(6)
   final DateTime releaseDate;
 
   /// List of genre IDs associated with the movie.
+
   @HiveField(7)
   final List<int> genreIds;
 
@@ -129,5 +139,39 @@ class Movie extends HiveObject {
       'release_date': releaseDate.toIso8601String(),
       'genre_ids': genreIds,
     };
+  }
+
+  /// Converts this Movie to a ContentItem for unified handling.
+
+  ContentItem toContentItem() {
+    return ContentItem(
+      id: id,
+      title: title,
+      overview: overview,
+      posterUrl: posterUrl,
+      backdropUrl: backdropUrl,
+      voteAverage: voteAverage,
+      releaseDate: releaseDate,
+      genreIds: genreIds,
+      contentType: ContentType.movie,
+    );
+  }
+
+  /// Creates a Movie from a ContentItem (for backward compatibility).
+
+  factory Movie.fromContentItem(ContentItem contentItem) {
+    if (contentItem.contentType != ContentType.movie) {
+      throw ArgumentError('ContentItem must be of type movie');
+    }
+    return Movie(
+      id: contentItem.id,
+      title: contentItem.title,
+      overview: contentItem.overview,
+      posterUrl: contentItem.posterUrl,
+      backdropUrl: contentItem.backdropUrl,
+      voteAverage: contentItem.voteAverage,
+      releaseDate: contentItem.releaseDate,
+      genreIds: contentItem.genreIds,
+    );
   }
 }

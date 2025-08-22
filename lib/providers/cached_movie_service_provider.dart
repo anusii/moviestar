@@ -31,6 +31,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/cache_settings_service.dart';
 import 'package:moviestar/services/cached_movie_service.dart';
+import 'package:moviestar/services/content_service.dart';
 import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/services/movie_service.dart';
 
@@ -131,6 +132,25 @@ final movieServiceProvider = Provider<MovieService>((ref) {
   });
 
   return movieService;
+});
+
+/// Provider for the content service (handles both movies and TV shows).
+
+final contentServiceProvider = Provider<ContentService>((ref) {
+  final apiKeyService = ref.watch(apiKeyServiceProvider);
+  // Watch the API key to trigger recreation when it changes.
+
+  ref.watch(apiKeyProvider);
+
+  final contentService = ContentService(apiKeyService);
+
+  // Ensure proper disposal.
+
+  ref.onDispose(() {
+    contentService.dispose();
+  });
+
+  return contentService;
 });
 
 /// Provider for the Hive movie cache service.

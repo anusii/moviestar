@@ -1,6 +1,6 @@
 /// Moviestar - Manage and share ratings through private PODs.
 ///
-// Time-stamp: <Friday 2025-08-22 05:47:52 +1000 Graham Williams>
+// Time-stamp: <Friday 2025-08-22 13:18:28 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU
 ///
@@ -38,10 +38,10 @@ import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
+import 'package:moviestar/screens/enhanced_search_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/my_lists_screen.dart';
 import 'package:moviestar/screens/my_movies_screen.dart';
-import 'package:moviestar/screens/search_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/screens/shared_movies_screen.dart';
 import 'package:moviestar/screens/to_watch_screen.dart';
@@ -280,13 +280,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   void _handleSearch() {
     if (mounted) {
-      final movieService = ref.read(movieServiceProvider);
+      final contentService = ref.read(contentServiceProvider);
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SearchScreen(
+          builder: (context) => EnhancedSearchScreen(
             favoritesService: _favoritesService,
-            movieService: movieService,
+            contentService: contentService,
           ),
         ),
       );
@@ -361,17 +361,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           serverUri: _webId?.split('profile')[0] ?? 'Not connected',
           displayText: _webId?.split('profile')[0] ?? 'Not connected',
           isClickable: _webId != null,
-          // If the default tooltips are not sutiable then let's discuss
-          // changing them. 20250822 gjw
-          //
-          //          tooltip:
-          //              'Server connection status - shows your Solid server information',
         ),
         loginStatus: SolidLoginStatus(
           webId: _webId,
           onTap: _handleLogout,
-          //          loggedInTooltip: 'Click to logout from your Solid server',
-          //          loggedOutTooltip: 'Click to login to your Solid server',
         ),
         securityKeyStatus: SolidSecurityKeyStatus(
           isKeySaved: true,
@@ -379,8 +372,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             // Handle security key tap - could show key management dialog
             //print('Security key status tapped')
           },
-          //          tooltip:
-          //              'Security key status - shows if your encryption key is saved',
         ),
         showOnNarrowScreens: false,
       ),

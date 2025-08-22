@@ -1,6 +1,6 @@
 /// Reusable movie card widget with cache status indicators.
 ///
-// Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
+// Time-stamp: <Friday 2025-08-22 05:51:08 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -166,10 +166,15 @@ class _MovieCardState extends State<MovieCard> {
 
   Timer? _hideTimer;
 
+  // Timer for delayed showing of the dialog.
+
+  Timer? _showTimer;
+
   @override
   void dispose() {
     _removeOverlay();
     _hideTimer?.cancel();
+    _showTimer?.cancel();
     super.dispose();
   }
 
@@ -296,12 +301,23 @@ class _MovieCardState extends State<MovieCard> {
 
   void _onCardMouseEnter(_) {
     _hideTimer?.cancel();
-    _showQuickActions(context);
+
+    // Start a timer to show the dialog after a delay.
+    // This prevents popups from appearing immediately when quickly moving the mouse.
+
+    _showTimer?.cancel();
+    _showTimer = Timer(const Duration(milliseconds: 1000), () {
+      _showQuickActions(context);
+    });
   }
 
   // Called when mouse exits the card area.
 
   void _onCardMouseExit(_) {
+    // Cancel the show timer if mouse exits before delay completes.
+
+    _showTimer?.cancel();
+
     if (!_isDialogShown) return;
 
     // Start a timer to hide the dialog after a short delay.
@@ -316,8 +332,9 @@ class _MovieCardState extends State<MovieCard> {
   // Called when mouse enters the dialog area.
 
   void _onDialogMouseEnter() {
-    // Cancel the hide timer since mouse is over the dialog.
+    // Cancel both timers since mouse is over the dialog.
 
+    _showTimer?.cancel();
     _hideTimer?.cancel();
   }
 

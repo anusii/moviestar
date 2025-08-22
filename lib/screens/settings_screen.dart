@@ -1049,7 +1049,8 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
               }
             }
           : null,
-      activeThumbColor: Theme.of(context).colorScheme.primary,
+      thumbColor:
+          WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
     );
   }
 
@@ -1089,7 +1090,8 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
       subtitle: Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
       value: value,
       onChanged: onChanged,
-      activeThumbColor: Theme.of(context).colorScheme.primary,
+      thumbColor:
+          WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
     );
   }
 

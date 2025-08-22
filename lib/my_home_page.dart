@@ -1,6 +1,6 @@
 /// Moviestar - Manage and share ratings through private PODs.
 ///
-// Time-stamp: <Wednesday 2025-07-23 16:53:30 +1000 Graham Williams>
+// Time-stamp: <Friday 2025-08-22 08:24:40 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU
 ///
@@ -28,6 +28,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:markdown_tooltip/markdown_tooltip.dart' show wordWrap;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart' show logoutPopup, getWebId;
 import 'package:solidui/solidui.dart';
@@ -38,10 +39,10 @@ import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
+import 'package:moviestar/screens/enhanced_search_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/my_lists_screen.dart';
 import 'package:moviestar/screens/my_movies_screen.dart';
-import 'package:moviestar/screens/search_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/screens/shared_movies_screen.dart';
 import 'package:moviestar/screens/to_watch_screen.dart';
@@ -280,13 +281,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   void _handleSearch() {
     if (mounted) {
-      final movieService = ref.read(movieServiceProvider);
+      final contentService = ref.read(contentServiceProvider);
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SearchScreen(
+          builder: (context) => EnhancedSearchScreen(
             favoritesService: _favoritesService,
-            movieService: movieService,
+            contentService: contentService,
           ),
         ),
       );
@@ -362,20 +363,22 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           Icons.movie,
           size: 64,
         ),
-        applicationLegalese:
-            '''© ${DateTime.now().year} Software Innovation Institute, ANU
+        applicationLegalese: wordWrap('''
 
-MovieStar is a movie discovery and management application built with Flutter,
-which helps you discover, track, and manage your favourite
-movies using the power of Solid PODs for decentralised data
-storage.
+          © ${DateTime.now().year} Software Innovation Institute, ANU
 
-Licensed under the GNU General Public License v3.0
+          MovieStar is a movie discovery and management application built with
+          Flutter, which helps you discover, track, and manage your favourite
+          movies using the power of Solid PODs for decentralised data storage.
 
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
+          Licensed under the GNU General Public License v3.0
 
-Visit https://github.com/anusii/moviestar for more information.''',
+          This is free software: you are free to change and redistribute it.
+          There is NO WARRANTY, to the extent permitted by law.
+
+          Visit https://github.com/anusii/moviestar for more information.
+
+          '''),
       ),
       statusBar: SolidStatusBarConfig(
         serverInfo: SolidServerInfo(
@@ -387,7 +390,13 @@ Visit https://github.com/anusii/moviestar for more information.''',
           webId: _webId,
           onTap: _handleLogout,
         ),
-        securityKeyStatus: SolidSecurityKeyStatus(),
+        securityKeyStatus: SolidSecurityKeyStatus(
+          isKeySaved: true,
+          onTap: () => {
+            // Handle security key tap - could show key management dialog
+            //print('Security key status tapped')
+          },
+        ),
         showOnNarrowScreens: false,
       ),
       userInfo: userInfo,

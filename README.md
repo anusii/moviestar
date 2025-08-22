@@ -7,8 +7,7 @@
 [![GitHub commit activity (dev)](https://img.shields.io/github/commit-activity/w/anusii/moviestar/dev)](https://github.com/anusii/moviestar/commits/dev/)
 [![GitHub Issues](https://img.shields.io/github/issues/anusii/moviestar)](https://github.com/anusii/moviestar/issues)
 
-# Movie Star
-# Encrypted Movie Preferences in your Data Vault
+# Movie Star - Movie Rating and Sharing
 
 **An ANU Software Innovation Institute demonstrator for your Data Vault**.
 

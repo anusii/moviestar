@@ -1,6 +1,6 @@
 /// Moviestar - Manage and share ratings through private PODs.
 ///
-// Time-stamp: <Friday 2025-08-22 13:18:28 +1000 Graham Williams>
+// Time-stamp: <Friday 2025-08-22 08:24:40 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU
 ///
@@ -28,6 +28,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:markdown_tooltip/markdown_tooltip.dart' show wordWrap;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart' show logoutPopup, getWebId;
 import 'package:solidui/solidui.dart';
@@ -355,6 +356,29 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           onSettings: _handleSettings,
           onLogout: _handleLogout,
         ),
+      ),
+      aboutConfig: SolidAboutConfig(
+        applicationName: 'MovieStar',
+        applicationIcon: const Icon(
+          Icons.movie,
+          size: 64,
+        ),
+        applicationLegalese: wordWrap('''
+
+          © ${DateTime.now().year} Software Innovation Institute, ANU
+
+          MovieStar is a movie discovery and management application built with
+          Flutter, which helps you discover, track, and manage your favourite
+          movies using the power of Solid PODs for decentralised data storage.
+
+          Licensed under the GNU General Public License v3.0
+
+          This is free software: you are free to change and redistribute it.
+          There is NO WARRANTY, to the extent permitted by law.
+
+          Visit https://github.com/anusii/moviestar for more information.
+
+          '''),
       ),
       statusBar: SolidStatusBarConfig(
         serverInfo: SolidServerInfo(

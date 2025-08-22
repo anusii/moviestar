@@ -29,7 +29,7 @@ dependencies:
   gap: ^3.0.1
   http: ^1.1.0
   intl: any
-  markdown_tooltip: ^0.0.7
+  markdown_tooltip: ^0.0.8
 
   path: ^1.9.1
   pdf: ^3.11.3
@@ -41,7 +41,7 @@ dependencies:
   solidui:
     git:
       url: https://github.com/anusii/solidui.git
-      ref: dev
+      ref: tony/8_about_button
 #    path: ../solidui
   universal_io: ^2.2.2
   url_launcher: ^6.3.1

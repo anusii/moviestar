@@ -1,6 +1,6 @@
 /// Service for managing application theme preferences.
 ///
-// Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
+// Time-stamp: <Friday 2025-08-22 08:06:02 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -40,11 +40,11 @@ class ThemeService {
 
   static const String _themeModeKey = 'theme_mode';
 
-  /// Creates a new [ThemeService] instance.
+  /// Create a new [ThemeService] instance.
 
   ThemeService(this._prefs);
 
-  /// Gets the current theme mode from shared preferences.
+  /// Obtain the current theme mode from shared preferences.
   /// Returns [ThemeMode.dark] as default if no preference is set.
 
   ThemeMode getThemeMode() {
@@ -67,7 +67,7 @@ class ThemeService {
     }
   }
 
-  /// Sets the theme mode and saves it to shared preferences.
+  /// Set the theme mode and saves it to shared preferences.
 
   Future<void> setThemeMode(ThemeMode themeMode) async {
     String themeModeString;
@@ -86,13 +86,25 @@ class ThemeService {
     await _prefs.setString(_themeModeKey, themeModeString);
   }
 
-  /// Toggles between light and dark theme modes.
+  /// Toggle between light, dark, and system theme modes.
+  /// Cycles: Light → Dark → System → Light
   /// Returns the new theme mode.
 
   Future<ThemeMode> toggleTheme() async {
     final currentMode = getThemeMode();
-    final newMode =
-        currentMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    ThemeMode newMode;
+
+    switch (currentMode) {
+      case ThemeMode.light:
+        newMode = ThemeMode.dark;
+        break;
+      case ThemeMode.dark:
+        newMode = ThemeMode.system;
+        break;
+      case ThemeMode.system:
+        newMode = ThemeMode.light;
+        break;
+    }
 
     await setThemeMode(newMode);
     return newMode;

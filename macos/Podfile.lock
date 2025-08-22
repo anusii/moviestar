@@ -71,7 +71,7 @@ SPEC CHECKSUMS:
   fast_rsa: 47a50bec1042c8c01726007dc0590a078418f997
   file_picker: e716a70a9fe5fd9e09ebc922d7541464289443af
   flutter_secure_storage_darwin: 12d2375c690785d97a4e586f15f11be5ae35d5b0
-  FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
+  FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
   package_info_plus: 12f1c5c2cfe8727ca46cbd0b26677728972d9a5b
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   printing: 1dd6a1fce2209ec240698e2439a4adbb9b427637
@@ -81,6 +81,6 @@ SPEC CHECKSUMS:
   url_launcher_macos: c82c93949963e55b228a30115bd219499a6fe404
   window_manager: e25faf20d88283a0d46e7b1a759d07261ca27575
 
-PODFILE CHECKSUM: 7eb978b976557c8c1cd717d8185ec483fd090a82
+PODFILE CHECKSUM: 54d867c82ac51cbd61b565781b9fada492027009
 
 COCOAPODS: 1.16.2

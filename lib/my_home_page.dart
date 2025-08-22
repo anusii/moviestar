@@ -362,17 +362,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           serverUri: _webId?.split('profile')[0] ?? 'Not connected',
           displayText: _webId?.split('profile')[0] ?? 'Not connected',
           isClickable: _webId != null,
-          // If the default tooltips are not sutiable then let's discuss
-          // changing them. 20250822 gjw
-          //
-          //          tooltip:
-          //              'Server connection status - shows your Solid server information',
+          tooltip:
+              'Server connection status - shows your Solid server information',
         ),
         loginStatus: SolidLoginStatus(
           webId: _webId,
           onTap: _handleLogout,
-          //          loggedInTooltip: 'Click to logout from your Solid server',
-          //          loggedOutTooltip: 'Click to login to your Solid server',
+          loggedInTooltip: 'Click to logout from your Solid server',
+          loggedOutTooltip: 'Click to login to your Solid server',
         ),
         securityKeyStatus: SolidSecurityKeyStatus(
           isKeySaved: true,
@@ -380,8 +377,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             // Handle security key tap - could show key management dialog
             //print('Security key status tapped')
           },
-          //          tooltip:
-          //              'Security key status - shows if your encryption key is saved',
+          tooltip:
+              'Security key status - shows if your encryption key is saved',
         ),
         showOnNarrowScreens: false,
       ),

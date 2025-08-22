@@ -69,26 +69,26 @@ As a user I can
   - [X] Description
   - [X] Rating
 - [X] View all movies in the GUI using movie art work
-- [ ] Settings to store my API key
-- [ ] New lists with names that I choose (e.g., Watched and To Watch)
-- [ ] Have any number of lists
-- [ ] Add movies to my Watched list or my To Watch list
-- [ ] Have the lists stored in my POD encrypted including the meta data
-- [ ] Retrieved the two lists from my POD on startup
-- [ ] Add my own comments to a movie (text)
-- [ ] Add a rating with a movie (0-5?)
-- [ ] My Movie Lists can be sorted by
-  - [ ] name
-  - [ ] rating
-  - [ ] release date
+- [X] Settings to store my API key
+- [x] New lists with names that I choose (e.g., Watched and To Watch)
+- [x] Have any number of lists
+- [x] Add movies to my Watched list or my To Watch list
+- [x] Have the lists stored in my POD encrypted including the meta data
+- [x] Retrieved the two lists from my POD on startup
+- [x] Add my own comments to a movie (text)
+- [x] Add a rating with a movie (0-5?)
+- [x] My Movie Lists can be sorted by
+  - [x] name
+  - [x] rating
+  - [x] release date
 
 ### Sharing my Movies
 
 As a user I can
 
-- [ ] Share all my movies data with another user
-- [ ] See who has shared their movies with me
-- [ ] Switch to a view of another user's movies - perhaps on HOME
+- [x] Share all my movies data with another user
+- [x] See who has shared their movies with me
+- [x] Switch to a view of another user's movies - perhaps on HOME
 - [ ] Summarise movies across users
   - [ ] Frequency count
   - [ ] Total ratings count

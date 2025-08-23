@@ -158,13 +158,15 @@ class _MovieCardState extends State<MovieCard> {
 
   OverlayEntry? _overlayEntry;
 
-  /// Validates if an image URL is valid and not empty.
+  // Validates if an image URL is valid and not empty.
+
   bool _isValidImageUrl(String? url) {
     if (url == null || url.trim().isEmpty) {
       return false;
     }
 
-    // Basic URL validation - must start with http:// or https://
+    // Basic URL validation - must start with http:// or https://.
+
     return url.trim().startsWith('http://') ||
         url.trim().startsWith('https://');
   }

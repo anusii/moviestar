@@ -62,6 +62,17 @@ class EnhancedSearchScreen extends StatefulWidget {
 
 //
 class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
+  /// Validates if an image URL is valid and not empty.
+  bool _isValidImageUrl(String? url) {
+    if (url == null || url.trim().isEmpty) {
+      return false;
+    }
+
+    // Basic URL validation - must start with http:// or https://
+    return url.trim().startsWith('http://') ||
+        url.trim().startsWith('https://');
+  }
+
   // Controller for the search text field.
 
   final TextEditingController _searchController = TextEditingController();
@@ -238,15 +249,26 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
             return ListTile(
               leading: ClipRRect(
                 borderRadius: BorderRadius.circular(4),
-                child: CachedNetworkImage(
-                  imageUrl: contentItem.posterUrl,
-                  width: 50,
-                  height: 75,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                ),
+                child: _isValidImageUrl(contentItem.posterUrl)
+                    ? CachedNetworkImage(
+                        imageUrl: contentItem.posterUrl.trim(),
+                        width: 50,
+                        height: 75,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) =>
+                            const Center(child: CircularProgressIndicator()),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                      )
+                    : Container(
+                        width: 50,
+                        height: 75,
+                        color: Colors.grey[300],
+                        child: const Icon(
+                          Icons.movie,
+                          color: Colors.grey,
+                        ),
+                      ),
               ),
               title: Row(
                 children: [
@@ -332,6 +354,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
                     builder: (context) => MovieDetailsScreen(
                       movie: movie,
                       favoritesService: widget.favoritesService,
+                      contentType: contentItem.contentType,
                     ),
                   ),
                 );

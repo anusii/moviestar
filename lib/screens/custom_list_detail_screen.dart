@@ -72,6 +72,17 @@ class CustomListDetailScreen extends ConsumerStatefulWidget {
 
 class _CustomListDetailScreenState
     extends ConsumerState<CustomListDetailScreen> {
+  /// Validates if an image URL is valid and not empty.
+  bool _isValidImageUrl(String? url) {
+    if (url == null || url.trim().isEmpty) {
+      return false;
+    }
+
+    // Basic URL validation - must start with http:// or https://
+    return url.trim().startsWith('http://') ||
+        url.trim().startsWith('https://');
+  }
+
   // Current custom list (may be updated).
 
   late CustomList _currentList;
@@ -699,26 +710,38 @@ Recipients will be able to:
 
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: CachedNetworkImage(
-                  imageUrl: movie.posterUrl,
-                  width: 60,
-                  height: 90,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    width: 60,
-                    height: 90,
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    child: const Center(child: CircularProgressIndicator()),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    width: 60,
-                    height: 90,
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    child: const Icon(Icons.movie),
-                  ),
-                ),
+                child: _isValidImageUrl(movie.posterUrl)
+                    ? CachedNetworkImage(
+                        imageUrl: movie.posterUrl.trim(),
+                        width: 60,
+                        height: 90,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          width: 60,
+                          height: 90,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
+                          child:
+                              const Center(child: CircularProgressIndicator()),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          width: 60,
+                          height: 90,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
+                          child: const Icon(Icons.movie),
+                        ),
+                      )
+                    : Container(
+                        width: 60,
+                        height: 90,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
+                        child: const Icon(Icons.movie),
+                      ),
               ),
               const SizedBox(width: 12),
 

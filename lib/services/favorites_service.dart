@@ -120,8 +120,10 @@ class FavoritesService extends ChangeNotifier {
   }
 
   /// Adds a movie to the to-watch list.
+  ///
+  /// [contentType] specifies whether this is a movie or TV show.
 
-  Future<void> addToWatch(Movie movie) async {
+  Future<void> addToWatch(Movie movie, {String contentType = 'movie'}) async {
     final toWatch = await getToWatch();
     if (!toWatch.any((m) => m.id == movie.id)) {
       toWatch.add(movie);
@@ -131,8 +133,10 @@ class FavoritesService extends ChangeNotifier {
   }
 
   /// Adds a movie to the watched list.
+  ///
+  /// [contentType] specifies whether this is a movie or TV show.
 
-  Future<void> addToWatched(Movie movie) async {
+  Future<void> addToWatched(Movie movie, {String contentType = 'movie'}) async {
     final watched = await getWatched();
     if (!watched.any((m) => m.id == movie.id)) {
       watched.add(movie);

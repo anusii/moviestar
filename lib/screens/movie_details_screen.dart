@@ -34,6 +34,7 @@ import 'package:gap/gap.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
@@ -55,6 +56,11 @@ class MovieDetailsScreen extends StatefulWidget {
 
   final Map<String, dynamic>? sharedMovieData;
 
+  /// Content type to distinguish between movies and TV shows.
+  /// Defaults to movie for backward compatibility.
+
+  final ContentType contentType;
+
   /// Creates a new [MovieDetailsScreen] widget.
 
   const MovieDetailsScreen({
@@ -62,6 +68,7 @@ class MovieDetailsScreen extends StatefulWidget {
     required this.movie,
     required this.favoritesService,
     this.sharedMovieData,
+    this.contentType = ContentType.movie,
   });
 
   @override
@@ -71,6 +78,17 @@ class MovieDetailsScreen extends StatefulWidget {
 /// State class for the movie details screen.
 
 class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
+  /// Validates if an image URL is valid and not empty.
+  bool _isValidImageUrl(String? url) {
+    if (url == null || url.trim().isEmpty) {
+      return false;
+    }
+
+    // Basic URL validation - must start with http:// or https://
+    return url.trim().startsWith('http://') ||
+        url.trim().startsWith('https://');
+  }
+
   /// Indicates whether the movie is in the to-watch list.
 
   bool _isInToWatch = false;
@@ -201,7 +219,10 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     if (_isInToWatch) {
       await widget.favoritesService.removeFromToWatch(widget.movie);
     } else {
-      await widget.favoritesService.addToWatch(widget.movie);
+      await widget.favoritesService.addToWatch(
+        widget.movie,
+        contentType: widget.contentType == ContentType.tvShow ? 'tv' : 'movie',
+      );
     }
     setState(() {
       _isInToWatch = !_isInToWatch;
@@ -214,7 +235,10 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     if (_isInWatched) {
       await widget.favoritesService.removeFromWatched(widget.movie);
     } else {
-      await widget.favoritesService.addToWatched(widget.movie);
+      await widget.favoritesService.addToWatched(
+        widget.movie,
+        contentType: widget.contentType == ContentType.tvShow ? 'tv' : 'movie',
+      );
     }
     setState(() {
       _isInWatched = !_isInWatched;
@@ -527,6 +551,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
         favoritesService: widget.favoritesService,
         customLists: _customLists,
         onListsUpdated: _loadCustomLists,
+        contentType: widget.contentType,
       ),
     );
   }
@@ -542,13 +567,25 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
             pinned: true,
             backgroundColor: Theme.of(context).colorScheme.surface,
             flexibleSpace: FlexibleSpaceBar(
-              background: CachedNetworkImage(
-                imageUrl: widget.movie.backdropUrl,
-                fit: BoxFit.cover,
-                placeholder: (context, url) =>
-                    const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-              ),
+              background: _isValidImageUrl(widget.movie.backdropUrl)
+                  ? CachedNetworkImage(
+                      imageUrl: widget.movie.backdropUrl.trim(),
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          const Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                    )
+                  : Container(
+                      color: Theme.of(context).colorScheme.surfaceContainer,
+                      child: Center(
+                        child: Icon(
+                          Icons.movie,
+                          size: 64,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
             ),
           ),
           SliverToBoxAdapter(
@@ -1048,12 +1085,14 @@ class _AddToCustomListsDialog extends StatefulWidget {
   final FavoritesService favoritesService;
   final List<CustomList> customLists;
   final VoidCallback onListsUpdated;
+  final ContentType contentType;
 
   const _AddToCustomListsDialog({
     required this.movie,
     required this.favoritesService,
     required this.customLists,
     required this.onListsUpdated,
+    required this.contentType,
   });
 
   @override
@@ -1098,8 +1137,12 @@ class _AddToCustomListsDialogState extends State<_AddToCustomListsDialog> {
 
     try {
       if (add) {
-        await widget.favoritesService
-            .addMovieToCustomList(listId, widget.movie);
+        await widget.favoritesService.addMovieToCustomList(
+          listId,
+          widget.movie,
+          contentType:
+              widget.contentType == ContentType.tvShow ? 'tv' : 'movie',
+        );
         _selectedListIds.add(listId);
       } else {
         await widget.favoritesService
@@ -1420,8 +1463,11 @@ class _AddToCustomListsDialogState extends State<_AddToCustomListsDialog> {
 
     try {
       final newList = await widget.favoritesService.createCustomList(name);
-      await widget.favoritesService
-          .addMovieToCustomList(newList.id, widget.movie);
+      await widget.favoritesService.addMovieToCustomList(
+        newList.id,
+        widget.movie,
+        contentType: widget.contentType == ContentType.tvShow ? 'tv' : 'movie',
+      );
       _selectedListIds.add(newList.id);
       _newListController.clear();
       widget.onListsUpdated();

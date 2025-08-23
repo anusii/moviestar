@@ -356,8 +356,15 @@ class MovieListService {
   }
 
   /// Adds a movie to a MovieList.
+  ///
+  /// [contentType] specifies whether this is a movie or TV show.
+  /// Only creates individual files for actual movies, not TV shows.
 
-  Future<bool> addMovieToList(String movieListId, Movie movie) async {
+  Future<bool> addMovieToList(
+    String movieListId,
+    Movie movie, {
+    String contentType = 'movie',
+  }) async {
     try {
       final movieList = await getMovieList(movieListId);
       if (movieList == null) {
@@ -374,9 +381,12 @@ class MovieListService {
         return true;
       }
 
-      // Create individual movie file to ensure full data is available.
+      // Only create individual movie files for actual movies, not TV shows.
+      // TV shows should be fetched from the API when needed.
 
-      await _createMovieFile(movie);
+      if (contentType == 'movie') {
+        await _createMovieFile(movie);
+      }
 
       currentMovies.add(movie);
 

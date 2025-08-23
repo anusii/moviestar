@@ -158,6 +158,17 @@ class _MovieCardState extends State<MovieCard> {
 
   OverlayEntry? _overlayEntry;
 
+  /// Validates if an image URL is valid and not empty.
+  bool _isValidImageUrl(String? url) {
+    if (url == null || url.trim().isEmpty) {
+      return false;
+    }
+
+    // Basic URL validation - must start with http:// or https://
+    return url.trim().startsWith('http://') ||
+        url.trim().startsWith('https://');
+  }
+
   // Whether the quick actions dialog is currently shown.
 
   bool _isDialogShown = false;
@@ -191,7 +202,7 @@ class _MovieCardState extends State<MovieCard> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: widget.movie.posterUrl.isEmpty
+                  child: !_isValidImageUrl(widget.movie.posterUrl)
                       ? Container(
                           width: widget.width,
                           height: widget.height,
@@ -203,7 +214,7 @@ class _MovieCardState extends State<MovieCard> {
                           ),
                         )
                       : CachedNetworkImage(
-                          imageUrl: widget.movie.posterUrl,
+                          imageUrl: widget.movie.posterUrl.trim(),
                           width: widget.width,
                           height: widget.height,
                           fit: BoxFit.cover,
@@ -229,7 +240,7 @@ class _MovieCardState extends State<MovieCard> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: widget.movie.posterUrl.isEmpty
+                  child: !_isValidImageUrl(widget.movie.posterUrl)
                       ? Container(
                           width: widget.width,
                           height: widget.height,
@@ -241,7 +252,7 @@ class _MovieCardState extends State<MovieCard> {
                           ),
                         )
                       : CachedNetworkImage(
-                          imageUrl: widget.movie.posterUrl,
+                          imageUrl: widget.movie.posterUrl.trim(),
                           width: widget.width,
                           height: widget.height,
                           fit: BoxFit.cover,

@@ -1436,7 +1436,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // Get content as Movie based on known content type
+  // Get content as Movie based on known content type.
 
   Future<Movie> _getContentAsMovieWithType(
     int contentId,

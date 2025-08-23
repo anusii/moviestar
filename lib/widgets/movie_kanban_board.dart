@@ -910,7 +910,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
-  // Get content as Movie based on known content type
+  // Get content as Movie based on known content type.
 
   Future<Movie> _getContentAsMovieWithType(
     int contentId,
@@ -939,7 +939,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         final cachedMovieService = ref.read(cachedMovieServiceProvider);
         final contentService = ref.read(contentServiceProvider);
 
-        // Get content type for this index
+        // Get content type for this index.
+
         final contentType = customList.getContentTypeAt(index);
 
         return FutureBuilder<Movie>(

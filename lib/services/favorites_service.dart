@@ -325,10 +325,12 @@ class FavoritesService extends ChangeNotifier {
       if (!currentList.movieIds.contains(movie.id)) {
         final updatedMovieIds = [...currentList.movieIds, movie.id];
 
-        // Update content types array
+        // Update content types array.
+
         List<String> currentContentTypes;
         if (currentList.contentTypes == null) {
-          // For backward compatibility, fill existing movies with 'movie' type
+          // For backward compatibility, fill existing movies with 'movie' type.
+
           currentContentTypes =
               List.filled(currentList.movieIds.length, 'movie');
         } else {
@@ -360,7 +362,8 @@ class FavoritesService extends ChangeNotifier {
         final updatedMovieIds =
             currentList.movieIds.where((id) => id != movieId).toList();
 
-        // Update content types array by removing the type at the same index
+        // Update content types array by removing the type at the same index.
+
         List<String>? updatedContentTypes = currentList.contentTypes;
         if (updatedContentTypes != null &&
             movieIndex < updatedContentTypes.length) {

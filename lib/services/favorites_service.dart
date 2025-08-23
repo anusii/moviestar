@@ -316,8 +316,11 @@ class FavoritesService extends ChangeNotifier {
 
   /// Adds a movie to a custom list.
 
-  Future<void> addMovieToCustomList(String listId, Movie movie,
-      {String contentType = 'movie'}) async {
+  Future<void> addMovieToCustomList(
+    String listId,
+    Movie movie, {
+    String contentType = 'movie',
+  }) async {
     final lists = await getCustomLists();
     final listIndex = lists.indexWhere((list) => list.id == listId);
     if (listIndex != -1) {

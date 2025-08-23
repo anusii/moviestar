@@ -1454,14 +1454,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   // Build a movie card for a custom list movie (loading movie details on demand).
 
-  Widget _buildCustomListMovieCard(int movieId,
-      {String contentType = 'movie'}) {
+  Widget _buildCustomListMovieCard(
+    int movieId, {
+    String contentType = 'movie',
+  }) {
     final cachedMovieService = ref.read(cachedMovieServiceProvider);
     final contentService = ref.read(contentServiceProvider);
 
     return FutureBuilder<Movie>(
       future: _getContentAsMovieWithType(
-          movieId, contentType, cachedMovieService, contentService),
+        movieId,
+        contentType,
+        cachedMovieService,
+        contentService,
+      ),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Container(
@@ -1648,14 +1654,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   // Build a list item for a custom list movie.
 
-  Widget _buildCustomListMovieListItem(int movieId,
-      {String contentType = 'movie'}) {
+  Widget _buildCustomListMovieListItem(
+    int movieId, {
+    String contentType = 'movie',
+  }) {
     final cachedMovieService = ref.read(cachedMovieServiceProvider);
     final contentService = ref.read(contentServiceProvider);
 
     return FutureBuilder<Movie>(
       future: _getContentAsMovieWithType(
-          movieId, contentType, cachedMovieService, contentService),
+        movieId,
+        contentType,
+        cachedMovieService,
+        contentService,
+      ),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Padding(

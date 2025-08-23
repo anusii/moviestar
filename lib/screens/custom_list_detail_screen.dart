@@ -36,7 +36,6 @@ import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/services/content_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/movie_list_service.dart';

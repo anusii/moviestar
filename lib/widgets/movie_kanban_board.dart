@@ -945,7 +945,11 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
         return FutureBuilder<Movie>(
           future: _getContentAsMovieWithType(
-              movieId, contentType, cachedMovieService, contentService),
+            movieId,
+            contentType,
+            cachedMovieService,
+            contentService,
+          ),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Container(

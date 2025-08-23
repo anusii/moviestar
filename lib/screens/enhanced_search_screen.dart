@@ -636,8 +636,11 @@ class _AddToCustomListsDialogState extends State<_AddToCustomListsDialog> {
             widget.originalContentItem.contentType == ContentType.tvShow
                 ? 'tv'
                 : 'movie';
-        await widget.favoritesService.addMovieToCustomList(listId, widget.movie,
-            contentType: contentType);
+        await widget.favoritesService.addMovieToCustomList(
+          listId,
+          widget.movie,
+          contentType: contentType,
+        );
         _selectedListIds.add(listId);
       } else {
         await widget.favoritesService
@@ -966,8 +969,10 @@ class _AddToCustomListsDialogState extends State<_AddToCustomListsDialog> {
               ? 'tv'
               : 'movie';
       await widget.favoritesService.addMovieToCustomList(
-          newList.id, widget.movie,
-          contentType: contentType);
+        newList.id,
+        widget.movie,
+        contentType: contentType,
+      );
       _selectedListIds.add(newList.id);
       _newListController.clear();
       widget.onListsUpdated();

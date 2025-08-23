@@ -158,11 +158,11 @@ class Movie extends HiveObject {
   }
 
   /// Creates a Movie from a ContentItem (for backward compatibility).
+  ///
+  /// Note: This also works for TV shows since they have the same structure.
+  /// TV shows are treated as movies for list management purposes.
 
   factory Movie.fromContentItem(ContentItem contentItem) {
-    if (contentItem.contentType != ContentType.movie) {
-      throw ArgumentError('ContentItem must be of type movie');
-    }
     return Movie(
       id: contentItem.id,
       title: contentItem.title,

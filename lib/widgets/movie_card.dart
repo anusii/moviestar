@@ -191,16 +191,27 @@ class _MovieCardState extends State<MovieCard> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: CachedNetworkImage(
-                    imageUrl: widget.movie.posterUrl,
-                    width: widget.width,
-                    height: widget.height,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) =>
-                        const Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                  ),
+                  child: widget.movie.posterUrl.isEmpty
+                      ? Container(
+                          width: widget.width,
+                          height: widget.height,
+                          color: Colors.grey[300],
+                          child: const Icon(
+                            Icons.movie,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                        )
+                      : CachedNetworkImage(
+                          imageUrl: widget.movie.posterUrl,
+                          width: widget.width,
+                          height: widget.height,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              const Center(child: CircularProgressIndicator()),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                        ),
                 ),
                 _buildCacheIndicator(context),
                 if (widget.cacheOnlyMode == true)
@@ -218,16 +229,27 @@ class _MovieCardState extends State<MovieCard> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: CachedNetworkImage(
-                    imageUrl: widget.movie.posterUrl,
-                    width: widget.width,
-                    height: widget.height,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) =>
-                        const Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                  ),
+                  child: widget.movie.posterUrl.isEmpty
+                      ? Container(
+                          width: widget.width,
+                          height: widget.height,
+                          color: Colors.grey[300],
+                          child: const Icon(
+                            Icons.movie,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                        )
+                      : CachedNetworkImage(
+                          imageUrl: widget.movie.posterUrl,
+                          width: widget.width,
+                          height: widget.height,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              const Center(child: CircularProgressIndicator()),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                        ),
                 ),
                 _buildCacheIndicator(context),
               ],

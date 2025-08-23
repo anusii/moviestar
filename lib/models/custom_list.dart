@@ -53,6 +53,12 @@ class CustomList extends HiveObject {
   @HiveField(3)
   final List<int> movieIds;
 
+  /// List of content types corresponding to movieIds (for distinguishing movies vs TV shows).
+  /// This field is optional for backward compatibility with existing lists.
+
+  @HiveField(6)
+  final List<String>? contentTypes;
+
   /// Date when the list was created.
 
   @HiveField(4)
@@ -70,6 +76,7 @@ class CustomList extends HiveObject {
     required this.name,
     this.description,
     required this.movieIds,
+    this.contentTypes,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -82,6 +89,9 @@ class CustomList extends HiveObject {
       name: json['name'] ?? '',
       description: json['description'],
       movieIds: List<int>.from(json['movieIds'] ?? []),
+      contentTypes: json['contentTypes'] != null
+          ? List<String>.from(json['contentTypes'])
+          : null,
       createdAt:
           DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
       updatedAt:
@@ -97,6 +107,7 @@ class CustomList extends HiveObject {
       'name': name,
       'description': description,
       'movieIds': movieIds,
+      if (contentTypes != null) 'contentTypes': contentTypes,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -109,6 +120,7 @@ class CustomList extends HiveObject {
     String? name,
     String? description,
     List<int>? movieIds,
+    List<String>? contentTypes,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -117,6 +129,7 @@ class CustomList extends HiveObject {
       name: name ?? this.name,
       description: description ?? this.description,
       movieIds: movieIds ?? this.movieIds,
+      contentTypes: contentTypes ?? this.contentTypes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -125,4 +138,22 @@ class CustomList extends HiveObject {
   /// Returns the number of movies in this list.
 
   int get movieCount => movieIds.length;
+
+  /// Gets the content type for a specific index.
+  /// Returns 'movie' as default for backward compatibility.
+
+  String getContentTypeAt(int index) {
+    if (contentTypes == null || index >= contentTypes!.length) {
+      return 'movie'; // Default for backward compatibility
+    }
+    return contentTypes![index];
+  }
+
+  /// Checks if the content at a specific index is a movie.
+
+  bool isMovieAt(int index) => getContentTypeAt(index) == 'movie';
+
+  /// Checks if the content at a specific index is a TV show.
+
+  bool isTVShowAt(int index) => getContentTypeAt(index) == 'tv';
 }

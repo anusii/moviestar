@@ -363,7 +363,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           Icons.movie,
           size: 64,
         ),
-        applicationLegalese: wordWrap('''
+        applicationLegalese: '''
 
           © ${DateTime.now().year} Software Innovation Institute, ANU
 
@@ -378,7 +378,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
           Visit https://github.com/anusii/moviestar for more information.
 
-          '''),
+          ''',
       ),
       statusBar: SolidStatusBarConfig(
         serverInfo: SolidServerInfo(

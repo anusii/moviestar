@@ -30,7 +30,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:solidpod/solidpod.dart';
-import 'package:solidui/solidui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
@@ -549,7 +548,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
 
   @override
   Widget build(BuildContext context) {
-    return SolidScaffold(
+    return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: ListView(
         children: [

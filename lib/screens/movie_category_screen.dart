@@ -27,7 +27,6 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
@@ -243,7 +242,7 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SolidScaffold(
+    return Scaffold(
       appBar: AppBar(
         title: Text(
           widget.categoryName,

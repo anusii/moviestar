@@ -31,7 +31,6 @@ import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:gap/gap.dart';
-import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
@@ -283,7 +282,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SolidScaffold(
+    return Scaffold(
       appBar: AppBar(
         title: TextField(
           controller: _searchController,

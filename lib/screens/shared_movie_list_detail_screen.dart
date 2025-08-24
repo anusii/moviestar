@@ -30,7 +30,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart';
-import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
@@ -411,7 +410,7 @@ class _SharedMovieListDetailScreenState
 
   @override
   Widget build(BuildContext context) {
-    return SolidScaffold(
+    return Scaffold(
       appBar: AppBar(
         title: Text(widget.listName),
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,

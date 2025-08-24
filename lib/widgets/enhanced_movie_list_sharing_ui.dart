@@ -30,7 +30,6 @@ import 'package:solidpod/solidpod.dart'
     show SolidFunctionCallStatus, readPod, writePod, grantPermission, getWebId;
 // ignore: implementation_imports
 import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
-import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/movie_list_service.dart';
@@ -556,7 +555,7 @@ class _EnhancedMovieListSharingUiState
 
   @override
   Widget build(BuildContext context) {
-    return SolidScaffold(
+    return Scaffold(
       backgroundColor: widget.backgroundColor,
       appBar: widget.customAppBar ??
           AppBar(

@@ -28,7 +28,6 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
@@ -73,7 +72,7 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
     final upcomingMoviesAsync = ref.watch(upcomingMoviesWithCacheInfoProvider);
     final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
 
-    return SolidScaffold(
+    return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: RefreshIndicator(
         onRefresh: _forceRefresh,

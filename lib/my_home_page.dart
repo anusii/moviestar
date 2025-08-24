@@ -363,21 +363,23 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           size: 64,
         ),
         applicationLegalese: '''
+        © ${DateTime.now().year} Software Innovation Institute, ANU
+        ''',
+        text: '''
 
-          © ${DateTime.now().year} Software Innovation Institute, ANU
+MovieStar is a movie discovery and management application built with
+Flutter, which helps you discover, track, and manage your favourite
+movies using the power of Solid PODs for decentralised data storage.
 
-          MovieStar is a movie discovery and management application built with
-          Flutter, which helps you discover, track, and manage your favourite
-          movies using the power of Solid PODs for decentralised data storage.
+Licensed under the GNU General Public License v3.0
 
-          Licensed under the GNU General Public License v3.0
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
 
-          This is free software: you are free to change and redistribute it.
-          There is NO WARRANTY, to the extent permitted by law.
+Visit [https://github.com/anusii/moviestar](https://github.com/anusii/moviestar)
+for more information.
 
-          Visit https://github.com/anusii/moviestar for more information.
-
-          ''',
+''',
       ),
       statusBar: SolidStatusBarConfig(
         serverInfo: SolidServerInfo(

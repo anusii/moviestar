@@ -28,7 +28,6 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:markdown_tooltip/markdown_tooltip.dart' show wordWrap;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart' show logoutPopup, getWebId;
 import 'package:solidui/solidui.dart';
@@ -363,7 +362,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           Icons.movie,
           size: 64,
         ),
-        applicationLegalese: wordWrap('''
+        applicationLegalese: '''
 
           © ${DateTime.now().year} Software Innovation Institute, ANU
 
@@ -378,7 +377,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
           Visit https://github.com/anusii/moviestar for more information.
 
-          '''),
+          ''',
       ),
       statusBar: SolidStatusBarConfig(
         serverInfo: SolidServerInfo(
@@ -415,7 +414,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           await ref.read(themeModeProvider.notifier).toggleTheme();
         },
         showInAppBarActions: true,
-        hideOnVeryNarrowScreen: true,
       ),
       child: mainContent,
     );

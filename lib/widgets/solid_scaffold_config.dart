@@ -30,7 +30,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solidui/solidui.dart';
 
+import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
+import 'package:moviestar/screens/coming_soon_screen.dart';
+import 'package:moviestar/screens/home_screen.dart';
+import 'package:moviestar/screens/my_lists_screen.dart';
+import 'package:moviestar/screens/my_movies_screen.dart';
+import 'package:moviestar/screens/settings_screen.dart';
+import 'package:moviestar/screens/shared_movies_screen.dart';
+import 'package:moviestar/screens/to_watch_screen.dart';
+import 'package:moviestar/screens/watched_screen.dart';
+import 'package:moviestar/services/api_key_service.dart';
+import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/services/favorites_service_manager.dart';
 
 /// MovieStar-specific SolidScaffold configuration.
 ///
@@ -42,13 +54,23 @@ class SolidScaffoldConfig {
   /// Creates the MovieStar app navigation menu items.
   ///
   /// Returns a list of menu items configured specifically for the
-  /// MovieStar application with proper titles, icons, and tooltips.
+  /// MovieStar application with proper titles, icons, tooltips, and child
+  /// widgets.
+  ///
+  /// [favoritesService] The service for managing favourite movies.
+  /// [apiKeyService] The service for managing API keys.
+  /// [favoritesServiceManager] The manager for favourites service.
 
-  static List<SolidMenuItem> createMenuItems() {
+  static List<SolidMenuItem> createMenuItems({
+    required FavoritesService favoritesService,
+    required ApiKeyService apiKeyService,
+    required FavoritesServiceManager favoritesServiceManager,
+  }) {
     return [
       SolidMenuItem(
         title: 'Home',
         icon: Icons.home,
+        child: HomeScreen(favoritesService: favoritesService),
         tooltip: '''
 
 **Home:** Tap here to view your movie dashboard and discover new films.
@@ -58,6 +80,7 @@ class SolidScaffoldConfig {
       SolidMenuItem(
         title: 'To Watch',
         icon: Icons.favorite,
+        child: ToWatchScreen(favoritesService: favoritesService),
         tooltip: '''
 
 **To Watch:** Tap here to view your watchlist of movies you want to see.
@@ -67,6 +90,7 @@ class SolidScaffoldConfig {
       SolidMenuItem(
         title: 'Watched',
         icon: Icons.history,
+        child: WatchedScreen(favoritesService: favoritesService),
         tooltip: '''
 
 **Watched:** Tap here to view movies you have already watched and rated.
@@ -76,6 +100,7 @@ class SolidScaffoldConfig {
       SolidMenuItem(
         title: 'Coming Soon',
         icon: Icons.upcoming,
+        child: ComingSoonScreen(favoritesService: favoritesService),
         tooltip: '''
 
 **Coming Soon:** Tap here to discover upcoming movie releases.
@@ -85,6 +110,7 @@ class SolidScaffoldConfig {
       SolidMenuItem(
         title: 'My Movies',
         icon: Icons.star,
+        child: MyMoviesScreen(favoritesService: favoritesService),
         tooltip: '''
 
 **My Movies:** Tap here to view movies you have rated and reviewed.
@@ -94,6 +120,7 @@ class SolidScaffoldConfig {
       SolidMenuItem(
         title: 'My Lists',
         icon: Icons.playlist_play,
+        child: MyListsScreen(favoritesService: favoritesService),
         tooltip: '''
 
 **My Lists:** Tap here to view and manage your custom movie lists.
@@ -103,6 +130,7 @@ class SolidScaffoldConfig {
       SolidMenuItem(
         title: 'Shared Movies',
         icon: Icons.movie_outlined,
+        child: const SharedMoviesScreen(),
         tooltip: '''
 
 **Shared Movies:** Tap here to view movies shared from your POD.
@@ -112,6 +140,7 @@ class SolidScaffoldConfig {
       SolidMenuItem(
         title: 'Pod Files',
         icon: Icons.folder,
+        child: const FileService(),
         tooltip: '''
 
 **File Management:** Tap here to access file management features for your POD.
@@ -124,6 +153,11 @@ your movie data files.
       SolidMenuItem(
         title: 'Settings',
         icon: Icons.person,
+        child: SettingsScreen(
+          favoritesService: favoritesService,
+          apiKeyService: apiKeyService,
+          favoritesServiceManager: favoritesServiceManager,
+        ),
         tooltip: '''
 
 **Settings:** Tap here to configure your movie preferences and account settings.
@@ -173,16 +207,9 @@ your movie data files.
   /// application.
 
   static List<SolidOverflowMenuItem> createOverflowItems({
-    required VoidCallback onSettings,
     required VoidCallback onLogout,
   }) {
     return [
-      SolidOverflowMenuItem(
-        id: 'settings',
-        icon: Icons.settings,
-        label: 'Settings',
-        onSelected: onSettings,
-      ),
       SolidOverflowMenuItem(
         id: 'logout',
         icon: Icons.logout,

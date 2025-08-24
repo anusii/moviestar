@@ -32,20 +32,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart' show logoutPopup, getWebId;
 import 'package:solidui/solidui.dart';
 
-import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
-import 'package:moviestar/screens/coming_soon_screen.dart';
 import 'package:moviestar/screens/enhanced_search_screen.dart';
-import 'package:moviestar/screens/home_screen.dart';
-import 'package:moviestar/screens/my_lists_screen.dart';
-import 'package:moviestar/screens/my_movies_screen.dart';
-import 'package:moviestar/screens/settings_screen.dart';
-import 'package:moviestar/screens/shared_movies_screen.dart';
-import 'package:moviestar/screens/to_watch_screen.dart';
-import 'package:moviestar/screens/watched_screen.dart';
 import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
@@ -69,9 +60,6 @@ class MyHomePage extends ConsumerStatefulWidget {
 /// State class for the main screen.
 
 class _MyHomePageState extends ConsumerState<MyHomePage> {
-  /// Index of the currently selected screen.
-
-  int _selectedIndex = 0;
   bool _isLoadingFolders = false;
   String? _webId;
   String? _name;
@@ -82,10 +70,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   late final FavoritesService _favoritesService;
   late final ApiKeyService _apiKeyService;
   late final MovieService _movieService;
-
-  /// List of screens to display in the navigation rail.
-
-  late List<Widget> _screens;
 
   /// Navigation menu items configuration.
 
@@ -187,33 +171,17 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       _buildScreens();
     });
 
-    // If we're on the home screen, make sure it reloads.
+    // Force refresh by rebuilding.
 
-    if (_selectedIndex == 0) {
-      // Force refresh by rebuilding.
-
-      setState(() {});
-    }
+    setState(() {});
   }
 
   void _buildScreens() {
-    _screens = [
-      HomeScreen(favoritesService: _favoritesService),
-      ToWatchScreen(favoritesService: _favoritesService),
-      WatchedScreen(favoritesService: _favoritesService),
-      ComingSoonScreen(favoritesService: _favoritesService),
-      MyMoviesScreen(favoritesService: _favoritesService),
-      MyListsScreen(favoritesService: _favoritesService),
-      const SharedMoviesScreen(),
-      const FileService(),
-      SettingsScreen(
-        favoritesService: _favoritesService,
-        apiKeyService: _apiKeyService,
-        favoritesServiceManager: _favoritesServiceManager,
-      ),
-    ];
-
-    _menuItems = SolidScaffoldConfig.createMenuItems();
+    _menuItems = SolidScaffoldConfig.createMenuItems(
+      favoritesService: _favoritesService,
+      apiKeyService: _apiKeyService,
+      favoritesServiceManager: _favoritesServiceManager,
+    );
 
     _initialiseAppData();
   }
@@ -293,14 +261,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     }
   }
 
-  /// Handles the settings action.
-
-  void _handleSettings() {
-    setState(() {
-      _selectedIndex = 6; // Settings screen index.
-    });
-  }
-
   /// Handles the view mode toggle action.
 
   void _handleViewModeToggle() {
@@ -326,20 +286,16 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       avatarIcon: Icons.account_circle,
     );
 
-    // Create the main content with loading overlay.
+    // Create loading overlay if needed.
 
-    final mainContent = Stack(
-      children: [
-        _isLoadingFolders
-            ? const Center(child: CircularProgressIndicator())
-            : _screens[_selectedIndex],
-      ],
-    );
+    final loadingOverlay = _isLoadingFolders
+        ? const Center(child: CircularProgressIndicator())
+        : null;
 
     return SolidScaffold(
       menu: _menuItems,
       appBar: SolidAppBarConfig(
-        title: _menuItems[_selectedIndex].title,
+        title: 'MovieStar',
         versionConfig: SolidVersionConfig(
           changelogUrl:
               'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
@@ -352,7 +308,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           onSearch: _handleSearch,
         ),
         overflowItems: SolidScaffoldConfig.createOverflowItems(
-          onSettings: _handleSettings,
           onLogout: _handleLogout,
         ),
       ),
@@ -403,12 +358,6 @@ for more information.
       userInfo: userInfo,
       onLogout: (context) => _handleLogout(),
       backgroundColor: theme.colorScheme.surface,
-      selectedIndex: _selectedIndex,
-      onMenuSelected: (index) {
-        setState(() {
-          _selectedIndex = index;
-        });
-      },
       themeToggle: SolidThemeToggleConfig(
         enabled: true,
         currentThemeMode: ref.watch(themeModeProvider),
@@ -417,7 +366,7 @@ for more information.
         },
         showInAppBarActions: true,
       ),
-      child: mainContent,
+      child: loadingOverlay,
     );
   }
 }

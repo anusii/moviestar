@@ -706,8 +706,12 @@ class PodFavoritesService extends ChangeNotifier {
     _pendingMovieUpdates[movie.id] = Timer(
       const Duration(milliseconds: 500),
       () async {
-        await _performMovieFileUpdate(movie,
-            rating: rating, comment: comment, contentType: contentType);
+        await _performMovieFileUpdate(
+          movie,
+          rating: rating,
+          comment: comment,
+          contentType: contentType,
+        );
         _pendingMovieUpdates.remove(movie.id);
       },
     );

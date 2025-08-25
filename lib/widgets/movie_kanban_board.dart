@@ -34,6 +34,8 @@ import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
+import 'package:moviestar/services/cached_movie_service.dart';
+import 'package:moviestar/services/content_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
@@ -262,8 +264,9 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     String action,
     Movie movie,
     KanbanColumnType sourceType,
-    String sourceId,
-  ) async {
+    String sourceId, {
+    String contentType = 'movie',
+  }) async {
     try {
       // Ensure movie file exists for copy operations (especially from Popular).
 
@@ -273,7 +276,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
       switch (action) {
         case 'copy_to_watch':
-          await widget.favoritesService.addToWatch(movie);
+          await widget.favoritesService
+              .addToWatch(movie, contentType: contentType);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Added "${movie.title}" to To Watch')),
@@ -281,7 +285,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           }
           break;
         case 'copy_watched':
-          await widget.favoritesService.addToWatched(movie);
+          await widget.favoritesService
+              .addToWatched(movie, contentType: contentType);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Added "${movie.title}" to Watched')),
@@ -866,6 +871,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                       final movieId = displayMovieIds[index];
                       return _buildCustomListMovieItem(
                         movieId,
+                        index,
                         customList.id,
                         customList,
                       );
@@ -907,19 +913,46 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
+  // Get content as Movie based on known content type.
+
+  Future<Movie> _getContentAsMovieWithType(
+    int contentId,
+    String contentType,
+    CachedMovieService cachedMovieService,
+    ContentService contentService,
+  ) async {
+    if (contentType == 'tv') {
+      final tvShowContent = await contentService.getTVDetails(contentId);
+      return Movie.fromContentItem(tvShowContent);
+    } else {
+      return await cachedMovieService.getMovieDetails(contentId);
+    }
+  }
+
   // Build a movie item for a custom list (loading movie details on demand).
 
   Widget _buildCustomListMovieItem(
     int movieId,
+    int index,
     String categoryId,
     CustomList customList,
   ) {
     return Consumer(
       builder: (context, ref, child) {
         final cachedMovieService = ref.read(cachedMovieServiceProvider);
+        final contentService = ref.read(contentServiceProvider);
+
+        // Get content type for this index.
+
+        final contentType = customList.getContentTypeAt(index);
 
         return FutureBuilder<Movie>(
-          future: cachedMovieService.getMovieDetails(movieId),
+          future: _getContentAsMovieWithType(
+            movieId,
+            contentType,
+            cachedMovieService,
+            contentService,
+          ),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Container(

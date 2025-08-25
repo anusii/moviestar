@@ -376,8 +376,10 @@ class PodFavoritesService extends ChangeNotifier {
   }
 
   /// Adds a movie to the to-watch list and saves to POD.
+  ///
+  /// [contentType] specifies whether this is a movie or TV show.
 
-  Future<void> addToWatch(Movie movie) async {
+  Future<void> addToWatch(Movie movie, {String contentType = 'movie'}) async {
     // If toWatchListId is null, try to initialise it first.
 
     if (_toWatchListId == null) {
@@ -389,6 +391,7 @@ class PodFavoritesService extends ChangeNotifier {
       final success = await _movieListService.addMovieToList(
         _toWatchListId!,
         movie,
+        contentType: contentType,
       );
       if (success) {
         // Update stream with fresh data from MovieList.
@@ -416,8 +419,10 @@ class PodFavoritesService extends ChangeNotifier {
   }
 
   /// Adds a movie to the watched list.
+  ///
+  /// [contentType] specifies whether this is a movie or TV show.
 
-  Future<void> addToWatched(Movie movie) async {
+  Future<void> addToWatched(Movie movie, {String contentType = 'movie'}) async {
     // If watchedListId is null, try to initialise it first.
 
     if (_watchedListId == null) {
@@ -428,6 +433,7 @@ class PodFavoritesService extends ChangeNotifier {
       final success = await _movieListService.addMovieToList(
         _watchedListId!,
         movie,
+        contentType: contentType,
       );
       if (success) {
         // Update stream with fresh data from MovieList.
@@ -685,6 +691,7 @@ class PodFavoritesService extends ChangeNotifier {
     Movie movie, {
     double? rating,
     String? comment,
+    String contentType = 'movie',
   }) async {
     if (_isSyncing) {
       return;
@@ -699,7 +706,12 @@ class PodFavoritesService extends ChangeNotifier {
     _pendingMovieUpdates[movie.id] = Timer(
       const Duration(milliseconds: 500),
       () async {
-        await _performMovieFileUpdate(movie, rating: rating, comment: comment);
+        await _performMovieFileUpdate(
+          movie,
+          rating: rating,
+          comment: comment,
+          contentType: contentType,
+        );
         _pendingMovieUpdates.remove(movie.id);
       },
     );
@@ -711,6 +723,7 @@ class PodFavoritesService extends ChangeNotifier {
     Movie movie, {
     double? rating,
     String? comment,
+    String contentType = 'movie',
   }) async {
     try {
       final loggedIn = await isLoggedIn();
@@ -782,7 +795,7 @@ class PodFavoritesService extends ChangeNotifier {
           final isAlreadyWatched = await isInWatched(movie);
 
           if (!isAlreadyWatched) {
-            await addToWatched(movie);
+            await addToWatched(movie, contentType: contentType);
           }
         }
       } else {

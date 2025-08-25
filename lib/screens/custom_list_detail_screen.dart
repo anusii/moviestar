@@ -72,6 +72,19 @@ class CustomListDetailScreen extends ConsumerStatefulWidget {
 
 class _CustomListDetailScreenState
     extends ConsumerState<CustomListDetailScreen> {
+  /// Validates if an image URL is valid and not empty.
+
+  bool _isValidImageUrl(String? url) {
+    if (url == null || url.trim().isEmpty) {
+      return false;
+    }
+
+    // Basic URL validation - must start with http:// or https://.
+
+    return url.trim().startsWith('http://') ||
+        url.trim().startsWith('https://');
+  }
+
   // Current custom list (may be updated).
 
   late CustomList _currentList;
@@ -95,12 +108,29 @@ class _CustomListDetailScreenState
     _loadMovies();
   }
 
+  // Gets content as movie with proper type routing.
+
+  Future<Movie> _getContentAsMovieWithType(
+    int contentId,
+    String contentType,
+  ) async {
+    final cachedMovieService = ref.read(cachedMovieServiceProvider);
+    final contentService = ref.read(contentServiceProvider);
+
+    if (contentType == 'tv') {
+      final tvShowContent = await contentService.getTVDetails(contentId);
+      return Movie.fromContentItem(tvShowContent);
+    } else {
+      return await cachedMovieService.getMovieDetails(contentId);
+    }
+  }
+
   // Loads movies in this custom list from cache.
 
   Future<void> _loadMovies() async {
-    final movieService = ref.read(cachedMovieServiceProvider);
+    for (int i = 0; i < _currentList.movieIds.length; i++) {
+      final movieId = _currentList.movieIds[i];
 
-    for (final movieId in _currentList.movieIds) {
       if (_moviesMap.containsKey(movieId) ||
           _loadingMovieIds.contains(movieId)) {
         continue; // Already loaded or loading.
@@ -111,7 +141,9 @@ class _CustomListDetailScreenState
       });
 
       try {
-        final movie = await movieService.getMovieDetails(movieId);
+        final contentType = _currentList.getContentTypeAt(i);
+
+        final movie = await _getContentAsMovieWithType(movieId, contentType);
         if (mounted) {
           setState(() {
             _moviesMap[movieId] = movie;
@@ -680,26 +712,38 @@ Recipients will be able to:
 
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: CachedNetworkImage(
-                  imageUrl: movie.posterUrl,
-                  width: 60,
-                  height: 90,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    width: 60,
-                    height: 90,
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    child: const Center(child: CircularProgressIndicator()),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    width: 60,
-                    height: 90,
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    child: const Icon(Icons.movie),
-                  ),
-                ),
+                child: _isValidImageUrl(movie.posterUrl)
+                    ? CachedNetworkImage(
+                        imageUrl: movie.posterUrl.trim(),
+                        width: 60,
+                        height: 90,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          width: 60,
+                          height: 90,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
+                          child:
+                              const Center(child: CircularProgressIndicator()),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          width: 60,
+                          height: 90,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
+                          child: const Icon(Icons.movie),
+                        ),
+                      )
+                    : Container(
+                        width: 60,
+                        height: 90,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
+                        child: const Icon(Icons.movie),
+                      ),
               ),
               const SizedBox(width: 12),
 

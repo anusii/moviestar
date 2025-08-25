@@ -375,7 +375,11 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
     switch (action) {
       case 'to_watch':
         try {
-          await widget.favoritesService.addToWatch(movie);
+          await widget.favoritesService.addToWatch(
+            movie,
+            contentType:
+                contentItem.contentType == ContentType.tvShow ? 'tv' : 'movie',
+          );
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -398,7 +402,11 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
         break;
       case 'watched':
         try {
-          await widget.favoritesService.addToWatched(movie);
+          await widget.favoritesService.addToWatched(
+            movie,
+            contentType:
+                contentItem.contentType == ContentType.tvShow ? 'tv' : 'movie',
+          );
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

@@ -264,8 +264,9 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     String action,
     Movie movie,
     KanbanColumnType sourceType,
-    String sourceId,
-  ) async {
+    String sourceId, {
+    String contentType = 'movie',
+  }) async {
     try {
       // Ensure movie file exists for copy operations (especially from Popular).
 
@@ -275,7 +276,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
       switch (action) {
         case 'copy_to_watch':
-          await widget.favoritesService.addToWatch(movie);
+          await widget.favoritesService
+              .addToWatch(movie, contentType: contentType);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Added "${movie.title}" to To Watch')),
@@ -283,7 +285,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           }
           break;
         case 'copy_watched':
-          await widget.favoritesService.addToWatched(movie);
+          await widget.favoritesService
+              .addToWatched(movie, contentType: contentType);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Added "${movie.title}" to Watched')),

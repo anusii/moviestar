@@ -223,7 +223,10 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     } else {
       await widget.favoritesService.addToWatch(
         widget.movie,
-        contentType: widget.contentType == ContentType.tvShow ? 'tv' : 'movie',
+        contentType: (widget.movie.contentType ?? widget.contentType) ==
+                ContentType.tvShow
+            ? 'tv'
+            : 'movie',
       );
     }
     setState(() {
@@ -239,7 +242,10 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     } else {
       await widget.favoritesService.addToWatched(
         widget.movie,
-        contentType: widget.contentType == ContentType.tvShow ? 'tv' : 'movie',
+        contentType: (widget.movie.contentType ?? widget.contentType) ==
+                ContentType.tvShow
+            ? 'tv'
+            : 'movie',
       );
     }
     setState(() {
@@ -1468,7 +1474,10 @@ class _AddToCustomListsDialogState extends State<_AddToCustomListsDialog> {
       await widget.favoritesService.addMovieToCustomList(
         newList.id,
         widget.movie,
-        contentType: widget.contentType == ContentType.tvShow ? 'tv' : 'movie',
+        contentType: (widget.movie.contentType ?? widget.contentType) ==
+                ContentType.tvShow
+            ? 'tv'
+            : 'movie',
       );
       _selectedListIds.add(newList.id);
       _newListController.clear();

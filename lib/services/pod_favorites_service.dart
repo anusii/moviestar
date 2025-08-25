@@ -691,6 +691,7 @@ class PodFavoritesService extends ChangeNotifier {
     Movie movie, {
     double? rating,
     String? comment,
+    String contentType = 'movie',
   }) async {
     if (_isSyncing) {
       return;
@@ -705,7 +706,8 @@ class PodFavoritesService extends ChangeNotifier {
     _pendingMovieUpdates[movie.id] = Timer(
       const Duration(milliseconds: 500),
       () async {
-        await _performMovieFileUpdate(movie, rating: rating, comment: comment);
+        await _performMovieFileUpdate(movie,
+            rating: rating, comment: comment, contentType: contentType);
         _pendingMovieUpdates.remove(movie.id);
       },
     );
@@ -717,6 +719,7 @@ class PodFavoritesService extends ChangeNotifier {
     Movie movie, {
     double? rating,
     String? comment,
+    String contentType = 'movie',
   }) async {
     try {
       final loggedIn = await isLoggedIn();
@@ -788,7 +791,7 @@ class PodFavoritesService extends ChangeNotifier {
           final isAlreadyWatched = await isInWatched(movie);
 
           if (!isAlreadyWatched) {
-            await addToWatched(movie);
+            await addToWatched(movie, contentType: contentType);
           }
         }
       } else {

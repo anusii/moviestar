@@ -76,6 +76,11 @@ class Movie extends HiveObject {
   @HiveField(7)
   final List<int> genreIds;
 
+  /// Content type - not persisted to Hive to avoid breaking existing storage.
+  /// This is a runtime field to track whether this Movie was originally a TV show.
+
+  final ContentType? contentType;
+
   /// Creates a new [Movie] instance.
 
   Movie({
@@ -87,6 +92,7 @@ class Movie extends HiveObject {
     required this.voteAverage,
     required this.releaseDate,
     required this.genreIds,
+    this.contentType,
   });
 
   /// Creates a [Movie] instance from a JSON map.
@@ -119,6 +125,11 @@ class Movie extends HiveObject {
       voteAverage: (json['vote_average'] as num?)?.toDouble() ?? 0.0,
       releaseDate: parseReleaseDate(json['release_date']),
       genreIds: List<int>.from(json['genre_ids'] ?? []),
+      contentType: json['content_type'] != null
+          ? (json['content_type'] == 'tv'
+              ? ContentType.tvShow
+              : ContentType.movie)
+          : null,
     );
   }
 
@@ -138,6 +149,8 @@ class Movie extends HiveObject {
       'vote_average': voteAverage,
       'release_date': releaseDate.toIso8601String(),
       'genre_ids': genreIds,
+      if (contentType != null)
+        'content_type': contentType == ContentType.tvShow ? 'tv' : 'movie',
     };
   }
 
@@ -153,7 +166,7 @@ class Movie extends HiveObject {
       voteAverage: voteAverage,
       releaseDate: releaseDate,
       genreIds: genreIds,
-      contentType: ContentType.movie,
+      contentType: contentType ?? ContentType.movie,
     );
   }
 
@@ -172,6 +185,7 @@ class Movie extends HiveObject {
       voteAverage: contentItem.voteAverage,
       releaseDate: contentItem.releaseDate,
       genreIds: contentItem.genreIds,
+      contentType: contentItem.contentType,
     );
   }
 }

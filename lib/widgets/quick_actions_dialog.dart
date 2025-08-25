@@ -31,6 +31,7 @@ import 'package:gap/gap.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
@@ -62,6 +63,10 @@ class QuickActionsDialog extends StatefulWidget {
 
   final VoidCallback? onMouseExit;
 
+  /// Content type to distinguish between movies and TV shows.
+
+  final ContentType contentType;
+
   /// Creates a quick actions dialog.
 
   const QuickActionsDialog({
@@ -72,6 +77,7 @@ class QuickActionsDialog extends StatefulWidget {
     this.onClose,
     this.onMouseEnter,
     this.onMouseExit,
+    this.contentType = ContentType.movie,
   });
 
   @override
@@ -145,7 +151,11 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
       if (_isInToWatch) {
         await widget.favoritesService.removeFromToWatch(widget.movie);
       } else {
-        await widget.favoritesService.addToWatch(widget.movie);
+        await widget.favoritesService.addToWatch(
+          widget.movie,
+          contentType:
+              widget.contentType == ContentType.tvShow ? 'tv' : 'movie',
+        );
       }
       if (mounted) {
         setState(() {
@@ -164,7 +174,11 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
       if (_isInWatched) {
         await widget.favoritesService.removeFromWatched(widget.movie);
       } else {
-        await widget.favoritesService.addToWatched(widget.movie);
+        await widget.favoritesService.addToWatched(
+          widget.movie,
+          contentType:
+              widget.contentType == ContentType.tvShow ? 'tv' : 'movie',
+        );
       }
       if (mounted) {
         setState(() {

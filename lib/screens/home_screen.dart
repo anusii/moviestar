@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
@@ -293,6 +294,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       builder: (context) => MovieDetailsScreen(
                         movie: movie,
                         favoritesService: widget.favoritesService,
+                        contentType: movie.contentType ?? ContentType.movie,
                       ),
                     ),
                   );
@@ -494,6 +496,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       builder: (context) => MovieDetailsScreen(
                         movie: movie,
                         favoritesService: widget.favoritesService,
+                        contentType: movie.contentType ?? ContentType.movie,
                       ),
                     ),
                   );
@@ -605,6 +608,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               builder: (context) => MovieDetailsScreen(
                                 movie: movie,
                                 favoritesService: widget.favoritesService,
+                                contentType:
+                                    movie.contentType ?? ContentType.movie,
                               ),
                             ),
                           );
@@ -1297,6 +1302,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   builder: (context) => MovieDetailsScreen(
                     movie: movie,
                     favoritesService: widget.favoritesService,
+                    contentType: movie.contentType ?? ContentType.movie,
                   ),
                 ),
               );
@@ -1551,6 +1557,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   builder: (context) => MovieDetailsScreen(
                     movie: movie,
                     favoritesService: widget.favoritesService,
+                    contentType: movie.contentType ?? ContentType.movie,
                   ),
                 ),
               );
@@ -1754,6 +1761,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   builder: (context) => MovieDetailsScreen(
                     movie: movie,
                     favoritesService: widget.favoritesService,
+                    contentType: movie.contentType ?? ContentType.movie,
                   ),
                 ),
               );

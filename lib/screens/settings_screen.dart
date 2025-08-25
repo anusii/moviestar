@@ -1,6 +1,6 @@
 /// Screen for managing user settings and preferences.
 ///
-// Time-stamp: <Tuesday 2025-08-26 08:55:23 +1000 >
+// Time-stamp: <Tuesday 2025-08-26 09:16:08 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -1048,7 +1048,12 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
               }
             }
           : null,
+      // ignore: deprecated_member_use
       activeColor: Theme.of(context).colorScheme.primary,
+      // Flutter 3.35.2
+      //
+      // thumbColor:
+      //     WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
     );
   }
 
@@ -1088,7 +1093,12 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
       subtitle: Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
       value: value,
       onChanged: onChanged,
+      // ignore: deprecated_member_use
       activeColor: Theme.of(context).colorScheme.primary,
+      // Flutter 3.35.2
+      //
+      // thumbColor:
+      //     WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
     );
   }
 

@@ -2,7 +2,7 @@
 #
 # Makefile template for Installations
 #
-# Time-stamp: <Saturday 2025-01-11 08:57:35 +1100 Graham Williams>
+# Time-stamp: <Tuesday 2025-08-26 09:47:40 +1000 Graham Williams>
 #
 # Copyright (c) Graham.Williams@togaware.com
 #
@@ -66,8 +66,6 @@ endif
 	perl -pi -e 's|^  <base href=.*$$|  <base href="/$*/">|' web/index.html
 	flutter build web
 	mv web/index.html.bak web/index.html
-	if [ ! -e $(DEST:$(APP)=$*) ]; then \
-		sudo mkdir $(DEST:$(APP)=$*); \
-	fi
-	sudo rsync -azvh build/web/ $(DEST:$(APP)=$*) --exclude *~ --exclude *.bak
-	sudo chmod -R a+rX $(DEST:$(APP)=$*)
+	ssh solidcommunity.au 'if [ ! -e $(DEST:$(APP)=$*) ]; then echo mkdir /$(DEST:$(APP)=$*); fi'
+	rsync -azvh build/web/ solidcommunity.au:$(DEST:$(APP)=$*) --exclude *~ --exclude *.bak
+	ssh solidcommunity.au sudo chmod -R a+rX $(DEST:$(APP)=$*)

@@ -103,6 +103,7 @@ class ApiKeyNotifier extends StateNotifier<String?> {
 }
 
 /// Provider for the API key service.
+/// Note: Context needs to be set manually via updateContext() for POD operations.
 
 final apiKeyServiceProvider = Provider<ApiKeyService>((ref) {
   return ApiKeyService();
@@ -227,6 +228,34 @@ final cachingEnabledProvider =
     StateNotifierProvider<CachingEnabledNotifier, bool>((ref) {
   final settingsService = ref.watch(cacheSettingsServiceProvider);
   return CachingEnabledNotifier(settingsService);
+});
+
+/// StateNotifier for managing local API key caching setting with persistence.
+
+class LocalApiKeyCachingNotifier extends StateNotifier<bool> {
+  final CacheSettingsService _settingsService;
+
+  LocalApiKeyCachingNotifier(this._settingsService) : super(false) {
+    _init();
+  }
+
+  Future<void> _init() async {
+    await _settingsService.initialize();
+    state = _settingsService.localApiKeyCachingEnabled;
+  }
+
+  Future<void> setLocalApiKeyCachingEnabled(bool enabled) async {
+    await _settingsService.setLocalApiKeyCachingEnabled(enabled);
+    state = enabled;
+  }
+}
+
+/// Provider for local API key caching state with persistence.
+
+final localApiKeyCachingProvider =
+    StateNotifierProvider<LocalApiKeyCachingNotifier, bool>((ref) {
+  final settingsService = ref.watch(cacheSettingsServiceProvider);
+  return LocalApiKeyCachingNotifier(settingsService);
 });
 
 /// Provider for configured cached movie service (with settings).

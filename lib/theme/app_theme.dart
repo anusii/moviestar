@@ -26,6 +26,7 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:solidui/solidui.dart';
 
 /// Theme configuration for the Movie Star application.
@@ -42,7 +43,8 @@ class AppTheme {
 
   /// Default border radius for UI elements.
 
-  static double get defaultBorderRadius => SolidDefaultTheme.defaultBorderRadius;
+  static double get defaultBorderRadius =>
+      SolidDefaultTheme.defaultBorderRadius;
 
   /// Text color for primary text.
 

@@ -28,9 +28,9 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/features/file/service/components/file_service_widget.dart';
-import 'package:solidui/solidui.dart';
 
 /// The file service page that provides file management functionality.
 ///

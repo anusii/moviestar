@@ -33,6 +33,7 @@ import 'package:solidpod/solidpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
+import 'package:solidui/solidui.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
@@ -758,13 +759,16 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                           ),
                         ],
                       ),
-                      Consumer(
-                        builder: (context, ref, _) {
-                          final themeMode = ref.watch(themeModeProvider);
+                      AnimatedBuilder(
+                        animation: solidThemeNotifier,
+                        builder: (context, _) {
+                          final themeMode = solidThemeNotifier.themeMode;
                           return Icon(
                             themeMode == ThemeMode.dark
                                 ? Icons.dark_mode
-                                : Icons.light_mode,
+                                : themeMode == ThemeMode.light
+                                    ? Icons.light_mode
+                                    : Icons.computer,
                             color: Theme.of(context).colorScheme.primary,
                           );
                         },

@@ -181,11 +181,11 @@ class _FileServiceWidgetState extends ConsumerState<FileServiceWidget> {
                             ),
                           ),
                           elevation: 4,
-                          margin: const EdgeInsets.only(
+                          margin: EdgeInsets.only(
                             right: AppTheme.defaultPadding / 2,
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(
+                            padding: EdgeInsets.all(
                               AppTheme.defaultPadding / 2,
                             ),
                             child: FileBrowser(
@@ -326,11 +326,11 @@ class _FileServiceWidgetState extends ConsumerState<FileServiceWidget> {
                             ),
                           ),
                           elevation: 4,
-                          margin: const EdgeInsets.only(
+                          margin: EdgeInsets.only(
                             left: AppTheme.defaultPadding / 2,
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(
+                            padding: EdgeInsets.all(
                               AppTheme.defaultPadding,
                             ),
                             child: FileUploadSection(),
@@ -351,7 +351,7 @@ class _FileServiceWidgetState extends ConsumerState<FileServiceWidget> {
                           ),
                         ),
                         elevation: 4,
-                        margin: const EdgeInsets.all(AppTheme.defaultPadding),
+                        margin: EdgeInsets.all(AppTheme.defaultPadding),
                         child: SizedBox(
                           height: MediaQuery.of(context).size.height * 0.4,
                           child: FileBrowser(
@@ -489,9 +489,9 @@ class _FileServiceWidgetState extends ConsumerState<FileServiceWidget> {
                           ),
                         ),
                         elevation: 4,
-                        margin: const EdgeInsets.all(AppTheme.defaultPadding),
+                        margin: EdgeInsets.all(AppTheme.defaultPadding),
                         child: Padding(
-                          padding: const EdgeInsets.all(
+                          padding: EdgeInsets.all(
                             AppTheme.defaultPadding,
                           ),
                           child: FileUploadSection(),

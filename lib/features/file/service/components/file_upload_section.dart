@@ -133,7 +133,7 @@ class _FileUploadSectionState extends ConsumerState<FileUploadSection> {
                   color: AppTheme.primaryColor,
                 ),
                 const Gap(8),
-                const Text(
+                Text(
                   'Preview',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -160,7 +160,7 @@ class _FileUploadSectionState extends ConsumerState<FileUploadSection> {
             child: SingleChildScrollView(
               child: Text(
                 filePreview!,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'monospace',
                   color: AppTheme.primaryTextColor,
                 ),
@@ -220,7 +220,7 @@ class _FileUploadSectionState extends ConsumerState<FileUploadSection> {
                 Expanded(
                   child: Text(
                     state.cleanFileName ?? '',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppTheme.primaryTextColor,
                       fontWeight: FontWeight.w500,
                     ),
@@ -274,7 +274,7 @@ class _FileUploadSectionState extends ConsumerState<FileUploadSection> {
                           }
                         },
                   icon: const Icon(Icons.file_upload, color: Colors.white),
-                  label: const Text(
+                  label: Text(
                     'Upload',
                     style: TextStyle(
                       color: Colors.white,
@@ -320,7 +320,7 @@ class _FileUploadSectionState extends ConsumerState<FileUploadSection> {
                     }
                   },
             icon: const Icon(Icons.analytics, color: AppTheme.primaryColor),
-            label: const Text(
+            label: Text(
               'Visualize JSON',
               style: TextStyle(
                 color: AppTheme.primaryColor,
@@ -353,7 +353,7 @@ class _FileUploadSectionState extends ConsumerState<FileUploadSection> {
                   ? null
                   : () => handlePreview(state.uploadFile!),
               icon: const Icon(Icons.preview, color: AppTheme.primaryColor),
-              label: const Text(
+              label: Text(
                 'Preview File',
                 style: TextStyle(
                   color: AppTheme.primaryColor,

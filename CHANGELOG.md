@@ -25,6 +25,7 @@ au](https://solidcommunity.au/docs/moviestar)
 
 ## 0.1 First stable release
 
++ Drag/drop improvement. Back button visibility [0.0.18 20250826 atangster]
 + Bug fixes for tv shows [0.0.17 20250826 atangster]
 + Support new solidui About dialog [0.0.16 20250826 tonypioneer]
 + Update to new SolidScaffold interface [0.0.15 20250826 tonypioneer]

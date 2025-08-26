@@ -574,6 +574,31 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
             expandedHeight: 300,
             pinned: true,
             backgroundColor: Theme.of(context).colorScheme.surface,
+            leading: Container(
+              margin: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .surface
+                    .withValues(alpha: 0.8),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                tooltip: 'Back',
+              ),
+            ),
             flexibleSpace: FlexibleSpaceBar(
               background: _isValidImageUrl(widget.movie.backdropUrl)
                   ? CachedNetworkImage(

@@ -168,12 +168,14 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
   int _addToQueue(String description) {
     final id = _nextOperationId++;
-    _operationQueue.add(OperationQueueItem(
-      id: id,
-      description: description,
-      status: OperationStatus.pending,
-      startTime: DateTime.now(),
-    ));
+    _operationQueue.add(
+      OperationQueueItem(
+        id: id,
+        description: description,
+        status: OperationStatus.pending,
+        startTime: DateTime.now(),
+      ),
+    );
     setState(() {});
     return id;
   }
@@ -196,15 +198,13 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     }
   }
 
-  void _removeFromQueue(int operationId) {
-    _operationQueue.removeWhere((op) => op.id == operationId);
-    setState(() {});
-  }
-
   // Add movie optimistically to UI state.
 
   void _addOptimisticMovie(
-      KanbanColumnType targetType, String targetId, Movie movie) {
+    KanbanColumnType targetType,
+    String targetId,
+    Movie movie,
+  ) {
     final key = _getOperationKey(targetType, targetId);
     _pendingOperations[key] ??= <int>{};
     _pendingOperations[key]!.add(movie.id);
@@ -215,7 +215,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   // Remove movie optimistically from UI state.
 
   void _removeOptimisticMovie(
-      KanbanColumnType sourceType, String sourceId, Movie movie) {
+    KanbanColumnType sourceType,
+    String sourceId,
+    Movie movie,
+  ) {
     final key = _getOperationKey(sourceType, sourceId);
     _pendingOperations[key] ??= <int>{};
     _pendingOperations[key]!.add(-movie.id); // Negative ID indicates removal
@@ -503,9 +506,11 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
     // Add to queue for progress tracking.
 
-    final operationId = _addToQueue(successMessage
-        .replaceFirst('Added', 'Adding')
-        .replaceFirst('Removed', 'Removing'));
+    final operationId = _addToQueue(
+      successMessage
+          .replaceFirst('Added', 'Adding')
+          .replaceFirst('Removed', 'Removing'),
+    );
 
     // Perform background sync.
 
@@ -648,7 +653,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     _addOptimisticMovie(targetType, targetId, dragData.movie);
     if (!isCopyOperation) {
       _removeOptimisticMovie(
-          dragData.sourceType, dragData.sourceId, dragData.movie);
+        dragData.sourceType,
+        dragData.sourceId,
+        dragData.movie,
+      );
     }
 
     // Add to queue for progress tracking.
@@ -715,7 +723,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       _clearOptimisticState(targetType, targetId, dragData.movie.id);
       if (!isCopyOperation) {
         _clearOptimisticState(
-            dragData.sourceType, dragData.sourceId, dragData.movie.id);
+          dragData.sourceType,
+          dragData.sourceId,
+          dragData.movie.id,
+        );
       }
       _updateQueueStatus(operationId, OperationStatus.completed);
     } catch (e) {
@@ -724,7 +735,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       _markSyncError(targetType, targetId, dragData.movie.id);
       if (!isCopyOperation) {
         _markSyncError(
-            dragData.sourceType, dragData.sourceId, dragData.movie.id);
+          dragData.sourceType,
+          dragData.sourceId,
+          dragData.movie.id,
+        );
       }
 
       _updateQueueStatus(operationId, OperationStatus.failed);
@@ -767,7 +781,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     required String columnName,
   }) {
     // Check if this movie has pending operations.
-    
+
     final key = _getOperationKey(columnType, columnId);
     final hasPendingOp =
         (_pendingOperations[key]?.contains(movie.id) ?? false) ||
@@ -1019,7 +1033,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                   const Gap(4),
                   TextButton(
                     onPressed: () => _navigateToMovieCategory(
-                        title, moviesWithOptimistic, fromCache),
+                      title,
+                      moviesWithOptimistic,
+                      fromCache,
+                    ),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 6,
@@ -1451,9 +1468,11 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
   Widget _buildProgressIndicator() {
     final pendingOps = _operationQueue
-        .where((op) =>
-            op.status == OperationStatus.pending ||
-            op.status == OperationStatus.inProgress)
+        .where(
+          (op) =>
+              op.status == OperationStatus.pending ||
+              op.status == OperationStatus.inProgress,
+        )
         .length;
     final completedOps = _operationQueue
         .where((op) => op.status == OperationStatus.completed)
@@ -1511,18 +1530,24 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (pendingOps > 0) ...[
-                _buildStatusChip('$pendingOps pending',
-                    Theme.of(context).colorScheme.primary),
+                _buildStatusChip(
+                  '$pendingOps pending',
+                  Theme.of(context).colorScheme.primary,
+                ),
                 const SizedBox(width: 4),
               ],
               if (completedOps > 0) ...[
-                _buildStatusChip('$completedOps done',
-                    Theme.of(context).colorScheme.tertiary),
+                _buildStatusChip(
+                  '$completedOps done',
+                  Theme.of(context).colorScheme.tertiary,
+                ),
                 const SizedBox(width: 4),
               ],
               if (failedOps > 0) ...[
                 _buildStatusChip(
-                    '$failedOps failed', Theme.of(context).colorScheme.error),
+                  '$failedOps failed',
+                  Theme.of(context).colorScheme.error,
+                ),
               ],
             ],
           ),

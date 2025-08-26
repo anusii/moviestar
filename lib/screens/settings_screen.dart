@@ -1,6 +1,6 @@
 /// Screen for managing user settings and preferences.
 ///
-// Time-stamp: <Wednesday 2025-07-23 16:57:43 +1000 Graham Williams>
+// Time-stamp: <Tuesday 2025-08-26 09:48:49 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

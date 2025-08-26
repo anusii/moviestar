@@ -21,6 +21,7 @@ class CustomListAdapter extends TypeAdapter<CustomList> {
       name: fields[1] as String,
       description: fields[2] as String?,
       movieIds: (fields[3] as List).cast<int>(),
+      contentTypes: (fields[6] as List?)?.cast<String>(),
       createdAt: fields[4] as DateTime,
       updatedAt: fields[5] as DateTime,
     );
@@ -29,7 +30,7 @@ class CustomListAdapter extends TypeAdapter<CustomList> {
   @override
   void write(BinaryWriter writer, CustomList obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,6 +39,8 @@ class CustomListAdapter extends TypeAdapter<CustomList> {
       ..write(obj.description)
       ..writeByte(3)
       ..write(obj.movieIds)
+      ..writeByte(6)
+      ..write(obj.contentTypes)
       ..writeByte(4)
       ..write(obj.createdAt)
       ..writeByte(5)

@@ -120,8 +120,10 @@ class FavoritesService extends ChangeNotifier {
   }
 
   /// Adds a movie to the to-watch list.
+  ///
+  /// [contentType] specifies whether this is a movie or TV show.
 
-  Future<void> addToWatch(Movie movie) async {
+  Future<void> addToWatch(Movie movie, {String contentType = 'movie'}) async {
     final toWatch = await getToWatch();
     if (!toWatch.any((m) => m.id == movie.id)) {
       toWatch.add(movie);
@@ -131,8 +133,10 @@ class FavoritesService extends ChangeNotifier {
   }
 
   /// Adds a movie to the watched list.
+  ///
+  /// [contentType] specifies whether this is a movie or TV show.
 
-  Future<void> addToWatched(Movie movie) async {
+  Future<void> addToWatched(Movie movie, {String contentType = 'movie'}) async {
     final watched = await getWatched();
     if (!watched.any((m) => m.id == movie.id)) {
       watched.add(movie);
@@ -316,15 +320,34 @@ class FavoritesService extends ChangeNotifier {
 
   /// Adds a movie to a custom list.
 
-  Future<void> addMovieToCustomList(String listId, Movie movie) async {
+  Future<void> addMovieToCustomList(
+    String listId,
+    Movie movie, {
+    String contentType = 'movie',
+  }) async {
     final lists = await getCustomLists();
     final listIndex = lists.indexWhere((list) => list.id == listId);
     if (listIndex != -1) {
       final currentList = lists[listIndex];
       if (!currentList.movieIds.contains(movie.id)) {
         final updatedMovieIds = [...currentList.movieIds, movie.id];
+
+        // Update content types array.
+
+        List<String> currentContentTypes;
+        if (currentList.contentTypes == null) {
+          // For backward compatibility, fill existing movies with 'movie' type.
+
+          currentContentTypes =
+              List.filled(currentList.movieIds.length, 'movie');
+        } else {
+          currentContentTypes = [...currentList.contentTypes!];
+        }
+        final updatedContentTypes = [...currentContentTypes, contentType];
+
         lists[listIndex] = currentList.copyWith(
           movieIds: updatedMovieIds,
+          contentTypes: updatedContentTypes,
           updatedAt: DateTime.now(),
         );
         await _saveCustomLists(lists);
@@ -340,14 +363,29 @@ class FavoritesService extends ChangeNotifier {
     final listIndex = lists.indexWhere((list) => list.id == listId);
     if (listIndex != -1) {
       final currentList = lists[listIndex];
-      final updatedMovieIds =
-          currentList.movieIds.where((id) => id != movieId).toList();
-      lists[listIndex] = currentList.copyWith(
-        movieIds: updatedMovieIds,
-        updatedAt: DateTime.now(),
-      );
-      await _saveCustomLists(lists);
-      _customListsController.add(lists);
+      final movieIndex = currentList.movieIds.indexOf(movieId);
+
+      if (movieIndex != -1) {
+        final updatedMovieIds =
+            currentList.movieIds.where((id) => id != movieId).toList();
+
+        // Update content types array by removing the type at the same index.
+
+        List<String>? updatedContentTypes = currentList.contentTypes;
+        if (updatedContentTypes != null &&
+            movieIndex < updatedContentTypes.length) {
+          updatedContentTypes = [...updatedContentTypes];
+          updatedContentTypes.removeAt(movieIndex);
+        }
+
+        lists[listIndex] = currentList.copyWith(
+          movieIds: updatedMovieIds,
+          contentTypes: updatedContentTypes,
+          updatedAt: DateTime.now(),
+        );
+        await _saveCustomLists(lists);
+        _customListsController.add(lists);
+      }
     }
   }
 

@@ -34,6 +34,8 @@ import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
+import 'package:moviestar/services/cached_movie_service.dart';
+import 'package:moviestar/services/content_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
@@ -60,6 +62,43 @@ class MovieDragData {
     required this.sourceId,
     required this.sourceName,
   });
+}
+
+/// Queue item for tracking pending operations.
+
+class OperationQueueItem {
+  final int id;
+  final String description;
+  final OperationStatus status;
+  final DateTime startTime;
+
+  OperationQueueItem({
+    required this.id,
+    required this.description,
+    required this.status,
+    required this.startTime,
+  });
+
+  OperationQueueItem copyWith({
+    int? id,
+    String? description,
+    OperationStatus? status,
+    DateTime? startTime,
+  }) {
+    return OperationQueueItem(
+      id: id ?? this.id,
+      description: description ?? this.description,
+      status: status ?? this.status,
+      startTime: startTime ?? this.startTime,
+    );
+  }
+}
+
+enum OperationStatus {
+  pending,
+  inProgress,
+  completed,
+  failed,
 }
 
 /// A movie item wrapper for kanban board usage.
@@ -96,6 +135,17 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   final int _maxItemsPerColumn = 8;
   late ScrollController _horizontalScrollController;
 
+  // Optimistic UI state tracking.
+
+  final Map<String, Set<int>> _pendingOperations = {};
+  final Map<String, Movie> _optimisticMovies = {};
+  final Set<String> _syncErrors = {};
+
+  // Queue-based progress tracking.
+
+  final List<OperationQueueItem> _operationQueue = [];
+  int _nextOperationId = 0;
+
   @override
   void initState() {
     super.initState();
@@ -106,6 +156,163 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   void dispose() {
     _horizontalScrollController.dispose();
     super.dispose();
+  }
+
+  // Get the key for tracking operations.
+
+  String _getOperationKey(KanbanColumnType type, String id) {
+    return '${type.name}_$id';
+  }
+
+  // Queue management methods.
+
+  int _addToQueue(String description) {
+    final id = _nextOperationId++;
+    _operationQueue.add(
+      OperationQueueItem(
+        id: id,
+        description: description,
+        status: OperationStatus.pending,
+        startTime: DateTime.now(),
+      ),
+    );
+    setState(() {});
+    return id;
+  }
+
+  void _updateQueueStatus(int operationId, OperationStatus status) {
+    final index = _operationQueue.indexWhere((op) => op.id == operationId);
+    if (index != -1) {
+      _operationQueue[index] = _operationQueue[index].copyWith(status: status);
+      setState(() {});
+
+      // Auto-remove completed/failed operations after delay.
+
+      if (status == OperationStatus.completed ||
+          status == OperationStatus.failed) {
+        Future.delayed(const Duration(seconds: 2), () {
+          _operationQueue.removeWhere((op) => op.id == operationId);
+          if (mounted) setState(() {});
+        });
+      }
+    }
+  }
+
+  // Add movie optimistically to UI state.
+
+  void _addOptimisticMovie(
+    KanbanColumnType targetType,
+    String targetId,
+    Movie movie,
+  ) {
+    final key = _getOperationKey(targetType, targetId);
+    _pendingOperations[key] ??= <int>{};
+    _pendingOperations[key]!.add(movie.id);
+    _optimisticMovies['${movie.id}_$key'] = movie;
+    setState(() {});
+  }
+
+  // Remove movie optimistically from UI state.
+
+  void _removeOptimisticMovie(
+    KanbanColumnType sourceType,
+    String sourceId,
+    Movie movie,
+  ) {
+    final key = _getOperationKey(sourceType, sourceId);
+    _pendingOperations[key] ??= <int>{};
+    _pendingOperations[key]!.add(-movie.id); // Negative ID indicates removal
+    setState(() {});
+  }
+
+  // Clear optimistic state after backend sync.
+
+  void _clearOptimisticState(KanbanColumnType type, String id, int movieId) {
+    final key = _getOperationKey(type, id);
+    _pendingOperations[key]?.remove(movieId);
+    _pendingOperations[key]?.remove(-movieId);
+    if (_pendingOperations[key]?.isEmpty == true) {
+      _pendingOperations.remove(key);
+    }
+    _optimisticMovies.remove('${movieId}_$key');
+    _syncErrors.remove('${movieId}_$key');
+    if (mounted) setState(() {});
+  }
+
+  // Mark sync error and revert optimistic state.
+
+  void _markSyncError(KanbanColumnType type, String id, int movieId) {
+    final key = _getOperationKey(type, id);
+    _syncErrors.add('${movieId}_$key');
+    // Remove the optimistic state to revert UI
+    _clearOptimisticState(type, id, movieId);
+  }
+
+  // Get movies with optimistic updates applied.
+
+  List<Movie> _getMoviesWithOptimisticUpdates(
+    List<Movie> originalMovies,
+    KanbanColumnType type,
+    String id,
+  ) {
+    final key = _getOperationKey(type, id);
+    final pendingOps = _pendingOperations[key];
+    if (pendingOps == null || pendingOps.isEmpty) {
+      return originalMovies;
+    }
+
+    final result = List<Movie>.from(originalMovies);
+
+    for (final opId in pendingOps) {
+      if (opId > 0) {
+        // Addition - add if not already present.
+
+        final movie = _optimisticMovies['${opId}_$key'];
+        if (movie != null && !result.any((m) => m.id == movie.id)) {
+          result.add(movie);
+        }
+      } else {
+        // Removal - remove if present.
+
+        final movieId = -opId;
+        result.removeWhere((m) => m.id == movieId);
+      }
+    }
+
+    return result;
+  }
+
+  // Get movie IDs with optimistic updates applied for custom lists.
+
+  List<int> _getMovieIdsWithOptimisticUpdates(
+    List<int> originalIds,
+    KanbanColumnType type,
+    String id,
+  ) {
+    final key = _getOperationKey(type, id);
+    final pendingOps = _pendingOperations[key];
+    if (pendingOps == null || pendingOps.isEmpty) {
+      return originalIds;
+    }
+
+    final result = List<int>.from(originalIds);
+
+    for (final opId in pendingOps) {
+      if (opId > 0) {
+        // Addition - add if not already present.
+
+        if (!result.contains(opId)) {
+          result.add(opId);
+        }
+      } else {
+        // Removal - remove if present.
+
+        final movieId = -opId;
+        result.remove(movieId);
+      }
+    }
+
+    return result;
   }
 
   // Show context menu for movie copy operations.
@@ -256,65 +463,128 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     return items;
   }
 
-  // Handle context menu action.
+  // Handle context menu action with optimistic UI updates
 
   Future<void> _handleContextMenuAction(
     String action,
     Movie movie,
     KanbanColumnType sourceType,
+    String sourceId, {
+    String contentType = 'movie',
+  }) async {
+    // Apply optimistic UI updates first.
+
+    String? targetListId;
+    KanbanColumnType? targetType;
+    String successMessage = '';
+
+    switch (action) {
+      case 'copy_to_watch':
+        targetType = KanbanColumnType.toWatch;
+        targetListId = 'towatch';
+        successMessage = 'Added "${movie.title}" to To Watch';
+        _addOptimisticMovie(targetType, targetListId, movie);
+        break;
+      case 'copy_watched':
+        targetType = KanbanColumnType.watched;
+        targetListId = 'watched';
+        successMessage = 'Added "${movie.title}" to Watched';
+        _addOptimisticMovie(targetType, targetListId, movie);
+        break;
+      case 'remove':
+        successMessage = 'Removed "${movie.title}" from list';
+        _removeOptimisticMovie(sourceType, sourceId, movie);
+        break;
+      default:
+        if (action.startsWith('copy_custom_')) {
+          targetType = KanbanColumnType.customList;
+          targetListId = action.substring('copy_custom_'.length);
+          successMessage = 'Added "${movie.title}" to custom list';
+          _addOptimisticMovie(targetType, targetListId, movie);
+        }
+    }
+
+    // Add to queue for progress tracking.
+
+    final operationId = _addToQueue(
+      successMessage
+          .replaceFirst('Added', 'Adding')
+          .replaceFirst('Removed', 'Removing'),
+    );
+
+    // Perform background sync.
+
+    _syncContextMenuAction(
+      action,
+      movie,
+      sourceType,
+      sourceId,
+      targetType,
+      targetListId,
+      successMessage,
+      contentType,
+      operationId,
+    );
+  }
+
+  // Background sync for context menu actions.
+
+  Future<void> _syncContextMenuAction(
+    String action,
+    Movie movie,
+    KanbanColumnType sourceType,
     String sourceId,
+    KanbanColumnType? targetType,
+    String? targetListId,
+    String successMessage,
+    String contentType,
+    int operationId,
   ) async {
+    _updateQueueStatus(operationId, OperationStatus.inProgress);
     try {
       // Ensure movie file exists for copy operations (especially from Popular).
-
       if (action != 'remove') {
         await _ensureMovieFileExists(movie);
       }
 
       switch (action) {
         case 'copy_to_watch':
-          await widget.favoritesService.addToWatch(movie);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Added "${movie.title}" to To Watch')),
-            );
-          }
+          await widget.favoritesService
+              .addToWatch(movie, contentType: contentType);
           break;
         case 'copy_watched':
-          await widget.favoritesService.addToWatched(movie);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Added "${movie.title}" to Watched')),
-            );
-          }
+          await widget.favoritesService
+              .addToWatched(movie, contentType: contentType);
           break;
         case 'remove':
           await _removeFromCurrentList(movie, sourceType, sourceId);
           break;
         default:
           // Handle custom list copy operations.
-
           if (action.startsWith('copy_custom_')) {
             final listId = action.substring('copy_custom_'.length);
             await widget.favoritesService.addMovieToCustomList(listId, movie);
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Added "${movie.title}" to custom list'),
-                ),
-              );
-            }
           }
       }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+
+      // Clear optimistic state and update queue status.
+
+      if (targetType != null && targetListId != null) {
+        _clearOptimisticState(targetType, targetListId, movie.id);
+      } else if (action == 'remove') {
+        _clearOptimisticState(sourceType, sourceId, movie.id);
       }
+      _updateQueueStatus(operationId, OperationStatus.completed);
+    } catch (e) {
+      // Revert optimistic updates on error.
+
+      if (targetType != null && targetListId != null) {
+        _markSyncError(targetType, targetListId, movie.id);
+      } else if (action == 'remove') {
+        _markSyncError(sourceType, sourceId, movie.id);
+      }
+
+      _updateQueueStatus(operationId, OperationStatus.failed);
     }
   }
 
@@ -360,7 +630,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     }
   }
 
-  // Handle drop operation for moving/copying movies between lists.
+  // Handle drop operation with optimistic UI updates
 
   Future<void> _handleDrop(
     MovieDragData dragData,
@@ -378,13 +648,52 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
     final isCopyOperation = dragData.sourceType == KanbanColumnType.popular;
 
+    // Apply optimistic UI updates immediately.
+
+    _addOptimisticMovie(targetType, targetId, dragData.movie);
+    if (!isCopyOperation) {
+      _removeOptimisticMovie(
+        dragData.sourceType,
+        dragData.sourceId,
+        dragData.movie,
+      );
+    }
+
+    // Add to queue for progress tracking.
+
+    final operationDescription = isCopyOperation
+        ? 'Copy ${dragData.movie.title} to $targetName'
+        : 'Move ${dragData.movie.title} to $targetName';
+    final operationId = _addToQueue(operationDescription);
+
+    // Perform background sync.
+
+    _syncDropOperation(
+      dragData,
+      targetType,
+      targetId,
+      targetName,
+      isCopyOperation,
+      operationId,
+    );
+  }
+
+  // Background sync operation.
+
+  Future<void> _syncDropOperation(
+    MovieDragData dragData,
+    KanbanColumnType targetType,
+    String targetId,
+    String targetName,
+    bool isCopyOperation,
+    int operationId,
+  ) async {
+    _updateQueueStatus(operationId, OperationStatus.inProgress);
     try {
       // Ensure movie file exists before adding to user lists.
-
       await _ensureMovieFileExists(dragData.movie);
 
       // Add to target list.
-
       switch (targetType) {
         case KanbanColumnType.toWatch:
           await widget.favoritesService.addToWatch(dragData.movie);
@@ -401,7 +710,6 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       }
 
       // Only remove from source if it's a move operation (not from Popular).
-
       if (!isCopyOperation) {
         await _removeFromCurrentList(
           dragData.movie,
@@ -410,26 +718,30 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         );
       }
 
-      if (mounted) {
-        final message = isCopyOperation
-            ? 'Copied "${dragData.movie.title}" from ${dragData.sourceName} to $targetName'
-            : 'Moved "${dragData.movie.title}" from ${dragData.sourceName} to $targetName';
+      // Clear optimistic state and update queue status.
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
+      _clearOptimisticState(targetType, targetId, dragData.movie.id);
+      if (!isCopyOperation) {
+        _clearOptimisticState(
+          dragData.sourceType,
+          dragData.sourceId,
+          dragData.movie.id,
         );
       }
+      _updateQueueStatus(operationId, OperationStatus.completed);
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Error ${isCopyOperation ? "copying" : "moving"} movie: ${e.toString()}',
-            ),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+      // Revert optimistic updates on error.
+
+      _markSyncError(targetType, targetId, dragData.movie.id);
+      if (!isCopyOperation) {
+        _markSyncError(
+          dragData.sourceType,
+          dragData.sourceId,
+          dragData.movie.id,
         );
       }
+
+      _updateQueueStatus(operationId, OperationStatus.failed);
     }
   }
 
@@ -468,29 +780,71 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     required String columnId,
     required String columnName,
   }) {
-    // All movies can be dragged, but Popular will be copy operations.
+    // Check if this movie has pending operations.
+
+    final key = _getOperationKey(columnType, columnId);
+    final hasPendingOp =
+        (_pendingOperations[key]?.contains(movie.id) ?? false) ||
+            (_pendingOperations[key]?.contains(-movie.id) ?? false);
+    final hasError = _syncErrors.contains('${movie.id}_$key');
 
     final movieCard = Container(
       margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-      child: MovieCard.poster(
-        movie: movie,
-        fromCache: fromCache,
-        width: 100,
-        height: 150,
-        favoritesService: widget.favoritesService,
-        onTap: () {
-          if (mounted) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MovieDetailsScreen(
-                  movie: movie,
-                  favoritesService: widget.favoritesService,
+      child: Stack(
+        children: [
+          MovieCard.poster(
+            movie: movie,
+            fromCache: fromCache,
+            width: 100,
+            height: 150,
+            favoritesService: widget.favoritesService,
+            onTap: () {
+              if (mounted) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MovieDetailsScreen(
+                      movie: movie,
+                      favoritesService: widget.favoritesService,
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+          // Show sync status indicator.
+
+          if (hasPendingOp || hasError)
+            Positioned(
+              bottom: 4,
+              right: 4,
+              child: Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  color: hasError
+                      ? Theme.of(context).colorScheme.error
+                      : Theme.of(context).colorScheme.primary,
+                  shape: BoxShape.circle,
                 ),
+                child: hasError
+                    ? Icon(
+                        Icons.error,
+                        size: 12,
+                        color: Theme.of(context).colorScheme.onError,
+                      )
+                    : SizedBox(
+                        width: 12,
+                        height: 12,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ),
+                      ),
               ),
-            );
-          }
-        },
+            ),
+        ],
       ),
     );
 
@@ -590,9 +944,21 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     required bool fromCache,
     required KanbanColumnType columnType,
   }) {
-    final displayMovies = movies.take(_maxItemsPerColumn).toList();
-    final hasMore = movies.length > _maxItemsPerColumn;
+    // Apply optimistic updates.
+
+    final moviesWithOptimistic = _getMoviesWithOptimisticUpdates(
+      movies,
+      columnType,
+      categoryId,
+    );
+    final displayMovies =
+        moviesWithOptimistic.take(_maxItemsPerColumn).toList();
+    final hasMore = moviesWithOptimistic.length > _maxItemsPerColumn;
     final canAcceptDrop = columnType != KanbanColumnType.popular;
+    final hasPendingOps =
+        _pendingOperations[_getOperationKey(columnType, categoryId)]
+                ?.isNotEmpty ??
+            false;
 
     Widget columnContent = Container(
       width: 220,
@@ -635,20 +1001,42 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                     color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    '${movies.length}${hasMore ? '+' : ''}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color:
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${moviesWithOptimistic.length}${hasMore ? '+' : ''}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                              fontWeight: FontWeight.w500,
+                            ),
+                      ),
+                      if (hasPendingOps) ...[
+                        const SizedBox(width: 4),
+                        SizedBox(
+                          width: 8,
+                          height: 8,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1,
+                            valueColor: AlwaysStoppedAnimation<Color>(
                               Theme.of(context).colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
+                      ],
+                    ],
                   ),
                 ),
                 if (hasMore) ...[
                   const Gap(4),
                   TextButton(
-                    onPressed: () =>
-                        _navigateToMovieCategory(title, movies, fromCache),
+                    onPressed: () => _navigateToMovieCategory(
+                      title,
+                      moviesWithOptimistic,
+                      fromCache,
+                    ),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 6,
@@ -758,8 +1146,19 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   // Build a custom list column that loads and displays movies from a CustomList.
 
   Widget _buildCustomListColumn(CustomList customList) {
-    final movieIds = customList.movieIds;
-    final displayMovieIds = movieIds.take(_maxItemsPerColumn).toList();
+    // Apply optimistic updates to movie IDs.
+
+    final movieIdsWithOptimistic = _getMovieIdsWithOptimisticUpdates(
+      customList.movieIds,
+      KanbanColumnType.customList,
+      customList.id,
+    );
+    final displayMovieIds =
+        movieIdsWithOptimistic.take(_maxItemsPerColumn).toList();
+    final hasPendingOps = _pendingOperations[
+                _getOperationKey(KanbanColumnType.customList, customList.id)]
+            ?.isNotEmpty ??
+        false;
 
     Widget columnContent = Container(
       width: 220,
@@ -807,16 +1206,35 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                     color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    '${movieIds.length}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color:
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${movieIdsWithOptimistic.length}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                              fontWeight: FontWeight.w500,
+                            ),
+                      ),
+                      if (hasPendingOps) ...[
+                        const SizedBox(width: 4),
+                        SizedBox(
+                          width: 8,
+                          height: 8,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1,
+                            valueColor: AlwaysStoppedAnimation<Color>(
                               Theme.of(context).colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
+                      ],
+                    ],
                   ),
                 ),
-                if (movieIds.length > _maxItemsPerColumn) ...[
+                if (movieIdsWithOptimistic.length > _maxItemsPerColumn) ...[
                   const Gap(4),
                   TextButton(
                     onPressed: () => _navigateToCustomListDetail(customList),
@@ -844,7 +1262,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           // Movie items.
 
           Expanded(
-            child: movieIds.isEmpty
+            child: movieIdsWithOptimistic.isEmpty
                 ? Center(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -866,6 +1284,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                       final movieId = displayMovieIds[index];
                       return _buildCustomListMovieItem(
                         movieId,
+                        index,
                         customList.id,
                         customList,
                       );
@@ -907,19 +1326,46 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
+  // Get content as Movie based on known content type.
+
+  Future<Movie> _getContentAsMovieWithType(
+    int contentId,
+    String contentType,
+    CachedMovieService cachedMovieService,
+    ContentService contentService,
+  ) async {
+    if (contentType == 'tv') {
+      final tvShowContent = await contentService.getTVDetails(contentId);
+      return Movie.fromContentItem(tvShowContent);
+    } else {
+      return await cachedMovieService.getMovieDetails(contentId);
+    }
+  }
+
   // Build a movie item for a custom list (loading movie details on demand).
 
   Widget _buildCustomListMovieItem(
     int movieId,
+    int index,
     String categoryId,
     CustomList customList,
   ) {
     return Consumer(
       builder: (context, ref, child) {
         final cachedMovieService = ref.read(cachedMovieServiceProvider);
+        final contentService = ref.read(contentServiceProvider);
+
+        // Get content type for this index.
+
+        final contentType = customList.getContentTypeAt(index);
 
         return FutureBuilder<Movie>(
-          future: cachedMovieService.getMovieDetails(movieId),
+          future: _getContentAsMovieWithType(
+            movieId,
+            contentType,
+            cachedMovieService,
+            contentService,
+          ),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Container(
@@ -1020,6 +1466,114 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
+  Widget _buildProgressIndicator() {
+    final pendingOps = _operationQueue
+        .where(
+          (op) =>
+              op.status == OperationStatus.pending ||
+              op.status == OperationStatus.inProgress,
+        )
+        .length;
+    final completedOps = _operationQueue
+        .where((op) => op.status == OperationStatus.completed)
+        .length;
+    final failedOps = _operationQueue
+        .where((op) => op.status == OperationStatus.failed)
+        .length;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (pendingOps > 0) ...[
+                SizedBox(
+                  width: 12,
+                  height: 12,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                'Syncing',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (pendingOps > 0) ...[
+                _buildStatusChip(
+                  '$pendingOps pending',
+                  Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 4),
+              ],
+              if (completedOps > 0) ...[
+                _buildStatusChip(
+                  '$completedOps done',
+                  Theme.of(context).colorScheme.tertiary,
+                ),
+                const SizedBox(width: 4),
+              ],
+              if (failedOps > 0) ...[
+                _buildStatusChip(
+                  '$failedOps failed',
+                  Theme.of(context).colorScheme.error,
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusChip(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 10,
+          color: color,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer(
@@ -1045,56 +1599,68 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                         final watchedMovies = watchedSnapshot.data ?? [];
                         final customLists = customListsSnapshot.data ?? [];
 
-                        return Scrollbar(
-                          controller: _horizontalScrollController,
-                          thumbVisibility: true,
-                          trackVisibility: true,
-                          thickness: 8,
-                          radius: const Radius.circular(4),
-                          child: SingleChildScrollView(
-                            controller: _horizontalScrollController,
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Popular Movies Column.
+                        return Stack(
+                          children: [
+                            Scrollbar(
+                              controller: _horizontalScrollController,
+                              thumbVisibility: true,
+                              trackVisibility: true,
+                              thickness: 8,
+                              radius: const Radius.circular(4),
+                              child: SingleChildScrollView(
+                                controller: _horizontalScrollController,
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Popular Movies Column.
 
-                                _buildKanbanColumn(
-                                  title: 'Popular',
-                                  movies: popularMovies,
-                                  categoryId: 'popular',
-                                  fromCache: popularCacheResult.fromCache,
-                                  columnType: KanbanColumnType.popular,
+                                    _buildKanbanColumn(
+                                      title: 'Popular',
+                                      movies: popularMovies,
+                                      categoryId: 'popular',
+                                      fromCache: popularCacheResult.fromCache,
+                                      columnType: KanbanColumnType.popular,
+                                    ),
+
+                                    // To Watch Column.
+
+                                    _buildKanbanColumn(
+                                      title: 'To Watch',
+                                      movies: toWatchMovies,
+                                      categoryId: 'towatch',
+                                      fromCache: false,
+                                      columnType: KanbanColumnType.toWatch,
+                                    ),
+
+                                    // Watched Column.
+
+                                    _buildKanbanColumn(
+                                      title: 'Watched',
+                                      movies: watchedMovies,
+                                      categoryId: 'watched',
+                                      fromCache: false,
+                                      columnType: KanbanColumnType.watched,
+                                    ),
+
+                                    // Custom List Columns.
+                                    ...customLists.map(
+                                      (customList) =>
+                                          _buildCustomListColumn(customList),
+                                    ),
+                                  ],
                                 ),
-
-                                // To Watch Column.
-
-                                _buildKanbanColumn(
-                                  title: 'To Watch',
-                                  movies: toWatchMovies,
-                                  categoryId: 'towatch',
-                                  fromCache: false,
-                                  columnType: KanbanColumnType.toWatch,
-                                ),
-
-                                // Watched Column.
-
-                                _buildKanbanColumn(
-                                  title: 'Watched',
-                                  movies: watchedMovies,
-                                  categoryId: 'watched',
-                                  fromCache: false,
-                                  columnType: KanbanColumnType.watched,
-                                ),
-
-                                // Custom List Columns.
-                                ...customLists.map(
-                                  (customList) =>
-                                      _buildCustomListColumn(customList),
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
+                            // Progress indicator overlay.
+
+                            if (_operationQueue.isNotEmpty)
+                              Positioned(
+                                bottom: 20,
+                                right: 20,
+                                child: _buildProgressIndicator(),
+                              ),
+                          ],
                         );
                       },
                     );

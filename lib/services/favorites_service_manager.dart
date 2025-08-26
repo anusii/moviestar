@@ -140,22 +140,26 @@ class FavoritesServiceManager extends ChangeNotifier {
   }
 
   /// Adds a movie to the to-watch list.
+  ///
+  /// [contentType] specifies whether this is a movie or TV show.
 
-  Future<void> addToWatch(Movie movie) async {
+  Future<void> addToWatch(Movie movie, {String contentType = 'movie'}) async {
     if (_isPodStorageEnabled && _podService != null) {
-      await _podService!.addToWatch(movie);
+      await _podService!.addToWatch(movie, contentType: contentType);
     } else {
-      await _localService.addToWatch(movie);
+      await _localService.addToWatch(movie, contentType: contentType);
     }
   }
 
   /// Adds a movie to the watched list.
+  ///
+  /// [contentType] specifies whether this is a movie or TV show.
 
-  Future<void> addToWatched(Movie movie) async {
+  Future<void> addToWatched(Movie movie, {String contentType = 'movie'}) async {
     if (_isPodStorageEnabled && _podService != null) {
-      await _podService!.addToWatched(movie);
+      await _podService!.addToWatched(movie, contentType: contentType);
     } else {
-      await _localService.addToWatched(movie);
+      await _localService.addToWatched(movie, contentType: contentType);
     }
   }
 

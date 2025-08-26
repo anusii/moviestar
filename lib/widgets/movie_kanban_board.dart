@@ -64,7 +64,7 @@ class MovieDragData {
   });
 }
 
-/// Queue item for tracking pending operations
+/// Queue item for tracking pending operations.
 
 class OperationQueueItem {
   final int id;
@@ -164,7 +164,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     return '${type.name}_$id';
   }
 
-  // Queue management methods
+  // Queue management methods.
+
   int _addToQueue(String description) {
     final id = _nextOperationId++;
     _operationQueue.add(OperationQueueItem(
@@ -765,7 +766,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     required String columnId,
     required String columnName,
   }) {
-    // Check if this movie has pending operations
+    // Check if this movie has pending operations.
+    
     final key = _getOperationKey(columnType, columnId);
     final hasPendingOp =
         (_pendingOperations[key]?.contains(movie.id) ?? false) ||

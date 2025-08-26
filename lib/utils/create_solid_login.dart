@@ -148,9 +148,10 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
 
     _hasCheckedApiKey = true;
 
-    // Only check for API key if user is logged in (required for POD access)
+    // Only check for API key if user is logged in (required for POD access).
+
     final loggedIn = await isLoggedIn();
-    if (!loggedIn) return; // Don't show dialog if not logged in
+    if (!loggedIn) return; // Don't show dialog if not logged in.
 
     // Set context for POD operations
     if (mounted) {

@@ -37,11 +37,9 @@ import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/enhanced_search_screen.dart';
-import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
-import 'package:moviestar/services/movie_service.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/widgets/solid_scaffold_config.dart';
@@ -68,8 +66,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   late final FavoritesServiceManager _favoritesServiceManager;
   late final FavoritesService _favoritesService;
-  late final ApiKeyService _apiKeyService;
-  late final MovieService _movieService;
 
   /// Navigation menu items configuration.
 
@@ -84,12 +80,15 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       widget,
     );
     _favoritesService = FavoritesServiceAdapter(_favoritesServiceManager);
-    _apiKeyService = ApiKeyService();
-    _movieService = MovieService(_apiKeyService);
+
+    // Set context for provider-based API key service.
+
+    final apiKeyService = ref.read(apiKeyServiceProvider);
+    apiKeyService.updateContext(context, widget);
 
     // Listen for API key changes.
 
-    _apiKeyService.addListener(_onApiKeyChanged);
+    apiKeyService.addListener(_onApiKeyChanged);
 
     _loadUserInfo();
     _buildScreens();
@@ -97,7 +96,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   @override
   void dispose() {
-    _apiKeyService.removeListener(_onApiKeyChanged);
+    final apiKeyService = ref.read(apiKeyServiceProvider);
+    apiKeyService.removeListener(_onApiKeyChanged);
     super.dispose();
   }
 
@@ -154,8 +154,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   void _onApiKeyChanged() {
     // When API key changes, update the movie service.
-
-    _movieService.updateApiKey();
+    final movieService = ref.read(movieServiceProvider);
+    movieService.updateApiKey();
 
     // Invalidate all movie providers to force refresh with new API key.
 
@@ -177,9 +177,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   }
 
   void _buildScreens() {
+    final apiKeyService = ref.read(apiKeyServiceProvider);
     _menuItems = SolidScaffoldConfig.createMenuItems(
       favoritesService: _favoritesService,
-      apiKeyService: _apiKeyService,
+      apiKeyService: apiKeyService,
       favoritesServiceManager: _favoritesServiceManager,
     );
 

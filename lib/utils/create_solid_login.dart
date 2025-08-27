@@ -36,6 +36,7 @@ import 'package:moviestar/my_home_page.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/utils/is_logged_in.dart';
 
 /// Creates a Solid login widget for authentication.
 ///
@@ -130,10 +131,15 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
   void initState() {
     super.initState();
     _apiKeyService = ApiKeyService();
-    // Delay the check to ensure the widget is fully built.
 
+    // Delay the check to ensure the widget is fully built AND POD is authenticated
+    // Wait a bit longer to allow POD authentication and API key fetching to complete
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkApiKey();
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
+          _checkApiKey();
+        }
+      });
     });
   }
 
@@ -141,6 +147,19 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
     if (_hasCheckedApiKey || _hasShownApiKeyDialogThisSession) return;
 
     _hasCheckedApiKey = true;
+
+    // Only check for API key if user is logged in (required for POD access).
+
+    final loggedIn = await isLoggedIn();
+    if (!loggedIn) return; // Don't show dialog if not logged in.
+
+    // Set context for POD operations
+    if (mounted) {
+      _apiKeyService.updateContext(context, widget);
+    } else {
+      return;
+    }
+
     final apiKey = await _apiKeyService.getApiKey();
 
     if (mounted && (apiKey == null || apiKey.isEmpty)) {

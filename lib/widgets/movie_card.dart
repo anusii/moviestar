@@ -296,8 +296,8 @@ class _MovieCardState extends State<MovieCard> {
                             const Text(' • '),
                             Text(
                               widget.movie.contentType == ContentType.movie
-                                  ? 'Movie'
-                                  : 'TV Show',
+                                  ? '🎬 Movie'
+                                  : '📺 TV Show',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium

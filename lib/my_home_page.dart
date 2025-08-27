@@ -34,7 +34,6 @@ import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/enhanced_search_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
@@ -359,12 +358,8 @@ for more information.
       userInfo: userInfo,
       onLogout: (context) => _handleLogout(),
       backgroundColor: theme.colorScheme.surface,
-      themeToggle: SolidThemeToggleConfig(
+      themeToggle: const SolidThemeToggleConfig(
         enabled: true,
-        currentThemeMode: ref.watch(themeModeProvider),
-        onToggleTheme: () async {
-          await ref.read(themeModeProvider.notifier).toggleTheme();
-        },
         showInAppBarActions: true,
       ),
       child: loadingOverlay,

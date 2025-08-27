@@ -28,9 +28,9 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/features/file/service/components/file_service_widget.dart';
-import 'package:moviestar/theme/app_theme.dart';
 
 /// The file service page that provides file management functionality.
 ///
@@ -44,9 +44,9 @@ class FileService extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: const Padding(
-        padding: EdgeInsets.all(AppTheme.defaultPadding),
-        child: FileServiceWidget(),
+      body: Padding(
+        padding: EdgeInsets.all(SolidTheme.defaultPadding),
+        child: const FileServiceWidget(),
       ),
     );
   }

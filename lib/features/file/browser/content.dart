@@ -107,7 +107,7 @@ class FileBrowserContent extends StatelessWidget {
               ),
             )
           : ListView(
-              padding: const EdgeInsets.all(AppTheme.defaultPadding / 2),
+              padding: EdgeInsets.all(AppTheme.defaultPadding / 2),
               children: [
                 // Directory list.
                 DirectoryList(

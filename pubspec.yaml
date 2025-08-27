@@ -1,7 +1,7 @@
 name: moviestar
 description: "A modern privacy-first movie discovery and tracking application."
 publish_to: "none"
-version: 0.0.14+7
+version: 0.0.19+7
 
 environment:
   sdk: ">=3.2.3 <4.0.0"
@@ -18,6 +18,7 @@ environment:
 
 dependencies:
   cached_network_image: ^3.3.0
+  cupertino_icons: ^1.0.2 # An asset repository.
   file_picker: ^10.1.9
   # Database dependencies for local caching
   hive: ^2.2.3
@@ -42,7 +43,6 @@ dependencies:
     git:
       url: https://github.com/anusii/solidui.git
       ref: tony/2_solidfile
-#    path: ../solidui
   universal_io: ^2.2.2
   url_launcher: ^6.3.1
   window_manager: ^0.5.0

@@ -158,6 +158,19 @@ class _MovieCardState extends State<MovieCard> {
 
   OverlayEntry? _overlayEntry;
 
+  // Validates if an image URL is valid and not empty.
+
+  bool _isValidImageUrl(String? url) {
+    if (url == null || url.trim().isEmpty) {
+      return false;
+    }
+
+    // Basic URL validation - must start with http:// or https://.
+
+    return url.trim().startsWith('http://') ||
+        url.trim().startsWith('https://');
+  }
+
   // Whether the quick actions dialog is currently shown.
 
   bool _isDialogShown = false;
@@ -191,16 +204,27 @@ class _MovieCardState extends State<MovieCard> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: CachedNetworkImage(
-                    imageUrl: widget.movie.posterUrl,
-                    width: widget.width,
-                    height: widget.height,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) =>
-                        const Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                  ),
+                  child: !_isValidImageUrl(widget.movie.posterUrl)
+                      ? Container(
+                          width: widget.width,
+                          height: widget.height,
+                          color: Colors.grey[300],
+                          child: const Icon(
+                            Icons.movie,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                        )
+                      : CachedNetworkImage(
+                          imageUrl: widget.movie.posterUrl.trim(),
+                          width: widget.width,
+                          height: widget.height,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              const Center(child: CircularProgressIndicator()),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                        ),
                 ),
                 _buildCacheIndicator(context),
                 if (widget.cacheOnlyMode == true)
@@ -218,16 +242,27 @@ class _MovieCardState extends State<MovieCard> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: CachedNetworkImage(
-                    imageUrl: widget.movie.posterUrl,
-                    width: widget.width,
-                    height: widget.height,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) =>
-                        const Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                  ),
+                  child: !_isValidImageUrl(widget.movie.posterUrl)
+                      ? Container(
+                          width: widget.width,
+                          height: widget.height,
+                          color: Colors.grey[300],
+                          child: const Icon(
+                            Icons.movie,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                        )
+                      : CachedNetworkImage(
+                          imageUrl: widget.movie.posterUrl.trim(),
+                          width: widget.width,
+                          height: widget.height,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              const Center(child: CircularProgressIndicator()),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                        ),
                 ),
                 _buildCacheIndicator(context),
               ],

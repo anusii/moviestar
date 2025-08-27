@@ -25,6 +25,11 @@ au](https://solidcommunity.au/docs/moviestar)
 
 ## 0.1 First stable release
 
++ Option to store movie database API in POD [0.0.19 20250827 atangster]
++ Drag/drop improvement. Back button visibility [0.0.18 20250826 atangster]
++ Bug fixes for tv shows [0.0.17 20250826 atangster]
++ Support new solidui About dialog [0.0.16 20250826 tonypioneer]
++ Update to new SolidScaffold interface [0.0.15 20250826 tonypioneer]
 + Add ABOUT [0.0.14 20250822 tonypioneer]
 + Add TV Shows [0.0.13 20250822 atangster]
 + Lint fixes and deprecation update [0.0.12 20250821 gjw]

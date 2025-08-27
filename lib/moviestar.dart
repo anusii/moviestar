@@ -28,6 +28,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/theme/app_theme.dart';
@@ -48,14 +49,12 @@ class MovieStar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeModeProvider);
     final prefs = ref.watch(sharedPreferencesProvider);
 
-    return MaterialApp(
+    return SolidThemeApp(
       title: 'Movie Star',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: themeMode,
       home: Builder(builder: (context) => createSolidLogin(context, prefs)),
     );
   }

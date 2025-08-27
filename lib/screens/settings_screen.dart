@@ -1,6 +1,6 @@
 /// Screen for managing user settings and preferences.
 ///
-// Time-stamp: <Wednesday 2025-07-23 16:57:43 +1000 Graham Williams>
+// Time-stamp: <Tuesday 2025-08-26 09:48:49 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:solidpod/solidpod.dart';
+import 'package:solidui/solidui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
@@ -472,6 +473,11 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
   void initState() {
     super.initState();
     _apiKeyController = TextEditingController();
+
+    // Update ApiKeyService context for POD operations.
+
+    widget.apiKeyService.updateContext(context, widget);
+
     _loadApiKey();
 
     // Initialise POD storage state - enable by default if user is logged in.
@@ -696,6 +702,15 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                       if (!context.mounted) return;
 
                       if (mounted) {
+                        // Invalidate all movie providers to force refresh with new API key.
+
+                        ref.invalidate(popularMoviesWithCacheInfoProvider);
+                        ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+                        ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+                        ref.invalidate(upcomingMoviesWithCacheInfoProvider);
+                        ref.invalidate(movieServiceProvider);
+                        ref.invalidate(contentServiceProvider);
+
                         // Show success message.
 
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -758,13 +773,16 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                           ),
                         ],
                       ),
-                      Consumer(
-                        builder: (context, ref, _) {
-                          final themeMode = ref.watch(themeModeProvider);
+                      AnimatedBuilder(
+                        animation: solidThemeNotifier,
+                        builder: (context, _) {
+                          final themeMode = solidThemeNotifier.themeMode;
                           return Icon(
                             themeMode == ThemeMode.dark
                                 ? Icons.dark_mode
-                                : Icons.light_mode,
+                                : themeMode == ThemeMode.light
+                                    ? Icons.light_mode
+                                    : Icons.computer,
                             color: Theme.of(context).colorScheme.primary,
                           );
                         },
@@ -866,6 +884,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
           },
         ),
         _buildOfflineModeTile(cachingEnabled, cacheOnlyMode),
+        _buildApiKeyCachingTile(),
 
         // Cache Statistics.
         cacheStatsAsync.when(
@@ -1050,6 +1069,54 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
           : null,
       thumbColor:
           WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
+    );
+  }
+
+  /// Builds the API key caching tile.
+
+  Widget _buildApiKeyCachingTile() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final localApiKeyCachingEnabled = ref.watch(localApiKeyCachingProvider);
+
+        return SwitchListTile(
+          title: const Text('Local API Key Caching'),
+          subtitle: Text(
+            localApiKeyCachingEnabled
+                ? 'API keys cached locally for offline access (shared across accounts on this device)'
+                : 'API keys stored only in your POD (recommended for privacy)',
+            style: localApiKeyCachingEnabled
+                ? TextStyle(color: Colors.orange[600])
+                : TextStyle(color: Colors.green[600]),
+          ),
+          value: localApiKeyCachingEnabled,
+          onChanged: (value) {
+            ref
+                .read(localApiKeyCachingProvider.notifier)
+                .setLocalApiKeyCachingEnabled(value);
+
+            // Show feedback about the change.
+
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    value
+                        ? '⚠️ API key caching enabled. Keys will be shared across accounts on this device.'
+                        : '✅ API key caching disabled. Keys stored only in your POD.',
+                  ),
+                  backgroundColor: value ? Colors.orange : Colors.green,
+                  duration: const Duration(seconds: 4),
+                ),
+              );
+            }
+          },
+          secondary: Icon(
+            localApiKeyCachingEnabled ? Icons.warning : Icons.security,
+            color: localApiKeyCachingEnabled ? Colors.orange : Colors.green,
+          ),
+        );
+      },
     );
   }
 

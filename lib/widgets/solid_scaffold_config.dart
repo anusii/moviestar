@@ -1,6 +1,6 @@
 /// MovieStar SolidScaffold Configuration.
 ///
-// Time-stamp: <Friday 2025-08-22 13:25:10 +1000 Graham Williams>
+// Time-stamp: <Wednesday 2025-08-27 11:42:58 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -127,7 +127,7 @@ class SolidScaffoldConfig {
 ''',
       ),
       SolidMenuItem(
-        title: 'Shared Movies',
+        title: 'Shared',
         icon: Icons.movie_outlined,
         child: const SharedMoviesScreen(),
         tooltip: '''

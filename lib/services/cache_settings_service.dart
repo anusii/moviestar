@@ -34,6 +34,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class CacheSettingsService {
   static const String _cachingEnabledKey = 'cache_settings_caching_enabled';
   static const String _cacheOnlyModeKey = 'cache_settings_cache_only_mode';
+  static const String _localApiKeyCachingKey =
+      'cache_settings_local_api_key_caching';
 
   static CacheSettingsService? _instance;
   SharedPreferences? _prefs;
@@ -93,11 +95,30 @@ class CacheSettingsService {
     );
   }
 
+  /// Gets whether local API key caching is enabled (defaults to false).
+  /// When false, API keys are only stored in user PODs.
+  /// When true, API keys can be cached locally for offline access.
+
+  bool get localApiKeyCachingEnabled {
+    return _prefs?.getBool(_localApiKeyCachingKey) ?? false;
+  }
+
+  /// Sets whether local API key caching is enabled.
+
+  Future<void> setLocalApiKeyCachingEnabled(bool enabled) async {
+    await _prefs?.setBool(_localApiKeyCachingKey, enabled);
+    developer.log(
+      'Local API key caching setting changed to: $enabled',
+      name: 'CacheSettingsService',
+    );
+  }
+
   /// Resets all cache settings to defaults.
 
   Future<void> resetToDefaults() async {
     await _prefs?.remove(_cachingEnabledKey);
     await _prefs?.remove(_cacheOnlyModeKey);
+    await _prefs?.remove(_localApiKeyCachingKey);
     developer.log(
       'Cache settings reset to defaults',
       name: 'CacheSettingsService',

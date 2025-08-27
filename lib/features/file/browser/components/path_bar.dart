@@ -93,7 +93,7 @@ class PathBar extends StatelessWidget {
       elevation: 2,
       margin: EdgeInsets.zero,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
+        padding: EdgeInsets.symmetric(
           horizontal: AppTheme.defaultPadding,
           vertical: AppTheme.defaultPadding / 2,
         ),

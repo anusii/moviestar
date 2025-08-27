@@ -104,14 +104,14 @@ class FavoritesServiceAdapter extends FavoritesService {
   }
 
   @override
-  Future<void> addToWatch(Movie movie) async {
-    await _manager.addToWatch(movie);
+  Future<void> addToWatch(Movie movie, {String contentType = 'movie'}) async {
+    await _manager.addToWatch(movie, contentType: contentType);
     _invalidateToWatchCache();
   }
 
   @override
-  Future<void> addToWatched(Movie movie) async {
-    await _manager.addToWatched(movie);
+  Future<void> addToWatched(Movie movie, {String contentType = 'movie'}) async {
+    await _manager.addToWatched(movie, contentType: contentType);
     _invalidateWatchedCache();
   }
 

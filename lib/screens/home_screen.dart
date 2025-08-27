@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
@@ -37,6 +38,8 @@ import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
+import 'package:moviestar/services/cached_movie_service.dart';
+import 'package:moviestar/services/content_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/hive_movie_cache_service.dart';
@@ -291,6 +294,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       builder: (context) => MovieDetailsScreen(
                         movie: movie,
                         favoritesService: widget.favoritesService,
+                        contentType: movie.contentType ?? ContentType.movie,
                       ),
                     ),
                   );
@@ -492,6 +496,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       builder: (context) => MovieDetailsScreen(
                         movie: movie,
                         favoritesService: widget.favoritesService,
+                        contentType: movie.contentType ?? ContentType.movie,
                       ),
                     ),
                   );
@@ -603,6 +608,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               builder: (context) => MovieDetailsScreen(
                                 movie: movie,
                                 favoritesService: widget.favoritesService,
+                                contentType:
+                                    movie.contentType ?? ContentType.movie,
                               ),
                             ),
                           );
@@ -1295,6 +1302,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   builder: (context) => MovieDetailsScreen(
                     movie: movie,
                     favoritesService: widget.favoritesService,
+                    contentType: movie.contentType ?? ContentType.movie,
                   ),
                 ),
               );
@@ -1424,22 +1432,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         itemCount: movieIds.length,
         itemBuilder: (context, index) {
           final movieId = movieIds[index];
+          final contentType = customList.getContentTypeAt(index);
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: _buildCustomListMovieCard(movieId),
+            child: _buildCustomListMovieCard(movieId, contentType: contentType),
           );
         },
       ),
     );
   }
 
+  // Get content as Movie based on known content type.
+
+  Future<Movie> _getContentAsMovieWithType(
+    int contentId,
+    String contentType,
+    CachedMovieService cachedMovieService,
+    ContentService contentService,
+  ) async {
+    if (contentType == 'tv') {
+      final tvShowContent = await contentService.getTVDetails(contentId);
+      return Movie.fromContentItem(tvShowContent);
+    } else {
+      return await cachedMovieService.getMovieDetails(contentId);
+    }
+  }
+
   // Build a movie card for a custom list movie (loading movie details on demand).
 
-  Widget _buildCustomListMovieCard(int movieId) {
+  Widget _buildCustomListMovieCard(
+    int movieId, {
+    String contentType = 'movie',
+  }) {
     final cachedMovieService = ref.read(cachedMovieServiceProvider);
+    final contentService = ref.read(contentServiceProvider);
 
     return FutureBuilder<Movie>(
-      future: cachedMovieService.getMovieDetails(movieId),
+      future: _getContentAsMovieWithType(
+        movieId,
+        contentType,
+        cachedMovieService,
+        contentService,
+      ),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Container(
@@ -1523,6 +1557,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   builder: (context) => MovieDetailsScreen(
                     movie: movie,
                     favoritesService: widget.favoritesService,
+                    contentType: movie.contentType ?? ContentType.movie,
                   ),
                 ),
               );
@@ -1615,19 +1650,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final displayMovieIds = movieIds.take(5).toList();
 
     return Column(
-      children: displayMovieIds.map((movieId) {
-        return _buildCustomListMovieListItem(movieId);
+      children: displayMovieIds.asMap().entries.map((entry) {
+        final index = entry.key;
+        final movieId = entry.value;
+        final contentType = customList.getContentTypeAt(index);
+        return _buildCustomListMovieListItem(movieId, contentType: contentType);
       }).toList(),
     );
   }
 
   // Build a list item for a custom list movie.
 
-  Widget _buildCustomListMovieListItem(int movieId) {
+  Widget _buildCustomListMovieListItem(
+    int movieId, {
+    String contentType = 'movie',
+  }) {
     final cachedMovieService = ref.read(cachedMovieServiceProvider);
+    final contentService = ref.read(contentServiceProvider);
 
     return FutureBuilder<Movie>(
-      future: cachedMovieService.getMovieDetails(movieId),
+      future: _getContentAsMovieWithType(
+        movieId,
+        contentType,
+        cachedMovieService,
+        contentService,
+      ),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Padding(
@@ -1714,6 +1761,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   builder: (context) => MovieDetailsScreen(
                     movie: movie,
                     favoritesService: widget.favoritesService,
+                    contentType: movie.contentType ?? ContentType.movie,
                   ),
                 ),
               );

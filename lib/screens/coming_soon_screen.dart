@@ -29,6 +29,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
@@ -88,9 +89,32 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
                 cacheOnlyMode: cacheOnlyMode,
                 favoritesService: widget.favoritesService,
                 parentWidget: widget,
-                customSubtitle: Text(
-                  'Release Date: ${DateFormatUtil.formatNumeric(movie.releaseDate)}',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                customSubtitle: Row(
+                  children: [
+                    Text(
+                      'Release: ${DateFormatUtil.formatNumeric(movie.releaseDate)}',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    if (movie.contentType != null) ...[
+                      const Text(' • '),
+                      Text(
+                        movie.contentType == ContentType.movie ? '🎬' : '📺',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      const Text(' '),
+                      Text(
+                        movie.contentType == ContentType.movie
+                            ? 'Movie'
+                            : 'TV Show',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.7),
+                            ),
+                      ),
+                    ],
+                  ],
                 ),
                 onTap: () {
                   Navigator.push(

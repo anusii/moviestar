@@ -35,6 +35,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/constants/paths.dart';
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/movie_list_service.dart';
@@ -321,6 +322,33 @@ class PodFavoritesService extends ChangeNotifier {
     }
   }
 
+  /// Helper method to ensure a movie has contentType set.
+
+  Movie _ensureContentType(Movie movie) {
+    if (movie.contentType != null) {
+      return movie;
+    }
+    // Migrate movies without contentType to have it set as movie.
+
+    return Movie(
+      id: movie.id,
+      title: movie.title,
+      overview: movie.overview,
+      posterUrl: movie.posterUrl,
+      backdropUrl: movie.backdropUrl,
+      voteAverage: movie.voteAverage,
+      releaseDate: movie.releaseDate,
+      genreIds: movie.genreIds,
+      contentType: ContentType.movie,
+    );
+  }
+
+  /// Helper method to ensure all movies in a list have contentType set.
+
+  List<Movie> _ensureAllContentTypes(List<Movie> movies) {
+    return movies.map((movie) => _ensureContentType(movie)).toList();
+  }
+
   /// Retrieves the list of to-watch movies from POD cache.
 
   Future<List<Movie>> getToWatch({bool forceRefresh = false}) async {
@@ -333,19 +361,20 @@ class PodFavoritesService extends ChangeNotifier {
       );
       if (movieListData != null) {
         final movies = movieListData['movies'] as List<Movie>? ?? [];
-        return List.from(movies);
+        return _ensureAllContentTypes(movies);
       }
     }
 
     // Fallback to cached data if MovieList fails.
 
     if (_cachedToWatch != null) {
-      return List.from(_cachedToWatch!);
+      return _ensureAllContentTypes(_cachedToWatch!);
     }
 
     // Final fallback to SharedPreferences.
 
-    return _fallbackService.getToWatch();
+    final fallbackMovies = await _fallbackService.getToWatch();
+    return _ensureAllContentTypes(fallbackMovies);
   }
 
   /// Retrieves the list of watched movies from POD cache.
@@ -360,19 +389,20 @@ class PodFavoritesService extends ChangeNotifier {
       );
       if (movieListData != null) {
         final movies = movieListData['movies'] as List<Movie>? ?? [];
-        return List.from(movies);
+        return _ensureAllContentTypes(movies);
       }
     }
 
     // Fallback to cached data if MovieList fails.
 
     if (_cachedWatched != null) {
-      return List.from(_cachedWatched!);
+      return _ensureAllContentTypes(_cachedWatched!);
     }
 
     // Final fallback to SharedPreferences.
 
-    return _fallbackService.getWatched();
+    final fallbackMovies = await _fallbackService.getWatched();
+    return _ensureAllContentTypes(fallbackMovies);
   }
 
   /// Adds a movie to the to-watch list and saves to POD.

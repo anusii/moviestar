@@ -32,6 +32,7 @@ import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 
@@ -86,6 +87,7 @@ class FavoritesService extends ChangeNotifier {
 
   FavoritesService(this._prefs) {
     _loadMovies();
+    _migrateMoviesContentType();
   }
 
   /// Loads both movie lists and custom lists and emits them to their respective streams.
@@ -97,6 +99,65 @@ class FavoritesService extends ChangeNotifier {
     _toWatchController.add(toWatch);
     _watchedController.add(watched);
     _customListsController.add(customLists);
+  }
+
+  /// Migrates existing movies to ensure they have contentType set.
+
+  Future<void> _migrateMoviesContentType() async {
+    bool needsMigration = false;
+
+    // Check and migrate To Watch list.
+
+    final toWatch = await getToWatch();
+    final migratedToWatch = toWatch.map((movie) {
+      if (movie.contentType == null) {
+        needsMigration = true;
+        return Movie(
+          id: movie.id,
+          title: movie.title,
+          overview: movie.overview,
+          posterUrl: movie.posterUrl,
+          backdropUrl: movie.backdropUrl,
+          voteAverage: movie.voteAverage,
+          releaseDate: movie.releaseDate,
+          genreIds: movie.genreIds,
+          contentType: ContentType.movie,
+        );
+      }
+      return movie;
+    }).toList();
+
+    if (needsMigration) {
+      await _saveToWatch(migratedToWatch);
+      _toWatchController.add(migratedToWatch);
+    }
+
+    // Check and migrate Watched list.
+
+    needsMigration = false;
+    final watched = await getWatched();
+    final migratedWatched = watched.map((movie) {
+      if (movie.contentType == null) {
+        needsMigration = true;
+        return Movie(
+          id: movie.id,
+          title: movie.title,
+          overview: movie.overview,
+          posterUrl: movie.posterUrl,
+          backdropUrl: movie.backdropUrl,
+          voteAverage: movie.voteAverage,
+          releaseDate: movie.releaseDate,
+          genreIds: movie.genreIds,
+          contentType: ContentType.movie,
+        );
+      }
+      return movie;
+    }).toList();
+
+    if (needsMigration) {
+      await _saveWatched(migratedWatched);
+      _watchedController.add(migratedWatched);
+    }
   }
 
   /// Retrieves the list of to-watch movies.
@@ -126,7 +187,23 @@ class FavoritesService extends ChangeNotifier {
   Future<void> addToWatch(Movie movie, {String contentType = 'movie'}) async {
     final toWatch = await getToWatch();
     if (!toWatch.any((m) => m.id == movie.id)) {
-      toWatch.add(movie);
+      // Ensure contentType is set if not already.
+
+      final movieToAdd = movie.contentType != null
+          ? movie
+          : Movie(
+              id: movie.id,
+              title: movie.title,
+              overview: movie.overview,
+              posterUrl: movie.posterUrl,
+              backdropUrl: movie.backdropUrl,
+              voteAverage: movie.voteAverage,
+              releaseDate: movie.releaseDate,
+              genreIds: movie.genreIds,
+              contentType:
+                  contentType == 'tv' ? ContentType.tvShow : ContentType.movie,
+            );
+      toWatch.add(movieToAdd);
       await _saveToWatch(toWatch);
       _toWatchController.add(toWatch);
     }
@@ -139,7 +216,23 @@ class FavoritesService extends ChangeNotifier {
   Future<void> addToWatched(Movie movie, {String contentType = 'movie'}) async {
     final watched = await getWatched();
     if (!watched.any((m) => m.id == movie.id)) {
-      watched.add(movie);
+      // Ensure contentType is set if not already.
+
+      final movieToAdd = movie.contentType != null
+          ? movie
+          : Movie(
+              id: movie.id,
+              title: movie.title,
+              overview: movie.overview,
+              posterUrl: movie.posterUrl,
+              backdropUrl: movie.backdropUrl,
+              voteAverage: movie.voteAverage,
+              releaseDate: movie.releaseDate,
+              genreIds: movie.genreIds,
+              contentType:
+                  contentType == 'tv' ? ContentType.tvShow : ContentType.movie,
+            );
+      watched.add(movieToAdd);
       await _saveWatched(watched);
       _watchedController.add(watched);
     }

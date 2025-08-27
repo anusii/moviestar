@@ -31,6 +31,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
@@ -173,9 +174,37 @@ Recipients will be able to:
                         movie.title,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
-                      subtitle: Text(
-                        '⭐ ${movie.voteAverage.toStringAsFixed(1)}',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                      subtitle: Row(
+                        children: [
+                          Text(
+                            '⭐ ${movie.voteAverage.toStringAsFixed(1)}',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          if (movie.contentType != null) ...[
+                            const Text(' • '),
+                            Text(
+                              movie.contentType == ContentType.movie
+                                  ? '🎬'
+                                  : '📺',
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            const Text(' '),
+                            Text(
+                              movie.contentType == ContentType.movie
+                                  ? 'Movie'
+                                  : 'TV Show',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.7),
+                                  ),
+                            ),
+                          ],
+                        ],
                       ),
                       trailing: IconButton(
                         icon: const Icon(

@@ -561,15 +561,18 @@ class ApiKeyService extends ChangeNotifier {
 
       final podApiKey = await _getApiKeyFromPod();
       debugPrint(
-          '🌐 POD API key: ${podApiKey != null ? "[${podApiKey.length} chars]" : "null"}',);
+        '🌐 POD API key: ${podApiKey != null ? "[${podApiKey.length} chars]" : "null"}',
+      );
 
       final localApiKey = await _getApiKeyFromLocalStorage();
       debugPrint(
-          '💻 Local API key: ${localApiKey != null ? "[${localApiKey.length} chars]" : "null"}',);
+        '💻 Local API key: ${localApiKey != null ? "[${localApiKey.length} chars]" : "null"}',
+      );
 
       final legacyApiKey = await _getLegacyApiKey();
       debugPrint(
-          '👴 Legacy API key: ${legacyApiKey != null ? "[${legacyApiKey.length} chars]" : "null"}',);
+        '👴 Legacy API key: ${legacyApiKey != null ? "[${legacyApiKey.length} chars]" : "null"}',
+      );
 
       debugPrint('🔍 === End Debug State ===');
     } catch (e) {

@@ -220,7 +220,7 @@ todo:
 license:
 	@echo "Files without a LICENSE:\n"
 	@-find lib -type f -not -name '*~' -not -name 'README*' \
-	! -exec grep -qE '^(/// .*|/// Copyright|/// Licensed)' {} \; -print | xargs printf "\t%s\n"
+	! -exec grep -qE '^(/// Copyright|/// Licensed)' {} \; -print | xargs printf "\t%s\n"
 	@echo $(SEPARATOR)
 
 .PHONY: riverpod

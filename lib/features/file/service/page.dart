@@ -45,7 +45,7 @@ class FileService extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
-        padding: EdgeInsets.all(SolidDefaultTheme.defaultPadding),
+        padding: EdgeInsets.all(SolidTheme.defaultPadding),
         child: const FileServiceWidget(),
       ),
     );

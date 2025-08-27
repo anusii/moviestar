@@ -39,25 +39,24 @@ class AppTheme {
 
   /// Default padding used throughout the application.
 
-  static double get defaultPadding => SolidDefaultTheme.defaultPadding;
+  static double get defaultPadding => SolidTheme.defaultPadding;
 
   /// Default border radius for UI elements.
 
-  static double get defaultBorderRadius =>
-      SolidDefaultTheme.defaultBorderRadius;
+  static double get defaultBorderRadius => SolidTheme.defaultBorderRadius;
 
   /// Text color for primary text.
 
-  static Color get primaryTextColor => SolidDefaultTheme.primaryTextColor;
+  static Color get primaryTextColor => SolidTheme.primaryTextColor;
 
   /// Text color for secondary text.
 
-  static Color get secondaryTextColor => SolidDefaultTheme.secondaryTextColor;
+  static Color get secondaryTextColor => SolidTheme.secondaryTextColor;
 
   /// Creates the light theme for the application.
 
   static ThemeData get lightTheme {
-    return SolidDefaultTheme.lightTheme(
+    return SolidTheme.lightTheme(
       primaryColor: primaryColor,
     );
   }
@@ -65,7 +64,7 @@ class AppTheme {
   /// Creates the dark theme for the application.
 
   static ThemeData get darkTheme {
-    return SolidDefaultTheme.darkTheme(
+    return SolidTheme.darkTheme(
       primaryColor: primaryColor,
     );
   }

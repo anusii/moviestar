@@ -43,8 +43,7 @@ class AppTheme {
 
   /// Default border radius for UI elements.
 
-  static double get defaultBorderRadius =>
-      SolidTheme.defaultBorderRadius;
+  static double get defaultBorderRadius => SolidTheme.defaultBorderRadius;
 
   /// Text color for primary text.
 

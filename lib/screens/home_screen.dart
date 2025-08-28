@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
@@ -38,11 +39,15 @@ import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
+import 'package:moviestar/screens/settings_screen.dart';
+import 'package:moviestar/services/api_key_validation_service.dart';
 import 'package:moviestar/services/cached_movie_service.dart';
 import 'package:moviestar/services/content_service.dart';
+import 'package:moviestar/services/error_mapper_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/hive_movie_cache_service.dart';
+import 'package:moviestar/services/network_connectivity_service.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 import 'package:moviestar/widgets/movie_card.dart';
@@ -75,6 +80,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   bool _hasShownInitialFeedback = false;
 
+  // Track API key error state per view to show single error message.
+
+  bool _hasApiKeyError = false;
+  String? _apiKeyErrorMessage;
+
   @override
   void initState() {
     super.initState();
@@ -102,6 +112,64 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       controller.dispose();
     }
     super.dispose();
+  }
+
+  /// Checks all movie providers for API key errors and updates state.
+
+  void _checkForApiKeyErrors(
+    AsyncValue<CacheResult<List<Movie>>> popularMovies,
+    AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,
+    AsyncValue<CacheResult<List<Movie>>> topRatedMovies,
+    AsyncValue<CacheResult<List<Movie>>> upcomingMovies,
+  ) {
+    // Check if any provider has an API key error.
+
+    bool foundApiKeyError = false;
+    String? errorMessage;
+
+    final providers = [
+      popularMovies,
+      nowPlayingMovies,
+      topRatedMovies,
+      upcomingMovies,
+    ];
+
+    for (final provider in providers) {
+      if (provider.hasError) {
+        final error = provider.error!;
+        // Check if this is an API key error.
+
+        if (_isApiKeyError(error)) {
+          foundApiKeyError = true;
+          errorMessage = error.toString();
+          break;
+        }
+      }
+    }
+
+    // Update state if API key error status changed.
+
+    if (foundApiKeyError != _hasApiKeyError) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _hasApiKeyError = foundApiKeyError;
+            _apiKeyErrorMessage = errorMessage;
+          });
+        }
+      });
+    }
+  }
+
+  /// Checks if an error is an API key related error.
+
+  bool _isApiKeyError(Object error) {
+    final errorString = error.toString().toLowerCase();
+    return errorString.contains('401') ||
+        errorString.contains('403') ||
+        errorString.contains('unauthorized') ||
+        errorString.contains('api key') ||
+        errorString.contains('forbidden');
   }
 
   // Builds the to-watch movies row using FavoritesServiceAdapter stream.
@@ -626,9 +694,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: CircularProgressIndicator(),
               ),
             ),
-            error: (error, stack) => ErrorDisplayWidget.compact(
-              message: 'Failed to load $title',
-              onRetry: () {
+            error: (error, stack) => _buildSmartErrorWidgetCompact(
+              ref,
+              error,
+              stack,
+              title,
+              () {
                 // Check if widget is still mounted before invalidating providers.
 
                 if (mounted) {
@@ -889,6 +960,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final upcomingMovies = ref.watch(upcomingMoviesWithCacheInfoProvider);
     final currentViewMode = ref.watch(viewModeProvider);
 
+    // Check for API key errors across all providers.
+
+    _checkForApiKeyErrors(
+      popularMovies,
+      nowPlayingMovies,
+      topRatedMovies,
+      upcomingMovies,
+    );
+
     // Show performance feedback after initial load.
 
     _showCachePerformanceFeedback();
@@ -914,6 +994,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     AsyncValue<CacheResult<List<Movie>>> topRatedMovies,
     AsyncValue<CacheResult<List<Movie>>> upcomingMovies,
   ) {
+    // If there's an API key error, show the error overlay instead of the normal content.
+
+    if (_hasApiKeyError) {
+      return _buildApiKeyErrorOverlay();
+    }
+
     switch (viewMode) {
       case HomeViewMode.grid:
         return _buildGridView(
@@ -1206,10 +1292,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           error: (error, stack) => Padding(
             padding: const EdgeInsets.all(16),
-            child: ErrorDisplayWidget(
-              message: 'Failed to load movies: $error',
-              onRetry: () => ref.invalidate(popularMoviesWithCacheInfoProvider),
-            ),
+            child: _buildSmartErrorWidget(ref, error, stack),
           ),
         ),
         const Gap(16),
@@ -1694,7 +1777,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   const Gap(16),
                   Expanded(
                     child: Text(
-                      'Error loading movie $movieId',
+                      'Error loading movie',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onErrorContainer,
                       ),
@@ -1784,5 +1867,245 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
     );
+  }
+
+  // Builds a smart error widget that provides user-friendly error messages and actions.
+  // Builds a prominent API key error overlay for the entire view.
+
+  Widget _buildApiKeyErrorOverlay() {
+    return FutureBuilder<UserFriendlyError>(
+      future: _createUserFriendlyError(
+        ref,
+        _apiKeyErrorMessage ?? 'API key error',
+        StackTrace.current,
+        () {
+          // Retry by refreshing all providers.
+
+          if (mounted) {
+            ref.invalidate(popularMoviesWithCacheInfoProvider);
+            ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+            ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+            ref.invalidate(upcomingMoviesWithCacheInfoProvider);
+            setState(() {
+              _hasApiKeyError = false;
+              _apiKeyErrorMessage = null;
+            });
+          }
+        },
+      ),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final userFriendlyError = snapshot.data;
+        if (userFriendlyError != null) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: ErrorDisplayWidget.fromUserFriendlyError(
+                error: userFriendlyError,
+              ),
+            ),
+          );
+        }
+
+        // Fallback to basic error display.
+
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.vpn_key_off,
+                  size: 64,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                const Gap(16),
+                Text(
+                  'API Key Required',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                ),
+                const Gap(8),
+                Text(
+                  'Configure your API key to access movie information.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                const Gap(24),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SettingsScreen(
+                          favoritesService: widget.favoritesService,
+                          apiKeyService: ref.read(apiKeyServiceProvider),
+                          fromApiKeyPrompt: true,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.vpn_key),
+                  label: const Text('Configure API Key'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSmartErrorWidget(
+    WidgetRef ref,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    return FutureBuilder<UserFriendlyError>(
+      future: _buildUserFriendlyError(ref, error, stackTrace),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        final userFriendlyError = snapshot.data;
+        if (userFriendlyError != null) {
+          return ErrorDisplayWidget.fromUserFriendlyError(
+            error: userFriendlyError,
+          );
+        }
+
+        // Fallback.
+
+        return ErrorDisplayWidget(
+          message: 'Error loading movies: $error',
+          onRetry: () => ref.invalidate(popularMoviesWithCacheInfoProvider),
+        );
+      },
+    );
+  }
+
+  // Builds a compact smart error widget for movie rows.
+
+  Widget _buildSmartErrorWidgetCompact(
+    WidgetRef ref,
+    Object error,
+    StackTrace stackTrace,
+    String title,
+    VoidCallback onRetry,
+  ) {
+    return FutureBuilder<UserFriendlyError>(
+      future: _buildUserFriendlyErrorCompact(ref, error, stackTrace, onRetry),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const ErrorDisplayWidget.compact(
+            message: 'Loading error details...',
+          );
+        }
+
+        final userFriendlyError = snapshot.data;
+        if (userFriendlyError != null) {
+          return ErrorDisplayWidget.compactFromUserFriendlyError(
+            error: userFriendlyError,
+          );
+        }
+
+        // Fallback.
+
+        return ErrorDisplayWidget.compact(
+          message: 'Failed to load $title',
+          onRetry: onRetry,
+        );
+      },
+    );
+  }
+
+  // Helper method to build user-friendly error for full widget.
+
+  Future<UserFriendlyError> _buildUserFriendlyError(
+    WidgetRef ref,
+    Object error,
+    StackTrace stackTrace,
+  ) async {
+    return _createUserFriendlyError(
+      ref,
+      error,
+      stackTrace,
+      () => ref.invalidate(popularMoviesWithCacheInfoProvider),
+    );
+  }
+
+  // Helper method to build user-friendly error for compact widget.
+
+  Future<UserFriendlyError> _buildUserFriendlyErrorCompact(
+    WidgetRef ref,
+    Object error,
+    StackTrace stackTrace,
+    VoidCallback onRetry,
+  ) async {
+    return _createUserFriendlyError(ref, error, stackTrace, onRetry);
+  }
+
+  // Creates a user-friendly error with smart detection services.
+
+  Future<UserFriendlyError> _createUserFriendlyError(
+    WidgetRef ref,
+    Object error,
+    StackTrace stackTrace,
+    VoidCallback onRetry,
+  ) async {
+    // Create services for smart detection.
+
+    final apiKeyService = ref.read(apiKeyServiceProvider);
+    final apiKeyValidationService = ApiKeyValidationService(apiKeyService);
+    final networkConnectivityService = NetworkConnectivityService.forTMDB();
+
+    // Create error context with available actions and services.
+
+    final errorContext = ErrorContext(
+      onRetry: onRetry,
+      onConfigureApiKey: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SettingsScreen(
+              favoritesService: widget.favoritesService,
+              apiKeyService: apiKeyService,
+              fromApiKeyPrompt: true,
+            ),
+          ),
+        );
+      },
+      apiKeyValidationService: apiKeyValidationService,
+      networkConnectivityService: networkConnectivityService,
+    );
+
+    try {
+      // Use smart error mapping.
+
+      return await ErrorMapperService.mapErrorSmart(
+        error,
+        stackTrace,
+        context: errorContext,
+      );
+    } catch (e) {
+      // If smart mapping fails, fall back to traditional mapping.
+
+      return ErrorMapperService.mapError(
+        error,
+        stackTrace,
+        context: errorContext,
+      );
+    }
   }
 }

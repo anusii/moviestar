@@ -28,15 +28,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
+import 'package:moviestar/screens/settings_screen.dart';
+import 'package:moviestar/services/api_key_validation_service.dart';
 import 'package:moviestar/services/cached_movie_service.dart';
 import 'package:moviestar/services/content_service.dart';
+import 'package:moviestar/services/error_mapper_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/services/network_connectivity_service.dart';
+import 'package:moviestar/widgets/error_display_widget.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
 /// Enum for different column types in the kanban board.
@@ -1574,6 +1580,97 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
+  // Builds a smart error widget that provides user-friendly error messages and actions.
+
+  Widget _buildSmartErrorWidget(Object error, StackTrace stackTrace) {
+    return FutureBuilder<UserFriendlyError>(
+      future: _buildUserFriendlyError(error, stackTrace),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // While processing, show a simple loading indicator.
+
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        final userFriendlyError = snapshot.data;
+        if (userFriendlyError != null) {
+          return ErrorDisplayWidget.fromUserFriendlyError(
+            error: userFriendlyError,
+          );
+        }
+
+        // Fallback to basic error display if something went wrong.
+
+        return ErrorDisplayWidget(
+          message: 'Error loading movies: $error',
+          onRetry: () => ref.invalidate(popularMoviesWithCacheInfoProvider),
+        );
+      },
+    );
+  }
+
+  // Builds a user-friendly error with smart detection.
+
+  Future<UserFriendlyError> _buildUserFriendlyError(
+    Object error,
+    StackTrace stackTrace,
+  ) async {
+    // Create services for smart detection.
+
+    final apiKeyService = ref.read(apiKeyServiceProvider);
+    final apiKeyValidationService = ApiKeyValidationService(apiKeyService);
+    final networkConnectivityService = NetworkConnectivityService.forTMDB();
+
+    // Create error context with available actions and services.
+
+    final errorContext = ErrorContext(
+      onRetry: () {
+        // Refresh the provider to retry loading.
+
+        ref.invalidate(popularMoviesWithCacheInfoProvider);
+      },
+      onConfigureApiKey: () {
+        // Navigate to settings screen for API key configuration.
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SettingsScreen(
+              favoritesService: widget.favoritesService,
+              apiKeyService: apiKeyService,
+              fromApiKeyPrompt: true,
+            ),
+          ),
+        );
+      },
+      apiKeyValidationService: apiKeyValidationService,
+      networkConnectivityService: networkConnectivityService,
+    );
+
+    try {
+      // Use smart error mapping.
+
+      return await ErrorMapperService.mapErrorSmart(
+        error,
+        stackTrace,
+        context: errorContext,
+      );
+    } catch (e) {
+      // If smart mapping fails, fall back to traditional mapping.
+
+      return ErrorMapperService.mapError(
+        error,
+        stackTrace,
+        context: errorContext,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer(
@@ -1672,12 +1769,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           loading: () => const Center(
             child: CircularProgressIndicator(),
           ),
-          error: (error, stack) => Center(
-            child: Text(
-              'Error loading movies: $error',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ),
+          error: (error, stack) => _buildSmartErrorWidget(error, stack),
         );
       },
     );

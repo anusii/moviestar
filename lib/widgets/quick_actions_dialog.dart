@@ -359,15 +359,56 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title.
-                    Text(
-                      widget.movie.title,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                    // Title with content type indicator.
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            widget.movie.title,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const Gap(8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                widget.movie.contentType == ContentType.tvShow
+                                    ? Colors.blue.withValues(alpha: 0.2)
+                                    : Colors.green.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color:
+                                  widget.movie.contentType == ContentType.tvShow
+                                      ? Colors.blue
+                                      : Colors.green,
+                              width: 1,
+                            ),
+                          ),
+                          child: Text(
+                            widget.movie.contentType == ContentType.tvShow
+                                ? '📺 TV Show'
+                                : '🎬 Movie',
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      color: widget.movie.contentType ==
+                                              ContentType.tvShow
+                                          ? Colors.blue
+                                          : Colors.green,
+                                    ),
+                          ),
+                        ),
+                      ],
                     ),
                     const Gap(12),
 

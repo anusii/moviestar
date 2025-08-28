@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang
+/// Authors: Kevin Wang, Tony Chen
 
 library;
 
@@ -554,506 +554,295 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
 
   @override
   Widget build(BuildContext context) {
-    if (widget.fromApiKeyPrompt) {
-      return Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.of(context).pop(),
-                    tooltip: 'Back',
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'API Configuration',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                children: [
-                  _buildApiConfigurationSection(),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+    return ListView(
+      children: [
+        const Gap(20),
 
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: ListView(
-        children: [
-          const Gap(20),
+        // Profile Picture.
 
-          // Profile Picture.
-
-          Center(
-            child: Stack(
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
+        Center(
+          child: Stack(
+            children: [
+              CircleAvatar(
+                radius: 50,
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                child: Icon(
+                  Icons.person,
+                  size: 50,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
                   child: Icon(
-                    Icons.person,
-                    size: 50,
-                    color: Theme.of(context).colorScheme.onSecondary,
+                    Icons.edit,
+                    size: 20,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
                 ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.edit,
-                      size: 20,
-                      color: Theme.of(context).textTheme.bodyLarge?.color,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-          const Gap(20),
+        ),
+        const Gap(20),
 
-          // Settings Sections.
-          _buildSection('API Configuration', [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'MovieDB API Key',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  const Gap(4),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Required to fetch movie data and images',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyMedium?.copyWith(fontSize: 12),
-                        ),
-                      ),
-                      if (widget.fromApiKeyPrompt)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.red.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text(
-                            'Required',
-                            style: TextStyle(color: Colors.red, fontSize: 12),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const Gap(8),
-                  SizedBox(
-                    width: 420,
-                    child: TextField(
-                      controller: _apiKeyController,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                      focusNode: _apiKeyFocusNode,
-                      decoration: InputDecoration(
-                        hintText: 'Enter your MovieDB API key',
-                        hintStyle:
-                            Theme.of(context).inputDecorationTheme.hintStyle,
-                        filled: true,
-                        fillColor:
-                            Theme.of(context).inputDecorationTheme.fillColor,
-                        border: Theme.of(context).inputDecorationTheme.border,
-                        enabledBorder: Theme.of(
-                          context,
-                        ).inputDecorationTheme.enabledBorder,
-                        focusedBorder: Theme.of(
-                          context,
-                        ).inputDecorationTheme.focusedBorder,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isApiKeyVisible
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Theme.of(context).iconTheme.color,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isApiKeyVisible = !_isApiKeyVisible;
-                            });
-                          },
-                          tooltip: _isApiKeyVisible
-                              ? 'Hide API key'
-                              : 'Show API key',
-                        ),
-                      ),
-                      obscureText: !_isApiKeyVisible,
-                    ),
-                  ),
-                  const Gap(8),
-                  GestureDetector(
-                    onTap: () {
-                      // Launch TMDB website to get API key.
-
-                      final Uri url = Uri.parse(
-                        'https://www.themoviedb.org/?language=en-AU',
-                      );
-                      _launchUrl(url);
-                    },
-                    child: const Text(
-                      'Get your API key from The Movie Database (TMDB)',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                  const Gap(16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await widget.apiKeyService.setApiKey(
-                        _apiKeyController.text,
-                      );
-
-                      if (!context.mounted) return;
-
-                      if (mounted) {
-                        // Invalidate all movie providers to force refresh with new API key.
-
-                        ref.invalidate(popularMoviesWithCacheInfoProvider);
-                        ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
-                        ref.invalidate(topRatedMoviesWithCacheInfoProvider);
-                        ref.invalidate(upcomingMoviesWithCacheInfoProvider);
-                        ref.invalidate(movieServiceProvider);
-                        ref.invalidate(contentServiceProvider);
-
-                        // Show success message.
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('API key saved successfully'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                        // If we navigated here from the API key prompt, navigate back to home.
-
-                        if (widget.fromApiKeyPrompt) {
-                          _navigateToHomeScreen();
-                        }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                    child: const Text('Save API Key'),
-                  ),
-                ],
-              ),
-            ),
-          ]),
-          _buildSection('Data Storage', [
-            _buildSwitchTile(
-              'Use Solid POD Storage',
-              'Store movie lists in your Solid POD instead of locally',
-              _podStorageEnabled,
-              (value) async {
-                if (value) {
-                  await _enablePodStorage();
-                } else {
-                  await _disablePodStorage();
-                }
-              },
-            ),
-          ]),
-          _buildSection('Appearance', [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Theme',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          const Gap(4),
-                          Text(
-                            'Switch between light and dark mode',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                      AnimatedBuilder(
-                        animation: solidThemeNotifier,
-                        builder: (context, _) {
-                          final themeMode = solidThemeNotifier.themeMode;
-                          return Icon(
-                            themeMode == ThemeMode.dark
-                                ? Icons.dark_mode
-                                : themeMode == ThemeMode.light
-                                    ? Icons.light_mode
-                                    : Icons.computer,
-                            color: Theme.of(context).colorScheme.primary,
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ]),
-          _buildSection('Preferences', [
-            _buildSwitchTile(
-              'Notifications',
-              'Get notified about new releases',
-              _notificationsEnabled,
-              (value) => setState(() => _notificationsEnabled = value),
-            ),
-            _buildSwitchTile(
-              'Auto-play',
-              'Play next episode automatically',
-              _autoPlayEnabled,
-              (value) => setState(() => _autoPlayEnabled = value),
-            ),
-          ]),
-          _buildCacheSection(),
-          _buildSection('Playback', [
-            _buildDropdownTile(
-              'Language',
-              _selectedLanguage,
-              ['English', 'Spanish', 'French', 'German'],
-              (value) => setState(() => _selectedLanguage = value!),
-            ),
-            _buildDropdownTile(
-              'Video Quality',
-              _selectedQuality,
-              ['Low', 'Medium', 'High', 'Auto'],
-              (value) => setState(() => _selectedQuality = value!),
-            ),
-          ]),
-          _buildSection('Account', [
-            _buildListTile('Help & Support', Icons.help_outline, () {
-              // TODO: Navigate to Help & Support.
-            }),
-            _buildListTile(
-              'Sign Out',
-              Icons.logout,
-              () async {
-                // Show logout confirmation dialog and handle logout.
-
-                final prefs = ref.read(sharedPreferencesProvider);
-
-                // Create a properly configured SolidLogin widget using the same function
-                // that creates the initial login screen to maintain consistent branding.
-
-                final solidLoginWidget = createSolidLogin(context, prefs);
-
-                await logoutPopup(context, solidLoginWidget);
-              },
-              isDestructive: true,
-            ),
-          ]),
-        ],
-      ),
-    );
-  }
-
-  /// Builds the API configuration section for focused API key entry.
-
-  Widget _buildApiConfigurationSection() {
-    return Card(
-      margin: const EdgeInsets.all(16.0),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+        // Settings Sections.
+        _buildSection('API Configuration', [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.vpn_key,
-                  size: 24,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(width: 12),
                 Text(
-                  'MovieDB API Key Required',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
+                  'MovieDB API Key',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                const Gap(4),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Required to fetch movie data and images',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(fontSize: 12),
                       ),
+                    ),
+                    if (widget.fromApiKeyPrompt)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'Required',
+                          style: TextStyle(color: Colors.red, fontSize: 12),
+                        ),
+                      ),
+                  ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'To display movie information and images, you need to provide a free API key from The Movie Database (TMDB).',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 20),
-
-            // API Key Input Section.
-
-            Text(
-              'API Key',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
+                const Gap(8),
+                SizedBox(
+                  width: 420,
+                  child: TextField(
+                    controller: _apiKeyController,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    focusNode: _apiKeyFocusNode,
+                    decoration: InputDecoration(
+                      hintText: 'Enter your MovieDB API key',
+                      hintStyle:
+                          Theme.of(context).inputDecorationTheme.hintStyle,
+                      filled: true,
+                      fillColor:
+                          Theme.of(context).inputDecorationTheme.fillColor,
+                      border: Theme.of(context).inputDecorationTheme.border,
+                      enabledBorder: Theme.of(
+                        context,
+                      ).inputDecorationTheme.enabledBorder,
+                      focusedBorder: Theme.of(
+                        context,
+                      ).inputDecorationTheme.focusedBorder,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isApiKeyVisible
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isApiKeyVisible = !_isApiKeyVisible;
+                          });
+                        },
+                        tooltip:
+                            _isApiKeyVisible ? 'Hide API key' : 'Show API key',
+                      ),
+                    ),
+                    obscureText: !_isApiKeyVisible,
                   ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _apiKeyController,
-              style: Theme.of(context).textTheme.bodyLarge,
-              focusNode: _apiKeyFocusNode,
-              decoration: InputDecoration(
-                hintText: 'Enter your MovieDB API key',
-                hintStyle: Theme.of(context).inputDecorationTheme.hintStyle,
-                filled: true,
-                fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                border: Theme.of(context).inputDecorationTheme.border,
-                enabledBorder:
-                    Theme.of(context).inputDecorationTheme.enabledBorder,
-                focusedBorder:
-                    Theme.of(context).inputDecorationTheme.focusedBorder,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _isApiKeyVisible ? Icons.visibility_off : Icons.visibility,
-                    color: Theme.of(context).iconTheme.color,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isApiKeyVisible = !_isApiKeyVisible;
-                    });
+                ),
+                const Gap(8),
+                GestureDetector(
+                  onTap: () {
+                    // Launch TMDB website to get API key.
+
+                    final Uri url = Uri.parse(
+                      'https://www.themoviedb.org/?language=en-AU',
+                    );
+                    _launchUrl(url);
                   },
-                  tooltip: _isApiKeyVisible ? 'Hide API key' : 'Show API key',
+                  child: const Text(
+                    'Get your API key from The Movie Database (TMDB)',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
                 ),
-              ),
-              obscureText: !_isApiKeyVisible,
-            ),
-            const SizedBox(height: 12),
-
-            // Get API Key Link.
-
-            InkWell(
-              onTap: () {
-                final Uri url = Uri.parse(
-                  'https://www.themoviedb.org/settings/api',
-                );
-                _launchUrl(url);
-              },
-              child: Text(
-                'Get your free API key from The Movie Database →',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  decoration: TextDecoration.underline,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Action Buttons.
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel'),
-                ),
-                const SizedBox(width: 12),
+                const Gap(16),
                 ElevatedButton(
                   onPressed: () async {
-                    if (_apiKeyController.text.trim().isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Please enter an API key'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                      return;
-                    }
-
-                    await widget.apiKeyService
-                        .setApiKey(_apiKeyController.text.trim());
-
-                    if (!context.mounted) return;
-                    final currentContext = context;
-
-                    // Invalidate all movie providers to force refresh with
-                    // new API key.
-
-                    ref.invalidate(popularMoviesWithCacheInfoProvider);
-                    ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
-                    ref.invalidate(topRatedMoviesWithCacheInfoProvider);
-                    ref.invalidate(upcomingMoviesWithCacheInfoProvider);
-                    ref.invalidate(movieServiceProvider);
-                    ref.invalidate(contentServiceProvider);
-
-                    // Show success message.
-
-                    ScaffoldMessenger.of(currentContext).showSnackBar(
-                      const SnackBar(
-                        content: Text('API key saved successfully'),
-                        backgroundColor: Colors.green,
-                      ),
+                    await widget.apiKeyService.setApiKey(
+                      _apiKeyController.text,
                     );
 
-                    // Navigate back and refresh the previous screen.
+                    if (!context.mounted) return;
 
-                    Navigator.of(currentContext).pop();
+                    if (mounted) {
+                      // Invalidate all movie providers to force refresh with new API key.
+
+                      ref.invalidate(popularMoviesWithCacheInfoProvider);
+                      ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+                      ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+                      ref.invalidate(upcomingMoviesWithCacheInfoProvider);
+                      ref.invalidate(movieServiceProvider);
+                      ref.invalidate(contentServiceProvider);
+
+                      // Show success message.
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('API key saved successfully'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                      // If we navigated here from the API key prompt, navigate back to home.
+
+                      if (widget.fromApiKeyPrompt) {
+                        _navigateToHomeScreen();
+                      }
+                    }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    backgroundColor: Colors.red,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
                   ),
                   child: const Text('Save API Key'),
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
+        ]),
+        _buildSection('Data Storage', [
+          _buildSwitchTile(
+            'Use Solid POD Storage',
+            'Store movie lists in your Solid POD instead of locally',
+            _podStorageEnabled,
+            (value) async {
+              if (value) {
+                await _enablePodStorage();
+              } else {
+                await _disablePodStorage();
+              }
+            },
+          ),
+        ]),
+        _buildSection('Appearance', [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Theme',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const Gap(4),
+                        Text(
+                          'Switch between light and dark mode',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                    AnimatedBuilder(
+                      animation: solidThemeNotifier,
+                      builder: (context, _) {
+                        final themeMode = solidThemeNotifier.themeMode;
+                        return Icon(
+                          themeMode == ThemeMode.dark
+                              ? Icons.dark_mode
+                              : themeMode == ThemeMode.light
+                                  ? Icons.light_mode
+                                  : Icons.computer,
+                          color: Theme.of(context).colorScheme.primary,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ]),
+        _buildSection('Preferences', [
+          _buildSwitchTile(
+            'Notifications',
+            'Get notified about new releases',
+            _notificationsEnabled,
+            (value) => setState(() => _notificationsEnabled = value),
+          ),
+          _buildSwitchTile(
+            'Auto-play',
+            'Play next episode automatically',
+            _autoPlayEnabled,
+            (value) => setState(() => _autoPlayEnabled = value),
+          ),
+        ]),
+        _buildCacheSection(),
+        _buildSection('Playback', [
+          _buildDropdownTile(
+            'Language',
+            _selectedLanguage,
+            ['English', 'Spanish', 'French', 'German'],
+            (value) => setState(() => _selectedLanguage = value!),
+          ),
+          _buildDropdownTile(
+            'Video Quality',
+            _selectedQuality,
+            ['Low', 'Medium', 'High', 'Auto'],
+            (value) => setState(() => _selectedQuality = value!),
+          ),
+        ]),
+        _buildSection('Account', [
+          _buildListTile('Help & Support', Icons.help_outline, () {
+            // TODO: Navigate to Help & Support.
+          }),
+          _buildListTile(
+            'Sign Out',
+            Icons.logout,
+            () async {
+              // Show logout confirmation dialog and handle logout.
+
+              final prefs = ref.read(sharedPreferencesProvider);
+
+              // Create a properly configured SolidLogin widget using the same function
+              // that creates the initial login screen to maintain consistent branding.
+
+              final solidLoginWidget = createSolidLogin(context, prefs);
+
+              await logoutPopup(context, solidLoginWidget);
+            },
+            isDestructive: true,
+          ),
+        ]),
+      ],
     );
   }
 

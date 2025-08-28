@@ -34,12 +34,12 @@ import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/my_home_page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/services/api_key_validation_service.dart';
 import 'package:moviestar/services/cached_movie_service.dart';
 import 'package:moviestar/services/content_service.dart';
@@ -1939,16 +1939,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const Gap(24),
                 ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SettingsScreen(
-                          favoritesService: widget.favoritesService,
-                          apiKeyService: ref.read(apiKeyServiceProvider),
-                          fromApiKeyPrompt: true,
-                        ),
-                      ),
-                    );
+                    // Navigate to Settings tab in the main SolidScaffold instead of creating a new page
+                    navigateToSettings();
                   },
                   icon: const Icon(Icons.vpn_key),
                   label: const Text('Configure API Key'),
@@ -2075,16 +2067,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final errorContext = ErrorContext(
       onRetry: onRetry,
       onConfigureApiKey: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SettingsScreen(
-              favoritesService: widget.favoritesService,
-              apiKeyService: apiKeyService,
-              fromApiKeyPrompt: true,
-            ),
-          ),
-        );
+        // Navigate to Settings tab in the main SolidScaffold instead of
+        // creating a new page.
+
+        navigateToSettings();
       },
       apiKeyValidationService: apiKeyValidationService,
       networkConnectivityService: networkConnectivityService,

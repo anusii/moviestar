@@ -1,4 +1,6 @@
 PODS:
+  - connectivity_plus (0.0.1):
+    - FlutterMacOS
   - fast_rsa (0.6.0):
     - FlutterMacOS
   - file_picker (0.0.1):
@@ -26,6 +28,7 @@ PODS:
     - FlutterMacOS
 
 DEPENDENCIES:
+  - connectivity_plus (from `Flutter/ephemeral/.symlinks/plugins/connectivity_plus/macos`)
   - fast_rsa (from `Flutter/ephemeral/.symlinks/plugins/fast_rsa/macos`)
   - file_picker (from `Flutter/ephemeral/.symlinks/plugins/file_picker/macos`)
   - flutter_secure_storage_darwin (from `Flutter/ephemeral/.symlinks/plugins/flutter_secure_storage_darwin/darwin`)
@@ -39,6 +42,8 @@ DEPENDENCIES:
   - window_manager (from `Flutter/ephemeral/.symlinks/plugins/window_manager/macos`)
 
 EXTERNAL SOURCES:
+  connectivity_plus:
+    :path: Flutter/ephemeral/.symlinks/plugins/connectivity_plus/macos
   fast_rsa:
     :path: Flutter/ephemeral/.symlinks/plugins/fast_rsa/macos
   file_picker:
@@ -63,6 +68,7 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/window_manager/macos
 
 SPEC CHECKSUMS:
+  connectivity_plus: 0a976dfd033b59192912fa3c6c7b54aab5093802
   fast_rsa: 47a50bec1042c8c01726007dc0590a078418f997
   file_picker: e716a70a9fe5fd9e09ebc922d7541464289443af
   flutter_secure_storage_darwin: 12d2375c690785d97a4e586f15f11be5ae35d5b0

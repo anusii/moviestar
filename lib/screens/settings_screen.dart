@@ -554,24 +554,61 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: widget.fromApiKeyPrompt
-          ? AppBar(
-              title: const Text('Settings'),
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => Navigator.of(context).pop(),
+    if (widget.fromApiKeyPrompt) {
+      return Container(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
               ),
-            )
-          : null,
-      body: ListView(
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => Navigator.of(context).pop(),
+                    tooltip: 'Back',
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'API Configuration',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                children: [
+                  _buildApiConfigurationSection(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: ListView(
         children: [
           const Gap(20),
 
           // Profile Picture.
+
           Center(
             child: Stack(
               children: [
@@ -856,6 +893,166 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
             ),
           ]),
         ],
+      ),
+    );
+  }
+
+  /// Builds the API configuration section for focused API key entry.
+
+  Widget _buildApiConfigurationSection() {
+    return Card(
+      margin: const EdgeInsets.all(16.0),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.vpn_key,
+                  size: 24,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'MovieDB API Key Required',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'To display movie information and images, you need to provide a free API key from The Movie Database (TMDB).',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 20),
+
+            // API Key Input Section.
+
+            Text(
+              'API Key',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _apiKeyController,
+              style: Theme.of(context).textTheme.bodyLarge,
+              focusNode: _apiKeyFocusNode,
+              decoration: InputDecoration(
+                hintText: 'Enter your MovieDB API key',
+                hintStyle: Theme.of(context).inputDecorationTheme.hintStyle,
+                filled: true,
+                fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                border: Theme.of(context).inputDecorationTheme.border,
+                enabledBorder:
+                    Theme.of(context).inputDecorationTheme.enabledBorder,
+                focusedBorder:
+                    Theme.of(context).inputDecorationTheme.focusedBorder,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isApiKeyVisible ? Icons.visibility_off : Icons.visibility,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isApiKeyVisible = !_isApiKeyVisible;
+                    });
+                  },
+                  tooltip: _isApiKeyVisible ? 'Hide API key' : 'Show API key',
+                ),
+              ),
+              obscureText: !_isApiKeyVisible,
+            ),
+            const SizedBox(height: 12),
+
+            // Get API Key Link.
+
+            InkWell(
+              onTap: () {
+                final Uri url = Uri.parse(
+                  'https://www.themoviedb.org/settings/api',
+                );
+                _launchUrl(url);
+              },
+              child: Text(
+                'Get your free API key from The Movie Database →',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  decoration: TextDecoration.underline,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Action Buttons.
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (_apiKeyController.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please enter an API key'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
+                    await widget.apiKeyService
+                        .setApiKey(_apiKeyController.text.trim());
+
+                    if (!context.mounted) return;
+                    final currentContext = context;
+
+                    // Invalidate all movie providers to force refresh with
+                    // new API key.
+
+                    ref.invalidate(popularMoviesWithCacheInfoProvider);
+                    ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+                    ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+                    ref.invalidate(upcomingMoviesWithCacheInfoProvider);
+                    ref.invalidate(movieServiceProvider);
+                    ref.invalidate(contentServiceProvider);
+
+                    // Show success message.
+
+                    ScaffoldMessenger.of(currentContext).showSnackBar(
+                      const SnackBar(
+                        content: Text('API key saved successfully'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+
+                    // Navigate back and refresh the previous screen.
+
+                    Navigator.of(currentContext).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                  ),
+                  child: const Text('Save API Key'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -340,7 +340,9 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                       ),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 12),
+                          horizontal: 8,
+                          vertical: 12,
+                        ),
                         minimumSize: const Size(0, 48),
                       ),
                     )
@@ -357,7 +359,9 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                       ),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 12),
+                          horizontal: 8,
+                          vertical: 12,
+                        ),
                         minimumSize: const Size(0, 48),
                       ),
                     ),
@@ -378,7 +382,9 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                       ),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 12),
+                          horizontal: 8,
+                          vertical: 12,
+                        ),
                         minimumSize: const Size(0, 48),
                       ),
                     )
@@ -395,7 +401,9 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                       ),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 12),
+                          horizontal: 8,
+                          vertical: 12,
+                        ),
                         minimumSize: const Size(0, 48),
                       ),
                     ),

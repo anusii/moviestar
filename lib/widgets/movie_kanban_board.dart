@@ -1617,7 +1617,9 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   // Builds a user-friendly error with smart detection.
 
   Future<UserFriendlyError> _buildUserFriendlyError(
-      Object error, StackTrace stackTrace) async {
+    Object error,
+    StackTrace stackTrace,
+  ) async {
     // Create services for smart detection.
 
     final apiKeyService = ref.read(apiKeyServiceProvider);

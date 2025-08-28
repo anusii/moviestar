@@ -131,7 +131,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       popularMovies,
       nowPlayingMovies,
       topRatedMovies,
-      upcomingMovies
+      upcomingMovies,
     ];
 
     for (final provider in providers) {
@@ -963,7 +963,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // Check for API key errors across all providers.
 
     _checkForApiKeyErrors(
-        popularMovies, nowPlayingMovies, topRatedMovies, upcomingMovies);
+      popularMovies,
+      nowPlayingMovies,
+      topRatedMovies,
+      upcomingMovies,
+    );
 
     // Show performance feedback after initial load.
 
@@ -1958,7 +1962,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildSmartErrorWidget(
-      WidgetRef ref, Object error, StackTrace stackTrace) {
+    WidgetRef ref,
+    Object error,
+    StackTrace stackTrace,
+  ) {
     return FutureBuilder<UserFriendlyError>(
       future: _buildUserFriendlyError(ref, error, stackTrace),
       builder: (context, snapshot) {

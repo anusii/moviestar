@@ -126,7 +126,8 @@ class NetworkConnectivityService {
       return hasInternet
           ? NetworkConnectivityResult.connected(responseTime: stopwatch.elapsed)
           : NetworkConnectivityResult.disconnected(
-              responseTime: stopwatch.elapsed);
+              responseTime: stopwatch.elapsed,
+            );
     } catch (e) {
       if (e.toString().contains('timeout')) {
         return NetworkConnectivityResult.error(

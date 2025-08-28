@@ -115,7 +115,11 @@ class ErrorMapperService {
         if (connectivityResult.isNetworkProblem) {
           // Definitive network problem
           return _createNetworkError(
-              error, stackTrace, context, connectivityResult);
+            error,
+            stackTrace,
+            context,
+            connectivityResult,
+          );
         } else if (connectivityResult.isInconclusive) {
           // Network check failed, might still be network issue
           return _mapPossibleNetworkError(error, stackTrace, context);

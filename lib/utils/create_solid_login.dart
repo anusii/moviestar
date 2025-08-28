@@ -28,15 +28,10 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gap/gap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/my_home_page.dart';
-import 'package:moviestar/screens/settings_screen.dart';
-import 'package:moviestar/services/api_key_service.dart';
-import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/utils/is_logged_in.dart';
 
 /// Creates a Solid login widget for authentication.
 ///
@@ -121,16 +116,14 @@ class ApiKeyCheckWrapper extends StatefulWidget {
 }
 
 class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
-  late final ApiKeyService _apiKeyService;
   bool _hasCheckedApiKey = false;
   // Add static flag to prevent showing dialog multiple times in the same session.
 
-  static bool _hasShownApiKeyDialogThisSession = false;
+  static final bool _hasShownApiKeyDialogThisSession = false;
 
   @override
   void initState() {
     super.initState();
-    _apiKeyService = ApiKeyService();
 
     // Delay the check to ensure the widget is fully built AND POD is authenticated
     // Wait a bit longer to allow POD authentication and API key fetching to complete

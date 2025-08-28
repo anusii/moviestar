@@ -556,6 +556,17 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: widget.fromApiKeyPrompt
+          ? AppBar(
+              title: const Text('Settings'),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            )
+          : null,
       body: ListView(
         children: [
           const Gap(20),

@@ -28,15 +28,10 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gap/gap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/my_home_page.dart';
-import 'package:moviestar/screens/settings_screen.dart';
-import 'package:moviestar/services/api_key_service.dart';
-import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/utils/is_logged_in.dart';
 
 /// Creates a Solid login widget for authentication.
 ///
@@ -121,16 +116,14 @@ class ApiKeyCheckWrapper extends StatefulWidget {
 }
 
 class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
-  late final ApiKeyService _apiKeyService;
   bool _hasCheckedApiKey = false;
   // Add static flag to prevent showing dialog multiple times in the same session.
 
-  static bool _hasShownApiKeyDialogThisSession = false;
+  static final bool _hasShownApiKeyDialogThisSession = false;
 
   @override
   void initState() {
     super.initState();
-    _apiKeyService = ApiKeyService();
 
     // Delay the check to ensure the widget is fully built AND POD is authenticated
     // Wait a bit longer to allow POD authentication and API key fetching to complete
@@ -148,99 +141,10 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
 
     _hasCheckedApiKey = true;
 
-    // Only check for API key if user is logged in (required for POD access).
+    // Skip API key check dialog since the new smart error handling covers API key issues.
+    // The app will show proper API key error messages when users try to fetch movie data.
 
-    final loggedIn = await isLoggedIn();
-    if (!loggedIn) return; // Don't show dialog if not logged in.
-
-    // Set context for POD operations
-    if (mounted) {
-      _apiKeyService.updateContext(context, widget);
-    } else {
-      return;
-    }
-
-    final apiKey = await _apiKeyService.getApiKey();
-
-    if (mounted && (apiKey == null || apiKey.isEmpty)) {
-      _hasShownApiKeyDialogThisSession = true;
-      // Show dialog asking user to set up API key.
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          backgroundColor: Theme.of(context).cardTheme.color,
-          title: Text(
-            'API Key Required',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'To use MovieStar, you need to set up a MovieDB API key.',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              const Gap(12),
-              Text(
-                'You can get your free API key from The Movie Database (TMDB) website.',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(fontSize: 13),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
-              ),
-              child: const Text('Later'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Navigate to settings screen
-                _navigateToSettings();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              ),
-              child: const Text('Set Up Now'),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
-  void _navigateToSettings() {
-    // We can't directly access _MyHomePageState as it's private.
-    // Instead, navigate to a new SettingsScreen.
-
-    final navigator = Navigator.of(context);
-    // Get API key service to pass to settings screen.
-
-    final apiKeyService = ApiKeyService();
-    // Use a delay to ensure the dialog is fully closed.
-
-    Future.delayed(const Duration(milliseconds: 100), () {
-      navigator.push(
-        MaterialPageRoute(
-          builder: (context) => SettingsScreen(
-            favoritesService: FavoritesService(widget.prefs),
-            apiKeyService: apiKeyService,
-            fromApiKeyPrompt: true,
-          ),
-        ),
-      );
-    });
+    return;
   }
 
   @override

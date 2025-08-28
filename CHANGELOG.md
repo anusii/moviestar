@@ -25,6 +25,9 @@ au](https://solidcommunity.au/docs/moviestar)
 
 ## 0.1 First stable release
 
++ Catch different errors with popups [0.0.22 20250828 atangster]
++ Add Move/TV Show indicator to images [0.0.21 20250828 atangster]
++ Add dark/light mode button [0.0.20 20250828 tonypioneer]
 + Option to store movie database API in POD [0.0.19 20250827 atangster]
 + Drag/drop improvement. Back button visibility [0.0.18 20250826 atangster]
 + Bug fixes for tv shows [0.0.17 20250826 atangster]

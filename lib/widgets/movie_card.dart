@@ -32,6 +32,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/widgets/quick_actions_dialog.dart';
@@ -229,6 +230,8 @@ class _MovieCardState extends State<MovieCard> {
                 _buildCacheIndicator(context),
                 if (widget.cacheOnlyMode == true)
                   _buildOfflineModeIndicator(context),
+                if (widget.movie.contentType != null)
+                  _buildContentTypeIndicator(context),
               ],
             ),
           ),
@@ -283,9 +286,30 @@ class _MovieCardState extends State<MovieCard> {
               children: [
                 Expanded(
                   child: widget.customSubtitle ??
-                      Text(
-                        '⭐ ${widget.movie.voteAverage.toStringAsFixed(1)}',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                      Row(
+                        children: [
+                          Text(
+                            '⭐ ${widget.movie.voteAverage.toStringAsFixed(1)}',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          if (widget.movie.contentType != null) ...[
+                            const Text(' • '),
+                            Text(
+                              widget.movie.contentType == ContentType.movie
+                                  ? '🎬 Movie'
+                                  : '📺 TV Show',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.7),
+                                  ),
+                            ),
+                          ],
+                        ],
                       ),
                 ),
                 if (widget.fromCache == true && widget.cacheAge != null)
@@ -449,6 +473,48 @@ class _MovieCardState extends State<MovieCard> {
                 color: Colors.white,
                 fontSize: 8,
                 fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds content type indicator for poster style.
+
+  Widget _buildContentTypeIndicator(BuildContext context) {
+    if (widget.movie.contentType == null) return const SizedBox.shrink();
+
+    final isMovie = widget.movie.contentType == ContentType.movie;
+    final label = isMovie ? 'Movie' : 'TV Show';
+    final icon = isMovie ? '🎬' : '📺';
+
+    return Positioned(
+      bottom: 4,
+      left: 4,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+            width: 0.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 10)),
+            const Gap(2),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ],

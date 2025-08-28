@@ -42,7 +42,7 @@ dependencies:
   solidui:
     git:
       url: https://github.com/anusii/solidui.git
-      ref: tony/9_theme_mode
+      ref: dev
   universal_io: ^2.2.2
   url_launcher: ^6.3.1
   window_manager: ^0.5.0

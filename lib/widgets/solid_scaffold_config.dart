@@ -29,12 +29,13 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solidui/solidui.dart';
+
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
+import 'package:moviestar/screens/files_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/my_lists_screen.dart';
 import 'package:moviestar/screens/my_movies_screen.dart';
-import 'package:moviestar/screens/files_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/screens/shared_movies_screen.dart';
 import 'package:moviestar/screens/to_watch_screen.dart';

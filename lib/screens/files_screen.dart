@@ -53,7 +53,7 @@ class FilesScreen extends StatelessWidget {
                 ),
               );
             }
-            
+
             return const Padding(
               padding: EdgeInsets.all(16.0),
               child: SolidFile(

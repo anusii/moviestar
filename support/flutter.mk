@@ -198,6 +198,24 @@ LINES ?= 300
 
 .PHONY: locmax
 locmax:
+	@-output=$$(find lib -name "*.dart" -exec sh -c ' \
+		lines=$$(grep -v "^\s*$$" "$$1" | grep -v "^\s*//" | sed "/\/\*/,/\*\//d" | wc -l); \
+		if [ $$lines -gt $(LINES) ]; then \
+			printf "%4d %s\n" $$lines "$$1"; \
+		fi \
+	' _ {} \; | sort -nr); \
+	if [ -n "$$output" ]; then \
+		echo "$$output"; \
+		echo "Error: Files with more than $(LINES) lines found"; \
+		exit 1; \
+	else \
+		echo "All files are under $(LINES) lines"; \
+	fi
+
+# Check and fail if any files exceed limit
+
+PHONY: locmax-enforce
+locmax-enforce:
 	@output=$$(find lib -name "*.dart" -exec sh -c ' \
 		lines=$$(grep -v "^\s*$$" "$$1" | grep -v "^\s*//" | sed "/\/\*/,/\*\//d" | wc -l); \
 		if [ $$lines -gt $(LINES) ]; then \
@@ -211,6 +229,7 @@ locmax:
 	else \
 		echo "All files are under $(LINES) lines"; \
 	fi
+
 
 # dart pub global activate dependency_validator
 

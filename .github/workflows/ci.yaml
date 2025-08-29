@@ -63,6 +63,16 @@ jobs:
       - run: markdownlint --disable MD036 -- *.md lib assets installers
         # -p .markdownlintignore -c .markdownlint.yaml
 
+  locmax:
+    runs-on: ubuntu-latest
+    if: github.event.repository.private == false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: make locmax-enforce
+
   copyright:
     runs-on: ubuntu-latest
     if: github.event.repository.private == false

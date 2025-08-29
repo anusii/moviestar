@@ -126,7 +126,7 @@ linux_config:
 	flutter config --enable-linux-desktop
 
 .PHONY: prep
-prep: analyze fix import_order_fix format ignore license todo markdown depend bakfind test
+prep: analyze fix import_order_fix format ignore license locmax todo markdown depend bakfind test
 	@echo "ADVISORY: make tests docs"
 	@echo $(SEPARATOR)
 
@@ -194,6 +194,23 @@ depend:
 	-dependency_validator
 	@echo $(SEPARATOR)
 
+LINES ?= 300
+
+.PHONY: locmax
+locmax:
+	@output=$$(find lib -name "*.dart" -exec sh -c ' \
+		lines=$$(grep -v "^\s*$$" "$$1" | grep -v "^\s*//" | sed "/\/\*/,/\*\//d" | wc -l); \
+		if [ $$lines -gt $(LINES) ]; then \
+			printf "%4d %s\n" $$lines "$$1"; \
+		fi \
+	' _ {} \; | sort -nr); \
+	if [ -n "$$output" ]; then \
+		echo "$$output"; \
+		echo "Error: Files with more than $(LINES) lines found"; \
+		exit 1; \
+	else \
+		echo "All files are under $(LINES) lines"; \
+	fi
 
 # dart pub global activate dependency_validator
 

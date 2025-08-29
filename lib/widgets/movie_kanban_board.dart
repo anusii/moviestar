@@ -27,6 +27,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:markdown_tooltip/markdown_tooltip.dart';
 
 import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/models/custom_list.dart';
@@ -37,13 +38,13 @@ import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/api_key_validation_service.dart';
-import 'package:moviestar/services/cached_movie_service.dart';
-import 'package:moviestar/services/content_service.dart';
 import 'package:moviestar/services/error_mapper_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/network_connectivity_service.dart';
+import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 import 'package:moviestar/widgets/movie_card.dart';
+import 'package:moviestar/widgets/sort_controls.dart';
 
 /// Enum for different column types in the kanban board.
 
@@ -152,6 +153,14 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   final List<OperationQueueItem> _operationQueue = [];
   int _nextOperationId = 0;
 
+  // Sorting state for each column.
+
+  final Map<String, MovieSortCriteria> _columnSortCriteria = {
+    'popular': MovieSortCriteria.ratingDesc, // Default: by rating
+    'towatch': MovieSortCriteria.nameAsc, // Default: alphabetical
+    'watched': MovieSortCriteria.dateDesc, // Default: recent first
+  };
+
   @override
   void initState() {
     super.initState();
@@ -168,6 +177,14 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
   String _getOperationKey(KanbanColumnType type, String id) {
     return '${type.name}_$id';
+  }
+
+  // Handle sort change for a column.
+
+  void _onSortChanged(String columnId, MovieSortCriteria criteria) {
+    setState(() {
+      _columnSortCriteria[columnId] = criteria;
+    });
   }
 
   // Queue management methods.
@@ -957,9 +974,16 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       columnType,
       categoryId,
     );
-    final displayMovies =
-        moviesWithOptimistic.take(_maxItemsPerColumn).toList();
-    final hasMore = moviesWithOptimistic.length > _maxItemsPerColumn;
+
+    // Apply sorting based on column's sort criteria.
+
+    final sortCriteria =
+        _columnSortCriteria[categoryId] ?? MovieSortCriteria.nameAsc;
+    final sortedMovies =
+        sortMovies(List<Movie>.from(moviesWithOptimistic), sortCriteria);
+
+    final displayMovies = sortedMovies.take(_maxItemsPerColumn).toList();
+    final hasMore = sortedMovies.length > _maxItemsPerColumn;
     final canAcceptDrop = columnType != KanbanColumnType.popular;
     final hasPendingOps =
         _pendingOperations[_getOperationKey(columnType, categoryId)]
@@ -990,74 +1014,213 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                 topRight: Radius.circular(12),
               ),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${moviesWithOptimistic.length}${hasMore ? '+' : ''}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                              fontWeight: FontWeight.w500,
+                // First row: Title + Count Badge + Sort button (always present).
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
                             ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      if (hasPendingOps) ...[
-                        const SizedBox(width: 4),
-                        SizedBox(
-                          width: 8,
-                          height: 8,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 1,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Theme.of(context).colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                if (hasMore) ...[
-                  const Gap(4),
-                  TextButton(
-                    onPressed: () => _navigateToMovieCategory(
-                      title,
-                      moviesWithOptimistic,
-                      fromCache,
                     ),
-                    style: TextButton.styleFrom(
+                    // Count badge.
+
+                    Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
+                        horizontal: 8,
                         vertical: 2,
                       ),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(
-                      'View More',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontSize: 11,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${sortedMovies.length}${hasMore ? '+' : ''}',
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                           ),
+                          if (hasPendingOps) ...[
+                            const SizedBox(width: 4),
+                            SizedBox(
+                              width: 8,
+                              height: 8,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 1,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
+                    // Sort button.
+
+                    MarkdownTooltip(
+                      message:
+                          '**Sort** movies in this column\n\nClick to choose from:\n• Name (A-Z / Z-A)\n• Rating (High-Low / Low-High)\n• Date (Newest / Oldest)',
+                      child: PopupMenuButton<MovieSortCriteria>(
+                        tooltip: 'Sort',
+                        icon: Icon(
+                          Icons.sort,
+                          size: 18,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        onSelected: (criteria) =>
+                            _onSortChanged(categoryId, criteria),
+                        itemBuilder: (context) {
+                          final currentSort = _columnSortCriteria[categoryId] ??
+                              MovieSortCriteria.nameAsc;
+                          return [
+                            PopupMenuItem(
+                              value: MovieSortCriteria.nameAsc,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    currentSort == MovieSortCriteria.nameAsc
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_unchecked,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text('Name (A-Z)'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: MovieSortCriteria.nameDesc,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    currentSort == MovieSortCriteria.nameDesc
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_unchecked,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text('Name (Z-A)'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: MovieSortCriteria.ratingDesc,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    currentSort == MovieSortCriteria.ratingDesc
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_unchecked,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text('Rating (High to Low)'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: MovieSortCriteria.ratingAsc,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    currentSort == MovieSortCriteria.ratingAsc
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_unchecked,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text('Rating (Low to High)'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: MovieSortCriteria.dateDesc,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    currentSort == MovieSortCriteria.dateDesc
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_unchecked,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text('Date (Newest First)'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: MovieSortCriteria.dateAsc,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    currentSort == MovieSortCriteria.dateAsc
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_unchecked,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text('Date (Oldest First)'),
+                                ],
+                              ),
+                            ),
+                          ];
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                // Second row: View More button (only when needed).
+
+                if (hasMore) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () => _navigateToMovieCategory(
+                          title,
+                          sortedMovies,
+                          fromCache,
+                        ),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          'View More',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 11,
+                              ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ],
@@ -1159,8 +1322,6 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       KanbanColumnType.customList,
       customList.id,
     );
-    final displayMovieIds =
-        movieIdsWithOptimistic.take(_maxItemsPerColumn).toList();
     final hasPendingOps = _pendingOperations[
                 _getOperationKey(KanbanColumnType.customList, customList.id)]
             ?.isNotEmpty ??
@@ -1190,75 +1351,215 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                 topRight: Radius.circular(12),
               ),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _navigateToCustomListDetail(customList),
-                    child: Text(
-                      customList.name,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${movieIdsWithOptimistic.length}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                              fontWeight: FontWeight.w500,
-                            ),
-                      ),
-                      if (hasPendingOps) ...[
-                        const SizedBox(width: 4),
-                        SizedBox(
-                          width: 8,
-                          height: 8,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 1,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Theme.of(context).colorScheme.onPrimaryContainer,
-                            ),
-                          ),
+                // First row: Title + Count Badge + Sort button (always present).
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => _navigateToCustomListDetail(customList),
+                        child: Text(
+                          customList.name,
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ],
-                    ],
-                  ),
-                ),
-                if (movieIdsWithOptimistic.length > _maxItemsPerColumn) ...[
-                  const Gap(4),
-                  TextButton(
-                    onPressed: () => _navigateToCustomListDetail(customList),
-                    style: TextButton.styleFrom(
+                      ),
+                    ),
+                    // Count badge.
+
+                    Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
+                        horizontal: 8,
                         vertical: 2,
                       ),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(
-                      'View More',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontSize: 11,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${movieIdsWithOptimistic.length}',
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                           ),
+                          if (hasPendingOps) ...[
+                            const SizedBox(width: 4),
+                            SizedBox(
+                              width: 8,
+                              height: 8,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 1,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
+                    // Sort button for custom list.
+
+                    MarkdownTooltip(
+                      message:
+                          '**Sort** movies in this list\n\nClick to choose from:\n• Name (A-Z / Z-A)\n• Rating (High-Low / Low-High)\n• Date (Newest / Oldest)',
+                      child: PopupMenuButton<MovieSortCriteria>(
+                        tooltip: 'Sort',
+                        icon: Icon(
+                          Icons.sort,
+                          size: 18,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        onSelected: (criteria) =>
+                            _onSortChanged(customList.id, criteria),
+                        itemBuilder: (context) {
+                          final currentSort =
+                              _columnSortCriteria[customList.id] ??
+                                  MovieSortCriteria.nameAsc;
+                          return [
+                            PopupMenuItem(
+                              value: MovieSortCriteria.nameAsc,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    currentSort == MovieSortCriteria.nameAsc
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_unchecked,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text('Name (A-Z)'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: MovieSortCriteria.nameDesc,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    currentSort == MovieSortCriteria.nameDesc
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_unchecked,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text('Name (Z-A)'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: MovieSortCriteria.ratingDesc,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    currentSort == MovieSortCriteria.ratingDesc
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_unchecked,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text('Rating (High to Low)'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: MovieSortCriteria.ratingAsc,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    currentSort == MovieSortCriteria.ratingAsc
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_unchecked,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text('Rating (Low to High)'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: MovieSortCriteria.dateDesc,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    currentSort == MovieSortCriteria.dateDesc
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_unchecked,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text('Date (Newest First)'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: MovieSortCriteria.dateAsc,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    currentSort == MovieSortCriteria.dateAsc
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_unchecked,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text('Date (Oldest First)'),
+                                ],
+                              ),
+                            ),
+                          ];
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                // Second row: View More button (only when needed).
+
+                if (movieIdsWithOptimistic.length > _maxItemsPerColumn) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () =>
+                            _navigateToCustomListDetail(customList),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          'View More',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 11,
+                              ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ],
@@ -1283,18 +1584,20 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                       ),
                     ),
                   )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(8),
-                    itemCount: displayMovieIds.length,
-                    itemBuilder: (context, index) {
-                      final movieId = displayMovieIds[index];
-                      return _buildCustomListMovieItem(
-                        movieId,
-                        index,
-                        customList.id,
-                        customList,
-                      );
-                    },
+                : _CustomListMoviesWidget(
+                    movieIds: movieIdsWithOptimistic,
+                    customList: customList,
+                    sortCriteria: _columnSortCriteria[customList.id] ??
+                        MovieSortCriteria.nameAsc,
+                    maxItems: _maxItemsPerColumn,
+                    buildMovieItem: (movie, index) => _buildMovieItem(
+                      movie,
+                      customList.id,
+                      fromCache: false,
+                      columnType: KanbanColumnType.customList,
+                      columnId: customList.id,
+                      columnName: customList.name,
+                    ),
                   ),
           ),
         ],
@@ -1327,132 +1630,6 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                 : null,
           ),
           child: columnContent,
-        );
-      },
-    );
-  }
-
-  // Get content as Movie based on known content type.
-
-  Future<Movie> _getContentAsMovieWithType(
-    int contentId,
-    String contentType,
-    CachedMovieService cachedMovieService,
-    ContentService contentService,
-  ) async {
-    if (contentType == 'tv') {
-      final tvShowContent = await contentService.getTVDetails(contentId);
-      return Movie.fromContentItem(tvShowContent);
-    } else {
-      return await cachedMovieService.getMovieDetails(contentId);
-    }
-  }
-
-  // Build a movie item for a custom list (loading movie details on demand).
-
-  Widget _buildCustomListMovieItem(
-    int movieId,
-    int index,
-    String categoryId,
-    CustomList customList,
-  ) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final cachedMovieService = ref.read(cachedMovieServiceProvider);
-        final contentService = ref.read(contentServiceProvider);
-
-        // Get content type for this index.
-
-        final contentType = customList.getContentTypeAt(index);
-
-        return FutureBuilder<Movie>(
-          future: _getContentAsMovieWithType(
-            movieId,
-            contentType,
-            cachedMovieService,
-            contentService,
-          ),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                width: 100,
-                height: 150,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.errorContainer,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      color: Theme.of(context).colorScheme.onErrorContainer,
-                      size: 24,
-                    ),
-                    const Gap(4),
-                    Text(
-                      'Error',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onErrorContainer,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            if (snapshot.connectionState == ConnectionState.waiting ||
-                !snapshot.hasData) {
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                width: 100,
-                height: 150,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Theme.of(context).primaryColor,
-                        ),
-                      ),
-                    ),
-                    const Gap(8),
-                    Text(
-                      'Loading...',
-                      style: TextStyle(
-                        color: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withValues(alpha: 0.7),
-                        fontSize: 10,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            final movie = snapshot.data!;
-            return _buildMovieItem(
-              movie,
-              categoryId,
-              fromCache: false,
-              columnType: KanbanColumnType.customList,
-              columnId: customList.id,
-              columnName: customList.name,
-            );
-          },
         );
       },
     );
@@ -1763,6 +1940,154 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           ),
           error: (error, stack) => _buildSmartErrorWidget(error, stack),
         );
+      },
+    );
+  }
+}
+
+// Helper widget to load and sort movies in a custom list.
+
+class _CustomListMoviesWidget extends ConsumerStatefulWidget {
+  final List<int> movieIds;
+  final CustomList customList;
+  final MovieSortCriteria sortCriteria;
+  final int maxItems;
+  final Widget Function(Movie movie, int index) buildMovieItem;
+
+  const _CustomListMoviesWidget({
+    required this.movieIds,
+    required this.customList,
+    required this.sortCriteria,
+    required this.maxItems,
+    required this.buildMovieItem,
+  });
+
+  @override
+  ConsumerState<_CustomListMoviesWidget> createState() =>
+      _CustomListMoviesWidgetState();
+}
+
+class _CustomListMoviesWidgetState
+    extends ConsumerState<_CustomListMoviesWidget> {
+  final Map<int, Movie> _moviesMap = {};
+  final Set<int> _loadingMovieIds = {};
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMovies();
+  }
+
+  @override
+  void didUpdateWidget(_CustomListMoviesWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Reload if movie IDs changed or sort criteria changed.
+
+    if (oldWidget.movieIds.length != widget.movieIds.length ||
+        !oldWidget.movieIds.every((id) => widget.movieIds.contains(id)) ||
+        oldWidget.sortCriteria != widget.sortCriteria) {
+      _loadMovies();
+    }
+  }
+
+  Future<Movie> _getContentAsMovieWithType(
+    int contentId,
+    String contentType,
+  ) async {
+    final cachedMovieService = ref.read(cachedMovieServiceProvider);
+    final contentService = ref.read(contentServiceProvider);
+
+    if (contentType == 'tv') {
+      final tvShowContent = await contentService.getTVDetails(contentId);
+      return Movie.fromContentItem(tvShowContent);
+    } else {
+      return await cachedMovieService.getMovieDetails(contentId);
+    }
+  }
+
+  Future<void> _loadMovies() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Load all movies needed for sorting.
+
+    final moviesToLoad = widget.movieIds.take(widget.maxItems * 2).toList();
+
+    for (int i = 0; i < moviesToLoad.length; i++) {
+      final movieId = moviesToLoad[i];
+
+      if (_moviesMap.containsKey(movieId) ||
+          _loadingMovieIds.contains(movieId)) {
+        continue;
+      }
+
+      _loadingMovieIds.add(movieId);
+
+      try {
+        final contentType = widget.customList.getContentTypeAt(
+          widget.movieIds.indexOf(movieId),
+        );
+        final movie = await _getContentAsMovieWithType(movieId, contentType);
+
+        if (mounted) {
+          setState(() {
+            _moviesMap[movieId] = movie;
+            _loadingMovieIds.remove(movieId);
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _loadingMovieIds.remove(movieId);
+          });
+        }
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  List<Movie> _getSortedMovies() {
+    // Get all loaded movies.
+
+    final loadedMovies = <Movie>[];
+    for (final movieId in widget.movieIds) {
+      final movie = _moviesMap[movieId];
+      if (movie != null) {
+        loadedMovies.add(movie);
+      }
+    }
+
+    // Apply sorting.
+
+    return sortMovies(loadedMovies, widget.sortCriteria);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading && _moviesMap.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    final sortedMovies = _getSortedMovies();
+    final displayMovies = sortedMovies.take(widget.maxItems).toList();
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(8),
+      itemCount: displayMovies.length,
+      itemBuilder: (context, index) {
+        return widget.buildMovieItem(displayMovies[index], index);
       },
     );
   }

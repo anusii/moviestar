@@ -25,6 +25,9 @@ au](https://solidcommunity.au/docs/moviestar)
 
 ## 0.1 First stable release
 
++ Add sort option to kanban view [0.0.25 20250830 atangster]
++ SETTINGS now contained in SolidScaffold [0.0.24 20250830 tonypioneer]
++ Move to using FILES from solidui [0.0.23 20250830 tonypioneer]
 + Catch different errors with popups [0.0.22 20250828 atangster]
 + Add Move/TV Show indicator to images [0.0.21 20250828 atangster]
 + Add dark/light mode button [0.0.20 20250828 tonypioneer]

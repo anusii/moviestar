@@ -30,9 +30,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solidui/solidui.dart';
 
-import 'package:moviestar/features/file/service/page.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';
+import 'package:moviestar/screens/files_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/my_lists_screen.dart';
 import 'package:moviestar/screens/my_movies_screen.dart';
@@ -138,9 +138,9 @@ class SolidScaffoldConfig {
 ''',
       ),
       SolidMenuItem(
-        title: 'Pod Files',
+        title: 'Files',
         icon: Icons.folder,
-        child: const FileService(),
+        child: const FilesScreen(),
         tooltip: '''
 
 **File Management:** Tap here to access file management features for your POD.

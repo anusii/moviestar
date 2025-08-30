@@ -198,6 +198,7 @@ LINES ?= 300
 
 .PHONY: locmax
 locmax:
+	@echo "Files with EXCESS LINES OF CODE:\n"
 	@-output=$$(find lib -name "*.dart" -exec sh -c ' \
 		lines=$$(grep -v "^\s*$$" "$$1" | grep -v "^\s*//" | sed "/\/\*/,/\*\//d" | wc -l); \
 		if [ $$lines -gt $(LINES) ]; then \
@@ -205,12 +206,13 @@ locmax:
 		fi \
 	' _ {} \; | sort -nr); \
 	if [ -n "$$output" ]; then \
-		echo "$$output"; \
+		echo "$$output\n"; \
 		echo "Error: Files with more than $(LINES) lines found"; \
 		exit 1; \
 	else \
 		echo "All files are under $(LINES) lines"; \
 	fi
+	@echo $(SEPARATOR)
 
 # Check and fail if any files exceed limit
 

@@ -446,6 +446,8 @@ import_order_fix:
 	import_order
 	@echo $(SEPARATOR)
 
+# dart pub global activate dart_code_metrics
+
 .PHONY: dcm
 dcm: nullable unused_code unused_files metrics
 
@@ -474,7 +476,6 @@ metrics:
 	@echo $(SEPARATOR)
 
 ### TODO THESE SHOULD BE CHECKED AND CLEANED UP
-
 
 .PHONY: docs
 docs::

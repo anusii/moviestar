@@ -73,6 +73,9 @@ export FLUTTER_HELP
 help::
 	@echo "$$FLUTTER_HELP"
 
+TICK=\033[0;32m✔\033[0m
+CROSS=\033[31m❌\033[0m
+
 .PHONY: chrome
 chrome:
 	flutter run -d chrome --release
@@ -207,10 +210,10 @@ locmax:
 	' _ {} \; | sort -nr); \
 	if [ -n "$$output" ]; then \
 		echo "$$output"; \
-		echo "Error: Files with more than $(LINES) lines found"; \
+		echo "\n$(CROSS) Error: Files with more than $(LINES) lines found"; \
 		exit 1; \
 	else \
-		echo "All files are under $(LINES) lines"; \
+		echo "$(TICK) All files are under $(LINES) lines"; \
 	fi
 	@echo $(SEPARATOR)
 
@@ -226,10 +229,10 @@ locmax-enforce:
 	' _ {} \; | sort -nr); \
 	if [ -n "$$output" ]; then \
 		echo "$$output"; \
-		echo "Error: Files with more than $(LINES) lines found"; \
+		echo "$(CROSS) Error: Files with more than $(LINES) lines found"; \
 		exit 1; \
 	else \
-		echo "All files are under $(LINES) lines"; \
+		echo "$(TICK) All files are under $(LINES) lines"; \
 	fi
 
 
@@ -257,8 +260,15 @@ todo:
 .PHONY: license
 license:
 	@echo "Files without a LICENSE:\n"
-	@-find lib -type f -not -name '*~' -not -name 'README*' \
-	! -exec grep -qE '^(/// Copyright|/// Licensed)' {} \; -print | xargs printf "\t%s\n"
+	@-output=$$(find lib -type f -not -name '*~' -not -name 'README*' -not -name '*.g.dart' \
+	! -exec grep -qE '^(/// Copyright|/// Licensed)' {} \; -print | xargs printf "\t%s\n"); \
+	if [ $$(echo "$$output" | wc -w) -ne 0 ]; then \
+		echo "$$output"; \
+		echo "\n$(CROSS) Error: Files with no license found."; \
+		exit 1; \
+	else \
+		echo "$(TICK) All source files contain a license."; \
+	fi
 	@echo $(SEPARATOR)
 
 .PHONY: riverpod

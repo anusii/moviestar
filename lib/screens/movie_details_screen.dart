@@ -218,39 +218,63 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   /// Toggles the to-watch status of the current movie.
 
   Future<void> _toggleToWatch() async {
-    if (_isInToWatch) {
-      await widget.favoritesService.removeFromToWatch(widget.movie);
-    } else {
-      await widget.favoritesService.addToWatch(
-        widget.movie,
-        contentType: (widget.movie.contentType ?? widget.contentType) ==
-                ContentType.tvShow
-            ? 'tv'
-            : 'movie',
-      );
-    }
+    // Store original state for potential rollback.
+    final originalState = _isInToWatch;
+
+    // Update UI immediately for instant feedback.
     setState(() {
       _isInToWatch = !_isInToWatch;
     });
+
+    try {
+      if (originalState) {
+        await widget.favoritesService.removeFromToWatch(widget.movie);
+      } else {
+        await widget.favoritesService.addToWatch(
+          widget.movie,
+          contentType: (widget.movie.contentType ?? widget.contentType) ==
+                  ContentType.tvShow
+              ? 'tv'
+              : 'movie',
+        );
+      }
+    } catch (e) {
+      // Rollback UI state on error.
+      setState(() {
+        _isInToWatch = originalState;
+      });
+    }
   }
 
   /// Toggles the watched status of the current movie.
 
   Future<void> _toggleWatched() async {
-    if (_isInWatched) {
-      await widget.favoritesService.removeFromWatched(widget.movie);
-    } else {
-      await widget.favoritesService.addToWatched(
-        widget.movie,
-        contentType: (widget.movie.contentType ?? widget.contentType) ==
-                ContentType.tvShow
-            ? 'tv'
-            : 'movie',
-      );
-    }
+    // Store original state for potential rollback.
+    final originalState = _isInWatched;
+
+    // Update UI immediately for instant feedback.
     setState(() {
       _isInWatched = !_isInWatched;
     });
+
+    try {
+      if (originalState) {
+        await widget.favoritesService.removeFromWatched(widget.movie);
+      } else {
+        await widget.favoritesService.addToWatched(
+          widget.movie,
+          contentType: (widget.movie.contentType ?? widget.contentType) ==
+                  ContentType.tvShow
+              ? 'tv'
+              : 'movie',
+        );
+      }
+    } catch (e) {
+      // Rollback UI state on error.
+      setState(() {
+        _isInWatched = originalState;
+      });
+    }
   }
 
   Future<void> _loadPersonalRating() async {

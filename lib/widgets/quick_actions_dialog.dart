@@ -147,8 +147,18 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
   // Toggles the to-watch status.
 
   Future<void> _toggleToWatch() async {
+    // Store original state for potential rollback.
+    final originalState = _isInToWatch;
+
+    // Update UI immediately for instant feedback.
+    if (mounted) {
+      setState(() {
+        _isInToWatch = !_isInToWatch;
+      });
+    }
+
     try {
-      if (_isInToWatch) {
+      if (originalState) {
         await widget.favoritesService.removeFromToWatch(widget.movie);
       } else {
         await widget.favoritesService.addToWatch(
@@ -157,21 +167,31 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
               widget.contentType == ContentType.tvShow ? 'tv' : 'movie',
         );
       }
+    } catch (e) {
+      // Rollback UI state on error.
       if (mounted) {
         setState(() {
-          _isInToWatch = !_isInToWatch;
+          _isInToWatch = originalState;
         });
       }
-    } catch (e) {
-      // Handle error silently for now.
     }
   }
 
   // Toggles the watched status.
 
   Future<void> _toggleWatched() async {
+    // Store original state for potential rollback.
+    final originalState = _isInWatched;
+
+    // Update UI immediately for instant feedback.
+    if (mounted) {
+      setState(() {
+        _isInWatched = !_isInWatched;
+      });
+    }
+
     try {
-      if (_isInWatched) {
+      if (originalState) {
         await widget.favoritesService.removeFromWatched(widget.movie);
       } else {
         await widget.favoritesService.addToWatched(
@@ -180,13 +200,13 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
               widget.contentType == ContentType.tvShow ? 'tv' : 'movie',
         );
       }
+    } catch (e) {
+      // Rollback UI state on error.
       if (mounted) {
         setState(() {
-          _isInWatched = !_isInWatched;
+          _isInWatched = originalState;
         });
       }
-    } catch (e) {
-      // Handle error silently for now.
     }
   }
 

@@ -150,6 +150,19 @@ your movie data files.
 
 ''',
       ),
+      SolidMenuItem(
+          title: 'Settings',
+          icon: Icons.person,
+          child: SettingsScreen(
+            favoritesService: favoritesService,
+            apiKeyService: apiKeyService,
+            favoritesServiceManager: favoritesServiceManager,
+          ),
+          tooltip: '''
+
+**Settings:** Tap here to configure your movie preferences and account settings.
+
+'''),
     ];
   }
 
@@ -160,14 +173,11 @@ your movie data files.
   /// handling actions.
 
   static List<SolidAppBarAction> createAppBarActions({
-    required BuildContext context,
     required WidgetRef ref,
     required VoidCallback onViewModeToggle,
     required VoidCallback onRefresh,
     required VoidCallback onSearch,
-    required FavoritesService favoritesService,
-    required ApiKeyService apiKeyService,
-    required FavoritesServiceManager favoritesServiceManager,
+    required VoidCallback onSettings,
   }) {
     return [
       SolidAppBarAction(
@@ -190,23 +200,7 @@ your movie data files.
       ),
       SolidAppBarAction(
         icon: Icons.settings,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Scaffold(
-                appBar: AppBar(
-                  title: const Text('Settings'),
-                ),
-                body: SettingsScreen(
-                  favoritesService: favoritesService,
-                  apiKeyService: apiKeyService,
-                  favoritesServiceManager: favoritesServiceManager,
-                ),
-              ),
-            ),
-          );
-        },
+        onPressed: onSettings,
         tooltip:
             'Settings: Tap here to configure your movie preferences and account settings.',
       ),

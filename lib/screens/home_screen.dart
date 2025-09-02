@@ -34,10 +34,7 @@ import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/screens/settings_screen.dart';
-import 'package:moviestar/services/api_key_service.dart';
-import 'package:moviestar/services/favorites_service_manager.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:moviestar/my_home_page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
@@ -1941,32 +1938,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 const Gap(24),
                 ElevatedButton.icon(
-                  onPressed: () async {
-                    // Navigate to Settings screen
-                    final apiKeyService = ref.read(apiKeyServiceProvider);
-                    final prefs = await SharedPreferences.getInstance();
-                    final favoritesServiceManager = FavoritesServiceManager(
-                      prefs,
-                      context,
-                      widget,
-                    );
-                    if (mounted) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Scaffold(
-                            appBar: AppBar(
-                              title: const Text('Settings'),
-                            ),
-                            body: SettingsScreen(
-                              favoritesService: widget.favoritesService,
-                              apiKeyService: apiKeyService,
-                              favoritesServiceManager: favoritesServiceManager,
-                            ),
-                          ),
-                        ),
-                      );
-                    }
+                  onPressed: () {
+                    // Navigate to Settings tab in the main SolidScaffold
+                    navigateToSettings();
                   },
                   icon: const Icon(Icons.vpn_key),
                   label: const Text('Configure API Key'),
@@ -2092,32 +2066,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final errorContext = ErrorContext(
       onRetry: onRetry,
-      onConfigureApiKey: () async {
-        // Navigate to Settings screen
-        final apiKeyService = ref.read(apiKeyServiceProvider);
-        final prefs = await SharedPreferences.getInstance();
-        final favoritesServiceManager = FavoritesServiceManager(
-          prefs,
-          context,
-          widget,
-        );
-        if (mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Scaffold(
-                appBar: AppBar(
-                  title: const Text('Settings'),
-                ),
-                body: SettingsScreen(
-                  favoritesService: widget.favoritesService,
-                  apiKeyService: apiKeyService,
-                  favoritesServiceManager: favoritesServiceManager,
-                ),
-              ),
-            ),
-          );
-        }
+      onConfigureApiKey: () {
+        // Navigate to Settings tab in the main SolidScaffold
+        navigateToSettings();
       },
       apiKeyValidationService: apiKeyValidationService,
       networkConnectivityService: networkConnectivityService,

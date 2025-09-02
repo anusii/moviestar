@@ -148,9 +148,11 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
 
   Future<void> _toggleToWatch() async {
     // Store original state for potential rollback.
+
     final originalState = _isInToWatch;
 
     // Update UI immediately for instant feedback.
+
     if (mounted) {
       setState(() {
         _isInToWatch = !_isInToWatch;
@@ -169,6 +171,7 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
       }
     } catch (e) {
       // Rollback UI state on error.
+
       if (mounted) {
         setState(() {
           _isInToWatch = originalState;
@@ -181,9 +184,11 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
 
   Future<void> _toggleWatched() async {
     // Store original state for potential rollback.
+
     final originalState = _isInWatched;
 
     // Update UI immediately for instant feedback.
+
     if (mounted) {
       setState(() {
         _isInWatched = !_isInWatched;
@@ -202,6 +207,7 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
       }
     } catch (e) {
       // Rollback UI state on error.
+
       if (mounted) {
         setState(() {
           _isInWatched = originalState;

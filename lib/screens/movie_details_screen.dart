@@ -219,9 +219,11 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
   Future<void> _toggleToWatch() async {
     // Store original state for potential rollback.
+
     final originalState = _isInToWatch;
 
     // Update UI immediately for instant feedback.
+
     setState(() {
       _isInToWatch = !_isInToWatch;
     });
@@ -240,6 +242,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
       }
     } catch (e) {
       // Rollback UI state on error.
+
       setState(() {
         _isInToWatch = originalState;
       });
@@ -250,9 +253,11 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
   Future<void> _toggleWatched() async {
     // Store original state for potential rollback.
+
     final originalState = _isInWatched;
 
     // Update UI immediately for instant feedback.
+
     setState(() {
       _isInWatched = !_isInWatched;
     });
@@ -271,6 +276,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
       }
     } catch (e) {
       // Rollback UI state on error.
+
       setState(() {
         _isInWatched = originalState;
       });

@@ -129,7 +129,8 @@ class ContentService {
   Future<List<ContentItem>> getPopularMixedContent() async {
     await _ensureClientInitialized();
 
-    // Fetch both popular movies and TV shows
+    // Fetch both popular movies and TV shows.
+
     final moviesFuture = getPopularMovies();
     final tvShowsFuture = getPopularTVShows();
 
@@ -137,12 +138,14 @@ class ContentService {
     final movies = results[0];
     final tvShows = results[1];
 
-    // Combine and shuffle for better variety
+    // Combine and shuffle for better variety.
+
     final combined = <ContentItem>[];
     combined.addAll(movies);
     combined.addAll(tvShows);
 
-    // Sort by vote average to maintain quality
+    // Sort by vote average to maintain quality.
+
     combined.sort((a, b) => b.voteAverage.compareTo(a.voteAverage));
 
     return combined;

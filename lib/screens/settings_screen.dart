@@ -1,6 +1,6 @@
 /// Screen for managing user settings and preferences.
 ///
-// Time-stamp: <Tuesday 2025-08-26 09:48:49 +1000 Graham Williams>
+// Time-stamp: <Tuesday 2025-09-02 15:11:46 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -1149,12 +1149,16 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
     ValueChanged<bool> onChanged,
   ) {
     return SwitchListTile(
-      title: Text(title, style: Theme.of(context).textTheme.bodyLarge),
-      subtitle: Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.bodyLarge,
+      ),
+      subtitle: Text(
+        subtitle,
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
       value: value,
       onChanged: onChanged,
-      thumbColor:
-          WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
     );
   }
 

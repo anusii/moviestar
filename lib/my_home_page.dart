@@ -36,22 +36,13 @@ import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/enhanced_search_screen.dart';
+import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/widgets/solid_scaffold_config.dart';
-
-/// Global callback for navigating to Settings.
-
-void Function()? _navigateToSettingsCallback;
-
-/// Navigates to the Settings tab globally.
-
-void navigateToSettings() {
-  _navigateToSettingsCallback?.call();
-}
 
 class MyHomePage extends ConsumerStatefulWidget {
   final SharedPreferences prefs;
@@ -103,12 +94,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     apiKeyService.addListener(_onApiKeyChanged);
 
-    // Set up global navigation callback.
-
-    _navigateToSettingsCallback = () {
-      navigateToSettingsTab();
-    };
-
     _loadUserInfo();
     _buildScreens();
   }
@@ -117,10 +102,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   void dispose() {
     final apiKeyService = ref.read(apiKeyServiceProvider);
     apiKeyService.removeListener(_onApiKeyChanged);
-
-    // Clear global navigation callback.
-
-    _navigateToSettingsCallback = null;
 
     super.dispose();
   }
@@ -298,18 +279,26 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     logoutPopup(context, const MovieStar());
   }
 
-  /// Navigates to the Settings tab.
-
-  void navigateToSettingsTab() {
-    setState(() {
-      _selectedTabIndex = 8; // Settings is the 9th item (index 8)
-    });
-  }
-
   /// Handles the settings action.
 
   void _handleSettings() {
-    navigateToSettingsTab();
+    // Navigate to Settings screen
+    final apiKeyService = ref.read(apiKeyServiceProvider);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: const Text('Settings'),
+          ),
+          body: SettingsScreen(
+            favoritesService: _favoritesService,
+            apiKeyService: apiKeyService,
+            favoritesServiceManager: _favoritesServiceManager,
+          ),
+        ),
+      ),
+    );
   }
 
   /// Handles menu tab selection.
@@ -355,10 +344,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           onViewModeToggle: _handleViewModeToggle,
           onRefresh: _handleRefresh,
           onSearch: _handleSearch,
-          onSettings: _handleSettings,
         ),
         overflowItems: SolidScaffoldConfig.createOverflowItems(
           onLogout: _handleLogout,
+          onSettings: _handleSettings,
         ),
       ),
       aboutConfig: SolidAboutConfig(

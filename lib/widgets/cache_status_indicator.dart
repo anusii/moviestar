@@ -30,8 +30,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
-import 'package:moviestar/my_home_page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
+import 'package:moviestar/screens/settings_screen.dart';
+import 'package:moviestar/services/api_key_service.dart';
+import 'package:moviestar/services/favorites_service_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
@@ -268,11 +271,33 @@ class CacheStatusIndicator extends ConsumerWidget {
 
   /// Navigates to the cache settings page.
 
-  void _navigateToSettings(BuildContext context, WidgetRef ref) {
-    // Try to use the global navigation callback
-    try {
-      navigateToSettings();
-    } catch (e) {
+  void _navigateToSettings(BuildContext context, WidgetRef ref) async {
+    if (favoritesService != null) {
+      final apiKeyService = ref.read(apiKeyServiceProvider);
+      final prefs = await SharedPreferences.getInstance();
+      final favoritesServiceManager = FavoritesServiceManager(
+        prefs,
+        context,
+        Container(), // Using placeholder widget
+      );
+      if (context.mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Scaffold(
+              appBar: AppBar(
+                title: const Text('Settings'),
+              ),
+              body: SettingsScreen(
+                favoritesService: favoritesService!,
+                apiKeyService: apiKeyService,
+                favoritesServiceManager: favoritesServiceManager,
+              ),
+            ),
+          ),
+        );
+      }
+    } else {
       // Fallback - show message that settings can be accessed from app bar.
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

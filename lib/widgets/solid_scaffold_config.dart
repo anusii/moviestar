@@ -150,20 +150,6 @@ your movie data files.
 
 ''',
       ),
-      SolidMenuItem(
-        title: 'Settings',
-        icon: Icons.person,
-        child: SettingsScreen(
-          favoritesService: favoritesService,
-          apiKeyService: apiKeyService,
-          favoritesServiceManager: favoritesServiceManager,
-        ),
-        tooltip: '''
-
-**Settings:** Tap here to configure your movie preferences and account settings.
-
-''',
-      ),
     ];
   }
 
@@ -178,7 +164,6 @@ your movie data files.
     required VoidCallback onViewModeToggle,
     required VoidCallback onRefresh,
     required VoidCallback onSearch,
-    required VoidCallback onSettings,
   }) {
     return [
       SolidAppBarAction(
@@ -199,12 +184,6 @@ your movie data files.
         tooltip:
             'Search: Tap here to search for movies by title, genre, or other criteria.',
       ),
-      SolidAppBarAction(
-        icon: Icons.settings,
-        onPressed: onSettings,
-        tooltip:
-            'Settings: Tap here to configure your movie preferences and account settings.',
-      ),
     ];
   }
 
@@ -215,6 +194,7 @@ your movie data files.
 
   static List<SolidOverflowMenuItem> createOverflowItems({
     required VoidCallback onLogout,
+    required VoidCallback onSettings,
   }) {
     return [
       SolidOverflowMenuItem(
@@ -222,6 +202,12 @@ your movie data files.
         icon: Icons.logout,
         label: 'Logout',
         onSelected: onLogout,
+      ),
+      SolidOverflowMenuItem(
+        id: 'settings',
+        icon: Icons.settings,
+        label: 'Settings',
+        onSelected: onSettings,
       ),
     ];
   }

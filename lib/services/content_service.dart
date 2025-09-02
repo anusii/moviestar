@@ -124,6 +124,30 @@ class ContentService {
     return results.map((tvShow) => ContentItem.fromTVJson(tvShow)).toList();
   }
 
+  // Gets a mixed list of popular movies and TV shows for better content diversity.
+
+  Future<List<ContentItem>> getPopularMixedContent() async {
+    await _ensureClientInitialized();
+
+    // Fetch both popular movies and TV shows
+    final moviesFuture = getPopularMovies();
+    final tvShowsFuture = getPopularTVShows();
+
+    final results = await Future.wait([moviesFuture, tvShowsFuture]);
+    final movies = results[0];
+    final tvShows = results[1];
+
+    // Combine and shuffle for better variety
+    final combined = <ContentItem>[];
+    combined.addAll(movies);
+    combined.addAll(tvShows);
+
+    // Sort by vote average to maintain quality
+    combined.sort((a, b) => b.voteAverage.compareTo(a.voteAverage));
+
+    return combined;
+  }
+
   // Gets a list of TV shows currently airing.
 
   Future<List<ContentItem>> getOnTheAirTVShows() async {

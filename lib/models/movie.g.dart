@@ -25,13 +25,14 @@ class MovieAdapter extends TypeAdapter<Movie> {
       voteAverage: fields[5] as double,
       releaseDate: fields[6] as DateTime,
       genreIds: (fields[7] as List).cast<int>(),
+      contentType: fields[8] as ContentType?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Movie obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -47,7 +48,9 @@ class MovieAdapter extends TypeAdapter<Movie> {
       ..writeByte(6)
       ..write(obj.releaseDate)
       ..writeByte(7)
-      ..write(obj.genreIds);
+      ..write(obj.genreIds)
+      ..writeByte(8)
+      ..write(obj.contentType);
   }
 
   @override

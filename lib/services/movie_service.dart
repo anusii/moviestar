@@ -83,11 +83,11 @@ class MovieService {
     }
   }
 
-  /// Gets a list of popular movies.
+  /// Gets a list of popular movies and TV shows (mixed content for better variety).
 
   Future<List<Movie>> getPopularMovies() async {
     await _ensureClientInitialized();
-    final contentItems = await _contentService!.getPopularMovies();
+    final contentItems = await _contentService!.getPopularMixedContent();
     return contentItems
         .map((content) => Movie.fromContentItem(content))
         .toList();

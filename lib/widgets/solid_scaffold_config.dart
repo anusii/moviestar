@@ -150,6 +150,20 @@ your movie data files.
 
 ''',
       ),
+      SolidMenuItem(
+        title: 'Settings',
+        icon: Icons.person,
+        child: SettingsScreen(
+          favoritesService: favoritesService,
+          apiKeyService: apiKeyService,
+          favoritesServiceManager: favoritesServiceManager,
+        ),
+        tooltip: '''
+
+**Settings:** Tap here to configure your movie preferences and account settings.
+
+''',
+      ),
     ];
   }
 

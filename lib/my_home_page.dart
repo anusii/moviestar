@@ -75,6 +75,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   int _selectedTabIndex = 0;
 
+  /// Flag to show Settings screen instead of menu content.
+
+  bool _showSettings = false;
+
   @override
   void initState() {
     super.initState();
@@ -284,22 +288,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   /// Handles the settings action.
 
   void _handleSettings() {
-    // Navigate to Settings screen as a new page
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => Scaffold(
-          appBar: AppBar(
-            title: const Text('Settings'),
-          ),
-          body: SettingsScreen(
-            favoritesService: _favoritesService,
-            apiKeyService: ref.read(apiKeyServiceProvider),
-            favoritesServiceManager: _favoritesServiceManager,
-          ),
-        ),
-      ),
-    );
+    // Show Settings by replacing the body content
+    setState(() {
+      _showSettings = true;
+    });
   }
 
   /// Handles menu tab selection.
@@ -307,6 +299,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   void _onTabSelected(int index) {
     setState(() {
       _selectedTabIndex = index;
+      _showSettings = false; // Hide Settings when navigating to other tabs
     });
   }
 
@@ -329,7 +322,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         ? const Center(child: CircularProgressIndicator())
         : null;
 
-    return SolidScaffold(
+    final solidScaffold = SolidScaffold(
       menu: _menuItems,
       selectedIndex: _selectedTabIndex,
       onMenuSelected: _onTabSelected,
@@ -403,6 +396,36 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         showInAppBarActions: true,
       ),
       child: loadingOverlay,
+    );
+
+    // Return Settings screen overlay if Settings is active, otherwise return SolidScaffold
+    return _showSettings ? _buildSettingsOverlay(solidScaffold) : solidScaffold;
+  }
+
+  /// Builds the Settings screen as an overlay on top of the SolidScaffold
+  Widget _buildSettingsOverlay(Widget solidScaffold) {
+    return Stack(
+      children: [
+        solidScaffold,
+        Scaffold(
+          appBar: AppBar(
+            title: const Text('Settings'),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                setState(() {
+                  _showSettings = false;
+                });
+              },
+            ),
+          ),
+          body: SettingsScreen(
+            favoritesService: _favoritesService,
+            apiKeyService: ref.read(apiKeyServiceProvider),
+            favoritesServiceManager: _favoritesServiceManager,
+          ),
+        ),
+      ],
     );
   }
 }

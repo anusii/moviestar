@@ -76,9 +76,10 @@ class Movie extends HiveObject {
   @HiveField(7)
   final List<int> genreIds;
 
-  /// Content type - not persisted to Hive to avoid breaking existing storage.
-  /// This is a runtime field to track whether this Movie was originally a TV show.
+  /// Content type - tracks whether this Movie was originally a TV show.
+  /// Added to Hive persistence to fix label persistence issue.
 
+  @HiveField(8)
   final ContentType? contentType;
 
   /// Creates a new [Movie] instance.

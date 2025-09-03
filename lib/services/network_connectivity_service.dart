@@ -49,7 +49,9 @@ class NetworkConnectivityResult {
   });
 
   /// Creates a successful result with internet access.
-  static NetworkConnectivityResult connected({Duration? responseTime}) {
+  static NetworkConnectivityResult connected({
+    Duration responseTime = Duration.zero,
+  }) {
     return NetworkConnectivityResult(
       hasInternetAccess: true,
       checkSuccessful: true,
@@ -58,7 +60,9 @@ class NetworkConnectivityResult {
   }
 
   /// Creates a successful result without internet access.
-  static NetworkConnectivityResult disconnected({Duration? responseTime}) {
+  static NetworkConnectivityResult disconnected({
+    Duration responseTime = Duration.zero,
+  }) {
     return NetworkConnectivityResult(
       hasInternetAccess: false,
       checkSuccessful: true,
@@ -84,8 +88,6 @@ class NetworkConnectivityResult {
 
 /// Service for checking network connectivity and internet access.
 class NetworkConnectivityService {
-  static const Duration _defaultTimeout = Duration(seconds: 10);
-
   final InternetConnection _internetConnection;
 
   /// Creates a new NetworkConnectivityService.
@@ -113,13 +115,13 @@ class NetworkConnectivityService {
 
   /// Checks if the device has internet connectivity.
   Future<NetworkConnectivityResult> checkConnectivity({
-    Duration? timeout,
+    Duration timeout = const Duration(seconds: 10),
   }) async {
     try {
       final stopwatch = Stopwatch()..start();
 
-      final hasInternet = await _internetConnection.hasInternetAccess
-          .timeout(timeout ?? _defaultTimeout);
+      final hasInternet =
+          await _internetConnection.hasInternetAccess.timeout(timeout);
 
       stopwatch.stop();
 

@@ -89,13 +89,13 @@ class OperationQueueItem {
   OperationQueueItem copyWith({
     int? id,
     String? description,
-    OperationStatus? status,
+    required OperationStatus status,
     DateTime? startTime,
   }) {
     return OperationQueueItem(
       id: id ?? this.id,
       description: description ?? this.description,
-      status: status ?? this.status,
+      status: status,
       startTime: startTime ?? this.startTime,
     );
   }

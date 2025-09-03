@@ -75,8 +75,8 @@ class ErrorAction {
   /// The callback to execute when the action is triggered.
   final VoidCallback onPressed;
 
-  /// Icon to display with the action (optional).
-  final IconData? icon;
+  /// Icon to display with the action.
+  final IconData icon;
 
   /// Whether this action is the primary action (highlighted).
   final bool isPrimary;
@@ -85,7 +85,7 @@ class ErrorAction {
     required this.type,
     required this.label,
     required this.onPressed,
-    this.icon,
+    required this.icon,
     this.isPrimary = false,
   });
 
@@ -154,7 +154,7 @@ class UserFriendlyError {
   final String message;
 
   /// Additional details or suggestions for resolution.
-  final String? details;
+  final String details;
 
   /// Actions the user can take to resolve the error.
   final List<ErrorAction> actions;
@@ -175,7 +175,7 @@ class UserFriendlyError {
     required this.type,
     required this.title,
     required this.message,
-    this.details,
+    required this.details,
     this.actions = const [],
     this.originalError,
     this.stackTrace,

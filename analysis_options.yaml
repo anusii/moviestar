@@ -3,14 +3,14 @@
 # Add the following to pubspec.yaml:
 #
 #   dev_dependencies:
-#     flutter_lints: ^6.0.0
+#     very_good_analysis: ^9.0.0
 #
 # Invoke the analyzer from the command line:
 #
 #   flutter analyze
 
-# Activate recommended lints for Flutter apps, packages, and plugins
-# designed to encourage good coding practices.
+# Activate very_good_analysis lints for comprehensive code quality checks
+# designed to enforce high standards and best practices.
 
 include: package:flutter_lints/flutter.yaml
 

@@ -74,8 +74,8 @@ class _CustomListDetailScreenState
     extends ConsumerState<CustomListDetailScreen> {
   /// Validates if an image URL is valid and not empty.
 
-  bool _isValidImageUrl(String? url) {
-    if (url == null || url.trim().isEmpty) {
+  bool _isValidImageUrl(String url) {
+    if (url.trim().isEmpty) {
       return false;
     }
 

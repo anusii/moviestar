@@ -38,12 +38,12 @@ import 'package:moviestar/services/favorites_service_manager.dart';
 class ListSharedMovies extends StatefulWidget {
   final Map<String, dynamic>
       sharedMoviesMap; // Contains both 'movies' and 'movieLists' keys
-  final VoidCallback? onDataChanged;
+  final VoidCallback onDataChanged;
 
   const ListSharedMovies({
     super.key,
     required this.sharedMoviesMap,
-    this.onDataChanged,
+    required this.onDataChanged,
   });
 
   @override
@@ -135,9 +135,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
         if (mounted) {
           // Refresh the parent screen data regardless of result.
 
-          if (widget.onDataChanged != null) {
-            widget.onDataChanged!();
-          }
+          widget.onDataChanged();
 
           // Force a rebuild to ensure the UI is properly refreshed.
 

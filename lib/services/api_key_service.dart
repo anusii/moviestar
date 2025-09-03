@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/services/cache_settings_service.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/utils/pod_path_helper.dart';
@@ -56,7 +57,8 @@ class ApiKeyService extends ChangeNotifier {
 
   String? _cachedApiKey;
   DateTime? _cacheTime;
-  static const Duration _cacheDuration = Duration(seconds: 10);
+  static const Duration _cacheDuration =
+      NetworkTimingConstants.apiKeyCacheDuration;
   Future<String?>? _pendingFetch;
 
   ApiKeyService({BuildContext? context, Widget? child})

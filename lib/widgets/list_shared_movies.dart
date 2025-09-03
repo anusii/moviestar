@@ -29,6 +29,7 @@ import 'package:gap/gap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/screens/shared_movie_list_detail_screen.dart';
@@ -283,7 +284,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
     if (allItems.isEmpty) {
       return const Center(
         child: Padding(
-          padding: EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(Dimensions.xxxl),
           child: Text(
             'No shared movies or lists yet',
             style: TextStyle(fontSize: 16, color: Colors.grey),

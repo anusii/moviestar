@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
@@ -1902,7 +1903,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         if (userFriendlyError != null) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(Dimensions.huge),
               child: ErrorDisplayWidget.fromUserFriendlyError(
                 error: userFriendlyError,
               ),
@@ -1914,7 +1915,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
         return Center(
           child: Padding(
-            padding: const EdgeInsets.all(32.0),
+            padding: const EdgeInsets.all(Dimensions.huge),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -1964,7 +1965,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(Dimensions.xl),
               child: CircularProgressIndicator(),
             ),
           );

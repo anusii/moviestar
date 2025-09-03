@@ -31,6 +31,7 @@ import 'package:gap/gap.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
@@ -400,7 +401,7 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const Gap(8),
+                        const Gap(Gaps.m),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
@@ -436,7 +437,7 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
                         ),
                       ],
                     ),
-                    const Gap(12),
+                    const Gap(Gaps.xl),
 
                     // Quick action buttons.
                     Row(
@@ -495,7 +496,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                       ],
                     ),
 
-                    const Gap(16),
+                    const Gap(Gaps.xxl),
 
                     // Rating section
                     Text(
@@ -505,7 +506,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                           .labelMedium
                           ?.copyWith(fontWeight: FontWeight.w600),
                     ),
-                    const Gap(8),
+                    const Gap(Gaps.m),
 
                     Row(
                       children: [

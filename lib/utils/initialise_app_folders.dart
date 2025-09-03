@@ -27,6 +27,7 @@ import 'package:flutter/material.dart';
 
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/constants/network_constants.dart';
 import 'package:moviestar/constants/paths.dart';
 import 'package:moviestar/utils/create_app_folder.dart';
 
@@ -81,10 +82,14 @@ Future<void> initialiseAppFolders({
             'Encryption key conflict detected (attempt $attempt/3) - this is caused by orphaned encryption keys from deleted files',
           );
 
-          if (attempt < 3) {
+          if (attempt < NetworkConstants.maxRetryAttempts) {
             // Wait with exponential backoff before retrying.
 
-            await Future.delayed(Duration(milliseconds: 500 * attempt));
+            await Future.delayed(
+              Duration(
+                milliseconds: NetworkConstants.backoffBaseDelayMs * attempt,
+              ),
+            );
             debugPrint('Retrying resource scan...');
             continue;
           } else {

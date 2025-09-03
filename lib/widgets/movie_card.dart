@@ -32,6 +32,8 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
@@ -365,7 +367,7 @@ class _MovieCardState extends State<MovieCard> {
     // This prevents popups from appearing immediately when quickly moving the mouse.
 
     _showTimer?.cancel();
-    _showTimer = Timer(const Duration(milliseconds: 1000), () {
+    _showTimer = Timer(TimingConstants.movieCardHoverShowDelay, () {
       _showQuickActions(context);
     });
   }
@@ -383,7 +385,7 @@ class _MovieCardState extends State<MovieCard> {
     // This gives the user time to move to the dialog.
 
     _hideTimer?.cancel();
-    _hideTimer = Timer(const Duration(milliseconds: 100), () {
+    _hideTimer = Timer(TimingConstants.movieCardHoverHideDelay, () {
       _hideQuickActions();
     });
   }
@@ -403,7 +405,7 @@ class _MovieCardState extends State<MovieCard> {
     // Start a timer to hide the dialog.
 
     _hideTimer?.cancel();
-    _hideTimer = Timer(const Duration(milliseconds: 100), () {
+    _hideTimer = Timer(TimingConstants.movieCardHoverHideDelay, () {
       _hideQuickActions();
     });
   }
@@ -434,7 +436,7 @@ class _MovieCardState extends State<MovieCard> {
       top: 4,
       right: 4,
       child: Container(
-        padding: const EdgeInsets.all(2),
+        padding: const EdgeInsets.all(Dimensions.xs),
         decoration: BoxDecoration(
           color: widget.fromCache!
               ? Colors.green.withValues(alpha: 0.8)
@@ -457,7 +459,10 @@ class _MovieCardState extends State<MovieCard> {
       top: 4,
       left: 4,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        padding: const EdgeInsets.symmetric(
+          horizontal: Dimensions.s,
+          vertical: Dimensions.xs,
+        ),
         decoration: BoxDecoration(
           color: Colors.orange.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(8),
@@ -466,7 +471,7 @@ class _MovieCardState extends State<MovieCard> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.offline_pin, size: 10, color: Colors.white),
-            Gap(2),
+            Gap(Gaps.xs),
             Text(
               'OFFLINE',
               style: TextStyle(
@@ -494,7 +499,10 @@ class _MovieCardState extends State<MovieCard> {
       bottom: 4,
       left: 4,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        padding: const EdgeInsets.symmetric(
+          horizontal: Dimensions.ms,
+          vertical: Dimensions.xs,
+        ),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(4),
@@ -508,7 +516,7 @@ class _MovieCardState extends State<MovieCard> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(icon, style: const TextStyle(fontSize: 10)),
-            const Gap(2),
+            const Gap(Gaps.xs),
             Text(
               label,
               style: TextStyle(
@@ -527,7 +535,7 @@ class _MovieCardState extends State<MovieCard> {
 
   Widget _buildOfflineModeIcon(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(2),
+      padding: const EdgeInsets.all(Dimensions.xs),
       decoration: BoxDecoration(
         color: Colors.orange,
         borderRadius: BorderRadius.circular(4),
@@ -541,7 +549,8 @@ class _MovieCardState extends State<MovieCard> {
   Widget _buildCacheAgeInfo(BuildContext context) {
     final ageText = _formatCacheAge(widget.cacheAge!);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+      padding:
+          const EdgeInsets.symmetric(horizontal: Dimensions.s, vertical: 1),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(4),

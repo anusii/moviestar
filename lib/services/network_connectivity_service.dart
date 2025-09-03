@@ -19,13 +19,15 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Claude Code
+/// Authors: Ashley Tang
 
 library;
 
 import 'dart:io';
 
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+
+import 'package:moviestar/constants/timing_constants.dart';
 
 /// Result of network connectivity check.
 class NetworkConnectivityResult {
@@ -115,7 +117,7 @@ class NetworkConnectivityService {
 
   /// Checks if the device has internet connectivity.
   Future<NetworkConnectivityResult> checkConnectivity({
-    Duration timeout = const Duration(seconds: 10),
+    Duration timeout = NetworkTimingConstants.defaultTimeout,
   }) async {
     try {
       final stopwatch = Stopwatch()..start();
@@ -149,7 +151,9 @@ class NetworkConnectivityService {
 
   /// Quick connectivity check with shorter timeout.
   Future<NetworkConnectivityResult> quickCheck() async {
-    return checkConnectivity(timeout: const Duration(seconds: 5));
+    return checkConnectivity(
+      timeout: NetworkTimingConstants.quickCheckTimeout,
+    );
   }
 
   /// Stream of connectivity status changes.
@@ -165,7 +169,7 @@ class NetworkConnectivityService {
       // Try to resolve TMDB domain
       final lookupResult = await InternetAddress.lookup(
         'api.themoviedb.org',
-      ).timeout(const Duration(seconds: 8));
+      ).timeout(NetworkTimingConstants.dnsLookupTimeout);
 
       stopwatch.stop();
 

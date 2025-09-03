@@ -29,6 +29,8 @@ import 'package:flutter/material.dart';
 
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/constants/dimensions.dart';
+
 /// A placeholder home page widget.
 
 class HomePage extends StatelessWidget {
@@ -44,13 +46,17 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.movie, size: 100, color: Colors.blue),
-            const Gap(20),
+            const Icon(
+              Icons.movie,
+              size: Dimensions.movieIconSize,
+              color: Colors.blue,
+            ),
+            const Gap(Gaps.xxxl),
             Text(
               'Welcome to Movie Star',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            const Gap(10),
+            const Gap(Gaps.l),
             Text(
               'Your ultimate movie companion',
               style: Theme.of(context).textTheme.bodyLarge,

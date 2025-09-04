@@ -92,8 +92,8 @@ class NetworkConnectivityService {
 
   /// Creates a new NetworkConnectivityService.
   NetworkConnectivityService({
-    InternetConnection internetConnection = const InternetConnection(),
-  }) : _internetConnection = internetConnection;
+    InternetConnection? internetConnection,
+  }) : _internetConnection = internetConnection ?? InternetConnection();
 
   /// Creates a service with custom check options for TMDB endpoints.
   factory NetworkConnectivityService.forTMDB() {

@@ -40,6 +40,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/movie_list_service.dart';
 import 'package:moviestar/services/user_profile_service.dart';
+import 'package:moviestar/utils/is_desktop.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 
@@ -133,31 +134,40 @@ class PodFavoritesService extends ChangeNotifier {
     try {
       // Check if user is logged into POD first.
       final isPodReady = await isPodAvailable();
+
       if (isPodReady) {
         // Initialize user profile following the ontology structure.
         await _userProfileService.initializeProfileIfNeeded();
 
-        // Get or create standard movie lists - this is critical for proper loading.
-
-        _toWatchListId = await _movieListService.getOrCreateStandardMovieList(
-          'to_watch',
-        );
-        _watchedListId = await _movieListService.getOrCreateStandardMovieList(
-          'watched',
-        );
+        // Platform-specific initialization strategies
+        if (isDesktop) {
+          await _initializeForDesktop();
+        } else {
+          await _initializeForWeb();
+        }
 
         // Only load and update streams if we have valid MovieList IDs.
-
         if (_toWatchListId != null || _watchedListId != null) {
           await _loadFromPod();
         } else {
           // If we couldn't get MovieList IDs, initialize with empty but don't update streams yet.
-
           _cachedToWatch = [];
           _cachedWatched = [];
           _cachedRatings = {};
           _cachedComments = {};
-          // Don't update streams here - wait for retry initialisation.
+
+          // Platform-specific retry strategies
+          if (isDesktop) {
+            // Desktop: single retry after short delay
+            Future.delayed(const Duration(seconds: 1), () {
+              retryPodInitialization();
+            });
+          } else {
+            // Web: more aggressive retry sequence
+            Future.delayed(const Duration(seconds: 2), () {
+              autoRetryPodInitialization(maxRetries: 5);
+            });
+          }
         }
       } else {
         // Initialize with empty data for new POD storage.
@@ -169,15 +179,88 @@ class PodFavoritesService extends ChangeNotifier {
         _watchedController.add(_cachedWatched!);
       }
     } catch (e) {
-      debugPrint('Failed to initialize POD data: $e');
-      // Initialise with empty data but don't update streams yet.
+      debugPrint('❌ [POD Init] Failed to initialize POD data: $e');
 
+      // Enhanced error categorization
+      final errorMsg = e.toString().toLowerCase();
+      if (errorMsg.contains('network') ||
+          errorMsg.contains('fetch') ||
+          errorMsg.contains('cors')) {
+        debugPrint(
+            '🌐 [POD Init] Network-related initialization error - likely web environment issue');
+      } else if (errorMsg.contains('auth') ||
+          errorMsg.contains('permission') ||
+          errorMsg.contains('unauthorized')) {
+        debugPrint(
+            '🔐 [POD Init] Authentication/permission error during initialization');
+      } else if (errorMsg.contains('timeout')) {
+        debugPrint(
+            '⏱️ [POD Init] Timeout during initialization - POD may be slow to respond');
+      } else {
+        debugPrint('🔍 [POD Init] Unknown initialization error type');
+      }
+
+      // Initialise with empty data but don't update streams yet.
       _cachedToWatch = [];
       _cachedWatched = [];
       _cachedRatings = {};
       _cachedComments = {};
       // Wait for retry initialisation instead of showing empty state immediately.
     }
+  }
+
+  /// Desktop-specific initialization strategy.
+  /// Desktop environments typically have more reliable POD access.
+
+  Future<void> _initializeForDesktop() async {
+    // Get or create standard movie lists - desktop can handle synchronous operations better
+    _toWatchListId =
+        await _movieListService.getOrCreateStandardMovieList('to_watch');
+    _watchedListId =
+        await _movieListService.getOrCreateStandardMovieList('watched');
+  }
+
+  /// Web-specific initialization strategy.
+  /// Web environments may have authentication delays and network limitations.
+
+  Future<void> _initializeForWeb() async {
+    // Web environments often have delayed authentication, so we use more aggressive retry logic
+    final List<Future<String?>> listInitFutures = [
+      _initializeWebMovieList('to_watch'),
+      _initializeWebMovieList('watched'),
+    ];
+
+    // Run list initializations in parallel for better performance
+    final results = await Future.wait(listInitFutures);
+
+    _toWatchListId = results[0];
+    _watchedListId = results[1];
+  }
+
+  /// Initialize a specific movie list for web environment with retries.
+
+  Future<String?> _initializeWebMovieList(String listType) async {
+    const maxRetries = 2; // Fewer retries for initial load to avoid blocking UI
+    const retryDelay = Duration(milliseconds: 500);
+
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        final listId =
+            await _movieListService.getOrCreateStandardMovieList(listType);
+        if (listId != null) {
+          return listId;
+        }
+      } catch (e) {
+        debugPrint(
+            '❌ [Web List Init] Attempt $attempt failed for $listType: $e');
+      }
+
+      if (attempt < maxRetries) {
+        await Future.delayed(retryDelay);
+      }
+    }
+
+    return null;
   }
 
   /// Loads data from POD and caches it locally.
@@ -193,7 +276,6 @@ class PodFavoritesService extends ChangeNotifier {
       _cachedComments = {};
 
       // Load from MovieList system instead of old TTL files.
-
       if (_toWatchListId != null) {
         final movieListData = await _movieListService.getMovieList(
           _toWatchListId!,
@@ -213,17 +295,12 @@ class PodFavoritesService extends ChangeNotifier {
       }
 
       // Load ratings from individual movie files (no longer using ratings.ttl).
-
       _cachedRatings = {};
       _cachedComments = {};
 
-      // Only update streams if we have at least one valid MovieList ID.
-      // This prevents showing empty state before MovieList IDs are discovered.
-
-      if (_toWatchListId != null || _watchedListId != null) {
-        _toWatchController.add(_cachedToWatch!);
-        _watchedController.add(_cachedWatched!);
-      }
+      // Update streams with loaded data - even if empty, this ensures UI consistency
+      _toWatchController.add(_cachedToWatch!);
+      _watchedController.add(_cachedWatched!);
     } catch (e) {
       debugPrint('Error loading from POD: $e');
       // Initialize with empty data if POD fails.
@@ -353,56 +430,80 @@ class PodFavoritesService extends ChangeNotifier {
 
   Future<List<Movie>> getToWatch({bool forceRefresh = false}) async {
     // Read from MovieList file instead of cached old TTL data.
-
     if (_toWatchListId != null) {
-      final movieListData = await _movieListService.getMovieList(
-        _toWatchListId!,
-        forceRefresh: forceRefresh,
-      );
-      if (movieListData != null) {
-        final movies = movieListData['movies'] as List<Movie>? ?? [];
-        return _ensureAllContentTypes(movies);
+      try {
+        final movieListData = await _movieListService.getMovieList(
+          _toWatchListId!,
+          forceRefresh: forceRefresh,
+        );
+        if (movieListData != null) {
+          final movies = movieListData['movies'] as List<Movie>? ?? [];
+          return _ensureAllContentTypes(movies);
+        }
+      } catch (e) {
+        debugPrint('❌ [Get ToWatch] Error reading from MovieList: $e');
       }
     }
 
     // Fallback to cached data if MovieList fails.
-
     if (_cachedToWatch != null) {
       return _ensureAllContentTypes(_cachedToWatch!);
     }
 
     // Final fallback to SharedPreferences.
+    try {
+      final fallbackMovies = await _fallbackService.getToWatch();
 
-    final fallbackMovies = await _fallbackService.getToWatch();
-    return _ensureAllContentTypes(fallbackMovies);
+      // Cache the fallback data for next time
+      if (fallbackMovies.isNotEmpty) {
+        _cachedToWatch = fallbackMovies;
+      }
+
+      return _ensureAllContentTypes(fallbackMovies);
+    } catch (e) {
+      debugPrint('❌ [Get ToWatch] SharedPreferences fallback failed: $e');
+      return <Movie>[];
+    }
   }
 
   /// Retrieves the list of watched movies from POD cache.
 
   Future<List<Movie>> getWatched({bool forceRefresh = false}) async {
     // Read from MovieList file instead of cached old TTL data.
-
     if (_watchedListId != null) {
-      final movieListData = await _movieListService.getMovieList(
-        _watchedListId!,
-        forceRefresh: forceRefresh,
-      );
-      if (movieListData != null) {
-        final movies = movieListData['movies'] as List<Movie>? ?? [];
-        return _ensureAllContentTypes(movies);
+      try {
+        final movieListData = await _movieListService.getMovieList(
+          _watchedListId!,
+          forceRefresh: forceRefresh,
+        );
+        if (movieListData != null) {
+          final movies = movieListData['movies'] as List<Movie>? ?? [];
+          return _ensureAllContentTypes(movies);
+        }
+      } catch (e) {
+        debugPrint('❌ [Get Watched] Error reading from MovieList: $e');
       }
     }
 
     // Fallback to cached data if MovieList fails.
-
     if (_cachedWatched != null) {
       return _ensureAllContentTypes(_cachedWatched!);
     }
 
     // Final fallback to SharedPreferences.
+    try {
+      final fallbackMovies = await _fallbackService.getWatched();
 
-    final fallbackMovies = await _fallbackService.getWatched();
-    return _ensureAllContentTypes(fallbackMovies);
+      // Cache the fallback data for next time
+      if (fallbackMovies.isNotEmpty) {
+        _cachedWatched = fallbackMovies;
+      }
+
+      return _ensureAllContentTypes(fallbackMovies);
+    } catch (e) {
+      debugPrint('❌ [Get Watched] SharedPreferences fallback failed: $e');
+      return <Movie>[];
+    }
   }
 
   /// Adds a movie to the to-watch list and saves to POD.
@@ -907,18 +1008,10 @@ class PodFavoritesService extends ChangeNotifier {
         return movieData;
       } else {
         // This is expected for movies that haven't been rated/commented yet.
-
-        debugPrint(
-          '📄 Movie file is empty or not found (expected for new movies)',
-        );
       }
     } catch (e) {
       if (e.toString().contains('does not exist')) {
         // This is expected for movies that haven't been rated/commented yet.
-
-        debugPrint(
-          '📄 Movie file does not exist for ${movie.title} (expected for new movies)',
-        );
       } else {
         debugPrint('❌ Error reading movie file for ${movie.title}: $e');
       }
@@ -972,6 +1065,71 @@ class PodFavoritesService extends ChangeNotifier {
 
   Future<void> syncWithPod() async {
     await _loadFromPod();
+  }
+
+  /// Retries POD initialization with exponential backoff for web environments.
+  /// This is useful when initial initialization fails due to timing or auth issues.
+
+  Future<void> retryPodInitialization() async {
+    try {
+      final isPodReady = await isPodAvailable();
+      if (!isPodReady) {
+        return;
+      }
+
+      // Initialize user profile if needed
+      await _userProfileService.initializeProfileIfNeeded();
+
+      bool needsStreamRefresh = false;
+
+      // Retry getting MovieList IDs
+      if (_toWatchListId == null) {
+        _toWatchListId =
+            await _movieListService.getOrCreateStandardMovieList('to_watch');
+        if (_toWatchListId != null) {
+          needsStreamRefresh = true;
+        }
+      }
+
+      if (_watchedListId == null) {
+        _watchedListId =
+            await _movieListService.getOrCreateStandardMovieList('watched');
+        if (_watchedListId != null) {
+          needsStreamRefresh = true;
+        }
+      }
+
+      if (needsStreamRefresh) {
+        await refreshUIStreams();
+      }
+    } catch (e) {
+      debugPrint('❌ [Retry Init] POD initialization retry failed: $e');
+    }
+  }
+
+  /// Auto-retry POD initialization with exponential backoff.
+  /// Useful for web environments where initial auth may take time.
+
+  Future<void> autoRetryPodInitialization({int maxRetries = 5}) async {
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      // Check if we already have both IDs
+      if (_toWatchListId != null && _watchedListId != null) {
+        return;
+      }
+
+      await retryPodInitialization();
+
+      // If we got at least one ID, we can stop retrying
+      if (_toWatchListId != null || _watchedListId != null) {
+        return;
+      }
+
+      if (attempt < maxRetries) {
+        // Exponential backoff: 2^attempt seconds
+        final waitTime = Duration(seconds: (2 << (attempt - 1)).clamp(2, 30));
+        await Future.delayed(waitTime);
+      }
+    }
   }
 
   /// Reloads data from POD after app folders are initialized.
@@ -1132,11 +1290,31 @@ class PodFavoritesService extends ChangeNotifier {
 
   Future<void> refreshUIStreams() async {
     try {
-      // Don't update streams if MovieList IDs aren't initialised yet.
-      // This prevents showing empty state before MovieList discovery completes.
-
+      // Modified logic: Only skip if BOTH IDs are null AND we have no cached data
+      // This allows showing cached/fallback data even when MovieList discovery fails
       if (_toWatchListId == null && _watchedListId == null) {
-        return;
+        // Check if we have any cached data to show
+        final hasCachedData = (_cachedToWatch?.isNotEmpty == true) ||
+            (_cachedWatched?.isNotEmpty == true);
+
+        if (!hasCachedData) {
+          // Try to load from SharedPreferences as a last resort
+          try {
+            final fallbackToWatch = await _fallbackService.getToWatch();
+            final fallbackWatched = await _fallbackService.getWatched();
+
+            if (fallbackToWatch.isNotEmpty || fallbackWatched.isNotEmpty) {
+              _toWatchController.add(fallbackToWatch);
+              _watchedController.add(fallbackWatched);
+              return;
+            }
+          } catch (fallbackError) {
+            debugPrint(
+                '❌ [Stream Update] Fallback data load failed: $fallbackError');
+          }
+
+          return;
+        }
       }
 
       final toWatchMovies = await getToWatch(forceRefresh: true);
@@ -1145,7 +1323,20 @@ class PodFavoritesService extends ChangeNotifier {
       _toWatchController.add(toWatchMovies);
       _watchedController.add(watchedMovies);
     } catch (e) {
-      debugPrint('❌ Failed to refresh UI streams: $e');
+      debugPrint('❌ [Stream Update] Failed to refresh UI streams: $e');
+
+      // Try to provide some fallback data even if refresh fails
+      try {
+        if (_cachedToWatch != null) {
+          _toWatchController.add(_cachedToWatch!);
+        }
+        if (_cachedWatched != null) {
+          _watchedController.add(_cachedWatched!);
+        }
+      } catch (fallbackError) {
+        debugPrint(
+            '❌ [Stream Update] Even fallback stream update failed: $fallbackError');
+      }
     }
   }
 

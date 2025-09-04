@@ -966,6 +966,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     required String categoryId,
     required bool fromCache,
     required KanbanColumnType columnType,
+    bool isLoading = false,
   }) {
     // Apply optimistic updates.
 
@@ -1230,33 +1231,63 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           // Movie items.
 
           Expanded(
-            child: displayMovies.isEmpty
+            child: isLoading
                 ? Center(
-                    child: Text(
-                      'No movies',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Theme.of(context).colorScheme.primary,
+                            ),
                           ),
+                        ),
+                        const Gap(8),
+                        Text(
+                          'Loading $title...',
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.7),
+                                  ),
+                        ),
+                      ],
                     ),
                   )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(8),
-                    itemCount: displayMovies.length,
-                    itemBuilder: (context, index) {
-                      final movie = displayMovies[index];
-                      return _buildMovieItem(
-                        movie,
-                        categoryId,
-                        fromCache: fromCache,
-                        columnType: columnType,
-                        columnId: categoryId,
-                        columnName: title,
-                      );
-                    },
-                  ),
+                : displayMovies.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No movies',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.5),
+                                  ),
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(8),
+                        itemCount: displayMovies.length,
+                        itemBuilder: (context, index) {
+                          final movie = displayMovies[index];
+                          return _buildMovieItem(
+                            movie,
+                            categoryId,
+                            fromCache: fromCache,
+                            columnType: columnType,
+                            columnId: categoryId,
+                            columnName: title,
+                          );
+                        },
+                      ),
           ),
         ],
       ),
@@ -1897,6 +1928,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                                       categoryId: 'towatch',
                                       fromCache: false,
                                       columnType: KanbanColumnType.toWatch,
+                                      isLoading:
+                                          toWatchSnapshot.connectionState ==
+                                                  ConnectionState.waiting &&
+                                              !toWatchSnapshot.hasData,
                                     ),
 
                                     // Watched Column.
@@ -1907,6 +1942,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                                       categoryId: 'watched',
                                       fromCache: false,
                                       columnType: KanbanColumnType.watched,
+                                      isLoading:
+                                          watchedSnapshot.connectionState ==
+                                                  ConnectionState.waiting &&
+                                              !watchedSnapshot.hasData,
                                     ),
 
                                     // Custom List Columns.

@@ -169,23 +169,6 @@ final hiveCacheServiceProvider = Provider<HiveMovieCacheService>((ref) {
   return service;
 });
 
-/// Provider for the Hive movie cache service that ensures initialisation.
-/// Use this when you need a guaranteed initialised service.
-
-final initializedHiveCacheServiceProvider =
-    FutureProvider<HiveMovieCacheService>((ref) async {
-  final service = HiveMovieCacheService();
-  await service.initialize();
-
-  // Ensure the service is disposed when the provider is disposed.
-
-  ref.onDispose(() {
-    service.dispose();
-  });
-
-  return service;
-});
-
 /// Provider for the cached movie service.
 
 final cachedMovieServiceProvider = Provider<CachedMovieService>((ref) {
@@ -331,73 +314,10 @@ final upcomingMoviesWithCacheInfoProvider =
   return cachedService.getUpcomingMoviesWithCacheInfo();
 });
 
-/// Provider for popular movies with caching (backward compatibility).
-
-final popularMoviesProvider = FutureProvider.autoDispose<List<Movie>>((
-  ref,
-) async {
-  final result = await ref.watch(popularMoviesWithCacheInfoProvider.future);
-  return result.data;
-});
-
-/// Provider for now playing movies with caching (backward compatibility).
-
-final nowPlayingMoviesProvider = FutureProvider.autoDispose<List<Movie>>((
-  ref,
-) async {
-  final result = await ref.watch(nowPlayingMoviesWithCacheInfoProvider.future);
-  return result.data;
-});
-
-/// Provider for top rated movies with caching (backward compatibility).
-
-final topRatedMoviesProvider = FutureProvider.autoDispose<List<Movie>>((
-  ref,
-) async {
-  final result = await ref.watch(topRatedMoviesWithCacheInfoProvider.future);
-  return result.data;
-});
-
-/// Provider for upcoming movies with caching (backward compatibility).
-
-final upcomingMoviesProvider = FutureProvider.autoDispose<List<Movie>>((
-  ref,
-) async {
-  final result = await ref.watch(upcomingMoviesWithCacheInfoProvider.future);
-  return result.data;
-});
-
 /// Provider for cache statistics.
 
 final cacheStatsProvider =
     FutureProvider<Map<CacheCategory, Map<String, dynamic>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
   return await cachedService.getCacheStats();
-});
-
-/// Provider for force refresh functionality.
-
-final forceRefreshProvider = FutureProvider.family<List<Movie>, CacheCategory>((
-  ref,
-  category,
-) async {
-  final cachedService = ref.watch(configuredCachedMovieServiceProvider);
-  return await cachedService.forceRefresh(category);
-});
-
-/// Provider for clearing cache functionality.
-
-final clearCacheProvider = FutureProvider.family<void, CacheCategory>((
-  ref,
-  category,
-) async {
-  final cachedService = ref.watch(configuredCachedMovieServiceProvider);
-  await cachedService.clearCache(category);
-});
-
-/// Provider for clearing all cache functionality.
-
-final clearAllCacheProvider = FutureProvider<void>((ref) async {
-  final cachedService = ref.watch(configuredCachedMovieServiceProvider);
-  await cachedService.clearAllCache();
 });

@@ -182,19 +182,3 @@ class CacheFeedbackWidget {
     }
   }
 }
-
-/// Settings for cache feedback display.
-
-class CacheFeedbackSettings {
-  /// Whether to show success toasts for cache hits.
-
-  static bool showSuccessToasts = true;
-
-  /// Whether to show performance statistics.
-
-  static bool showPerformanceStats = true;
-
-  /// Whether to show offline mode notifications.
-
-  static bool showOfflineNotifications = true;
-}

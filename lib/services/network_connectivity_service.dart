@@ -91,6 +91,7 @@ class NetworkConnectivityService {
   final InternetConnection _internetConnection;
 
   /// Creates a new NetworkConnectivityService.
+  // ignore: avoid-unnecessary-nullable-parameters
   NetworkConnectivityService({
     InternetConnection? internetConnection,
   }) : _internetConnection = internetConnection ?? InternetConnection();

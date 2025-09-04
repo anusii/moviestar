@@ -31,7 +31,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/hive_movie_cache_service.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
@@ -254,41 +253,8 @@ class CacheStatusIndicator extends ConsumerWidget {
               },
               child: const Text('Go Online'),
             ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _navigateToSettings(context, ref);
-            },
-            child: const Text('Cache Settings'),
-          ),
         ],
       ),
     );
-  }
-
-  /// Navigates to the cache settings page.
-
-  void _navigateToSettings(BuildContext context, WidgetRef ref) {
-    if (favoritesService != null) {
-      final apiKeyService = ref.read(apiKeyServiceProvider);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SettingsScreen(
-            favoritesService: favoritesService!,
-            apiKeyService: apiKeyService,
-          ),
-        ),
-      );
-    } else {
-      // Fallback - show message that settings can be accessed from main navigation.
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Access Cache Settings from the Settings tab'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
   }
 }

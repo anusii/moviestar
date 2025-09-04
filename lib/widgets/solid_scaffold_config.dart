@@ -36,7 +36,6 @@ import 'package:moviestar/screens/files_screen.dart';
 import 'package:moviestar/screens/home_screen.dart';
 import 'package:moviestar/screens/my_lists_screen.dart';
 import 'package:moviestar/screens/my_movies_screen.dart';
-import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/screens/shared_movies_screen.dart';
 import 'package:moviestar/screens/to_watch_screen.dart';
 import 'package:moviestar/screens/watched_screen.dart';
@@ -150,20 +149,6 @@ your movie data files.
 
 ''',
       ),
-      SolidMenuItem(
-        title: 'Settings',
-        icon: Icons.person,
-        child: SettingsScreen(
-          favoritesService: favoritesService,
-          apiKeyService: apiKeyService,
-          favoritesServiceManager: favoritesServiceManager,
-        ),
-        tooltip: '''
-
-**Settings:** Tap here to configure your movie preferences and account settings.
-
-''',
-      ),
     ];
   }
 
@@ -208,6 +193,7 @@ your movie data files.
 
   static List<SolidOverflowMenuItem> createOverflowItems({
     required VoidCallback onLogout,
+    required VoidCallback onSettings,
   }) {
     return [
       SolidOverflowMenuItem(
@@ -215,6 +201,12 @@ your movie data files.
         icon: Icons.logout,
         label: 'Logout',
         onSelected: onLogout,
+      ),
+      SolidOverflowMenuItem(
+        id: 'settings',
+        icon: Icons.settings,
+        label: 'Settings',
+        onSelected: onSettings,
       ),
     ];
   }

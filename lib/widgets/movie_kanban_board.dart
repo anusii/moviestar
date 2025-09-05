@@ -109,22 +109,6 @@ enum OperationStatus {
   failed,
 }
 
-/// A movie item wrapper for kanban board usage.
-
-class MovieItem {
-  final Movie movie;
-  final bool fromCache;
-  final Duration? cacheAge;
-
-  const MovieItem({
-    required this.movie,
-    this.fromCache = false,
-    this.cacheAge,
-  });
-
-  String get id => movie.id.toString();
-}
-
 /// Custom Kanban board widget for displaying movies in columns.
 
 class MovieKanbanBoard extends ConsumerStatefulWidget {

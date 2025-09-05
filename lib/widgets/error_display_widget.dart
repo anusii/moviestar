@@ -90,6 +90,7 @@ class ErrorDisplayWidget extends StatelessWidget {
 
   /// Creates a new [ErrorDisplayWidget].
 
+  // ignore: avoid-unnecessary-nullable-parameters
   const ErrorDisplayWidget({
     super.key,
     required this.message,

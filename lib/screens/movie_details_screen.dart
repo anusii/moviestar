@@ -1260,6 +1260,28 @@ class _AddToCustomListsDialogState extends State<_AddToCustomListsDialog> {
     }
   }
 
+  /// Calculate the updated movie count for a list, accounting for current selections
+  int _getUpdatedMovieCount(CustomList list) {
+    final isCurrentlySelected = _selectedListIds.contains(list.id);
+    final wasOriginallyInList = widget.customLists
+        .firstWhere((l) => l.id == list.id)
+        .movieIds
+        .contains(widget.movie.id);
+    
+    // If the movie was originally in the list and is now deselected, subtract 1
+    if (wasOriginallyInList && !isCurrentlySelected) {
+      return list.movieCount - 1;
+    }
+    // If the movie was not originally in the list but is now selected, add 1
+    else if (!wasOriginallyInList && isCurrentlySelected) {
+      return list.movieCount + 1;
+    }
+    // Otherwise, return the original count
+    else {
+      return list.movieCount;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -1422,7 +1444,7 @@ class _AddToCustomListsDialogState extends State<_AddToCustomListsDialog> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  '${list.movieCount} movies',
+                                  '${_getUpdatedMovieCount(list)} movies/tv shows',
                                   style: TextStyle(
                                     color: Theme.of(context)
                                         .colorScheme

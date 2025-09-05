@@ -1468,9 +1468,41 @@ class PodFavoritesService extends ChangeNotifier {
         throw Exception('Please log in to update custom lists');
       }
 
-      // For now, we can only update the list by recreating it with new metadata
-      // since MovieListService doesn't have a direct update method for metadata
-      // This is a limitation we might want to address later
+      // Get the current MovieList data to preserve movies
+      final movieListData = await _movieListService.getMovieList(updatedList.id);
+      if (movieListData == null) {
+        throw Exception('MovieList not found for ID: ${updatedList.id}');
+      }
+
+      // Get the movies from the existing list
+      final movies = movieListData['movies'] as List<Movie>? ?? [];
+      
+      // Create updated TTL content with new name/description but same movies
+      final movieListTtl = TurtleSerializer.createMovieList(
+        updatedList.id,
+        updatedList.name,
+        movies: movies,
+        description: updatedList.description,
+      );
+
+      // Write updated content back to POD
+      final fileName = 'user_lists/MovieList-${updatedList.id}.ttl';
+      
+      if (!_context.mounted) {
+        throw Exception('Context not mounted, cannot update list');
+      }
+      
+      final result = await writePod(
+        fileName,
+        movieListTtl,
+        _context,
+        _child,
+        encrypted: false,
+      );
+
+      if (result != SolidFunctionCallStatus.success) {
+        throw Exception('Failed to write updated list to POD storage');
+      }
       
       // Update cache
       _customListsCache[updatedList.id] = updatedList;

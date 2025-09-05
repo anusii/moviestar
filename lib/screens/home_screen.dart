@@ -1495,6 +1495,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return StreamBuilder<List<CustomList>>(
       stream: widget.favoritesService.customLists,
       builder: (context, snapshot) {
+        // Show loading indicator while waiting for custom lists
+        if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Loading Custom Lists...',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                          ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }
+
         final customLists = snapshot.data ?? [];
         if (customLists.isEmpty) {
           return const SizedBox.shrink();
@@ -1826,6 +1858,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return StreamBuilder<List<CustomList>>(
       stream: widget.favoritesService.customLists,
       builder: (context, snapshot) {
+        // Show loading indicator while waiting for custom lists
+        if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Loading Custom Lists...',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                          ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }
+
         final customLists = snapshot.data ?? [];
         if (customLists.isEmpty) {
           return const SizedBox.shrink();

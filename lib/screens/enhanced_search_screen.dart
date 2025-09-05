@@ -32,6 +32,8 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
@@ -205,7 +207,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(Dimensions.xl),
           child: Row(
             children: [
               Icon(
@@ -213,7 +215,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
                 color: Theme.of(context).colorScheme.primary,
                 size: 20,
               ),
-              const Gap(8),
+              const Gap(Gaps.m),
               Text(
                 categoryTitle,
                 style: TextStyle(
@@ -222,7 +224,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const Gap(8),
+              const Gap(Gaps.m),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
@@ -362,7 +364,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
             );
           },
         ),
-        const Gap(16),
+        const Gap(Gaps.xxl),
       ],
     );
   }
@@ -517,7 +519,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
                                 .onSurface
                                 .withValues(alpha: 0.4),
                           ),
-                          const Gap(16),
+                          const Gap(Gaps.xxl),
                           Text(
                             _searchController.text.isEmpty
                                 ? 'Search for movies and TV shows'
@@ -531,7 +533,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
                               fontSize: 18,
                             ),
                           ),
-                          const Gap(8),
+                          const Gap(Gaps.m),
                           Text(
                             'Find content by title, actor, or genre',
                             style: TextStyle(
@@ -1038,7 +1040,7 @@ class _AddToCustomListsDialogState extends State<_AddToCustomListsDialog> {
             ),
             margin: const EdgeInsets.all(16),
             elevation: 6,
-            duration: const Duration(seconds: 3),
+            duration: TimingConstants.snackbarStandardDuration,
           ),
         );
       }

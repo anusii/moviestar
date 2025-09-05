@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/widgets/list_shared_movies.dart';
 
 class SharedMoviesScreen extends StatefulWidget {
@@ -584,7 +585,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(Dimensions.xxxl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -624,7 +625,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
   Widget _buildErrorState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(Dimensions.xxxl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

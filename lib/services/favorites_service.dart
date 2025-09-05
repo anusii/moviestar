@@ -52,6 +52,7 @@ class FavoritesService extends ChangeNotifier {
   static const String _ratingsKey = 'ratings';
 
   /// Key used to store custom lists in shared preferences.
+  /// DEPRECATED: Custom lists are now POD-only and account-specific.
 
   static const String _customListsKey = 'custom_lists';
 
@@ -361,54 +362,39 @@ class FavoritesService extends ChangeNotifier {
   /// Retrieves all custom lists.
 
   Future<List<CustomList>> getCustomLists() async {
-    final String? listsJson = _prefs.getString(_customListsKey);
-    if (listsJson == null) return [];
-
-    final List<dynamic> decoded = jsonDecode(listsJson);
-    return decoded.map((list) => CustomList.fromJson(list)).toList();
+    debugPrint('🗂️ [FavoritesService] getCustomLists() called - DEPRECATED: Custom lists are POD-only');
+    debugPrint('🗂️ [FavoritesService] Custom lists require POD login and are account-specific');
+    
+    // Custom lists are now POD-only and account-specific
+    // This method only exists for backward compatibility but always returns empty
+    return [];
   }
 
   /// Creates a new custom list.
+  /// DEPRECATED: Custom lists are now POD-only and account-specific.
 
   Future<CustomList> createCustomList(
     String name, {
     String? description,
   }) async {
-    final lists = await getCustomLists();
-    final newList = CustomList(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: name,
-      description: description,
-      movieIds: [],
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
-
-    lists.add(newList);
-    await _saveCustomLists(lists);
-    _customListsController.add(lists);
-    return newList;
+    debugPrint('🚫 [FavoritesService] createCustomList() called - DEPRECATED');
+    throw Exception('Custom lists are account-specific and require POD login');
   }
 
   /// Updates an existing custom list.
+  /// DEPRECATED: Custom lists are now POD-only and account-specific.
 
   Future<void> updateCustomList(CustomList updatedList) async {
-    final lists = await getCustomLists();
-    final index = lists.indexWhere((list) => list.id == updatedList.id);
-    if (index != -1) {
-      lists[index] = updatedList.copyWith(updatedAt: DateTime.now());
-      await _saveCustomLists(lists);
-      _customListsController.add(lists);
-    }
+    debugPrint('🚫 [FavoritesService] updateCustomList() called - DEPRECATED');
+    throw Exception('Custom lists are account-specific and require POD login');
   }
 
   /// Deletes a custom list.
+  /// DEPRECATED: Custom lists are now POD-only and account-specific.
 
   Future<void> deleteCustomList(String listId) async {
-    final lists = await getCustomLists();
-    lists.removeWhere((list) => list.id == listId);
-    await _saveCustomLists(lists);
-    _customListsController.add(lists);
+    debugPrint('🚫 [FavoritesService] deleteCustomList() called - DEPRECATED');
+    throw Exception('Custom lists are account-specific and require POD login');
   }
 
   /// Adds a movie to a custom list.
@@ -507,24 +493,10 @@ class FavoritesService extends ChangeNotifier {
   }
 
   /// Gets movies in a specific custom list.
-  /// Note: This base implementation returns empty list.
-  /// The adapter implementation should override this to load from cache.
+  /// DEPRECATED: Custom lists are now POD-only and account-specific.
 
   Future<List<Movie>> getMoviesInCustomList(String listId) async {
-    final lists = await getCustomLists();
-    lists.firstWhere(
-      (list) => list.id == listId,
-      orElse: () => CustomList(
-        id: '',
-        name: '',
-        movieIds: [],
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-    );
-
-    // Base implementation returns empty list
-    // This should be overridden in the adapter to load from cache
+    debugPrint('🚫 [FavoritesService] getMoviesInCustomList() called - DEPRECATED');
     return [];
   }
 

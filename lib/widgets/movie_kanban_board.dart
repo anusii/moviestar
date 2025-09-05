@@ -40,6 +40,7 @@ import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/api_key_validation_service.dart';
 import 'package:moviestar/services/error_mapper_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/network_connectivity_service.dart';
 import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
@@ -1600,8 +1601,40 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           // Movie items.
 
           Expanded(
-            child: movieIdsWithOptimistic.isEmpty
-                ? Center(
+            child: FutureBuilder<List<Movie>>(
+              future: widget.favoritesService.getMoviesInCustomList(customList.id),
+              builder: (context, snapshot) {
+                debugPrint('🎯 [Kanban] Loading movies for custom list: ${customList.name}');
+                
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+                
+                if (snapshot.hasError) {
+                  debugPrint('❌ [Kanban] Error loading custom list movies: ${snapshot.error}');
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        'Error loading movies',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                
+                final podMovies = snapshot.data ?? [];
+                debugPrint('🎯 [Kanban] Got ${podMovies.length} movies from POD for ${customList.name}');
+                
+                if (podMovies.isEmpty) {
+                  return Center(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Text(
@@ -1614,22 +1647,35 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                             ),
                       ),
                     ),
-                  )
-                : _CustomListMoviesWidget(
-                    movieIds: movieIdsWithOptimistic,
-                    customList: customList,
-                    sortCriteria: _columnSortCriteria[customList.id] ??
-                        MovieSortCriteria.nameAsc,
-                    maxItems: _maxItemsPerColumn,
-                    buildMovieItem: (movie, index) => _buildMovieItem(
-                      movie,
-                      customList.id,
-                      fromCache: false,
-                      columnType: KanbanColumnType.customList,
-                      columnId: customList.id,
-                      columnName: customList.name,
-                    ),
+                  );
+                }
+                
+                // Apply optimistic updates to the POD movies
+                final movieIdsFromPod = podMovies.map((m) => m.id).toList();
+                final optimisticMovieIds = _getMovieIdsWithOptimisticUpdates(
+                  movieIdsFromPod,
+                  KanbanColumnType.customList,
+                  customList.id,
+                );
+                
+                return _CustomListMoviesWidget(
+                  movieIds: optimisticMovieIds,
+                  customList: customList,
+                  favoritesService: widget.favoritesService,
+                  sortCriteria: _columnSortCriteria[customList.id] ??
+                      MovieSortCriteria.nameAsc,
+                  maxItems: _maxItemsPerColumn,
+                  buildMovieItem: (movie, index) => _buildMovieItem(
+                    movie,
+                    customList.id,
+                    fromCache: false,
+                    columnType: KanbanColumnType.customList,
+                    columnId: customList.id,
+                    columnName: customList.name,
                   ),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -1989,6 +2035,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 class _CustomListMoviesWidget extends ConsumerStatefulWidget {
   final List<int> movieIds;
   final CustomList customList;
+  final FavoritesService favoritesService;
   final MovieSortCriteria sortCriteria;
   final int maxItems;
   final Widget Function(Movie movie, int index) buildMovieItem;
@@ -1996,6 +2043,7 @@ class _CustomListMoviesWidget extends ConsumerStatefulWidget {
   const _CustomListMoviesWidget({
     required this.movieIds,
     required this.customList,
+    required this.favoritesService,
     required this.sortCriteria,
     required this.maxItems,
     required this.buildMovieItem,
@@ -2050,8 +2098,43 @@ class _CustomListMoviesWidgetState
       _isLoading = true;
     });
 
-    // Load all movies needed for sorting.
+    debugPrint('🎯 [Kanban] Loading movies for custom list: ${widget.customList.name}');
+    
+    // Try POD-first approach if POD storage is available
+    if (widget.favoritesService is FavoritesServiceAdapter &&
+        (widget.favoritesService as FavoritesServiceAdapter).isPodStorageEnabled) {
+      debugPrint('🎯 [Kanban] Using POD-first approach for ${widget.customList.name}');
+      
+      try {
+        final podMovies = await widget.favoritesService.getMoviesInCustomList(widget.customList.id);
+        debugPrint('🎯 [Kanban] Got ${podMovies.length} movies from POD');
+        
+        if (podMovies.isNotEmpty) {
+          if (mounted) {
+            setState(() {
+              _moviesMap.clear();
+              for (final movie in podMovies) {
+                _moviesMap[movie.id] = movie;
+                debugPrint('🎯 [Kanban] Added movie from POD: ${movie.title} (${movie.id})');
+              }
+              _isLoading = false;
+            });
+          }
+          return;
+        }
+      } catch (e) {
+        debugPrint('⚠️ [Kanban] Failed to load from POD, falling back to API: $e');
+      }
+    }
+    
+    // Fallback to API loading (original method)
+    debugPrint('🎯 [Kanban] Using API fallback for ${widget.customList.name}');
+    await _loadMoviesFromAPI();
+  }
 
+  // Original API loading method
+  Future<void> _loadMoviesFromAPI() async {
+    // Load all movies needed for sorting.
     final moviesToLoad = widget.movieIds.take(widget.maxItems * 2).toList();
 
     for (int i = 0; i < moviesToLoad.length; i++) {

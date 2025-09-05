@@ -1496,9 +1496,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return StreamBuilder<List<CustomList>>(
       stream: widget.favoritesService.customLists,
       builder: (context, snapshot) {
+        debugPrint('🏠 [HomeScreen] CustomList stream update - connection: ${snapshot.connectionState}');
+        debugPrint('🏠 [HomeScreen] CustomList stream - has data: ${snapshot.hasData}');
+        debugPrint('🏠 [HomeScreen] CustomList stream - data length: ${snapshot.data?.length ?? 0}');
+        
         final customLists = snapshot.data ?? [];
         if (customLists.isEmpty) {
+          debugPrint('🏠 [HomeScreen] No custom lists to display in grid view');
           return const SizedBox.shrink();
+        }
+        
+        debugPrint('🏠 [HomeScreen] Displaying ${customLists.length} custom lists in grid view');
+        for (final list in customLists) {
+          debugPrint('🏠 [HomeScreen] Grid list: ${list.name} with ${list.movieCount} movies');
         }
 
         return Column(
@@ -1584,6 +1594,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // Get movie IDs from the custom list.
 
     final movieIds = customList.movieIds;
+    
+    // If using POD storage, try to get movies from POD first
+    debugPrint('🏠 [HomeScreen] Building content for custom list: ${customList.name}');
+    debugPrint('🏠 [HomeScreen] FavoritesService type: ${widget.favoritesService.runtimeType}');
+    debugPrint('🏠 [HomeScreen] Is FavoritesServiceAdapter: ${widget.favoritesService is FavoritesServiceAdapter}');
+    
+    if (widget.favoritesService is FavoritesServiceAdapter) {
+      final adapter = widget.favoritesService as FavoritesServiceAdapter;
+      debugPrint('🏠 [HomeScreen] POD storage enabled: ${adapter.isPodStorageEnabled}');
+      
+      if (adapter.isPodStorageEnabled) {
+        debugPrint('🏠 [HomeScreen] Using POD-first approach for ${customList.name}');
+        return FutureBuilder<List<Movie>>(
+          future: widget.favoritesService.getMoviesInCustomList(customList.id),
+          builder: (context, snapshot) {
+            debugPrint('🏠 [HomeScreen] FutureBuilder state: ${snapshot.connectionState}');
+            debugPrint('🏠 [HomeScreen] Has data: ${snapshot.hasData}');
+            debugPrint('🏠 [HomeScreen] Data length: ${snapshot.data?.length ?? 0}');
+            
+            if (snapshot.hasError) {
+              debugPrint('🏠 [HomeScreen] Error loading POD movies: ${snapshot.error}');
+            }
+            
+            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              final podMovies = snapshot.data!;
+              debugPrint('🏠 [HomeScreen] Got ${podMovies.length} movies from POD for ${customList.name}');
+              
+              return _buildMovieCardsFromMovieObjects(podMovies, customList);
+            } else {
+              // Fallback to loading from API
+              debugPrint('🏠 [HomeScreen] No POD movies found for ${customList.name}, using API fallback');
+              return _buildMovieCardsFromIds(movieIds, customList);
+            }
+          },
+        );
+      }
+    }
 
     if (movieIds.isEmpty) {
       return Center(
@@ -1597,6 +1644,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }
 
+    return _buildMovieCardsFromIds(movieIds, customList);
+  }
+
+  // Build movie cards from movie objects (when we have full data from PODs)
+  Widget _buildMovieCardsFromMovieObjects(List<Movie> movies, CustomList customList) {
+    return Scrollbar(
+      controller: _scrollControllers[customList.id] ?? ScrollController(),
+      thickness: 6,
+      radius: const Radius.circular(3),
+      thumbVisibility: true,
+      child: ListView.builder(
+        controller: _scrollControllers[customList.id],
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        itemCount: movies.length,
+        itemBuilder: (context, index) {
+          final movie = movies[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: _buildCustomListMovieCardFromMovie(movie),
+          );
+        },
+      ),
+    );
+  }
+
+  // Build movie cards from IDs (fallback when POD data not available)
+  Widget _buildMovieCardsFromIds(List<int> movieIds, CustomList customList) {
     return Scrollbar(
       controller: _scrollControllers[customList.id] ?? ScrollController(),
       thickness: 6,
@@ -1616,6 +1691,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
         },
       ),
+    );
+  }
+
+  // Build a movie card directly from a Movie object using consistent MovieCard styling
+  Widget _buildCustomListMovieCardFromMovie(Movie movie) {
+    return MovieCard.poster(
+      movie: movie,
+      fromCache: true, // Since we got it from PODs
+      favoritesService: widget.favoritesService,
+      parentWidget: widget,
+      onTap: () {
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MovieDetailsScreen(
+                movie: movie,
+                favoritesService: widget.favoritesService,
+                contentType: movie.contentType ?? ContentType.movie,
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -1751,9 +1850,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return StreamBuilder<List<CustomList>>(
       stream: widget.favoritesService.customLists,
       builder: (context, snapshot) {
+        debugPrint('🏠 [HomeScreen] CustomList LIST stream update - connection: ${snapshot.connectionState}');
+        debugPrint('🏠 [HomeScreen] CustomList LIST stream - has data: ${snapshot.hasData}');
+        debugPrint('🏠 [HomeScreen] CustomList LIST stream - data length: ${snapshot.data?.length ?? 0}');
+        
         final customLists = snapshot.data ?? [];
         if (customLists.isEmpty) {
+          debugPrint('🏠 [HomeScreen] No custom lists to display in list view');
           return const SizedBox.shrink();
+        }
+        
+        debugPrint('🏠 [HomeScreen] Displaying ${customLists.length} custom lists in list view');
+        for (final list in customLists) {
+          debugPrint('🏠 [HomeScreen] List view list: ${list.name} with ${list.movieCount} movies');
         }
 
         return Column(
@@ -1817,6 +1926,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildCustomListItems(CustomList customList) {
     final movieIds = customList.movieIds;
 
+    debugPrint('🏠 [HomeScreen] Building list items for custom list: ${customList.name}');
+    debugPrint('🏠 [HomeScreen] FavoritesService type: ${widget.favoritesService.runtimeType}');
+    
     if (movieIds.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(16),
@@ -1824,6 +1936,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }
 
+    // If using POD storage, try to get movies from POD first (same as grid view)
+    if (widget.favoritesService is FavoritesServiceAdapter) {
+      final adapter = widget.favoritesService as FavoritesServiceAdapter;
+      debugPrint('🏠 [HomeScreen] POD storage enabled: ${adapter.isPodStorageEnabled}');
+      
+      if (adapter.isPodStorageEnabled) {
+        debugPrint('🏠 [HomeScreen] Using POD-first approach for list items: ${customList.name}');
+        return FutureBuilder<List<Movie>>(
+          future: widget.favoritesService.getMoviesInCustomList(customList.id),
+          builder: (context, snapshot) {
+            debugPrint('🏠 [HomeScreen] List FutureBuilder state: ${snapshot.connectionState}');
+            debugPrint('🏠 [HomeScreen] List has data: ${snapshot.hasData}');
+            debugPrint('🏠 [HomeScreen] List data length: ${snapshot.data?.length ?? 0}');
+            
+            if (snapshot.hasError) {
+              debugPrint('🏠 [HomeScreen] Error loading POD movies for list: ${snapshot.error}');
+            }
+            
+            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              final podMovies = snapshot.data!;
+              debugPrint('🏠 [HomeScreen] Got ${podMovies.length} movies from POD for list: ${customList.name}');
+              
+              return _buildCustomListItemsFromMovieObjects(podMovies);
+            } else {
+              // Fallback to loading from API
+              debugPrint('🏠 [HomeScreen] No POD movies found for list: ${customList.name}, using API fallback');
+              return _buildCustomListItemsFromIds(movieIds, customList);
+            }
+          },
+        );
+      }
+    }
+
+    return _buildCustomListItemsFromIds(movieIds, customList);
+  }
+
+  // Build list items from movie objects (when we have full data from PODs)
+  Widget _buildCustomListItemsFromMovieObjects(List<Movie> movies) {
+    final displayMovies = movies.take(5).toList();
+    
+    return Column(
+      children: displayMovies.map((movie) {
+        return _buildCustomListMovieListItemFromMovie(movie);
+      }).toList(),
+    );
+  }
+
+  // Build list items from IDs (fallback when POD data not available)
+  Widget _buildCustomListItemsFromIds(List<int> movieIds, CustomList customList) {
     final displayMovieIds = movieIds.take(5).toList();
 
     return Column(
@@ -1833,6 +1994,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         final contentType = customList.getContentTypeAt(index);
         return _buildCustomListMovieListItem(movieId, contentType: contentType);
       }).toList(),
+    );
+  }
+
+  // Build a list item directly from a Movie object using consistent MovieCard styling
+  Widget _buildCustomListMovieListItemFromMovie(Movie movie) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: MovieCard.listItem(
+        movie: movie,
+        fromCache: true, // Since we got it from PODs
+        favoritesService: widget.favoritesService,
+        parentWidget: widget,
+        onTap: () {
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MovieDetailsScreen(
+                  movie: movie,
+                  favoritesService: widget.favoritesService,
+                  contentType: movie.contentType ?? ContentType.movie,
+                ),
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 

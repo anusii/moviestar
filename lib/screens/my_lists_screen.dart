@@ -93,7 +93,15 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen> {
   // Loads all custom lists.
 
   Future<void> _loadCustomLists() async {
+    debugPrint('📱 [MyListsScreen] Loading custom lists...');
+    debugPrint('📱 [MyListsScreen] FavoritesService type: ${widget.favoritesService.runtimeType}');
+    
     final lists = await widget.favoritesService.getCustomLists();
+    debugPrint('📱 [MyListsScreen] Loaded ${lists.length} custom lists');
+    for (final list in lists) {
+      debugPrint('  - List: "${list.name}" (${list.movieIds.length} movies)');
+    }
+    
     setState(() {
       _customLists = lists;
       _isLoading = false;
@@ -143,44 +151,81 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen> {
             onPressed: () async {
               final name = nameController.text.trim();
               if (name.isNotEmpty) {
-                final description = descriptionController.text.trim();
-                await widget.favoritesService.createCustomList(
-                  name,
-                  description: description.isEmpty ? null : description,
-                );
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle_outline,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Created "$name" list',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontWeight: FontWeight.w500,
+                try {
+                  final description = descriptionController.text.trim();
+                  await widget.favoritesService.createCustomList(
+                    name,
+                    description: description.isEmpty ? null : description,
+                  );
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle_outline,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Created "$name" list',
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onPrimary,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        margin: const EdgeInsets.all(16),
+                        elevation: 6,
+                        duration: const Duration(seconds: 3),
                       ),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              color: Theme.of(context).colorScheme.onErrorContainer,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                e.toString().replaceAll('Exception: ', ''),
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onErrorContainer,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        margin: const EdgeInsets.all(16),
+                        elevation: 6,
+                        duration: const Duration(seconds: 5),
                       ),
-                      margin: const EdgeInsets.all(16),
-                      elevation: 6,
-                      duration: const Duration(seconds: 3),
-                    ),
-                  );
+                    );
+                  }
                 }
               }
             },
@@ -516,7 +561,7 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Create your first custom list to organize\nyour movies the way you want!',
+              'Create your first custom list to organize\nyour movies the way you want!\n\nCustom lists are stored in your personal POD\nand require you to be logged in.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,

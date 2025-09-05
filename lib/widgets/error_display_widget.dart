@@ -89,6 +89,7 @@ class ErrorDisplayWidget extends StatelessWidget {
 
   /// Creates a new [ErrorDisplayWidget].
 
+  // ignore: avoid-unnecessary-nullable-parameters
   const ErrorDisplayWidget({
     super.key,
     required this.message,
@@ -263,19 +264,17 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                 textAlign: TextAlign.start,
               ),
 
-              // Additional details (if available).
+              // Additional details.
 
-              if (widget.error.details != null) ...[
-                Gap(widget.isCompact ? 6.0 : 8.0),
-                Text(
-                  widget.error.details!,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: onSurfaceColor.withValues(alpha: 0.8),
-                    fontSize: widget.textSize - (widget.isCompact ? 2 : 1),
-                  ),
-                  textAlign: TextAlign.start,
+              Gap(widget.isCompact ? 6.0 : 8.0),
+              Text(
+                widget.error.details,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: onSurfaceColor.withValues(alpha: 0.8),
+                  fontSize: widget.textSize - (widget.isCompact ? 2 : 1),
                 ),
-              ],
+                textAlign: TextAlign.start,
+              ),
 
               // Action buttons.
 
@@ -309,12 +308,12 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
         child: action.isPrimary
             ? ElevatedButton.icon(
                 onPressed: action.onPressed,
-                icon: action.icon != null ? Icon(action.icon) : null,
+                icon: Icon(action.icon),
                 label: Text(action.label),
               )
             : OutlinedButton.icon(
                 onPressed: action.onPressed,
-                icon: action.icon != null ? Icon(action.icon) : null,
+                icon: Icon(action.icon),
                 label: Text(action.label),
               ),
       );
@@ -329,9 +328,7 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
               child: actions[1].isPrimary
                   ? ElevatedButton.icon(
                       onPressed: actions[1].onPressed,
-                      icon: actions[1].icon != null
-                          ? Icon(actions[1].icon)
-                          : null,
+                      icon: Icon(actions[1].icon),
                       label: Text(
                         actions[1].label,
                         textAlign: TextAlign.center,
@@ -348,9 +345,7 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                     )
                   : OutlinedButton.icon(
                       onPressed: actions[1].onPressed,
-                      icon: actions[1].icon != null
-                          ? Icon(actions[1].icon)
-                          : null,
+                      icon: Icon(actions[1].icon),
                       label: Text(
                         actions[1].label,
                         textAlign: TextAlign.center,
@@ -371,9 +366,7 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
               child: actions[0].isPrimary
                   ? ElevatedButton.icon(
                       onPressed: actions[0].onPressed,
-                      icon: actions[0].icon != null
-                          ? Icon(actions[0].icon)
-                          : null,
+                      icon: Icon(actions[0].icon),
                       label: Text(
                         actions[0].label,
                         textAlign: TextAlign.center,
@@ -390,9 +383,7 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                     )
                   : OutlinedButton.icon(
                       onPressed: actions[0].onPressed,
-                      icon: actions[0].icon != null
-                          ? Icon(actions[0].icon)
-                          : null,
+                      icon: Icon(actions[0].icon),
                       label: Text(
                         actions[0].label,
                         textAlign: TextAlign.center,
@@ -421,12 +412,12 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
           return action.isPrimary
               ? ElevatedButton.icon(
                   onPressed: action.onPressed,
-                  icon: action.icon != null ? Icon(action.icon) : null,
+                  icon: Icon(action.icon),
                   label: Text(action.label),
                 )
               : OutlinedButton.icon(
                   onPressed: action.onPressed,
-                  icon: action.icon != null ? Icon(action.icon) : null,
+                  icon: Icon(action.icon),
                   label: Text(action.label),
                 );
         }).toList(),

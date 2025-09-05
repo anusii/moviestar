@@ -191,8 +191,8 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
 
   // Helper function to extract a friendly name from a WebID.
 
-  String _formatWebId(String? webId) {
-    if (webId == null || webId.isEmpty) return 'Unknown';
+  String _formatWebId(String webId) {
+    if (webId.isEmpty) return 'Unknown';
 
     // Extract the username from URLs like:
     // https://pods.dev.solidcommunity.au/my-moviestar/profile/card#me -> my-moviestar

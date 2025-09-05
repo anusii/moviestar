@@ -58,6 +58,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
   /// Creates a new [SettingsScreen] widget.
 
+  // ignore: avoid-unnecessary-nullable-parameters
   const SettingsScreen({
     super.key,
     required this.favoritesService,

@@ -667,7 +667,7 @@ class TurtleSerializer {
   static String createMovieList(
     String movieListId,
     String listName, {
-    List<Movie>? movies,
+    List<Movie> movies = const [],
     String? description,
     Map<String, String>? sharedWith, // Map of WebId -> permissions
     DateTime? sharedDate,
@@ -722,7 +722,7 @@ class TurtleSerializer {
 
     // Add movie references (not full movie data) if provided.
 
-    if (movies != null && movies.isNotEmpty) {
+    if (movies.isNotEmpty) {
       final movieRefs = movies
           .map((movie) => moviestarDataNS.withAttr('movie-${movie.id}'))
           .toList();

@@ -88,13 +88,13 @@ class OperationQueueItem {
   OperationQueueItem copyWith({
     int? id,
     String? description,
-    OperationStatus? status,
+    required OperationStatus status,
     DateTime? startTime,
   }) {
     return OperationQueueItem(
       id: id ?? this.id,
       description: description ?? this.description,
-      status: status ?? this.status,
+      status: status,
       startTime: startTime ?? this.startTime,
     );
   }
@@ -105,22 +105,6 @@ enum OperationStatus {
   inProgress,
   completed,
   failed,
-}
-
-/// A movie item wrapper for kanban board usage.
-
-class MovieItem {
-  final Movie movie;
-  final bool fromCache;
-  final Duration? cacheAge;
-
-  const MovieItem({
-    required this.movie,
-    this.fromCache = false,
-    this.cacheAge,
-  });
-
-  String get id => movie.id.toString();
 }
 
 /// Custom Kanban board widget for displaying movies in columns.

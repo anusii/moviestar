@@ -40,22 +40,3 @@ Future<String> getReadPath(String relativePath) async {
   final dataDir = await getDataDirPath();
   return '$dataDir/$relativePath';
 }
-
-/// Gets the write path for POD operations.
-///
-/// For writePod, use the relative path directly since writePod
-/// automatically handles the data directory prefix.
-
-String getWritePath(String relativePath) {
-  return relativePath;
-}
-
-/// Ensures consistent path formatting by removing leading/trailing slashes
-/// and normalizing path separators.
-
-String normalizePath(String path) {
-  return path
-      .replaceAll(RegExp(r'^/+'), '')
-      .replaceAll(RegExp(r'/+$'), '')
-      .replaceAll('\\', '/');
-}

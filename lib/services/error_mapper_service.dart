@@ -75,7 +75,7 @@ class ErrorMapperService {
   static UserFriendlyError mapError(
     Object error,
     StackTrace stackTrace, {
-    ErrorContext? context,
+    ErrorContext? context = const ErrorContext(),
   }) {
     return _mapErrorTraditionally(error, stackTrace, context);
   }
@@ -85,7 +85,7 @@ class ErrorMapperService {
   static Future<UserFriendlyError> mapErrorSmart(
     Object error,
     StackTrace stackTrace, {
-    ErrorContext? context,
+    ErrorContext? context = const ErrorContext(),
   }) async {
     // Step 1: Check if this is clearly an API key error based on error content
     if (ApiKeyValidationService.isApiKeyError(error)) {

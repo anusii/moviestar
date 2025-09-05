@@ -53,15 +53,15 @@ class QuickActionsDialog extends StatefulWidget {
 
   /// Callback when the dialog should be closed.
 
-  final VoidCallback? onClose;
+  final VoidCallback onClose;
 
   /// Callback when mouse enters the dialog area.
 
-  final VoidCallback? onMouseEnter;
+  final VoidCallback onMouseEnter;
 
   /// Callback when mouse exits the dialog area.
 
-  final VoidCallback? onMouseExit;
+  final VoidCallback onMouseExit;
 
   /// Content type to distinguish between movies and TV shows.
 
@@ -74,9 +74,9 @@ class QuickActionsDialog extends StatefulWidget {
     required this.movie,
     required this.favoritesService,
     this.parentWidget,
-    this.onClose,
-    this.onMouseEnter,
-    this.onMouseExit,
+    required this.onClose,
+    required this.onMouseEnter,
+    required this.onMouseExit,
     this.contentType = ContentType.movie,
   });
 
@@ -350,8 +350,8 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => widget.onMouseEnter?.call(),
-      onExit: (_) => widget.onMouseExit?.call(),
+      onEnter: (_) => widget.onMouseEnter(),
+      onExit: (_) => widget.onMouseExit(),
       child: Material(
         color: Colors.transparent,
         child: Container(

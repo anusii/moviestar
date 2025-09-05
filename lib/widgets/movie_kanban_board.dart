@@ -34,7 +34,6 @@ import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/my_home_page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
@@ -1822,12 +1821,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
         ref.invalidate(popularMoviesWithCacheInfoProvider);
       },
-      onConfigureApiKey: () {
-        // Navigate to Settings tab in the main SolidScaffold instead of
-        // creating a new page.
-
-        navigateToSettings();
-      },
+      onConfigureApiKey: null,
       apiKeyValidationService: apiKeyValidationService,
       networkConnectivityService: networkConnectivityService,
     );

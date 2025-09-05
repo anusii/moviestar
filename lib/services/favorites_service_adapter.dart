@@ -246,8 +246,6 @@ class FavoritesServiceAdapter extends FavoritesService {
 
   @override
   Future<List<CustomList>> getCustomLists() async {
-    debugPrint('🔄 [FavoritesServiceAdapter] getCustomLists() called, delegating to manager');
-    debugPrint('🔄 [FavoritesServiceAdapter] POD storage enabled: $isPodStorageEnabled');
     return _manager.getCustomLists();
   }
 

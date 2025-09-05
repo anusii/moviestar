@@ -199,22 +199,6 @@ class PodFavoritesService extends ChangeNotifier {
 
       // Enhanced error categorization
       final errorMsg = e.toString().toLowerCase();
-      if (errorMsg.contains('network') ||
-          errorMsg.contains('fetch') ||
-          errorMsg.contains('cors')) {
-        debugPrint(
-            '🌐 [POD Init] Network-related initialization error - likely web environment issue');
-      } else if (errorMsg.contains('auth') ||
-          errorMsg.contains('permission') ||
-          errorMsg.contains('unauthorized')) {
-        debugPrint(
-            '🔐 [POD Init] Authentication/permission error during initialization');
-      } else if (errorMsg.contains('timeout')) {
-        debugPrint(
-            '⏱️ [POD Init] Timeout during initialization - POD may be slow to respond');
-      } else {
-        debugPrint('🔍 [POD Init] Unknown initialization error type');
-      }
 
       // Initialise with empty data but don't update streams yet.
       _cachedToWatch = [];
@@ -267,8 +251,6 @@ class PodFavoritesService extends ChangeNotifier {
           return listId;
         }
       } catch (e) {
-        debugPrint(
-            '❌ [Web List Init] Attempt $attempt failed for $listType: $e');
       }
 
       if (attempt < maxRetries) {
@@ -330,7 +312,6 @@ class PodFavoritesService extends ChangeNotifier {
       _toWatchController.add(_cachedToWatch!);
       _watchedController.add(_cachedWatched!);
     } catch (e) {
-      debugPrint('Error loading from POD: $e');
       // Initialize with empty data if POD fails.
       _cachedToWatch = [];
       _cachedWatched = [];
@@ -374,11 +355,9 @@ class PodFavoritesService extends ChangeNotifier {
         _cachedToWatch = List.from(movies);
         await Future.delayed(const Duration(milliseconds: 500));
       } else {
-        debugPrint('WritePod failed with status: $result');
         throw Exception('WritePod failed with status: $result');
       }
     } catch (e) {
-      debugPrint('Failed to save to-watch list to POD: $e');
       final encoded = jsonEncode(movies.map((m) => m.toJson()).toList());
       await _prefs.setString('to_watch', encoded);
     }
@@ -397,7 +376,6 @@ class PodFavoritesService extends ChangeNotifier {
       await writePod(_watchedFileName, ttlContent, _context, _child);
       _cachedWatched = List.from(movies);
     } catch (e) {
-      debugPrint('Failed to save watched list to POD: $e');
 
       // Fallback to SharedPreferences.
 
@@ -423,7 +401,6 @@ class PodFavoritesService extends ChangeNotifier {
       _cachedRatings = Map.from(ratings);
     } catch (e) {
       // Don't log - this is background save for compatibility
-      // debugPrint('Failed to save ratings to POD: $e');
     }
   }
 
@@ -1084,7 +1061,6 @@ class PodFavoritesService extends ChangeNotifier {
       // Skip saving comments to old format - we use individual movie files now
       // await _saveCommentsToPod(comments);
     } catch (e) {
-      debugPrint('Failed to migrate data to POD: $e');
       rethrow;
     }
   }
@@ -1182,7 +1158,6 @@ class PodFavoritesService extends ChangeNotifier {
         await _loadFromPodWithoutKeyValidation();
       }
     } catch (e) {
-      debugPrint('Failed to reload from POD: $e');
     }
   }
 
@@ -1232,7 +1207,6 @@ class PodFavoritesService extends ChangeNotifier {
         _watchedController.add(_cachedWatched!);
       }
     } catch (e) {
-      debugPrint('Error loading from POD: $e');
       // Initialize with empty data if POD fails.
       _cachedToWatch = [];
       _cachedWatched = [];
@@ -1253,7 +1227,6 @@ class PodFavoritesService extends ChangeNotifier {
       final loggedIn = await isLoggedIn();
       return loggedIn;
     } catch (e) {
-      debugPrint('POD availability check failed: $e');
       return false;
     }
   }
@@ -1337,8 +1310,6 @@ class PodFavoritesService extends ChangeNotifier {
               return;
             }
           } catch (fallbackError) {
-            debugPrint(
-                '❌ [Stream Update] Fallback data load failed: $fallbackError');
           }
 
           return;
@@ -1362,8 +1333,6 @@ class PodFavoritesService extends ChangeNotifier {
           _watchedController.add(_cachedWatched!);
         }
       } catch (fallbackError) {
-        debugPrint(
-            '❌ [Stream Update] Even fallback stream update failed: $fallbackError');
       }
     }
   }
@@ -1375,22 +1344,17 @@ class PodFavoritesService extends ChangeNotifier {
   Future<List<CustomList>> getCustomLists() async {
     try {
       final loggedIn = await isLoggedIn();
-      debugPrint('🔐 [PodFavorites] getCustomLists - isLoggedIn: $loggedIn');
       
       if (!loggedIn) {
         // No custom lists if not logged in - custom lists are account-specific
-        debugPrint('⚡ [PodFavorites] User not logged in, returning empty list');
-        debugPrint('📋 [PodFavorites] Custom lists are account-specific and require login');
         return [];
       }
 
       // Get all MovieLists from user profile or scan directory
-      debugPrint('🎯 [PodFavorites] User logged in, loading from PODs');
       final customLists = <CustomList>[];
       
       // Always scan directory to ensure we have the latest data
       // (Cache will be rebuilt during this process)
-      debugPrint('🔄 [PodFavorites] Scanning directory for latest custom lists (cache will be rebuilt)');
       
       // Clear cache to avoid duplicates
       _customListsCache.clear();
@@ -1401,9 +1365,7 @@ class PodFavoritesService extends ChangeNotifier {
       // Scan the user_lists directory for MovieList files
       try {
         final dirUrl = await getDirUrl('moviestar/data/user_lists');
-        debugPrint('📂 [PodFavorites] Scanning directory: $dirUrl');
         final resources = await getResourcesInContainer(dirUrl);
-        debugPrint('📋 [PodFavorites] Found ${resources.files.length} files in user_lists directory');
         
         for (final fileName in resources.files) {
           if (fileName.startsWith('MovieList-') && fileName.endsWith('.ttl')) {
@@ -1414,26 +1376,21 @@ class PodFavoritesService extends ChangeNotifier {
             
             // Skip if we've already processed this list ID
             if (processedListIds.contains(movieListId)) {
-              debugPrint('⏭️ [PodFavorites] Skipping duplicate list ID: $movieListId');
               continue;
             }
             processedListIds.add(movieListId);
             
             // Get the MovieList data first to check its name
-            debugPrint('🎯 [PodFavorites] Loading MovieList: $movieListId');
             final movieListData = await _movieListService.getMovieList(movieListId);
             if (movieListData != null) {
-              debugPrint('✅ [PodFavorites] Successfully loaded MovieList: $movieListId');
               // Convert MovieList data to CustomList format
               final customList = _movieListToCustomList(movieListId, movieListData);
               
               // Skip standard lists by checking their actual names
               if (customList.name == 'To Watch' || customList.name == 'Watched') {
-                debugPrint('🚫 [PodFavorites] Skipping standard list: ${customList.name}');
                 continue;
               }
               
-              debugPrint('🎯 [PodFavorites] Added custom list: ${customList.name} with ${customList.movieIds.length} movies');
               customLists.add(customList);
               _customListsCache[movieListId] = customList;
             } else {
@@ -1463,7 +1420,6 @@ class PodFavoritesService extends ChangeNotifier {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
         // Cannot create custom lists without login
-        debugPrint('⚠️ [PodFavorites] Cannot create custom list - user not logged in');
         throw Exception('Please log in to create custom lists');
       }
 
@@ -1509,7 +1465,6 @@ class PodFavoritesService extends ChangeNotifier {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
         // Cannot update custom lists without login
-        debugPrint('⚠️ [PodFavorites] Cannot update custom list - user not logged in');
         throw Exception('Please log in to update custom lists');
       }
 
@@ -1537,7 +1492,6 @@ class PodFavoritesService extends ChangeNotifier {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
         // Cannot delete custom lists without login
-        debugPrint('⚠️ [PodFavorites] Cannot delete custom list - user not logged in');
         throw Exception('Please log in to delete custom lists');
       }
 
@@ -1622,7 +1576,6 @@ class PodFavoritesService extends ChangeNotifier {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
         // Cannot modify custom lists without login
-        debugPrint('⚠️ [PodFavorites] Cannot remove movie from custom list - user not logged in');
         throw Exception('Please log in to modify custom lists');
       }
 
@@ -1716,23 +1669,14 @@ class PodFavoritesService extends ChangeNotifier {
       final movieListData = await _movieListService.getMovieList(listId);
       if (movieListData != null && movieListData['movies'] != null) {
         final movies = List<Movie>.from(movieListData['movies']);
-        debugPrint('🎭 [PodFavorites] getMoviesInCustomList - raw movies: ${movies.length}');
-        for (final movie in movies) {
-          debugPrint('  - Movie: ${movie.id} - "${movie.title}"');
-        }
         
         // Filter out placeholder movies (those with title like "Movie 12345")
         // But "Nobody 2" should NOT be filtered since it's a real title
         final validMovies = movies.where((movie) {
           // Only filter movies with titles exactly matching "Movie 123456" pattern
           final isPlaceholder = RegExp(r'^Movie \d+$').hasMatch(movie.title);
-          if (isPlaceholder) {
-            debugPrint('🚫 [PodFavorites] Filtering placeholder: ${movie.title}');
-          }
           return !isPlaceholder;
         }).toList();
-        
-        debugPrint('🎭 [PodFavorites] getMoviesInCustomList - filtered movies: ${validMovies.length}');
         return validMovies;
       }
 
@@ -1749,13 +1693,6 @@ class PodFavoritesService extends ChangeNotifier {
     final movies = List<Movie>.from(movieListData['movies'] ?? []);
     final movieIds = movies.map((m) => m.id).toList();
     
-    debugPrint('🔄 [PodFavorites] Converting MovieList to CustomList:');
-    debugPrint('  - Name: ${movieListData['name']}');
-    debugPrint('  - Movies count: ${movies.length}');
-    debugPrint('  - Movie IDs: $movieIds');
-    for (final movie in movies) {
-      debugPrint('  - Movie: ${movie.id} - ${movie.title}');
-    }
     
     return CustomList(
       id: movieListId,
@@ -1771,8 +1708,6 @@ class PodFavoritesService extends ChangeNotifier {
   /// Custom lists are now account-specific and don't migrate from SharedPreferences.
 
   Future<void> migrateCustomListsToPod() async {
-    debugPrint('📋 [PodFavorites] Custom lists migration skipped - lists are now POD-only');
-    debugPrint('💡 [PodFavorites] Custom lists are account-specific and require login');
     // No migration needed - custom lists are POD-only now
   }
 

@@ -182,11 +182,9 @@ class MovieListService {
                 movieListData['movies'] as List<Movie>? ?? [];
             final fullMovies = <Movie>[];
 
-            debugPrint('📽️ [MovieList] Loading full data for ${placeholderMovies.length} movies');
             
             for (final placeholderMovie in placeholderMovies) {
               try {
-                debugPrint('📽️ [MovieList] Loading movie ${placeholderMovie.id} from file');
                 
                 // Try to load full movie data from individual movie file.
                 final fullMovieData = await _loadFullMovieData(
@@ -194,13 +192,11 @@ class MovieListService {
                 );
                 
                 if (fullMovieData != null) {
-                  debugPrint('📽️ [MovieList] Loaded full data for movie ${placeholderMovie.id}: ${fullMovieData.title}');
                   fullMovies.add(fullMovieData);
                 } else {
                   // If no individual movie file exists, keep the placeholder
                   // but mark it as needing to be fetched from API
                   // The UI should handle fetching the full data
-                  debugPrint('⚠️ [MovieList] No file for movie ${placeholderMovie.id}, using placeholder');
                   fullMovies.add(placeholderMovie);
                 }
               } catch (e) {
@@ -244,32 +240,25 @@ class MovieListService {
       // First try to load from individual movie file.
 
       final movieFileName = 'moviestar/data/movies/Movie-$movieId.ttl';
-      debugPrint('📁 [MovieList] Trying to read file: $movieFileName');
 
       if (!_context.mounted) return null;
       
       try {
         final result = await readPod(movieFileName, _context, _child);
-        debugPrint('📁 [MovieList] Read ${result.length} characters from $movieFileName');
 
         if (result.isNotEmpty) {
           final movieData = TurtleSerializer.movieWithUserDataFromTurtle(result);
-          debugPrint('📁 [MovieList] Parsed movie data: $movieData');
           
           if (movieData != null && movieData['movie'] is Movie) {
             final movie = movieData['movie'] as Movie;
-            debugPrint('✅ [MovieList] Successfully loaded movie: ${movie.title} (ID: ${movie.id})');
             return movie;
           } else {
-            debugPrint('⚠️ [MovieList] Movie data parsed but no valid movie object found');
           }
         }
       } catch (e) {
         // File doesn't exist or can't be read, continue to fallback
         if (!e.toString().contains('does not exist')) {
-          debugPrint('⚠️ [MovieList] Error reading movie file for $movieId: $e');
         } else {
-          debugPrint('📁 [MovieList] Movie file does not exist for $movieId');
         }
       }
 
@@ -501,7 +490,6 @@ class MovieListService {
       );
 
       if (result == SolidFunctionCallStatus.success) {
-        debugPrint('✅ Created individual movie file for ${movie.title}');
       } else {
         debugPrint(
           '❌ Failed to create individual movie file for ${movie.title}',

@@ -1604,8 +1604,6 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
             child: FutureBuilder<List<Movie>>(
               future: widget.favoritesService.getMoviesInCustomList(customList.id),
               builder: (context, snapshot) {
-                debugPrint('🎯 [Kanban] Loading movies for custom list: ${customList.name}');
-                
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
                     child: Padding(
@@ -1616,7 +1614,6 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                 }
                 
                 if (snapshot.hasError) {
-                  debugPrint('❌ [Kanban] Error loading custom list movies: ${snapshot.error}');
                   return Center(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -1631,7 +1628,6 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                 }
                 
                 final podMovies = snapshot.data ?? [];
-                debugPrint('🎯 [Kanban] Got ${podMovies.length} movies from POD for ${customList.name}');
                 
                 if (podMovies.isEmpty) {
                   return Center(
@@ -2098,16 +2094,12 @@ class _CustomListMoviesWidgetState
       _isLoading = true;
     });
 
-    debugPrint('🎯 [Kanban] Loading movies for custom list: ${widget.customList.name}');
-    
     // Try POD-first approach if POD storage is available
     if (widget.favoritesService is FavoritesServiceAdapter &&
         (widget.favoritesService as FavoritesServiceAdapter).isPodStorageEnabled) {
-      debugPrint('🎯 [Kanban] Using POD-first approach for ${widget.customList.name}');
       
       try {
         final podMovies = await widget.favoritesService.getMoviesInCustomList(widget.customList.id);
-        debugPrint('🎯 [Kanban] Got ${podMovies.length} movies from POD');
         
         if (podMovies.isNotEmpty) {
           if (mounted) {
@@ -2115,7 +2107,6 @@ class _CustomListMoviesWidgetState
               _moviesMap.clear();
               for (final movie in podMovies) {
                 _moviesMap[movie.id] = movie;
-                debugPrint('🎯 [Kanban] Added movie from POD: ${movie.title} (${movie.id})');
               }
               _isLoading = false;
             });
@@ -2123,12 +2114,10 @@ class _CustomListMoviesWidgetState
           return;
         }
       } catch (e) {
-        debugPrint('⚠️ [Kanban] Failed to load from POD, falling back to API: $e');
       }
     }
     
     // Fallback to API loading (original method)
-    debugPrint('🎯 [Kanban] Using API fallback for ${widget.customList.name}');
     await _loadMoviesFromAPI();
   }
 

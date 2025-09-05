@@ -241,12 +241,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             // Automatically enable POD storage for authenticated users if not already enabled.
             
             if (!_favoritesServiceManager.isPodStorageEnabled) {
-              debugPrint('🔧 [MyHomePage] User authenticated but POD storage disabled. Attempting to enable...');
               try {
                 final enabled = await _favoritesServiceManager.enablePodStorage();
-                if (enabled) {
-                  debugPrint('✅ [MyHomePage] POD storage automatically enabled for authenticated user');
-                } else {
+                if (!enabled) {
                   debugPrint('❌ [MyHomePage] Failed to automatically enable POD storage');
                 }
               } catch (e) {

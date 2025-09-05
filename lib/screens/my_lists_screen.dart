@@ -93,14 +93,7 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen> {
   // Loads all custom lists.
 
   Future<void> _loadCustomLists() async {
-    debugPrint('📱 [MyListsScreen] Loading custom lists...');
-    debugPrint('📱 [MyListsScreen] FavoritesService type: ${widget.favoritesService.runtimeType}');
-    
     final lists = await widget.favoritesService.getCustomLists();
-    debugPrint('📱 [MyListsScreen] Loaded ${lists.length} custom lists');
-    for (final list in lists) {
-      debugPrint('  - List: "${list.name}" (${list.movieIds.length} movies)');
-    }
     
     setState(() {
       _customLists = lists;

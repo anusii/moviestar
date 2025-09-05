@@ -362,8 +362,6 @@ class FavoritesService extends ChangeNotifier {
   /// Retrieves all custom lists.
 
   Future<List<CustomList>> getCustomLists() async {
-    debugPrint('🗂️ [FavoritesService] getCustomLists() called - DEPRECATED: Custom lists are POD-only');
-    debugPrint('🗂️ [FavoritesService] Custom lists require POD login and are account-specific');
     
     // Custom lists are now POD-only and account-specific
     // This method only exists for backward compatibility but always returns empty
@@ -377,7 +375,6 @@ class FavoritesService extends ChangeNotifier {
     String name, {
     String? description,
   }) async {
-    debugPrint('🚫 [FavoritesService] createCustomList() called - DEPRECATED');
     throw Exception('Custom lists are account-specific and require POD login');
   }
 
@@ -385,7 +382,6 @@ class FavoritesService extends ChangeNotifier {
   /// DEPRECATED: Custom lists are now POD-only and account-specific.
 
   Future<void> updateCustomList(CustomList updatedList) async {
-    debugPrint('🚫 [FavoritesService] updateCustomList() called - DEPRECATED');
     throw Exception('Custom lists are account-specific and require POD login');
   }
 
@@ -393,7 +389,6 @@ class FavoritesService extends ChangeNotifier {
   /// DEPRECATED: Custom lists are now POD-only and account-specific.
 
   Future<void> deleteCustomList(String listId) async {
-    debugPrint('🚫 [FavoritesService] deleteCustomList() called - DEPRECATED');
     throw Exception('Custom lists are account-specific and require POD login');
   }
 
@@ -496,7 +491,6 @@ class FavoritesService extends ChangeNotifier {
   /// DEPRECATED: Custom lists are now POD-only and account-specific.
 
   Future<List<Movie>> getMoviesInCustomList(String listId) async {
-    debugPrint('🚫 [FavoritesService] getMoviesInCustomList() called - DEPRECATED');
     return [];
   }
 

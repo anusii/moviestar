@@ -912,7 +912,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       // Handle error gracefully without causing setState after dispose.
 
       if (mounted) {
-        debugPrint('Error during force refresh: $e');
       }
     }
   }
@@ -1496,19 +1495,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return StreamBuilder<List<CustomList>>(
       stream: widget.favoritesService.customLists,
       builder: (context, snapshot) {
-        debugPrint('🏠 [HomeScreen] CustomList stream update - connection: ${snapshot.connectionState}');
-        debugPrint('🏠 [HomeScreen] CustomList stream - has data: ${snapshot.hasData}');
-        debugPrint('🏠 [HomeScreen] CustomList stream - data length: ${snapshot.data?.length ?? 0}');
-        
         final customLists = snapshot.data ?? [];
         if (customLists.isEmpty) {
-          debugPrint('🏠 [HomeScreen] No custom lists to display in grid view');
           return const SizedBox.shrink();
-        }
-        
-        debugPrint('🏠 [HomeScreen] Displaying ${customLists.length} custom lists in grid view');
-        for (final list in customLists) {
-          debugPrint('🏠 [HomeScreen] Grid list: ${list.name} with ${list.movieCount} movies');
         }
 
         return Column(
@@ -1596,35 +1585,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final movieIds = customList.movieIds;
     
     // If using POD storage, try to get movies from POD first
-    debugPrint('🏠 [HomeScreen] Building content for custom list: ${customList.name}');
-    debugPrint('🏠 [HomeScreen] FavoritesService type: ${widget.favoritesService.runtimeType}');
-    debugPrint('🏠 [HomeScreen] Is FavoritesServiceAdapter: ${widget.favoritesService is FavoritesServiceAdapter}');
-    
     if (widget.favoritesService is FavoritesServiceAdapter) {
       final adapter = widget.favoritesService as FavoritesServiceAdapter;
-      debugPrint('🏠 [HomeScreen] POD storage enabled: ${adapter.isPodStorageEnabled}');
       
       if (adapter.isPodStorageEnabled) {
-        debugPrint('🏠 [HomeScreen] Using POD-first approach for ${customList.name}');
         return FutureBuilder<List<Movie>>(
           future: widget.favoritesService.getMoviesInCustomList(customList.id),
           builder: (context, snapshot) {
-            debugPrint('🏠 [HomeScreen] FutureBuilder state: ${snapshot.connectionState}');
-            debugPrint('🏠 [HomeScreen] Has data: ${snapshot.hasData}');
-            debugPrint('🏠 [HomeScreen] Data length: ${snapshot.data?.length ?? 0}');
-            
             if (snapshot.hasError) {
-              debugPrint('🏠 [HomeScreen] Error loading POD movies: ${snapshot.error}');
             }
             
             if (snapshot.hasData && snapshot.data!.isNotEmpty) {
               final podMovies = snapshot.data!;
-              debugPrint('🏠 [HomeScreen] Got ${podMovies.length} movies from POD for ${customList.name}');
               
               return _buildMovieCardsFromMovieObjects(podMovies, customList);
             } else {
               // Fallback to loading from API
-              debugPrint('🏠 [HomeScreen] No POD movies found for ${customList.name}, using API fallback');
               return _buildMovieCardsFromIds(movieIds, customList);
             }
           },
@@ -1850,19 +1826,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return StreamBuilder<List<CustomList>>(
       stream: widget.favoritesService.customLists,
       builder: (context, snapshot) {
-        debugPrint('🏠 [HomeScreen] CustomList LIST stream update - connection: ${snapshot.connectionState}');
-        debugPrint('🏠 [HomeScreen] CustomList LIST stream - has data: ${snapshot.hasData}');
-        debugPrint('🏠 [HomeScreen] CustomList LIST stream - data length: ${snapshot.data?.length ?? 0}');
-        
         final customLists = snapshot.data ?? [];
         if (customLists.isEmpty) {
-          debugPrint('🏠 [HomeScreen] No custom lists to display in list view');
           return const SizedBox.shrink();
-        }
-        
-        debugPrint('🏠 [HomeScreen] Displaying ${customLists.length} custom lists in list view');
-        for (final list in customLists) {
-          debugPrint('🏠 [HomeScreen] List view list: ${list.name} with ${list.movieCount} movies');
         }
 
         return Column(
@@ -1926,9 +1892,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildCustomListItems(CustomList customList) {
     final movieIds = customList.movieIds;
 
-    debugPrint('🏠 [HomeScreen] Building list items for custom list: ${customList.name}');
-    debugPrint('🏠 [HomeScreen] FavoritesService type: ${widget.favoritesService.runtimeType}');
-    
     if (movieIds.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(16),
@@ -1939,29 +1902,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // If using POD storage, try to get movies from POD first (same as grid view)
     if (widget.favoritesService is FavoritesServiceAdapter) {
       final adapter = widget.favoritesService as FavoritesServiceAdapter;
-      debugPrint('🏠 [HomeScreen] POD storage enabled: ${adapter.isPodStorageEnabled}');
       
       if (adapter.isPodStorageEnabled) {
-        debugPrint('🏠 [HomeScreen] Using POD-first approach for list items: ${customList.name}');
         return FutureBuilder<List<Movie>>(
           future: widget.favoritesService.getMoviesInCustomList(customList.id),
           builder: (context, snapshot) {
-            debugPrint('🏠 [HomeScreen] List FutureBuilder state: ${snapshot.connectionState}');
-            debugPrint('🏠 [HomeScreen] List has data: ${snapshot.hasData}');
-            debugPrint('🏠 [HomeScreen] List data length: ${snapshot.data?.length ?? 0}');
-            
             if (snapshot.hasError) {
-              debugPrint('🏠 [HomeScreen] Error loading POD movies for list: ${snapshot.error}');
             }
             
             if (snapshot.hasData && snapshot.data!.isNotEmpty) {
               final podMovies = snapshot.data!;
-              debugPrint('🏠 [HomeScreen] Got ${podMovies.length} movies from POD for list: ${customList.name}');
               
               return _buildCustomListItemsFromMovieObjects(podMovies);
             } else {
               // Fallback to loading from API
-              debugPrint('🏠 [HomeScreen] No POD movies found for list: ${customList.name}, using API fallback');
               return _buildCustomListItemsFromIds(movieIds, customList);
             }
           },

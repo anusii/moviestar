@@ -76,9 +76,7 @@ class FavoritesServiceManager extends ChangeNotifier {
   Future<void> _enablePodService() async {
     try {
       _podService = PodFavoritesService(_prefs, _context, _child);
-      debugPrint('POD storage service enabled');
     } catch (e) {
-      debugPrint('Failed to enable POD service: $e');
       _isPodStorageEnabled = false;
       await _prefs.setBool(_podStorageEnabledKey, false);
     }
@@ -135,17 +133,10 @@ class FavoritesServiceManager extends ChangeNotifier {
   
   /// Stream of custom lists from the active service.
   Stream<List<CustomList>> get customLists {
-    debugPrint('🔄 [FavoritesServiceManager] customLists stream getter accessed');
-    debugPrint('🔄 [FavoritesServiceManager] _lastCustomLists is null: ${_lastCustomLists == null}');
-    debugPrint('🔄 [FavoritesServiceManager] _lastCustomLists length: ${_lastCustomLists?.length ?? 0}');
-    
     // If we have cached data, create a stream that emits it first
     if (_lastCustomLists != null) {
-      debugPrint('✅ [FavoritesServiceManager] Providing stream with cached data: ${_lastCustomLists!.length} lists');
       return _createStreamWithInitialValue(_lastCustomLists!);
     }
-    
-    debugPrint('🔄 [FavoritesServiceManager] Providing raw controller stream');
     return _customListsController.stream;
   }
   
@@ -158,17 +149,11 @@ class FavoritesServiceManager extends ChangeNotifier {
   /// Updates the custom lists stream with data from the active service.
   Future<void> _updateCustomListsStream() async {
     try {
-      debugPrint('🔄 [FavoritesServiceManager] _updateCustomListsStream called, POD enabled: $_isPodStorageEnabled');
       final lists = await getCustomLists();
-      debugPrint('🔄 [FavoritesServiceManager] Got ${lists.length} custom lists for stream');
-      for (final list in lists) {
-        debugPrint('🔄 [FavoritesServiceManager] Stream list: ${list.name} with ${list.movieCount} movies');
-      }
       
       if (!_customListsController.isClosed) {
         _lastCustomLists = lists; // Store last value for late listeners
         _customListsController.add(lists);
-        debugPrint('✅ [FavoritesServiceManager] Stream updated with ${lists.length} lists');
       } else {
         debugPrint('❌ [FavoritesServiceManager] Stream controller is closed!');
       }
@@ -351,14 +336,9 @@ class FavoritesServiceManager extends ChangeNotifier {
   /// Retrieves all custom lists.
 
   Future<List<CustomList>> getCustomLists() async {
-    debugPrint('🔧 [FavoritesServiceManager] getCustomLists() - POD storage enabled: $_isPodStorageEnabled');
-    debugPrint('🔧 [FavoritesServiceManager] POD service available: ${_podService != null}');
-    
     if (_isPodStorageEnabled && _podService != null) {
-      debugPrint('🔧 [FavoritesServiceManager] Delegating to POD service');
       return _podService!.getCustomLists();
     }
-    debugPrint('🔧 [FavoritesServiceManager] Delegating to local service (deprecated)');
     return _localService.getCustomLists();
   }
 
@@ -493,9 +473,6 @@ class FavoritesServiceManager extends ChangeNotifier {
 
       final isPodAvailable = await _podService!.isPodAvailable();
       if (!isPodAvailable) {
-        debugPrint(
-          'POD is not available (user not logged in), cannot enable POD storage',
-        );
         _podService = null;
         return false;
       }
@@ -518,7 +495,6 @@ class FavoritesServiceManager extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      debugPrint('Failed to enable POD storage: $e');
       _podService = null;
       _isPodStorageEnabled = false;
       await _prefs.setBool(_podStorageEnabledKey, false);
@@ -537,7 +513,6 @@ class FavoritesServiceManager extends ChangeNotifier {
     _podService?.dispose();
     _podService = null;
 
-    debugPrint('POD storage disabled, using local storage');
     notifyListeners();
   }
 

@@ -128,16 +128,11 @@ class _CustomListDetailScreenState
   // Loads movies in this custom list from cache.
 
   Future<void> _loadMovies() async {
-    debugPrint('🎬 [CustomList] Loading movies for list: ${_currentList.name}');
-    debugPrint('🎬 [CustomList] Movie IDs to load: ${_currentList.movieIds}');
-    
     // First try to get movies directly from POD if using POD storage
     if (widget.favoritesService is FavoritesServiceAdapter &&
         (widget.favoritesService as FavoritesServiceAdapter).isPodStorageEnabled) {
-      debugPrint('🎬 [CustomList] Using POD storage - trying to get movies directly from PODs');
       try {
         final podMovies = await widget.favoritesService.getMoviesInCustomList(_currentList.id);
-        debugPrint('🎬 [CustomList] Got ${podMovies.length} movies from POD');
         
         if (podMovies.isNotEmpty) {
           if (mounted) {
@@ -146,7 +141,6 @@ class _CustomListDetailScreenState
                 _moviesMap[movie.id] = movie;
                 _loadingMovieIds.remove(movie.id);
                 _failedMovieIds.remove(movie.id);
-                debugPrint('🎬 [CustomList] Loaded from POD: ${movie.title} (${movie.id})');
               }
             });
           }
@@ -154,7 +148,6 @@ class _CustomListDetailScreenState
           final loadedIds = podMovies.map((m) => m.id).toSet();
           final remainingIds = _currentList.movieIds.where((id) => !loadedIds.contains(id)).toList();
           if (remainingIds.isNotEmpty) {
-            debugPrint('🎬 [CustomList] Still need to load from API: $remainingIds');
             await _loadMoviesFromAPI(remainingIds);
           }
           return;
@@ -175,11 +168,9 @@ class _CustomListDetailScreenState
 
       if (_moviesMap.containsKey(movieId) ||
           _loadingMovieIds.contains(movieId)) {
-        debugPrint('🎬 [CustomList] Movie $movieId already loaded or loading');
         continue; // Already loaded or loading.
       }
 
-      debugPrint('🎬 [CustomList] Starting to load movie $movieId from API');
       setState(() {
         _loadingMovieIds.add(movieId);
       });
@@ -188,10 +179,7 @@ class _CustomListDetailScreenState
         final contentType = _currentList.getContentTypeAt(
           _currentList.movieIds.indexOf(movieId),
         );
-        debugPrint('🎬 [CustomList] Loading movie $movieId as contentType: $contentType');
-
         final movie = await _getContentAsMovieWithType(movieId, contentType);
-        debugPrint('🎬 [CustomList] Successfully loaded movie $movieId from API: ${movie.title}');
         
         if (mounted) {
           setState(() {

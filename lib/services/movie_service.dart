@@ -93,31 +93,31 @@ class MovieService {
         .toList();
   }
 
-  /// Gets a list of movies currently playing in theaters.
+  /// Gets a list of movies currently playing in theaters and TV shows on the air.
 
   Future<List<Movie>> getNowPlayingMovies() async {
     await _ensureClientInitialized();
-    final contentItems = await _contentService!.getNowPlayingMovies();
+    final contentItems = await _contentService!.getNowPlayingMixedContent();
     return contentItems
         .map((content) => Movie.fromContentItem(content))
         .toList();
   }
 
-  /// Gets a list of top rated movies.
+  /// Gets a list of top rated movies and TV shows.
 
   Future<List<Movie>> getTopRatedMovies() async {
     await _ensureClientInitialized();
-    final contentItems = await _contentService!.getTopRatedMovies();
+    final contentItems = await _contentService!.getTopRatedMixedContent();
     return contentItems
         .map((content) => Movie.fromContentItem(content))
         .toList();
   }
 
-  /// Gets a list of upcoming movies.
+  /// Gets a list of upcoming movies and TV shows airing today.
 
   Future<List<Movie>> getUpcomingMovies() async {
     await _ensureClientInitialized();
-    final contentItems = await _contentService!.getUpcomingMovies();
+    final contentItems = await _contentService!.getUpcomingMixedContent();
     return contentItems
         .map((content) => Movie.fromContentItem(content))
         .toList();

@@ -65,7 +65,8 @@ class FavoritesServiceManager extends ChangeNotifier {
       await _enablePodService();
     }
 
-    // Initialize the custom lists stream after POD preference is loaded
+    // Initialize the custom lists stream after POD preference is loaded.
+
     await _updateCustomListsStream();
 
     notifyListeners();
@@ -125,34 +126,43 @@ class FavoritesServiceManager extends ChangeNotifier {
     return _localService.watchedMovies;
   }
 
-  /// Stream controller for unified custom lists stream.
+  // Stream controller for unified custom lists stream.
+
   final _customListsController = StreamController<List<CustomList>>.broadcast();
-  
-  /// Last emitted custom lists data for late listeners
+
+  // Last emitted custom lists data for late listeners.
+
   List<CustomList>? _lastCustomLists;
-  
+
   /// Stream of custom lists from the active service.
+
   Stream<List<CustomList>> get customLists {
-    // If we have cached data, create a stream that emits it first
+    // If we have cached data, create a stream that emits it first.
+
     if (_lastCustomLists != null) {
       return _createStreamWithInitialValue(_lastCustomLists!);
     }
     return _customListsController.stream;
   }
-  
-  /// Create a stream that starts with an initial value then continues with the controller stream
-  Stream<List<CustomList>> _createStreamWithInitialValue(List<CustomList> initialValue) async* {
+
+  // Create a stream that starts with an initial value then continues with the controller stream.
+
+  Stream<List<CustomList>> _createStreamWithInitialValue(
+    List<CustomList> initialValue,
+  ) async* {
     yield initialValue;
     yield* _customListsController.stream;
   }
-  
-  /// Updates the custom lists stream with data from the active service.
+
+  // Updates the custom lists stream with data from the active service.
+
   Future<void> _updateCustomListsStream() async {
     try {
       final lists = await getCustomLists();
-      
+
       if (!_customListsController.isClosed) {
-        _lastCustomLists = lists; // Store last value for late listeners
+        _lastCustomLists = lists; // Store last value for late listeners.
+
         _customListsController.add(lists);
       } else {
         debugPrint('❌ [FavoritesServiceManager] Stream controller is closed!');
@@ -160,7 +170,8 @@ class FavoritesServiceManager extends ChangeNotifier {
     } catch (e) {
       debugPrint('❌ Error updating custom lists stream: $e');
       if (!_customListsController.isClosed) {
-        _lastCustomLists = []; // Store empty list as last value
+        _lastCustomLists = []; // Store empty list as last value.
+
         _customListsController.add([]);
       }
     }
@@ -350,11 +361,13 @@ class FavoritesServiceManager extends ChangeNotifier {
   }) async {
     late CustomList result;
     if (_isPodStorageEnabled && _podService != null) {
-      result = await _podService!.createCustomList(name, description: description);
+      result =
+          await _podService!.createCustomList(name, description: description);
     } else {
-      result = await _localService.createCustomList(name, description: description);
+      result =
+          await _localService.createCustomList(name, description: description);
     }
-    
+
     // Update stream after creating
     await _updateCustomListsStream();
     return result;
@@ -368,7 +381,7 @@ class FavoritesServiceManager extends ChangeNotifier {
     } else {
       await _localService.updateCustomList(updatedList);
     }
-    
+
     // Update stream after updating custom list
     await _updateCustomListsStream();
   }
@@ -381,7 +394,7 @@ class FavoritesServiceManager extends ChangeNotifier {
     } else {
       await _localService.deleteCustomList(listId);
     }
-    
+
     // Update stream after deleting custom list
     await _updateCustomListsStream();
   }
@@ -406,8 +419,9 @@ class FavoritesServiceManager extends ChangeNotifier {
         contentType: contentType,
       );
     }
-    
-    // Update stream after adding movie to custom list
+
+    // Update stream after adding movie to custom list.
+
     await _updateCustomListsStream();
   }
 
@@ -419,8 +433,9 @@ class FavoritesServiceManager extends ChangeNotifier {
     } else {
       await _localService.removeMovieFromCustomList(listId, movieId);
     }
-    
-    // Update stream after removing movie from custom list
+
+    // Update stream after removing movie from custom list.
+
     await _updateCustomListsStream();
   }
 
@@ -480,7 +495,7 @@ class FavoritesServiceManager extends ChangeNotifier {
       // Migrate data from local to POD.
 
       await _podService!.migrateToPod();
-      
+
       // Also migrate custom lists to POD
       await _podService!.migrateCustomListsToPod();
 
@@ -489,9 +504,10 @@ class FavoritesServiceManager extends ChangeNotifier {
       _isPodStorageEnabled = true;
       await _prefs.setBool(_podStorageEnabledKey, true);
 
-      // Update streams to use POD service
+      // Update streams to use POD service.
+
       await _updateCustomListsStream();
-      
+
       notifyListeners();
       return true;
     } catch (e) {

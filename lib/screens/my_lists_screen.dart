@@ -95,7 +95,7 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen> {
 
   Future<void> _loadCustomLists() async {
     final lists = await widget.favoritesService.getCustomLists();
-    
+
     setState(() {
       _customLists = lists;
       _isLoading = false;

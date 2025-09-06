@@ -962,7 +962,8 @@ class TurtleSerializer {
 
           final movie = Movie(
             id: int.parse(movieId),
-            title: 'Loading...', // Use a loading indicator instead of "Movie ID"
+            title:
+                'Loading...', // Use a loading indicator instead of "Movie ID"
             overview: '',
             posterUrl: '', // Empty poster URL will trigger loading in UI
             backdropUrl: '',

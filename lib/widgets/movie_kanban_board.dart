@@ -48,6 +48,8 @@ import 'package:moviestar/widgets/error_display_widget.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
 
+import '../constants/ui_constants.dart';
+
 /// Enum for different column types in the kanban board.
 
 enum KanbanColumnType {
@@ -885,7 +887,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         child: Stack(
           children: [
             Opacity(
-              opacity: 0.8,
+              opacity: UIConstants.highOpacity,
               child: SizedBox(
                 width: 100,
                 height: 150,
@@ -1590,18 +1592,18 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
           Expanded(
             child: FutureBuilder<List<Movie>>(
-              future: widget.favoritesService.getMoviesInCustomList(customList.id),
+              future:
+                  widget.favoritesService.getMoviesInCustomList(customList.id),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    
+                  return Center(
                     child: Padding(
-                      padding: EdgeInsets.all(Dimensions.xl),
+                      padding: const EdgeInsets.all(Dimensions.xl),
                       child: CircularProgressIndicator(),
                     ),
                   );
                 }
-                
+
                 if (snapshot.hasError) {
                   return Center(
                     child: Padding(
@@ -1609,15 +1611,15 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                       child: Text(
                         'Error loading movies',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
+                              color: Theme.of(context).colorScheme.error,
+                            ),
                       ),
                     ),
                   );
                 }
-                
+
                 final podMovies = snapshot.data ?? [];
-                
+
                 if (podMovies.isEmpty) {
                   return Center(
                     child: Padding(
@@ -1634,7 +1636,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                     ),
                   );
                 }
-                
+
                 // Apply optimistic updates to the POD movies
                 final movieIdsFromPod = podMovies.map((m) => m.id).toList();
                 final optimisticMovieIds = _getMovieIdsWithOptimisticUpdates(
@@ -1642,7 +1644,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                   KanbanColumnType.customList,
                   customList.id,
                 );
-                
+
                 return _CustomListMoviesWidget(
                   movieIds: optimisticMovieIds,
                   customList: customList,
@@ -1760,7 +1762,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                   child: Text(
                     '...',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
                           fontWeight: FontWeight.w500,
                         ),
                   ),
@@ -1768,7 +1771,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
               ],
             ),
           ),
-          
+
           // Loading content area - matching the exact style of To Watch/Watched
           Expanded(
             child: Center(
@@ -1789,7 +1792,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                   Text(
                     'Loading Custom Lists...',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.7),
                         ),
                   ),
                 ],
@@ -2075,9 +2081,11 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                                       (customList) =>
                                           _buildCustomListColumn(customList),
                                     ),
-                                    
+
                                     // Show loading placeholder for custom lists if they're still loading
-                                    if (customListsSnapshot.connectionState == ConnectionState.waiting && customLists.isEmpty)
+                                    if (customListsSnapshot.connectionState ==
+                                            ConnectionState.waiting &&
+                                        customLists.isEmpty)
                                       _buildCustomListLoadingColumn(),
                                   ],
                                 ),
@@ -2180,11 +2188,12 @@ class _CustomListMoviesWidgetState
 
     // Try POD-first approach if POD storage is available
     if (widget.favoritesService is FavoritesServiceAdapter &&
-        (widget.favoritesService as FavoritesServiceAdapter).isPodStorageEnabled) {
-      
+        (widget.favoritesService as FavoritesServiceAdapter)
+            .isPodStorageEnabled) {
       try {
-        final podMovies = await widget.favoritesService.getMoviesInCustomList(widget.customList.id);
-        
+        final podMovies = await widget.favoritesService
+            .getMoviesInCustomList(widget.customList.id);
+
         if (podMovies.isNotEmpty) {
           if (mounted) {
             setState(() {
@@ -2197,10 +2206,9 @@ class _CustomListMoviesWidgetState
           }
           return;
         }
-      } catch (e) {
-      }
+      } catch (e) {}
     }
-    
+
     // Fallback to API loading (original method)
     await _loadMoviesFromAPI();
   }

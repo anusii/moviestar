@@ -26,10 +26,8 @@
 
 library;
 
-import 'package:flutter/foundation.dart';
-
-import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/constants/timing_constants.dart';
+import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';

@@ -362,9 +362,9 @@ class FavoritesService extends ChangeNotifier {
   /// Retrieves all custom lists.
 
   Future<List<CustomList>> getCustomLists() async {
-    
-    // Custom lists are now POD-only and account-specific
-    // This method only exists for backward compatibility but always returns empty
+    // Custom lists are now POD-only and account-specific.
+    // This method only exists for backward compatibility but always returns empty.
+
     return [];
   }
 

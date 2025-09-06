@@ -63,8 +63,8 @@ class MovieListService {
 
   Future<String?> createMovieList(
     String listName, {
-    List<Movie>? movies,
-    String? description,
+    List<Movie> movies = const [],
+    String description = '',
   }) async {
     try {
       final loggedIn = await isLoggedIn();
@@ -107,7 +107,7 @@ class MovieListService {
         _movieListCache[movieListId] = {
           'id': movieListId,
           'name': listName,
-          'movies': movies ?? [],
+          'movies': movies,
           'filePath': 'moviestar/data/$fileName',
         };
 

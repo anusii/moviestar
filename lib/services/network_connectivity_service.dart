@@ -19,13 +19,15 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Claude Code
+/// Authors: Ashley Tang
 
 library;
 
 import 'dart:io';
 
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+
+import 'package:moviestar/constants/timing_constants.dart';
 
 /// Result of network connectivity check.
 class NetworkConnectivityResult {
@@ -49,7 +51,9 @@ class NetworkConnectivityResult {
   });
 
   /// Creates a successful result with internet access.
-  static NetworkConnectivityResult connected({Duration? responseTime}) {
+  static NetworkConnectivityResult connected({
+    Duration responseTime = Duration.zero,
+  }) {
     return NetworkConnectivityResult(
       hasInternetAccess: true,
       checkSuccessful: true,
@@ -58,7 +62,9 @@ class NetworkConnectivityResult {
   }
 
   /// Creates a successful result without internet access.
-  static NetworkConnectivityResult disconnected({Duration? responseTime}) {
+  static NetworkConnectivityResult disconnected({
+    Duration responseTime = Duration.zero,
+  }) {
     return NetworkConnectivityResult(
       hasInternetAccess: false,
       checkSuccessful: true,
@@ -84,11 +90,10 @@ class NetworkConnectivityResult {
 
 /// Service for checking network connectivity and internet access.
 class NetworkConnectivityService {
-  static const Duration _defaultTimeout = Duration(seconds: 10);
-
   final InternetConnection _internetConnection;
 
   /// Creates a new NetworkConnectivityService.
+  // ignore: avoid-unnecessary-nullable-parameters
   NetworkConnectivityService({
     InternetConnection? internetConnection,
   }) : _internetConnection = internetConnection ?? InternetConnection();
@@ -113,13 +118,13 @@ class NetworkConnectivityService {
 
   /// Checks if the device has internet connectivity.
   Future<NetworkConnectivityResult> checkConnectivity({
-    Duration? timeout,
+    Duration timeout = NetworkTimingConstants.defaultTimeout,
   }) async {
     try {
       final stopwatch = Stopwatch()..start();
 
-      final hasInternet = await _internetConnection.hasInternetAccess
-          .timeout(timeout ?? _defaultTimeout);
+      final hasInternet =
+          await _internetConnection.hasInternetAccess.timeout(timeout);
 
       stopwatch.stop();
 
@@ -147,7 +152,9 @@ class NetworkConnectivityService {
 
   /// Quick connectivity check with shorter timeout.
   Future<NetworkConnectivityResult> quickCheck() async {
-    return checkConnectivity(timeout: const Duration(seconds: 5));
+    return checkConnectivity(
+      timeout: NetworkTimingConstants.quickCheckTimeout,
+    );
   }
 
   /// Stream of connectivity status changes.
@@ -163,7 +170,7 @@ class NetworkConnectivityService {
       // Try to resolve TMDB domain
       final lookupResult = await InternetAddress.lookup(
         'api.themoviedb.org',
-      ).timeout(const Duration(seconds: 8));
+      ).timeout(NetworkTimingConstants.dnsLookupTimeout);
 
       stopwatch.stop();
 

@@ -29,6 +29,8 @@ import 'package:flutter/material.dart';
 
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/constants/dimensions.dart';
+
 /// Utility class for showing cache performance feedback to users.
 
 class CacheFeedbackWidget {
@@ -66,7 +68,7 @@ class CacheFeedbackWidget {
         content: Row(
           children: [
             Icon(icon, color: Colors.white, size: 16),
-            const Gap(8),
+            const Gap(Gaps.m),
             Expanded(
               child: Text(message, style: const TextStyle(color: Colors.white)),
             ),
@@ -120,7 +122,7 @@ class CacheFeedbackWidget {
               color: Colors.white,
               size: 16,
             ),
-            const Gap(8),
+            const Gap(Gaps.m),
             Expanded(
               child: Text(message, style: const TextStyle(color: Colors.white)),
             ),
@@ -153,7 +155,7 @@ class CacheFeedbackWidget {
         content: Row(
           children: [
             Icon(icon, color: Colors.white, size: 16),
-            const Gap(8),
+            const Gap(Gaps.m),
             Expanded(
               child: Text(message, style: const TextStyle(color: Colors.white)),
             ),
@@ -181,20 +183,4 @@ class CacheFeedbackWidget {
       return '(fresh)';
     }
   }
-}
-
-/// Settings for cache feedback display.
-
-class CacheFeedbackSettings {
-  /// Whether to show success toasts for cache hits.
-
-  static bool showSuccessToasts = true;
-
-  /// Whether to show performance statistics.
-
-  static bool showPerformanceStats = true;
-
-  /// Whether to show offline mode notifications.
-
-  static bool showOfflineNotifications = true;
 }

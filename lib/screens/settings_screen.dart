@@ -33,6 +33,7 @@ import 'package:solidpod/solidpod.dart';
 import 'package:solidui/solidui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/services/api_key_service.dart';
@@ -58,6 +59,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
   /// Creates a new [SettingsScreen] widget.
 
+  // ignore: avoid-unnecessary-nullable-parameters
   const SettingsScreen({
     super.key,
     required this.favoritesService,
@@ -234,7 +236,7 @@ This will remove all cached movie data. Fresh data will be downloaded from the n
 Cache cleared! You're now in Offline Mode with no cached data. Consider disabling Offline Mode to load fresh data.''',
             ),
             backgroundColor: Colors.orange,
-            duration: Duration(seconds: 5),
+            duration: TimingConstants.snackbarExtendedDuration,
           ),
         );
       }
@@ -317,7 +319,7 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
                 Text('Refreshing all movie data...'),
               ],
             ),
-            duration: Duration(seconds: 10),
+            duration: TimingConstants.snackbarVeryLongDuration,
           ),
         );
       }
@@ -381,7 +383,7 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
               Text('Enabling POD storage...'),
             ],
           ),
-          duration: Duration(seconds: 10),
+          duration: TimingConstants.snackbarVeryLongDuration,
         ),
       );
     }
@@ -401,7 +403,7 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
 POD storage enabled successfully! Your movie lists are now stored in your Solid POD.''',
               ),
               backgroundColor: Colors.green,
-              duration: Duration(seconds: 5),
+              duration: TimingConstants.snackbarExtendedDuration,
             ),
           );
         }
@@ -417,7 +419,7 @@ POD storage enabled successfully! Your movie lists are now stored in your Solid 
 Failed to enable POD storage. Please check your Solid POD login and try again.''',
               ),
               backgroundColor: Colors.red,
-              duration: Duration(seconds: 5),
+              duration: TimingConstants.snackbarExtendedDuration,
             ),
           );
         }
@@ -431,7 +433,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
           SnackBar(
             content: Text('Error enabling POD storage: $e'),
             backgroundColor: Colors.red,
-            duration: const Duration(seconds: 5),
+            duration: TimingConstants.snackbarExtendedDuration,
           ),
         );
       }
@@ -452,7 +454,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
           const SnackBar(
             content: Text('POD storage disabled. Using local storage.'),
             backgroundColor: Colors.orange,
-            duration: Duration(seconds: 3),
+            duration: TimingConstants.snackbarStandardDuration,
           ),
         );
       }
@@ -462,7 +464,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
           SnackBar(
             content: Text('Error disabling POD storage: $e'),
             backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
+            duration: TimingConstants.snackbarStandardDuration,
           ),
         );
       }
@@ -1103,7 +1105,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                         : '✅ API key caching disabled. Keys stored only in your POD.',
                   ),
                   backgroundColor: value ? Colors.orange : Colors.green,
-                  duration: const Duration(seconds: 4),
+                  duration: TimingConstants.snackbarLongDuration,
                 ),
               );
             }

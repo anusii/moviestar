@@ -29,10 +29,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 
+import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/my_home_page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
@@ -90,13 +91,13 @@ class OperationQueueItem {
   OperationQueueItem copyWith({
     int? id,
     String? description,
-    OperationStatus? status,
+    required OperationStatus status,
     DateTime? startTime,
   }) {
     return OperationQueueItem(
       id: id ?? this.id,
       description: description ?? this.description,
-      status: status ?? this.status,
+      status: status,
       startTime: startTime ?? this.startTime,
     );
   }
@@ -107,22 +108,6 @@ enum OperationStatus {
   inProgress,
   completed,
   failed,
-}
-
-/// A movie item wrapper for kanban board usage.
-
-class MovieItem {
-  final Movie movie;
-  final bool fromCache;
-  final Duration? cacheAge;
-
-  const MovieItem({
-    required this.movie,
-    this.fromCache = false,
-    this.cacheAge,
-  });
-
-  String get id => movie.id.toString();
 }
 
 /// Custom Kanban board widget for displaying movies in columns.
@@ -214,7 +199,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
       if (status == OperationStatus.completed ||
           status == OperationStatus.failed) {
-        Future.delayed(const Duration(seconds: 2), () {
+        Future.delayed(TimingConstants.autoRemoveDelay, () {
           _operationQueue.removeWhere((op) => op.id == operationId);
           if (mounted) setState(() {});
         });
@@ -406,7 +391,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           child: Row(
             children: [
               Icon(Icons.bookmark_add_outlined),
-              Gap(8),
+              Gap(Gaps.m),
               Text('Copy to To Watch'),
             ],
           ),
@@ -421,7 +406,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           child: Row(
             children: [
               Icon(Icons.check_circle_outline),
-              Gap(8),
+              Gap(Gaps.m),
               Text('Copy to Watched'),
             ],
           ),
@@ -445,7 +430,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           child: Row(
             children: [
               const Icon(Icons.playlist_add),
-              const Gap(8),
+              const Gap(Gaps.m),
               Expanded(
                 child: Text(
                   'Copy to ${customList.name}',
@@ -473,7 +458,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                 Icons.remove_circle_outline,
                 color: Theme.of(context).colorScheme.error,
               ),
-              const Gap(8),
+              const Gap(Gaps.m),
               Text(
                 'Remove from this list',
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
@@ -783,7 +768,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         // The favorites service should handle this automatically when adding to lists,
         // but we can add a small delay to ensure the movie data is properly cached.
 
-        await Future.delayed(const Duration(milliseconds: 100));
+        await Future.delayed(TimingConstants.movieCardHoverHideDelay);
       }
     } catch (e) {
       // If checking fails, continue anyway - the favorites service should handle creation.
@@ -843,7 +828,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
               bottom: 4,
               right: 4,
               child: Container(
-                padding: const EdgeInsets.all(3),
+                padding: const EdgeInsets.all(3.0),
                 decoration: BoxDecoration(
                   color: hasError
                       ? Theme.of(context).colorScheme.error
@@ -921,7 +906,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                 top: 4,
                 right: 4,
                 child: Container(
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(Dimensions.s),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primary,
                     shape: BoxShape.circle,
@@ -937,7 +922,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         ),
       ),
       childWhenDragging: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        margin: const EdgeInsets.symmetric(
+          horizontal: Dimensions.s,
+          vertical: Dimensions.s,
+        ),
         width: 100,
         height: 150,
         decoration: BoxDecoration(
@@ -994,7 +982,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
     Widget columnContent = Container(
       width: 220,
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+      margin: const EdgeInsets.symmetric(horizontal: Dimensions.m),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
@@ -1008,7 +996,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           // Column header.
 
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(Dimensions.xl),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainer,
               borderRadius: const BorderRadius.only(
@@ -1308,7 +1296,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         final isHovering = candidateData.isNotEmpty;
 
         return AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: TimingConstants.containerAnimationDuration,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: isHovering
@@ -1361,7 +1349,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
     Widget columnContent = Container(
       width: 220,
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+      margin: const EdgeInsets.symmetric(horizontal: Dimensions.m),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
@@ -1375,7 +1363,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           // Column header.
 
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(Dimensions.xl),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainer,
               borderRadius: const BorderRadius.only(
@@ -1606,8 +1594,9 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
+                    
                     child: Padding(
-                      padding: EdgeInsets.all(16),
+                      padding: EdgeInsets.all(Dimensions.xl),
                       child: CircularProgressIndicator(),
                     ),
                   );
@@ -1616,7 +1605,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                 if (snapshot.hasError) {
                   return Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(Dimensions.xl),
                       child: Text(
                         'Error loading movies',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -1632,7 +1621,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                 if (podMovies.isEmpty) {
                   return Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(Dimensions.xl),
                       child: Text(
                         'No movies',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -1692,7 +1681,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         final isHovering = candidateData.isNotEmpty;
 
         return AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: TimingConstants.containerAnimationDuration,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: isHovering
@@ -1828,7 +1817,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         .length;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: Dimensions.l,
+        vertical: Dimensions.m,
+      ),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
@@ -1904,7 +1896,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
   Widget _buildStatusChip(String text, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: Dimensions.ms,
+        vertical: Dimensions.xs,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(10),
@@ -1931,7 +1926,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
           return const Center(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(Dimensions.xl),
               child: CircularProgressIndicator(),
             ),
           );
@@ -1974,12 +1969,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
         ref.invalidate(popularMoviesWithCacheInfoProvider);
       },
-      onConfigureApiKey: () {
-        // Navigate to Settings tab in the main SolidScaffold instead of
-        // creating a new page.
-
-        navigateToSettings();
-      },
+      onConfigureApiKey: null,
       apiKeyValidationService: apiKeyValidationService,
       networkConnectivityService: networkConnectivityService,
     );
@@ -2279,7 +2269,7 @@ class _CustomListMoviesWidgetState
     if (_isLoading && _moviesMap.isEmpty) {
       return const Center(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(Dimensions.xl),
           child: CircularProgressIndicator(),
         ),
       );

@@ -1,12 +1,12 @@
-/// Show alert safely.
-//
-// Time-stamp: <Thursday 2024-12-19 13:33:06 +1100 Graham Williams>
-//
-/// Copyright (C) 2025, Software Innovation Institute, ANU
+/// Network constants for the Movie Star application.
 ///
-/// Licensed under the GNU General Public License, Version 3 (the "License");
+// Time-stamp: <Tuesday 2025-09-03 16:00:00 +1100 Ashley Tang>
 ///
-/// License: https://www.gnu.org/licenses/gpl-3.0.en.html
+/// Copyright (C) 2024-2025, Software Innovation Institute, ANU.
+///
+/// Licensed under the GNU General Public License, Version 3 (the "License").
+///
+/// License: https://www.gnu.org/licenses/gpl-3.0.en.html.
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU General Public License as published by the Free Software
@@ -23,16 +23,18 @@
 ///
 /// Authors: Ashley Tang
 
-// Helper method to show alerts safely.
-
 library;
 
-import 'package:flutter/material.dart';
+/// Network operation constants for retry logic and timeouts.
 
-import 'package:moviestar/dialogs/alert.dart';
+class NetworkConstants {
+  /// Maximum number of retry attempts.
 
-void showAlert(BuildContext context, String message) {
-  if (context.mounted) {
-    alert(context, message);
-  }
+  static const int maxRetryAttempts = 3;
+
+  /// Base delay for exponential backoff (500 milliseconds).
+  ///
+  /// Used in retry logic: delay = baseDelay * attempt
+
+  static const int backoffBaseDelayMs = 500;
 }

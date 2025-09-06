@@ -29,6 +29,7 @@ import 'package:gap/gap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/screens/shared_movie_list_detail_screen.dart';
@@ -38,12 +39,12 @@ import 'package:moviestar/services/favorites_service_manager.dart';
 class ListSharedMovies extends StatefulWidget {
   final Map<String, dynamic>
       sharedMoviesMap; // Contains both 'movies' and 'movieLists' keys
-  final VoidCallback? onDataChanged;
+  final VoidCallback onDataChanged;
 
   const ListSharedMovies({
     super.key,
     required this.sharedMoviesMap,
-    this.onDataChanged,
+    required this.onDataChanged,
   });
 
   @override
@@ -135,9 +136,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
         if (mounted) {
           // Refresh the parent screen data regardless of result.
 
-          if (widget.onDataChanged != null) {
-            widget.onDataChanged!();
-          }
+          widget.onDataChanged();
 
           // Force a rebuild to ensure the UI is properly refreshed.
 
@@ -285,7 +284,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
     if (allItems.isEmpty) {
       return const Center(
         child: Padding(
-          padding: EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(Dimensions.xxxl),
           child: Text(
             'No shared movies or lists yet',
             style: TextStyle(fontSize: 16, color: Colors.grey),

@@ -29,6 +29,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import 'package:moviestar/constants/timing_constants.dart';
+
 /// Custom exception for network-related errors.
 
 class NetworkException implements Exception {
@@ -66,7 +68,7 @@ class NetworkClient {
 
   /// The default timeout duration for requests.
 
-  static const Duration _timeout = Duration(seconds: 10);
+  static const Duration _timeout = NetworkTimingConstants.defaultTimeout;
 
   /// Creates a new [NetworkClient].
 

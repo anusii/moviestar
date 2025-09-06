@@ -36,22 +36,13 @@ import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/enhanced_search_screen.dart';
+import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/widgets/solid_scaffold_config.dart';
-
-/// Global callback for navigating to Settings.
-
-void Function()? _navigateToSettingsCallback;
-
-/// Navigates to the Settings tab globally.
-
-void navigateToSettings() {
-  _navigateToSettingsCallback?.call();
-}
 
 class MyHomePage extends ConsumerStatefulWidget {
   final SharedPreferences prefs;
@@ -84,6 +75,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   int _selectedTabIndex = 0;
 
+  /// Flag to show Settings screen instead of menu content.
+
+  bool _showSettings = false;
+
   @override
   void initState() {
     super.initState();
@@ -103,12 +98,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     apiKeyService.addListener(_onApiKeyChanged);
 
-    // Set up global navigation callback.
-
-    _navigateToSettingsCallback = () {
-      navigateToSettingsTab();
-    };
-
     _loadUserInfo();
     _buildScreens();
   }
@@ -120,7 +109,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     // Clear global navigation callback.
 
-    _navigateToSettingsCallback = null;
     super.dispose();
   }
 
@@ -310,11 +298,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     logoutPopup(context, const MovieStar());
   }
 
-  /// Navigates to the Settings tab.
+  /// Handles the settings action.
 
-  void navigateToSettingsTab() {
+  void _handleSettings() {
+    // Show Settings by replacing the body content
     setState(() {
-      _selectedTabIndex = 8; // Settings is the 9th item (index 8)
+      _showSettings = true;
     });
   }
 
@@ -323,6 +312,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   void _onTabSelected(int index) {
     setState(() {
       _selectedTabIndex = index;
+      _showSettings = false; // Hide Settings when navigating to other tabs
     });
   }
 
@@ -345,7 +335,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         ? const Center(child: CircularProgressIndicator())
         : null;
 
-    return SolidScaffold(
+    final solidScaffold = SolidScaffold(
       menu: _menuItems,
       selectedIndex: _selectedTabIndex,
       onMenuSelected: _onTabSelected,
@@ -364,6 +354,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         ),
         overflowItems: SolidScaffoldConfig.createOverflowItems(
           onLogout: _handleLogout,
+          onSettings: _handleSettings,
         ),
       ),
       aboutConfig: SolidAboutConfig(
@@ -418,6 +409,36 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         showInAppBarActions: true,
       ),
       child: loadingOverlay,
+    );
+
+    // Return Settings screen overlay if Settings is active, otherwise return SolidScaffold
+    return _showSettings ? _buildSettingsOverlay(solidScaffold) : solidScaffold;
+  }
+
+  /// Builds the Settings screen as an overlay on top of the SolidScaffold
+  Widget _buildSettingsOverlay(Widget solidScaffold) {
+    return Stack(
+      children: [
+        solidScaffold,
+        Scaffold(
+          appBar: AppBar(
+            title: const Text('Settings'),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                setState(() {
+                  _showSettings = false;
+                });
+              },
+            ),
+          ),
+          body: SettingsScreen(
+            favoritesService: _favoritesService,
+            apiKeyService: ref.read(apiKeyServiceProvider),
+            favoritesServiceManager: _favoritesServiceManager,
+          ),
+        ),
+      ],
     );
   }
 }

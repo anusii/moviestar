@@ -34,6 +34,8 @@ import 'package:gap/gap.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
@@ -80,8 +82,8 @@ class MovieDetailsScreen extends StatefulWidget {
 class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   /// Validates if an image URL is valid and not empty.
   ///
-  bool _isValidImageUrl(String? url) {
-    if (url == null || url.trim().isEmpty) {
+  bool _isValidImageUrl(String url) {
+    if (url.trim().isEmpty) {
       return false;
     }
 
@@ -338,7 +340,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     // Hide the saved banner after 2 seconds.
 
     _ratingSavedTimer?.cancel();
-    _ratingSavedTimer = Timer(const Duration(seconds: 2), () {
+    _ratingSavedTimer = Timer(TimingConstants.ratingFeedbackDuration, () {
       if (mounted) {
         setState(() {
           _ratingSaved = false;
@@ -413,7 +415,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     // Hide the saved banner after 2 seconds.
 
     _commentsSavedTimer?.cancel();
-    _commentsSavedTimer = Timer(const Duration(seconds: 2), () {
+    _commentsSavedTimer = Timer(TimingConstants.ratingFeedbackDuration, () {
       if (mounted) {
         setState(() {
           _commentsSaved = false;
@@ -439,7 +441,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     // Hide the saved banner after 2 seconds.
 
     _commentsSavedTimer?.cancel();
-    _commentsSavedTimer = Timer(const Duration(seconds: 2), () {
+    _commentsSavedTimer = Timer(TimingConstants.ratingFeedbackDuration, () {
       if (mounted) {
         setState(() {
           _commentsSaved = false;
@@ -605,7 +607,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
             pinned: true,
             backgroundColor: Theme.of(context).colorScheme.surface,
             leading: Container(
-              margin: const EdgeInsets.all(8.0),
+              margin: const EdgeInsets.all(Dimensions.m),
               decoration: BoxDecoration(
                 color: Theme.of(context)
                     .colorScheme
@@ -747,7 +749,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                       ),
                     ],
                   ),
-                  const Gap(8),
+                  const Gap(Gaps.m),
                   Row(
                     children: [
                       // Content type indicator.
@@ -852,7 +854,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                             color: Theme.of(context).colorScheme.primary,
                             size: 20,
                           ),
-                          const Gap(8),
+                          const Gap(Gaps.m),
                           Text(
                             'This movie was shared by ${_getSharedByText()}',
                             style: TextStyle(
@@ -897,7 +899,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                         ),
                     ],
                   ),
-                  const Gap(8),
+                  const Gap(Gaps.m),
                   _isLoadingRating
                       ? const Center(child: CircularProgressIndicator())
                       : Row(
@@ -1045,7 +1047,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                         ),
                     ],
                   ),
-                  const Gap(8),
+                  const Gap(Gaps.m),
                   _isLoadingComments
                       ? const Center(child: CircularProgressIndicator())
                       : Column(
@@ -1103,7 +1105,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                                       }
                                     },
                             ),
-                            const Gap(8),
+                            const Gap(Gaps.m),
                             if (!_isSharedMovie)
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -1125,7 +1127,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                                   if (_commentsModified &&
                                       (_personalComments != null &&
                                           _personalComments!.isNotEmpty))
-                                    const Gap(8),
+                                    const Gap(Gaps.m),
                                   if (_personalComments != null &&
                                       _personalComments!.isNotEmpty)
                                     TextButton.icon(
@@ -1158,7 +1160,7 @@ Your shared movies will appear in their "Shared with Me" tab.
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const Gap(8),
+                  const Gap(Gaps.m),
                   Text(
                     widget.movie.overview,
                     style: TextStyle(
@@ -1625,7 +1627,7 @@ class _AddToCustomListsDialogState extends State<_AddToCustomListsDialog> {
             ),
             margin: const EdgeInsets.all(16),
             elevation: 6,
-            duration: const Duration(seconds: 3),
+            duration: TimingConstants.snackbarStandardDuration,
           ),
         );
       }

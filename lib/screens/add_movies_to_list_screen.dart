@@ -32,6 +32,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
@@ -270,7 +271,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
             ),
             margin: const EdgeInsets.all(16),
             elevation: 6,
-            duration: const Duration(seconds: 3),
+            duration: TimingConstants.snackbarStandardDuration,
           ),
         );
       }
@@ -304,7 +305,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
             ),
             margin: const EdgeInsets.all(16),
             elevation: 6,
-            duration: const Duration(seconds: 4),
+            duration: TimingConstants.snackbarLongDuration,
           ),
         );
       }

@@ -30,6 +30,7 @@ import 'package:flutter/services.dart';
 
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/models/app_error.dart';
 
 /// A reusable widget for displaying error states with consistent styling.
@@ -89,6 +90,7 @@ class ErrorDisplayWidget extends StatelessWidget {
 
   /// Creates a new [ErrorDisplayWidget].
 
+  // ignore: avoid-unnecessary-nullable-parameters
   const ErrorDisplayWidget({
     super.key,
     required this.message,
@@ -206,11 +208,11 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
           maxHeight: MediaQuery.of(context).size.height *
               0.8, // Prevent full-screen overflow.
         ),
-        margin: EdgeInsets.all(widget.isCompact ? 12.0 : 16.0),
-        padding: EdgeInsets.all(widget.isCompact ? 16.0 : 20.0),
+        margin: EdgeInsets.all(widget.isCompact ? Dimensions.l : Dimensions.xl),
+        padding: EdgeInsets.all(widget.isCompact ? 16.0 : Dimensions.xxl),
         decoration: BoxDecoration(
           color: surfaceColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(Dimensions.l),
           border: Border.all(
             color: errorColor.withValues(alpha: 0.3),
             width: 1,
@@ -236,7 +238,7 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                     size: widget.iconSize,
                     color: errorColor,
                   ),
-                  Gap(widget.isCompact ? 8.0 : 12.0),
+                  Gap(widget.isCompact ? Gaps.m : Gaps.xl),
                   Expanded(
                     child: Text(
                       widget.error.title,
@@ -250,7 +252,7 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                 ],
               ),
 
-              Gap(widget.isCompact ? 8.0 : 12.0),
+              Gap(widget.isCompact ? Gaps.m : Gaps.xl),
 
               // Error message.
 
@@ -263,31 +265,29 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                 textAlign: TextAlign.start,
               ),
 
-              // Additional details (if available).
+              // Additional details.
 
-              if (widget.error.details != null) ...[
-                Gap(widget.isCompact ? 6.0 : 8.0),
-                Text(
-                  widget.error.details!,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: onSurfaceColor.withValues(alpha: 0.8),
-                    fontSize: widget.textSize - (widget.isCompact ? 2 : 1),
-                  ),
-                  textAlign: TextAlign.start,
+              Gap(widget.isCompact ? Dimensions.ms : Gaps.m),
+              Text(
+                widget.error.details,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: onSurfaceColor.withValues(alpha: 0.8),
+                  fontSize: widget.textSize - (widget.isCompact ? 2 : 1),
                 ),
-              ],
+                textAlign: TextAlign.start,
+              ),
 
               // Action buttons.
 
               if (widget.error.actions.isNotEmpty) ...[
-                Gap(widget.isCompact ? 12.0 : 16.0),
+                Gap(widget.isCompact ? Gaps.xl : Gaps.xxl),
                 _buildActionButtons(),
               ],
 
               // Technical details section (expandable).
 
               if (widget.error.hasTechnicalDetails) ...[
-                Gap(widget.isCompact ? 8.0 : 12.0),
+                Gap(widget.isCompact ? Gaps.m : Gaps.xl),
                 _buildTechnicalDetailsSection(),
               ],
             ],
@@ -309,12 +309,12 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
         child: action.isPrimary
             ? ElevatedButton.icon(
                 onPressed: action.onPressed,
-                icon: action.icon != null ? Icon(action.icon) : null,
+                icon: Icon(action.icon),
                 label: Text(action.label),
               )
             : OutlinedButton.icon(
                 onPressed: action.onPressed,
-                icon: action.icon != null ? Icon(action.icon) : null,
+                icon: Icon(action.icon),
                 label: Text(action.label),
               ),
       );
@@ -329,9 +329,7 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
               child: actions[1].isPrimary
                   ? ElevatedButton.icon(
                       onPressed: actions[1].onPressed,
-                      icon: actions[1].icon != null
-                          ? Icon(actions[1].icon)
-                          : null,
+                      icon: Icon(actions[1].icon),
                       label: Text(
                         actions[1].label,
                         textAlign: TextAlign.center,
@@ -348,9 +346,7 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                     )
                   : OutlinedButton.icon(
                       onPressed: actions[1].onPressed,
-                      icon: actions[1].icon != null
-                          ? Icon(actions[1].icon)
-                          : null,
+                      icon: Icon(actions[1].icon),
                       label: Text(
                         actions[1].label,
                         textAlign: TextAlign.center,
@@ -366,14 +362,12 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                       ),
                     ),
             ),
-            const Gap(8),
+            const Gap(Gaps.m),
             Expanded(
               child: actions[0].isPrimary
                   ? ElevatedButton.icon(
                       onPressed: actions[0].onPressed,
-                      icon: actions[0].icon != null
-                          ? Icon(actions[0].icon)
-                          : null,
+                      icon: Icon(actions[0].icon),
                       label: Text(
                         actions[0].label,
                         textAlign: TextAlign.center,
@@ -390,9 +384,7 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                     )
                   : OutlinedButton.icon(
                       onPressed: actions[0].onPressed,
-                      icon: actions[0].icon != null
-                          ? Icon(actions[0].icon)
-                          : null,
+                      icon: Icon(actions[0].icon),
                       label: Text(
                         actions[0].label,
                         textAlign: TextAlign.center,
@@ -421,12 +413,12 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
           return action.isPrimary
               ? ElevatedButton.icon(
                   onPressed: action.onPressed,
-                  icon: action.icon != null ? Icon(action.icon) : null,
+                  icon: Icon(action.icon),
                   label: Text(action.label),
                 )
               : OutlinedButton.icon(
                   onPressed: action.onPressed,
-                  icon: action.icon != null ? Icon(action.icon) : null,
+                  icon: Icon(action.icon),
                   label: Text(action.label),
                 );
         }).toList(),
@@ -457,7 +449,7 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                   size: 20,
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
-                const Gap(4),
+                const Gap(Gaps.s),
                 Text(
                   'Technical Details',
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -476,13 +468,13 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
           Container(
             width: double.infinity,
             margin: const EdgeInsets.only(top: 4),
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(Dimensions.l),
             constraints: const BoxConstraints(
               maxHeight: 200, // Limit height to prevent overflow.
             ),
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(Dimensions.m),
               border: Border.all(
                 color: theme.colorScheme.outline.withValues(alpha: 0.2),
               ),
@@ -507,7 +499,7 @@ class _UserFriendlyErrorWidgetState extends State<_UserFriendlyErrorWidget> {
                   ),
                 ),
 
-                const Gap(8),
+                const Gap(Gaps.m),
 
                 // Copy to clipboard button with scroll hint.
 
@@ -586,20 +578,20 @@ class _LegacyErrorWidget extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(isCompact ? 12.0 : 16.0),
+        padding: EdgeInsets.all(isCompact ? Dimensions.l : Dimensions.xl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.error_outline, size: iconSize, color: errorColor),
-            Gap(isCompact ? 8.0 : 16.0),
+            Gap(isCompact ? Gaps.m : Gaps.xxl),
             Text(
               message,
               style: TextStyle(color: errorColor, fontSize: textSize),
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[
-              Gap(isCompact ? 8.0 : 16.0),
+              Gap(isCompact ? Gaps.m : Gaps.xxl),
               ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
             ],
           ],

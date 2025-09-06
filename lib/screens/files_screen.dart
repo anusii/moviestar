@@ -29,6 +29,8 @@ import 'package:flutter/material.dart';
 
 import 'package:solidui/solidui.dart';
 
+import 'package:moviestar/constants/dimensions.dart';
+
 /// Screen for managing POD files.
 
 class FilesScreen extends StatelessWidget {
@@ -55,7 +57,7 @@ class FilesScreen extends StatelessWidget {
             }
 
             return const Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(Dimensions.xl),
               child: SolidFile(
                 basePath: 'moviestar',
               ),

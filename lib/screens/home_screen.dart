@@ -30,11 +30,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/my_home_page.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
@@ -2202,7 +2202,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         if (userFriendlyError != null) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(Dimensions.huge),
               child: ErrorDisplayWidget.fromUserFriendlyError(
                 error: userFriendlyError,
               ),
@@ -2214,7 +2214,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
         return Center(
           child: Padding(
-            padding: const EdgeInsets.all(32.0),
+            padding: const EdgeInsets.all(Dimensions.huge),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -2236,15 +2236,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
-                const Gap(24),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    // Navigate to Settings tab in the main SolidScaffold instead of creating a new page
-                    navigateToSettings();
-                  },
-                  icon: const Icon(Icons.vpn_key),
-                  label: const Text('Configure API Key'),
-                ),
               ],
             ),
           ),
@@ -2264,7 +2255,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(Dimensions.xl),
               child: CircularProgressIndicator(),
             ),
           );
@@ -2366,12 +2357,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final errorContext = ErrorContext(
       onRetry: onRetry,
-      onConfigureApiKey: () {
-        // Navigate to Settings tab in the main SolidScaffold instead of
-        // creating a new page.
-
-        navigateToSettings();
-      },
+      onConfigureApiKey: null,
       apiKeyValidationService: apiKeyValidationService,
       networkConnectivityService: networkConnectivityService,
     );

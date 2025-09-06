@@ -51,16 +51,16 @@ class ShareableFile {
     required this.displayName,
     required this.fileType,
     this.movie,
-    List<String>? permissions,
-  }) : permissions = permissions ?? ['read'];
+    this.permissions = const ['read'],
+  });
 
-  ShareableFile copyWith({List<String>? permissions}) {
+  ShareableFile copyWith({required List<String> permissions}) {
     return ShareableFile(
       fileName: fileName,
       displayName: displayName,
       fileType: fileType,
       movie: movie,
-      permissions: permissions ?? this.permissions,
+      permissions: permissions,
     );
   }
 }
@@ -80,8 +80,8 @@ class MovieStarBatchSharingUi extends StatefulWidget {
   /// Widget to return to
   final Widget child;
 
-  /// Optional callback when sharing is complete
-  final VoidCallback? onSharingComplete;
+  /// Callback when sharing is complete
+  final VoidCallback onSharingComplete;
 
   /// Custom app bar
   final PreferredSizeWidget? customAppBar;
@@ -94,7 +94,7 @@ class MovieStarBatchSharingUi extends StatefulWidget {
     required this.listName,
     required this.movies,
     required this.child,
-    this.onSharingComplete,
+    required this.onSharingComplete,
     this.customAppBar,
     this.backgroundColor = const Color.fromARGB(255, 240, 240, 240),
     super.key,
@@ -327,7 +327,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
       }
 
       // Call completion callback
-      widget.onSharingComplete?.call();
+      widget.onSharingComplete();
     } catch (e) {
       setState(() {
         currentOperation = 'Error: $e';

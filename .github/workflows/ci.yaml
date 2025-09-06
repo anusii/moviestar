@@ -38,22 +38,6 @@ jobs:
       - run: flutter pub get
       - run: dart format --set-exit-if-changed .
 
-  dart_code_metrics:
-    runs-on: ubuntu-latest
-    if: github.event.repository.private == false
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          flutter-version: ${{env.FLUTTER_VERSION}}
-      - run: flutter pub get
-      - run: dart pub global activate dart_code_metrics
-      - run: metrics check-unnecessary-nullable --disable-sunset-warning lib
-      - run: metrics check-unused-code --disable-sunset-warning lib
-      - run: metrics check-unused-files --disable-sunset-warning lib
-      - run: metrics analyze --disable-sunset-warning lib --reporter=console
-
   import_order:
     runs-on: ubuntu-latest
     if: github.event.repository.private == false
@@ -119,3 +103,19 @@ jobs:
           else
             echo "✅ All non-generated Dart files have copyright headers"
           fi
+
+  dart_code_metrics:
+    runs-on: ubuntu-latest
+    if: github.event.repository.private == false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: ${{env.FLUTTER_VERSION}}
+      - run: flutter pub get
+      - run: dart pub global activate dart_code_metrics
+      - run: dart pub global run dart_code_metrics:metrics check-unnecessary-nullable --disable-sunset-warning lib
+      - run: dart pub global run dart_code_metrics:metrics check-unused-code --disable-sunset-warning lib
+      - run: dart pub global run dart_code_metrics:metrics check-unused-files --disable-sunset-warning lib
+      - run: dart pub global run dart_code_metrics:metrics analyze --disable-sunset-warning lib --reporter=console

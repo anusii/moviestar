@@ -29,6 +29,7 @@ library;
 import 'package:flutter/foundation.dart';
 
 import 'package:moviestar/models/custom_list.dart';
+import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
@@ -52,7 +53,7 @@ class FavoritesServiceAdapter extends FavoritesService {
 
   /// TTL (time to live) for user data cache (5 minutes for frequent updates).
 
-  static const Duration _userDataTtl = Duration(minutes: 5);
+  static const Duration _userDataTtl = NetworkTimingConstants.userDataTtl;
 
   FavoritesServiceAdapter(this._manager) : super(_manager.prefs);
 

@@ -32,6 +32,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
@@ -74,8 +75,8 @@ class _CustomListDetailScreenState
     extends ConsumerState<CustomListDetailScreen> {
   /// Validates if an image URL is valid and not empty.
 
-  bool _isValidImageUrl(String? url) {
-    if (url == null || url.trim().isEmpty) {
+  bool _isValidImageUrl(String url) {
+    if (url.trim().isEmpty) {
       return false;
     }
 
@@ -345,7 +346,7 @@ class _CustomListDetailScreenState
                       ),
                       margin: const EdgeInsets.all(16),
                       elevation: 6,
-                      duration: const Duration(seconds: 3),
+                      duration: TimingConstants.snackbarStandardDuration,
                     ),
                   );
                 }
@@ -417,7 +418,7 @@ class _CustomListDetailScreenState
                     ),
                     margin: const EdgeInsets.all(16),
                     elevation: 6,
-                    duration: const Duration(seconds: 3),
+                    duration: TimingConstants.snackbarStandardDuration,
                   ),
                 );
               }
@@ -480,7 +481,7 @@ class _CustomListDetailScreenState
           ),
           margin: const EdgeInsets.all(16),
           elevation: 6,
-          duration: const Duration(seconds: 3),
+          duration: TimingConstants.snackbarStandardDuration,
         ),
       );
     }

@@ -2206,7 +2206,9 @@ class _CustomListMoviesWidgetState
           }
           return;
         }
-      } catch (e) {}
+      } catch (e) {
+        // Continue to fallback to API loading
+      }
     }
 
     // Fallback to API loading (original method)

@@ -197,9 +197,6 @@ class PodFavoritesService extends ChangeNotifier {
     } catch (e) {
       debugPrint('❌ [POD Init] Failed to initialize POD data: $e');
 
-      // Enhanced error categorization
-      final errorMsg = e.toString().toLowerCase();
-
       // Initialise with empty data but don't update streams yet.
       _cachedToWatch = [];
       _cachedWatched = [];
@@ -250,7 +247,9 @@ class PodFavoritesService extends ChangeNotifier {
         if (listId != null) {
           return listId;
         }
-      } catch (e) {}
+      } catch (e) {
+        // Silently continue to retry
+      }
 
       if (attempt < maxRetries) {
         await Future.delayed(retryDelay);
@@ -1155,7 +1154,9 @@ class PodFavoritesService extends ChangeNotifier {
         // Load data without triggering encryption key validation.
         await _loadFromPodWithoutKeyValidation();
       }
-    } catch (e) {}
+    } catch (e) {
+      // Silently handle initialization errors
+    }
   }
 
   /// Loads data from POD without triggering encryption key validation.
@@ -1306,7 +1307,9 @@ class PodFavoritesService extends ChangeNotifier {
               _watchedController.add(fallbackWatched);
               return;
             }
-          } catch (fallbackError) {}
+          } catch (fallbackError) {
+            // Fallback also failed, continue without data
+          }
 
           return;
         }
@@ -1328,7 +1331,9 @@ class PodFavoritesService extends ChangeNotifier {
         if (_cachedWatched != null) {
           _watchedController.add(_cachedWatched!);
         }
-      } catch (fallbackError) {}
+      } catch (fallbackError) {
+        // Fallback failed, continue without updating streams
+      }
     }
   }
 

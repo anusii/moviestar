@@ -359,18 +359,6 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
   /// Enable POD storage and migrate data.
 
   Future<void> _enablePodStorage() async {
-    if (widget.favoritesServiceManager == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('POD storage manager not available.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-      return;
-    }
-
     // Show loading indicator.
 
     if (mounted) {
@@ -396,7 +384,7 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
     }
 
     try {
-      final success = await widget.favoritesServiceManager!.enablePodStorage();
+      final success = await widget.favoritesServiceManager.enablePodStorage();
 
       if (success) {
         setState(() => _podStorageEnabled = true);
@@ -450,10 +438,8 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
   /// Disable POD storage and revert to local storage.
 
   Future<void> _disablePodStorage() async {
-    if (widget.favoritesServiceManager == null) return;
-
     try {
-      await widget.favoritesServiceManager!.disablePodStorage();
+      await widget.favoritesServiceManager.disablePodStorage();
       setState(() => _podStorageEnabled = false);
 
       if (mounted) {
@@ -507,7 +493,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
   /// Initialises POD storage state, enabling by default for logged-in users.
 
   Future<void> _initializePodStorageState() async {
-    if (widget.favoritesServiceManager != null) {
+    {
       // Check if user is logged in.
 
       final loggedIn = await isLoggedIn();
@@ -515,7 +501,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
       // If user is logged in and POD storage is not explicitly disabled,
       // enable it by default.
 
-      if (loggedIn && !widget.favoritesServiceManager!.isPodStorageEnabled) {
+      if (loggedIn && !widget.favoritesServiceManager.isPodStorageEnabled) {
         // Enable POD storage silently for logged-in users.
 
         setState(() {
@@ -525,22 +511,21 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
         // Try to enable POD storage in the background.
 
         try {
-          await widget.favoritesServiceManager!.enablePodStorage();
+          await widget.favoritesServiceManager.enablePodStorage();
         } catch (e) {
           // If enabling fails, revert to current state.
 
           if (mounted) {
             setState(() {
               _podStorageEnabled =
-                  widget.favoritesServiceManager!.isPodStorageEnabled;
+                  widget.favoritesServiceManager.isPodStorageEnabled;
             });
           }
         }
       } else {
         // Use current state from service manager.
 
-        _podStorageEnabled =
-            widget.favoritesServiceManager!.isPodStorageEnabled;
+        _podStorageEnabled = widget.favoritesServiceManager.isPodStorageEnabled;
       }
     }
   }

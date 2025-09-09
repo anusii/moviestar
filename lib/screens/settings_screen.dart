@@ -122,6 +122,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final cachedService = ref.read(configuredCachedMovieServiceProvider);
       await cachedService.clearAllCache();
 
+      // Invalidate providers that depend on cache state to refresh UI
+      ref.invalidate(popularMoviesWithCacheInfoProvider);
+      ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+      ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+      ref.invalidate(upcomingMoviesWithCacheInfoProvider);
+      ref.invalidate(cacheStatsProvider);
+      ref.invalidate(contentServiceProvider);
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

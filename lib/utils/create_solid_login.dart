@@ -411,12 +411,21 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
                 const SizedBox(height: 16),
                 _buildStep('1', 'Visit The Movie Database website', Icons.web),
                 _buildStep(
-                    '2', 'Create a free account or sign in', Icons.person_add),
+                  '2',
+                  'Create a free account or sign in',
+                  Icons.person_add,
+                ),
                 _buildStep('3', 'Go to Settings → API section', Icons.settings),
-                _buildStep('4', 'Request an API key (free for personal use)',
-                    Icons.key),
-                _buildStep('5', 'Copy your API key and paste it in Movie Star',
-                    Icons.copy),
+                _buildStep(
+                  '4',
+                  'Request an API key (free for personal use)',
+                  Icons.key,
+                ),
+                _buildStep(
+                  '5',
+                  'Copy your API key and paste it in Movie Star',
+                  Icons.copy,
+                ),
                 const SizedBox(height: 24),
                 Row(
                   children: [
@@ -530,7 +539,8 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Could not open website. URL copied to clipboard instead.'),
+              'Could not open website. URL copied to clipboard instead.',
+            ),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

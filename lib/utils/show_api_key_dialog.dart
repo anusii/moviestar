@@ -178,7 +178,8 @@ Future<bool> showApiKeyDialog(
                                             .showSnackBar(
                                           const SnackBar(
                                             content: Text(
-                                                'API key saved successfully'),
+                                              'API key saved successfully',
+                                            ),
                                             backgroundColor: Colors.green,
                                           ),
                                         );
@@ -192,7 +193,8 @@ Future<bool> showApiKeyDialog(
                                             .showSnackBar(
                                           SnackBar(
                                             content: Text(
-                                                'Failed to save API key: $e'),
+                                              'Failed to save API key: $e',
+                                            ),
                                             backgroundColor: Colors.red,
                                           ),
                                         );
@@ -208,7 +210,8 @@ Future<bool> showApiKeyDialog(
                                     width: 20,
                                     height: 20,
                                     child: CircularProgressIndicator(
-                                        strokeWidth: 2),
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : const Text('Save API Key'),
                           ),
@@ -345,16 +348,28 @@ void _showApiKeyHelpDialog(BuildContext context) {
               const SizedBox(height: 12),
 
               _buildCompactStep(
-                  context, '1', 'Create account at TMDB (if needed)'),
+                context,
+                '1',
+                'Create account at TMDB (if needed)',
+              ),
               const SizedBox(height: 8),
               _buildCompactStep(
-                  context, '2', 'Go to Settings → API → Create → Developer'),
-              const SizedBox(height: 8),
-              _buildCompactStep(context, '3',
-                  'Fill form: Name="MovieStar", Summary="Personal use"'),
+                context,
+                '2',
+                'Go to Settings → API → Create → Developer',
+              ),
               const SizedBox(height: 8),
               _buildCompactStep(
-                  context, '4', 'Copy "API Key (v3 auth)" once approved'),
+                context,
+                '3',
+                'Fill form: Name="MovieStar", Summary="Personal use"',
+              ),
+              const SizedBox(height: 8),
+              _buildCompactStep(
+                context,
+                '4',
+                'Copy "API Key (v3 auth)" once approved',
+              ),
 
               const SizedBox(height: 24),
               Align(
@@ -373,7 +388,10 @@ void _showApiKeyHelpDialog(BuildContext context) {
 }
 
 Widget _buildCompactStep(
-    BuildContext context, String number, String description) {
+  BuildContext context,
+  String number,
+  String description,
+) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [

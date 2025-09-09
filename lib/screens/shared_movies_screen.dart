@@ -168,7 +168,18 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
             }
           }
         } catch (e) {
-          debugPrint('Error reading resource file $resourceUrl: $e');
+          if (e.toString().contains('enc-keys.ttl') ||
+              e.toString().contains('Invalid content in file') ||
+              e.toString().contains('Duplicated encryption key')) {
+            debugPrint(
+              '⚠️  Encryption key corruption detected for $resourceUrl: $e',
+            );
+            debugPrint(
+              '   Skipping this resource - consider regenerating encryption keys in POD',
+            );
+          } else {
+            debugPrint('Error reading resource file $resourceUrl: $e');
+          }
           // Continue with other files even if one fails.
         }
       }

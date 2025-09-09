@@ -242,8 +242,10 @@ class MovieListService {
 
   /// Loads full movie data from individual movie file or fallback sources.
 
-  Future<Movie?> _loadFullMovieData(int movieId,
-      {String contentType = 'movie'}) async {
+  Future<Movie?> _loadFullMovieData(
+    int movieId, {
+    String contentType = 'movie',
+  }) async {
     try {
       // First try to load from individual movie file.
       // Check both Movie and TVShow patterns for backward compatibility
@@ -500,8 +502,10 @@ class MovieListService {
 
   /// Creates an individual movie file with full movie data.
 
-  Future<void> _createMovieFile(Movie movie,
-      {String contentType = 'movie'}) async {
+  Future<void> _createMovieFile(
+    Movie movie, {
+    String contentType = 'movie',
+  }) async {
     try {
       // Don't create a file for placeholder movies
       if (movie.title == 'Loading...' || movie.posterUrl.isEmpty) {

@@ -229,7 +229,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               if (!apiKeySet) {
                 // If user dismissed without setting API key, they can still use POD features
                 debugPrint(
-                    '⚠️  User dismissed API key dialog - movie features unavailable');
+                  '⚠️  User dismissed API key dialog - movie features unavailable',
+                );
               }
             }
           });
@@ -309,6 +310,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   void _handleSearch() {
     if (mounted) {
+      // Get the content service - it will be fresh due to provider dependencies
       final contentService = ref.read(contentServiceProvider);
       Navigator.push(
         context,

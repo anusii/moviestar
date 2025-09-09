@@ -134,7 +134,8 @@ Future<SolidFunctionCallStatus> createAppFolder({
             e.toString().contains('enc-keys.ttl')) {
           if (attempt == 1) {
             debugPrint(
-                '⚠️  Encryption key issue detected - retrying resource scan');
+              '⚠️  Encryption key issue detected - retrying resource scan',
+            );
           }
           if (attempt < 3) {
             await Future.delayed(Duration(milliseconds: 500 * attempt));
@@ -181,7 +182,8 @@ Future<SolidFunctionCallStatus> createAppFolder({
               e.toString().contains('enc-keys.ttl')) {
             if (attempt == 1) {
               debugPrint(
-                  '⚠️  Encryption key issue detected - retrying folder creation');
+                '⚠️  Encryption key issue detected - retrying folder creation',
+              );
             }
             if (attempt < 3) {
               await Future.delayed(Duration(milliseconds: 500 * attempt));
@@ -190,13 +192,15 @@ Future<SolidFunctionCallStatus> createAppFolder({
             // For the final attempt, try creating without encryption as fallback
             if (attempt == 3) {
               debugPrint(
-                  '⚠️  Using unencrypted fallback for folder initialization');
+                '⚠️  Using unencrypted fallback for folder initialization',
+              );
               initResult = await writePod(
                 '$folderName/init.ttl',
                 initContent,
                 context,
                 const Text(
-                    'Creating initialization file (unencrypted fallback)'),
+                  'Creating initialization file (unencrypted fallback)',
+                ),
                 encrypted: false,
               );
             }

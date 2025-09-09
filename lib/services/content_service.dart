@@ -83,7 +83,7 @@ class ContentService {
   // Ensures the client is initialized before making requests.
 
   Future<void> _ensureClientInitialized() async {
-    if (_client == null) {
+    if (_client == null || _searchService == null) {
       await _initializeClient();
     }
   }
@@ -316,6 +316,10 @@ class ContentService {
     String query,
   ) async {
     await _ensureClientInitialized();
+    if (_searchService == null) {
+      // Fallback: reinitialize if still null
+      await _initializeClient();
+    }
     return await _searchService!.searchContentComprehensive(query);
   }
 

@@ -29,8 +29,8 @@ import 'package:flutter/material.dart';
 
 import 'package:solidui/solidui.dart';
 
-import 'package:moviestar/constants/paths.dart';
 import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/constants/paths.dart';
 
 /// Screen for managing POD files.
 

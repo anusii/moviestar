@@ -32,11 +32,13 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:moviestar/constants/timing_constants.dart';
+import 'package:moviestar/mixins/screen_state_mixin.dart';
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 
 /// Screen for adding movies to a custom list with search functionality.
@@ -66,18 +68,18 @@ class AddMoviesToListScreen extends ConsumerStatefulWidget {
 /// State class for the add movies to list screen.
 
 class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, ScreenStateMixin {
   // Controller for the search text field.
 
   final TextEditingController _searchController = TextEditingController();
 
-  // Loading state indicator for search.
-
-  bool _isSearchLoading = false;
-
   // Loading state indicator for suggestions.
 
   bool _isSuggestionsLoading = true;
+
+  // Loading state indicator for search.
+
+  bool _isSearchLoading = false;
 
   // Error message if any.
 
@@ -85,11 +87,11 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
 
   // Search results categorized by search type.
 
-  Map<String, List<Movie>> _searchResults = {};
+  Map<String, List<ContentItem>> _searchResults = {};
 
-  // Suggested movies (popular, trending, etc.)
+  // Suggested content (popular movies and TV shows)
 
-  List<Movie> _suggestedMovies = [];
+  List<ContentItem> _suggestedContent = [];
 
   // Timer for debouncing search requests.
 
@@ -113,7 +115,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     _tabController = TabController(length: 2, vsync: this);
     _searchController.addListener(_onSearchChanged);
     _loadMoviesInList();
-    _loadSuggestedMovies();
+    _loadSuggestedContent();
   }
 
   @override
@@ -128,47 +130,36 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
   // Loads the list of movies already in this custom list.
 
   Future<void> _loadMoviesInList() async {
-    setState(() {
+    safeSetState(() {
       _moviesInList = Set.from(widget.customList.movieIds);
     });
   }
 
-  // Loads suggested movies from popular/trending categories.
+  // Loads suggested content from popular mixed content (movies and TV shows).
 
-  Future<void> _loadSuggestedMovies() async {
-    setState(() {
+  Future<void> _loadSuggestedContent() async {
+    safeSetState(() {
       _isSuggestionsLoading = true;
-      _error = null;
     });
+    safeSetState(() => _error = null);
 
     try {
-      final popularMoviesWithCacheInfo =
-          await ref.read(popularMoviesWithCacheInfoProvider.future);
-      final topRatedMoviesWithCacheInfo =
-          await ref.read(topRatedMoviesWithCacheInfoProvider.future);
+      final contentService = ref.read(contentServiceProvider);
+      final popularMixedContent = await contentService.getPopularMixedContent();
 
-      // Combine popular and top-rated movies, remove duplicates.
+      // Remove content already in the list.
+      final filteredSuggestions = popularMixedContent
+          .where((content) => !_moviesInList.contains(content.id))
+          .take(20)
+          .toList();
 
-      final allSuggestions = <Movie>[];
-      allSuggestions.addAll(popularMoviesWithCacheInfo.data);
-      allSuggestions.addAll(topRatedMoviesWithCacheInfo.data);
-
-      // Remove duplicates and movies already in the list.
-
-      final uniqueSuggestions = <int, Movie>{};
-      for (final movie in allSuggestions) {
-        if (!_moviesInList.contains(movie.id)) {
-          uniqueSuggestions[movie.id] = movie;
-        }
-      }
-
-      setState(() {
-        _suggestedMovies = uniqueSuggestions.values.take(20).toList();
+      safeSetState(() {
+        _suggestedContent = filteredSuggestions;
         _isSuggestionsLoading = false;
       });
     } catch (e) {
-      setState(() {
-        _error = e.toString();
+      safeSetState(() => _error = e.toString());
+      safeSetState(() {
         _isSuggestionsLoading = false;
       });
     }
@@ -187,7 +178,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
 
   Future<void> _searchMovies(String query) async {
     if (query.isEmpty) {
-      setState(() {
+      safeSetState(() {
         _searchResults = {};
         _error = null;
         _isSearchLoading = false;
@@ -199,32 +190,32 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
       return;
     }
 
-    setState(() {
+    safeSetState(() {
       _isSearchLoading = true;
       _error = null;
     });
 
     try {
-      final movieService = ref.read(movieServiceProvider);
-      final results = await movieService.searchMoviesComprehensive(query);
+      final contentService = ref.read(contentServiceProvider);
+      final results = await contentService.searchContentComprehensive(query);
 
-      // Filter out movies already in the list.
-      final filteredResults = <String, List<Movie>>{};
+      // Filter out content already in the list.
+      final filteredResults = <String, List<ContentItem>>{};
       for (final entry in results.entries) {
         filteredResults[entry.key] = entry.value
-            .where((movie) => !_moviesInList.contains(movie.id))
+            .where((content) => !_moviesInList.contains(content.id))
             .toList();
       }
 
       if (_searchController.text == query) {
-        setState(() {
+        safeSetState(() {
           _searchResults = filteredResults;
           _isSearchLoading = false;
         });
       }
     } catch (e) {
       if (_searchController.text == query) {
-        setState(() {
+        safeSetState(() {
           _error = e.toString();
           _isSearchLoading = false;
         });
@@ -232,90 +223,35 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     }
   }
 
-  // Adds a movie to the custom list.
+  // Adds a content item to the custom list.
 
-  Future<void> _addMovieToList(Movie movie) async {
+  Future<void> _addContentToList(ContentItem contentItem) async {
     try {
-      await widget.favoritesService
-          .addMovieToCustomList(widget.customList.id, movie);
+      final movie = Movie.fromContentItem(contentItem);
+      final contentType =
+          contentItem.contentType == ContentType.tvShow ? 'tv' : 'movie';
+
+      await widget.favoritesService.addMovieToCustomList(
+        widget.customList.id,
+        movie,
+        contentType: contentType,
+      );
       setState(() {
-        _moviesInList.add(movie.id);
+        _moviesInList.add(contentItem.id);
       });
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(
-                  Icons.check_circle_outline,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Added "${movie.title}" to ${widget.customList.name}',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            margin: const EdgeInsets.all(16),
-            elevation: 6,
-            duration: TimingConstants.snackbarStandardDuration,
-          ),
-        );
-      }
+      showSuccessSnackBar(
+        'Added "${contentItem.title}" to ${widget.customList.name}',
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  color: Theme.of(context).colorScheme.onErrorContainer,
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Error adding movie: $e',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onErrorContainer,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            margin: const EdgeInsets.all(16),
-            elevation: 6,
-            duration: TimingConstants.snackbarLongDuration,
-          ),
-        );
-      }
+      showErrorSnackBar('Error adding content: $e');
     }
   }
 
-  // Builds a movie item card.
+  // Builds a content item card (for search results).
 
-  Widget _buildMovieCard(Movie movie) {
-    final isInList = _moviesInList.contains(movie.id);
+  Widget _buildContentCard(ContentItem contentItem) {
+    final isInList = _moviesInList.contains(contentItem.id);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -325,7 +261,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: CachedNetworkImage(
-            imageUrl: movie.posterUrl,
+            imageUrl: contentItem.posterUrl,
             width: 50,
             height: 75,
             fit: BoxFit.cover,
@@ -343,12 +279,22 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
             ),
           ),
         ),
-        title: Text(
-          movie.title,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
-          ),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                contentItem.title,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Text(
+              contentItem.contentTypeIcon,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -362,24 +308,24 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  movie.voteAverage.toStringAsFixed(1),
+                  contentItem.voteAverage.toStringAsFixed(1),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(width: 16),
                 Text(
-                  movie.releaseDate.year.toString(),
+                  '${contentItem.contentTypeLabel} • ${contentItem.releaseYear}',
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
             ),
-            if (movie.overview.isNotEmpty) ...[
+            if (contentItem.overview.isNotEmpty) ...[
               const SizedBox(height: 4),
               Text(
-                movie.overview,
+                contentItem.overview,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -400,7 +346,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
                   Icons.add_circle_outline,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                onPressed: () => _addMovieToList(movie),
+                onPressed: () => _addContentToList(contentItem),
               ),
       ),
     );
@@ -436,10 +382,10 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
             const SizedBox(height: 16),
             Text(
               _searchController.text.isEmpty
-                  ? 'Search for movies to add'
+                  ? 'Search for movies and TV shows to add'
                   : _searchController.text.length < 2
                       ? 'Type at least 2 characters'
-                      : 'No movies found',
+                      : 'No results found',
               style: TextStyle(
                 color: Theme.of(context)
                     .colorScheme
@@ -450,7 +396,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
             ),
             const SizedBox(height: 8),
             Text(
-              'Find movies by title, actor, or genre',
+              'Find movies and TV shows by title, actor, or genre',
               style: TextStyle(
                 color: Theme.of(context)
                     .colorScheme
@@ -492,7 +438,11 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
 
   // Builds a search results section.
 
-  Widget _buildSearchSection(String title, List<Movie> movies, IconData icon) {
+  Widget _buildSearchSection(
+    String title,
+    List<ContentItem> contents,
+    IconData icon,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -522,7 +472,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${movies.length}',
+                  '${contents.length}',
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                     fontSize: 12,
@@ -533,7 +483,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
             ],
           ),
         ),
-        ...movies.map((movie) => _buildMovieCard(movie)),
+        ...contents.map((content) => _buildContentCard(content)),
         const SizedBox(height: 8),
       ],
     );
@@ -549,11 +499,11 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     if (_error != null) {
       return ErrorDisplayWidget(
         message: 'Failed to load suggestions: $_error',
-        onRetry: _loadSuggestedMovies,
+        onRetry: _loadSuggestedContent,
       );
     }
 
-    if (_suggestedMovies.isEmpty) {
+    if (_suggestedContent.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -595,7 +545,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
               ),
               const SizedBox(width: 8),
               Text(
-                'Popular Movies',
+                'Popular Content',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 16,
@@ -605,7 +555,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
             ],
           ),
         ),
-        ..._suggestedMovies.map((movie) => _buildMovieCard(movie)),
+        ..._suggestedContent.map((content) => _buildContentCard(content)),
       ],
     );
   }
@@ -620,32 +570,31 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Add Movies'),
-            Text(
-              widget.customList.name,
-              style: TextStyle(
-                fontSize: 14,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+    return BaseScreen(
+      titleWidget: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Add Content'),
+          Text(
+            widget.customList.name,
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
-          ],
-        ),
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        foregroundColor: Theme.of(context).colorScheme.onSurface,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Search', icon: Icon(Icons.search)),
-            Tab(text: 'Suggestions', icon: Icon(Icons.trending_up)),
-          ],
-        ),
+          ),
+        ],
       ),
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      isLoading:
+          false, // Only use BaseScreen loading for overall screen loading
+      error: null, // Handle errors within individual tabs
+      onErrorRetry: null,
+      appBarBottom: TabBar(
+        controller: _tabController,
+        tabs: const [
+          Tab(text: 'Search', icon: Icon(Icons.search)),
+          Tab(text: 'Suggestions', icon: Icon(Icons.trending_up)),
+        ],
+      ),
       body: Column(
         children: [
           // Search bar (only shown in search tab).
@@ -661,7 +610,8 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Search by title, actor, or genre...',
+                      hintText:
+                          'Search movies and TV shows by title, actor, or genre...',
                       hintStyle: TextStyle(
                         color: Theme.of(context)
                             .colorScheme
@@ -685,7 +635,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
                           Theme.of(context).colorScheme.surfaceContainerHighest,
                     ),
                     onChanged: (value) =>
-                        setState(() {}), // To show/hide clear button.
+                        safeSetState(() {}), // To show/hide clear button.
                     onSubmitted: (value) {
                       _debounceTimer?.cancel();
                       _searchMovies(value);

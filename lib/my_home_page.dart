@@ -466,7 +466,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         solidScaffold,
         Scaffold(
           appBar: AppBar(
-            title: const Text('Settings'),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {

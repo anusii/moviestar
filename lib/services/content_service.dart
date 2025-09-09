@@ -25,6 +25,8 @@
 
 library;
 
+import 'dart:io';
+
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/api_key_service.dart';
@@ -61,6 +63,12 @@ class ContentService {
     final apiKey = await _apiKeyService.getApiKey();
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
     _searchService = ContentSearchService(_client!);
+
+    // On Linux, add a small delay to ensure services are ready
+    // This helps with search immediately after API key is added
+    if (Platform.isLinux) {
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
   }
 
   // Updates the API key and recreates the network client.

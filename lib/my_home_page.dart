@@ -42,6 +42,7 @@ import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
+import 'package:moviestar/utils/show_api_key_dialog.dart';
 import 'package:moviestar/widgets/solid_scaffold_config.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
@@ -202,10 +203,42 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     final loggedIn = await isLoggedIn();
 
     // Refresh user info based on login status.
-
     await _loadUserInfo();
 
     if (loggedIn) {
+      // Check if API key is present and show dialog immediately if missing
+      bool hasApiKey = false;
+      try {
+        final apiKeyService = ref.read(apiKeyServiceProvider);
+        final apiKey = await apiKeyService.getApiKey();
+        hasApiKey = apiKey != null && apiKey.trim().isNotEmpty;
+
+        if (!hasApiKey) {
+          // Show API key dialog immediately but continue with POD initialization
+          debugPrint('⚠️  No API key configured - showing setup dialog');
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            if (mounted) {
+              final apiKeySet = await showApiKeyDialog(
+                context,
+                apiKeyService,
+                onApiKeySet: () {
+                  // Reinitialize after API key is set
+                  reinitializeAfterApiKey();
+                },
+              );
+              if (!apiKeySet) {
+                // If user dismissed without setting API key, they can still use POD features
+                debugPrint(
+                    '⚠️  User dismissed API key dialog - movie features unavailable');
+              }
+            }
+          });
+        }
+      } catch (e) {
+        debugPrint('⚠️  Error checking API key during initialization: $e');
+      }
+
+      // Always initialize POD folders regardless of API key status
       if (mounted) {
         setState(() {
           _isLoadingFolders = true;
@@ -308,6 +341,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     setState(() {
       _showSettings = true;
     });
+  }
+
+  /// Reinitializes the app after API key is set
+  Future<void> reinitializeAfterApiKey() async {
+    debugPrint('🔄 Reinitializing app after API key configuration');
+    await _initialiseAppData();
   }
 
   /// Handles menu tab selection.

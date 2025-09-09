@@ -279,7 +279,9 @@ class UserProfileService {
 
       return null;
     } catch (e) {
-      debugPrint('❌ Error loading existing profile: $e');
+      if (!e.toString().contains('does not exist')) {
+        debugPrint('❌ Error loading existing profile: $e');
+      }
       return null;
     }
   }
@@ -330,7 +332,9 @@ class UserProfileService {
           }
         }
       } catch (e) {
-        debugPrint('❌ Failed to read profile from POD: $e');
+        if (!e.toString().contains('does not exist')) {
+          debugPrint('❌ Failed to read profile from POD: $e');
+        }
       }
 
       return null;

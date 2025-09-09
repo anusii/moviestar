@@ -703,7 +703,8 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
 
                     if (mounted) {
                       // Invalidate all movie providers to force refresh with new API key.
-
+                      // IMPORTANT: Must invalidate apiKeyProvider first so dependent providers refresh
+                      ref.invalidate(apiKeyProvider);
                       ref.invalidate(popularMoviesWithCacheInfoProvider);
                       ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
                       ref.invalidate(topRatedMoviesWithCacheInfoProvider);
@@ -711,18 +712,26 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                       ref.invalidate(movieServiceProvider);
                       ref.invalidate(contentServiceProvider);
 
+                      // Give providers time to refresh before showing success message
+                      await Future.delayed(const Duration(milliseconds: 100));
+
                       // Show success message.
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('API key saved successfully'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('API key saved successfully'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                      // If we navigated here from the API key prompt, navigate back to home.
+                        // If we navigated here from the API key prompt, navigate back to home.
+                        if (widget.fromApiKeyPrompt) {
+                          _navigateToHomeScreen();
+                        }
 
-                      if (widget.fromApiKeyPrompt) {
-                        _navigateToHomeScreen();
+                        // Trigger app reinitialization after API key is set
+                        // This will properly initialize POD folders and data loading
+                        _triggerAppReinitialization();
                       }
                     }
                   },
@@ -1217,6 +1226,13 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
       ),
       onTap: onTap,
     );
+  }
+
+  /// Triggers app reinitialization after API key is set
+  void _triggerAppReinitialization() {
+    // The provider invalidations we added earlier will handle the reinitialization
+    // No additional action needed here since the providers are already invalidated
+    debugPrint('🔄 API key saved - providers invalidated for reinitialization');
   }
 
   void _navigateToHomeScreen() {

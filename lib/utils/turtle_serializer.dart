@@ -33,6 +33,7 @@ import 'package:rdflib/rdflib.dart';
 import 'package:solidpod/solidpod.dart'
     show tripleMapToTurtle, turtleToTripleMap;
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Utility class for serializing/deserializing movies to/from Turtle format using proper RDF.
@@ -733,11 +734,16 @@ class TurtleSerializer {
 
       for (final movie in movies) {
         final movieResource = moviestarDataNS.withAttr('movie-${movie.id}');
+        // Use content-type aware file naming
+        final contentPrefix =
+            movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie';
+        final filePathStr =
+            'moviestar/data/movies/$contentPrefix-${movie.id}.ttl';
         triples[movieResource] = {
           rdfType: [owlNS.withAttr('NamedIndividual'), movieType],
-          filePath: Literal('moviestar/data/movies/Movie-${movie.id}.ttl'),
+          filePath: Literal(filePathStr),
           rdfsLabel: Literal(
-            '|filePath=moviestar/data/movies/Movie-${movie.id}.ttl|',
+            '|filePath=$filePathStr|',
           ),
         };
       }

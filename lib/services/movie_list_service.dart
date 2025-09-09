@@ -29,6 +29,7 @@ import 'package:flutter/material.dart';
 
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/models/movie_list_operation.dart';
 import 'package:moviestar/models/shared_movie_list.dart';
@@ -185,8 +186,14 @@ class MovieListService {
             for (final placeholderMovie in placeholderMovies) {
               try {
                 // Try to load full movie data from individual movie file.
+                // Check content type from placeholder if available
+                final contentType =
+                    placeholderMovie.contentType == ContentType.tvShow
+                        ? 'tv'
+                        : 'movie';
                 final fullMovieData = await _loadFullMovieData(
                   placeholderMovie.id,
+                  contentType: contentType,
                 );
 
                 if (fullMovieData != null) {
@@ -235,16 +242,33 @@ class MovieListService {
 
   /// Loads full movie data from individual movie file or fallback sources.
 
-  Future<Movie?> _loadFullMovieData(int movieId) async {
+  Future<Movie?> _loadFullMovieData(int movieId,
+      {String contentType = 'movie'}) async {
     try {
       // First try to load from individual movie file.
-
+      // Check both Movie and TVShow patterns for backward compatibility
       final movieFileName = 'moviestar/data/movies/Movie-$movieId.ttl';
+      final tvShowFileName = 'moviestar/data/movies/TVShow-$movieId.ttl';
 
       if (!_context.mounted) return null;
 
       try {
-        final result = await readPod(movieFileName, _context, _child);
+        String result = '';
+        // For TV shows, try TVShow file first, then fall back to Movie file
+        if (contentType == 'tv' || contentType == 'tvShow') {
+          try {
+            result = await readPod(tvShowFileName, _context, _child);
+          } catch (e) {
+            // Fall back to Movie file for backward compatibility
+            if (!e.toString().contains('does not exist')) {
+              rethrow;
+            }
+            result = await readPod(movieFileName, _context, _child);
+          }
+        } else {
+          // For movies, just try Movie file
+          result = await readPod(movieFileName, _context, _child);
+        }
 
         if (result.isNotEmpty) {
           final movieData =
@@ -384,7 +408,10 @@ class MovieListService {
         );
         debugPrint('🔄 May need to wait for POD authentication to complete');
       } else {
-        debugPrint('❌ Error scanning user_lists directory: $e');
+        if (!e.toString().contains('does not exist') &&
+            !e.toString().contains('Failed to get resource list')) {
+          debugPrint('❌ Error scanning user_lists directory: $e');
+        }
       }
 
       // Return null to trigger fallback creation instead of failing completely.
@@ -425,12 +452,8 @@ class MovieListService {
         return true;
       }
 
-      // Only create individual movie files for actual movies, not TV shows.
-      // TV shows should be fetched from the API when needed.
-
-      if (contentType == 'movie') {
-        await _createMovieFile(movie);
-      }
+      // Create individual files for both movies and TV shows with proper naming
+      await _createMovieFile(movie, contentType: contentType);
 
       currentMovies.add(movie);
 
@@ -477,7 +500,8 @@ class MovieListService {
 
   /// Creates an individual movie file with full movie data.
 
-  Future<void> _createMovieFile(Movie movie) async {
+  Future<void> _createMovieFile(Movie movie,
+      {String contentType = 'movie'}) async {
     try {
       // Don't create a file for placeholder movies
       if (movie.title == 'Loading...' || movie.posterUrl.isEmpty) {
@@ -487,7 +511,10 @@ class MovieListService {
         return;
       }
 
-      final movieFileName = 'movies/Movie-${movie.id}.ttl';
+      // Use content-type aware file naming
+      final contentPrefix =
+          (contentType == 'tv' || contentType == 'tvShow') ? 'TVShow' : 'Movie';
+      final movieFileName = 'movies/$contentPrefix-${movie.id}.ttl';
 
       // Create the movie TTL content with full data.
 

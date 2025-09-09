@@ -226,6 +226,22 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               });
             }
 
+            // Automatically enable POD storage for authenticated users if not already enabled.
+
+            if (!_favoritesServiceManager.isPodStorageEnabled) {
+              try {
+                final enabled =
+                    await _favoritesServiceManager.enablePodStorage();
+                if (!enabled) {
+                  debugPrint(
+                    '❌ [MyHomePage] Failed to automatically enable POD storage',
+                  );
+                }
+              } catch (e) {
+                debugPrint('❌ [MyHomePage] Error enabling POD storage: $e');
+              }
+            }
+
             // Now reload POD data since folders are ready.
 
             await _favoritesServiceManager.reloadPodDataAfterInit();

@@ -104,23 +104,3 @@ class Gaps {
 
   static const double xxxl = 20.0;
 }
-
-/// Border radius constants for consistent rounded corners.
-
-class BorderRadii {
-  /// Small border radius (4.0 pixels).
-
-  static const double small = 4.0;
-
-  /// Medium border radius (8.0 pixels).
-
-  static const double medium = 8.0;
-
-  /// Large border radius (10.0 pixels).
-
-  static const double large = 10.0;
-
-  /// Extra large border radius (12.0 pixels).
-
-  static const double extraLarge = 12.0;
-}

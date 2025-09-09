@@ -185,21 +185,22 @@ class MovieListService {
             for (final placeholderMovie in placeholderMovies) {
               try {
                 // Try to load full movie data from individual movie file.
-
                 final fullMovieData = await _loadFullMovieData(
                   placeholderMovie.id,
                 );
+
                 if (fullMovieData != null) {
                   fullMovies.add(fullMovieData);
                 } else {
                   // If no individual movie file exists, keep the placeholder.
-                  // but try to get basic data from TMDB if we have a movie service.
+                  // but mark it as needing to be fetched from API.
+                  // The UI should handle fetching the full data.
 
                   fullMovies.add(placeholderMovie);
                 }
               } catch (e) {
                 debugPrint(
-                  '❌ Failed to load full data for movie ${placeholderMovie.id}: $e',
+                  '❌ [MovieList] Failed to load full data for movie ${placeholderMovie.id}: $e',
                 );
                 // Keep placeholder as fallback.
 
@@ -241,19 +242,34 @@ class MovieListService {
       final movieFileName = 'moviestar/data/movies/Movie-$movieId.ttl';
 
       if (!_context.mounted) return null;
-      final result = await readPod(movieFileName, _context, _child);
 
-      if (result.isNotEmpty) {
-        final movieData = TurtleSerializer.movieWithUserDataFromTurtle(result);
-        if (movieData != null && movieData['movie'] is Movie) {
-          return movieData['movie'] as Movie;
+      try {
+        final result = await readPod(movieFileName, _context, _child);
+
+        if (result.isNotEmpty) {
+          final movieData =
+              TurtleSerializer.movieWithUserDataFromTurtle(result);
+
+          if (movieData != null && movieData['movie'] is Movie) {
+            final movie = movieData['movie'] as Movie;
+            return movie;
+          } else {}
         }
+      } catch (e) {
+        // File doesn't exist or can't be read, continue to fallback.
+
+        if (!e.toString().contains('does not exist')) {
+        } else {}
       }
 
-      debugPrint('💡 No individual movie file found for movie $movieId');
+      // If no file exists, this is expected for movies that were added before
+      // individual files were created, return null to trigger fetching from API.
+
       return null;
     } catch (e) {
-      debugPrint('❌ Error loading full movie data for $movieId: $e');
+      debugPrint(
+        '❌ [MovieList] Error loading full movie data for $movieId: $e',
+      );
       return null;
     }
   }
@@ -337,6 +353,7 @@ class MovieListService {
           } catch (e) {
             // Skip files that can't be read (deleted, corrupted, etc.).
 
+            debugPrint('⚠️ Could not read MovieList file $fileName: $e');
             continue;
           }
         }
@@ -344,7 +361,34 @@ class MovieListService {
 
       return null;
     } catch (e) {
-      debugPrint('❌ Error scanning user_lists directory: $e');
+      // Enhanced error handling with specific web-related error detection.
+
+      final errorMsg = e.toString().toLowerCase();
+
+      if (errorMsg.contains('network') ||
+          errorMsg.contains('fetch') ||
+          errorMsg.contains('cors') ||
+          errorMsg.contains('connection')) {
+        debugPrint(
+          '🌐 Web-specific network error scanning user_lists directory: $e',
+        );
+        debugPrint(
+          '🔄 This may be due to web environment POD access limitations',
+        );
+      } else if (errorMsg.contains('permission') ||
+          errorMsg.contains('auth') ||
+          errorMsg.contains('unauthorized') ||
+          errorMsg.contains('forbidden')) {
+        debugPrint(
+          '🔐 Permission/Auth error scanning user_lists directory: $e',
+        );
+        debugPrint('🔄 May need to wait for POD authentication to complete');
+      } else {
+        debugPrint('❌ Error scanning user_lists directory: $e');
+      }
+
+      // Return null to trigger fallback creation instead of failing completely.
+
       return null;
     }
   }
@@ -435,6 +479,14 @@ class MovieListService {
 
   Future<void> _createMovieFile(Movie movie) async {
     try {
+      // Don't create a file for placeholder movies
+      if (movie.title == 'Loading...' || movie.posterUrl.isEmpty) {
+        debugPrint(
+          '⚠️ Skipping movie file creation for placeholder movie ${movie.id}',
+        );
+        return;
+      }
+
       final movieFileName = 'movies/Movie-${movie.id}.ttl';
 
       // Create the movie TTL content with full data.
@@ -455,7 +507,6 @@ class MovieListService {
       );
 
       if (result == SolidFunctionCallStatus.success) {
-        debugPrint('✅ Created individual movie file for ${movie.title}');
       } else {
         debugPrint(
           '❌ Failed to create individual movie file for ${movie.title}',
@@ -540,6 +591,14 @@ class MovieListService {
           )
           .join(' ');
 
+      // Check if user is logged in first.
+
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        debugPrint('⚠️ User not logged in, cannot create/access MovieLists');
+        return null;
+      }
+
       // Scan the user_lists directory for existing MovieLists instead of relying on profile data.
 
       final existingMovieListId = await _findExistingMovieListInDirectory(
@@ -567,21 +626,83 @@ class MovieListService {
           description = 'List of movies: $displayName';
       }
 
-      // No existing list found, create a new one.
+      // Attempt to create new list with multiple retry strategies for web environments.
 
-      final listId = await createMovieList(
-        displayName,
-        movies: [],
-        description: description,
-      );
+      String? listId;
+      int retryCount = 0;
+      const maxRetries = 3;
+
+      while (listId == null && retryCount < maxRetries) {
+        retryCount++;
+
+        try {
+          listId = await createMovieList(
+            displayName,
+            movies: [],
+            description: description,
+          );
+
+          if (listId != null) {
+            break;
+          }
+        } catch (createError) {
+          debugPrint('❌ Create attempt $retryCount threw error: $createError');
+
+          // Wait before retry, with exponential backoff for web environments.
+
+          if (retryCount < maxRetries) {
+            final waitTime = Duration(milliseconds: 1000 * retryCount);
+            await Future.delayed(waitTime);
+          }
+        }
+      }
 
       if (listId == null) {
-        debugPrint('❌ Failed to create standard movie list: $listType');
+        debugPrint(
+          '❌ Failed to create standard movie list after $maxRetries attempts: $listType',
+        );
+        debugPrint(
+          '🔄 This may be due to web environment POD limitations or authentication issues',
+        );
+
+        // For web environments, we should still return a placeholder ID
+        // to prevent the app from being completely unusable.
+
+        final fallbackId =
+            'fallback-$listType-${DateTime.now().millisecondsSinceEpoch}';
+
+        // Cache the fallback data locally.
+
+        _movieListCache[fallbackId] = {
+          'id': fallbackId,
+          'name': displayName,
+          'movies': <Movie>[],
+          'filePath': 'user_lists/MovieList-$fallbackId.ttl',
+          'isFallback': true, // Mark as fallback for later recovery.
+        };
+
+        return fallbackId;
       }
 
       return listId;
     } catch (e) {
       debugPrint('❌ Exception in get/create standard movie list: $e');
+
+      // Enhanced error categorization for better debugging.
+
+      final errorMsg = e.toString().toLowerCase();
+      if (errorMsg.contains('network') ||
+          errorMsg.contains('fetch') ||
+          errorMsg.contains('cors')) {
+        debugPrint(
+          '🌐 Network-related error - may be web environment limitation',
+        );
+      } else if (errorMsg.contains('auth') || errorMsg.contains('permission')) {
+        debugPrint(
+          '🔐 Authentication/permission error - POD access may not be ready',
+        );
+      }
+
       return null;
     }
   }

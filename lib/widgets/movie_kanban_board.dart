@@ -41,11 +41,14 @@ import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/api_key_validation_service.dart';
 import 'package:moviestar/services/error_mapper_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/network_connectivity_service.dart';
 import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
+
+import '../constants/ui_constants.dart';
 
 /// Enum for different column types in the kanban board.
 
@@ -884,7 +887,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         child: Stack(
           children: [
             Opacity(
-              opacity: 0.8,
+              opacity: UIConstants.highOpacity,
               child: SizedBox(
                 width: 100,
                 height: 150,
@@ -954,6 +957,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     required String categoryId,
     required bool fromCache,
     required KanbanColumnType columnType,
+    bool isLoading = false,
   }) {
     // Apply optimistic updates.
 
@@ -1218,33 +1222,63 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           // Movie items.
 
           Expanded(
-            child: displayMovies.isEmpty
+            child: isLoading
                 ? Center(
-                    child: Text(
-                      'No movies',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Theme.of(context).colorScheme.primary,
+                            ),
                           ),
+                        ),
+                        const Gap(8),
+                        Text(
+                          'Loading $title...',
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.7),
+                                  ),
+                        ),
+                      ],
                     ),
                   )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(Dimensions.m),
-                    itemCount: displayMovies.length,
-                    itemBuilder: (context, index) {
-                      final movie = displayMovies[index];
-                      return _buildMovieItem(
-                        movie,
-                        categoryId,
-                        fromCache: fromCache,
-                        columnType: columnType,
-                        columnId: categoryId,
-                        columnName: title,
-                      );
-                    },
-                  ),
+                : displayMovies.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No movies',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.5),
+                                  ),
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(8),
+                        itemCount: displayMovies.length,
+                        itemBuilder: (context, index) {
+                          final movie = displayMovies[index];
+                          return _buildMovieItem(
+                            movie,
+                            categoryId,
+                            fromCache: fromCache,
+                            columnType: columnType,
+                            columnId: categoryId,
+                            columnName: title,
+                          );
+                        },
+                      ),
           ),
         ],
       ),
@@ -1557,8 +1591,37 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           // Movie items.
 
           Expanded(
-            child: movieIdsWithOptimistic.isEmpty
-                ? Center(
+            child: FutureBuilder<List<Movie>>(
+              future:
+                  widget.favoritesService.getMoviesInCustomList(customList.id),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(Dimensions.xl),
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(Dimensions.xl),
+                      child: Text(
+                        'Error loading movies',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                      ),
+                    ),
+                  );
+                }
+
+                final podMovies = snapshot.data ?? [];
+
+                if (podMovies.isEmpty) {
+                  return Center(
                     child: Padding(
                       padding: const EdgeInsets.all(Dimensions.xl),
                       child: Text(
@@ -1571,22 +1634,35 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                             ),
                       ),
                     ),
-                  )
-                : _CustomListMoviesWidget(
-                    movieIds: movieIdsWithOptimistic,
-                    customList: customList,
-                    sortCriteria: _columnSortCriteria[customList.id] ??
-                        MovieSortCriteria.nameAsc,
-                    maxItems: _maxItemsPerColumn,
-                    buildMovieItem: (movie, index) => _buildMovieItem(
-                      movie,
-                      customList.id,
-                      fromCache: false,
-                      columnType: KanbanColumnType.customList,
-                      columnId: customList.id,
-                      columnName: customList.name,
-                    ),
+                  );
+                }
+
+                // Apply optimistic updates to the POD movies
+                final movieIdsFromPod = podMovies.map((m) => m.id).toList();
+                final optimisticMovieIds = _getMovieIdsWithOptimisticUpdates(
+                  movieIdsFromPod,
+                  KanbanColumnType.customList,
+                  customList.id,
+                );
+
+                return _CustomListMoviesWidget(
+                  movieIds: optimisticMovieIds,
+                  customList: customList,
+                  favoritesService: widget.favoritesService,
+                  sortCriteria: _columnSortCriteria[customList.id] ??
+                      MovieSortCriteria.nameAsc,
+                  maxItems: _maxItemsPerColumn,
+                  buildMovieItem: (movie, index) => _buildMovieItem(
+                    movie,
+                    customList.id,
+                    fromCache: false,
+                    columnType: KanbanColumnType.customList,
+                    columnId: customList.id,
+                    columnName: customList.name,
                   ),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -1633,6 +1709,100 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           customList: customList,
           favoritesService: widget.favoritesService,
         ),
+      ),
+    );
+  }
+
+  Widget _buildCustomListLoadingColumn() {
+    return Container(
+      width: 220,
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Column header.
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainer,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Custom Lists',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                // Count badge placeholder
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '...',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Loading content area - matching the exact style of To Watch/Watched
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Loading Custom Lists...',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.7),
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1886,6 +2056,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                                       categoryId: 'towatch',
                                       fromCache: false,
                                       columnType: KanbanColumnType.toWatch,
+                                      isLoading:
+                                          toWatchSnapshot.connectionState ==
+                                                  ConnectionState.waiting &&
+                                              !toWatchSnapshot.hasData,
                                     ),
 
                                     // Watched Column.
@@ -1896,6 +2070,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                                       categoryId: 'watched',
                                       fromCache: false,
                                       columnType: KanbanColumnType.watched,
+                                      isLoading:
+                                          watchedSnapshot.connectionState ==
+                                                  ConnectionState.waiting &&
+                                              !watchedSnapshot.hasData,
                                     ),
 
                                     // Custom List Columns.
@@ -1903,6 +2081,12 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                                       (customList) =>
                                           _buildCustomListColumn(customList),
                                     ),
+
+                                    // Show loading placeholder for custom lists if they're still loading
+                                    if (customListsSnapshot.connectionState ==
+                                            ConnectionState.waiting &&
+                                        customLists.isEmpty)
+                                      _buildCustomListLoadingColumn(),
                                   ],
                                 ),
                               ),
@@ -1939,6 +2123,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 class _CustomListMoviesWidget extends ConsumerStatefulWidget {
   final List<int> movieIds;
   final CustomList customList;
+  final FavoritesService favoritesService;
   final MovieSortCriteria sortCriteria;
   final int maxItems;
   final Widget Function(Movie movie, int index) buildMovieItem;
@@ -1946,6 +2131,7 @@ class _CustomListMoviesWidget extends ConsumerStatefulWidget {
   const _CustomListMoviesWidget({
     required this.movieIds,
     required this.customList,
+    required this.favoritesService,
     required this.sortCriteria,
     required this.maxItems,
     required this.buildMovieItem,
@@ -2000,8 +2186,38 @@ class _CustomListMoviesWidgetState
       _isLoading = true;
     });
 
-    // Load all movies needed for sorting.
+    // Try POD-first approach if POD storage is available
+    if (widget.favoritesService is FavoritesServiceAdapter &&
+        (widget.favoritesService as FavoritesServiceAdapter)
+            .isPodStorageEnabled) {
+      try {
+        final podMovies = await widget.favoritesService
+            .getMoviesInCustomList(widget.customList.id);
 
+        if (podMovies.isNotEmpty) {
+          if (mounted) {
+            setState(() {
+              _moviesMap.clear();
+              for (final movie in podMovies) {
+                _moviesMap[movie.id] = movie;
+              }
+              _isLoading = false;
+            });
+          }
+          return;
+        }
+      } catch (e) {
+        // Continue to fallback to API loading
+      }
+    }
+
+    // Fallback to API loading (original method)
+    await _loadMoviesFromAPI();
+  }
+
+  // Original API loading method
+  Future<void> _loadMoviesFromAPI() async {
+    // Load all movies needed for sorting.
     final moviesToLoad = widget.movieIds.take(widget.maxItems * 2).toList();
 
     for (int i = 0; i < moviesToLoad.length; i++) {

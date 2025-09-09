@@ -36,10 +36,12 @@ import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/constants/paths.dart';
 import 'package:moviestar/models/content_item.dart';
+import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/movie_list_service.dart';
 import 'package:moviestar/services/user_profile_service.dart';
+import 'package:moviestar/utils/is_desktop.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 
@@ -91,6 +93,10 @@ class PodFavoritesService extends ChangeNotifier {
 
   final _watchedController = BehaviorSubject<List<Movie>>();
 
+  /// Stream controller for custom lists.
+
+  final _customListsController = BehaviorSubject<List<CustomList>>();
+
   /// Stream of to-watch movies.
 
   Stream<List<Movie>> get toWatchMovies => _toWatchController.stream;
@@ -98,6 +104,10 @@ class PodFavoritesService extends ChangeNotifier {
   /// Stream of watched movies.
 
   Stream<List<Movie>> get watchedMovies => _watchedController.stream;
+
+  /// Stream of custom lists.
+
+  Stream<List<CustomList>> get customLists => _customListsController.stream;
 
   /// Track pending movie file updates to batch them.
 
@@ -116,6 +126,10 @@ class PodFavoritesService extends ChangeNotifier {
   String? _toWatchListId;
   String? _watchedListId;
 
+  /// Cache for custom lists metadata.
+
+  final Map<String, CustomList> _customListsCache = {};
+
   /// Creates a new [PodFavoritesService] instance.
 
   PodFavoritesService(this._prefs, this._context, this._child)
@@ -133,31 +147,43 @@ class PodFavoritesService extends ChangeNotifier {
     try {
       // Check if user is logged into POD first.
       final isPodReady = await isPodAvailable();
+
       if (isPodReady) {
         // Initialize user profile following the ontology structure.
         await _userProfileService.initializeProfileIfNeeded();
 
-        // Get or create standard movie lists - this is critical for proper loading.
-
-        _toWatchListId = await _movieListService.getOrCreateStandardMovieList(
-          'to_watch',
-        );
-        _watchedListId = await _movieListService.getOrCreateStandardMovieList(
-          'watched',
-        );
+        // Platform-specific initialization strategies
+        if (isDesktop) {
+          await _initializeForDesktop();
+        } else {
+          await _initializeForWeb();
+        }
 
         // Only load and update streams if we have valid MovieList IDs.
-
         if (_toWatchListId != null || _watchedListId != null) {
           await _loadFromPod();
+
+          // Also load custom lists
+          await _loadCustomListsFromPod();
         } else {
           // If we couldn't get MovieList IDs, initialize with empty but don't update streams yet.
-
           _cachedToWatch = [];
           _cachedWatched = [];
           _cachedRatings = {};
           _cachedComments = {};
-          // Don't update streams here - wait for retry initialisation.
+
+          // Platform-specific retry strategies
+          if (isDesktop) {
+            // Desktop: single retry after short delay
+            Future.delayed(const Duration(seconds: 1), () {
+              retryPodInitialization();
+            });
+          } else {
+            // Web: more aggressive retry sequence
+            Future.delayed(const Duration(seconds: 2), () {
+              autoRetryPodInitialization(maxRetries: 5);
+            });
+          }
         }
       } else {
         // Initialize with empty data for new POD storage.
@@ -169,14 +195,79 @@ class PodFavoritesService extends ChangeNotifier {
         _watchedController.add(_cachedWatched!);
       }
     } catch (e) {
-      debugPrint('Failed to initialize POD data: $e');
-      // Initialise with empty data but don't update streams yet.
+      debugPrint('❌ [POD Init] Failed to initialize POD data: $e');
 
+      // Initialise with empty data but don't update streams yet.
       _cachedToWatch = [];
       _cachedWatched = [];
       _cachedRatings = {};
       _cachedComments = {};
       // Wait for retry initialisation instead of showing empty state immediately.
+    }
+  }
+
+  /// Desktop-specific initialization strategy.
+  /// Desktop environments typically have more reliable POD access.
+
+  Future<void> _initializeForDesktop() async {
+    // Get or create standard movie lists - desktop can handle synchronous operations better
+    _toWatchListId =
+        await _movieListService.getOrCreateStandardMovieList('to_watch');
+    _watchedListId =
+        await _movieListService.getOrCreateStandardMovieList('watched');
+  }
+
+  /// Web-specific initialization strategy.
+  /// Web environments may have authentication delays and network limitations.
+
+  Future<void> _initializeForWeb() async {
+    // Web environments often have delayed authentication, so we use more aggressive retry logic
+    final List<Future<String?>> listInitFutures = [
+      _initializeWebMovieList('to_watch'),
+      _initializeWebMovieList('watched'),
+    ];
+
+    // Run list initializations in parallel for better performance
+    final results = await Future.wait(listInitFutures);
+
+    _toWatchListId = results[0];
+    _watchedListId = results[1];
+  }
+
+  /// Initialize a specific movie list for web environment with retries.
+
+  Future<String?> _initializeWebMovieList(String listType) async {
+    const maxRetries = 2; // Fewer retries for initial load to avoid blocking UI
+    const retryDelay = Duration(milliseconds: 500);
+
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        final listId =
+            await _movieListService.getOrCreateStandardMovieList(listType);
+        if (listId != null) {
+          return listId;
+        }
+      } catch (e) {
+        // Silently continue to retry
+      }
+
+      if (attempt < maxRetries) {
+        await Future.delayed(retryDelay);
+      }
+    }
+
+    return null;
+  }
+
+  /// Loads custom lists from POD and updates the stream.
+
+  Future<void> _loadCustomListsFromPod() async {
+    try {
+      final customLists = await getCustomLists();
+      _customListsController.add(customLists);
+    } catch (e) {
+      debugPrint('❌ Failed to load custom lists from POD: $e');
+      _customListsController.add([]);
     }
   }
 
@@ -193,7 +284,6 @@ class PodFavoritesService extends ChangeNotifier {
       _cachedComments = {};
 
       // Load from MovieList system instead of old TTL files.
-
       if (_toWatchListId != null) {
         final movieListData = await _movieListService.getMovieList(
           _toWatchListId!,
@@ -213,19 +303,13 @@ class PodFavoritesService extends ChangeNotifier {
       }
 
       // Load ratings from individual movie files (no longer using ratings.ttl).
-
       _cachedRatings = {};
       _cachedComments = {};
 
-      // Only update streams if we have at least one valid MovieList ID.
-      // This prevents showing empty state before MovieList IDs are discovered.
-
-      if (_toWatchListId != null || _watchedListId != null) {
-        _toWatchController.add(_cachedToWatch!);
-        _watchedController.add(_cachedWatched!);
-      }
+      // Update streams with loaded data - even if empty, this ensures UI consistency
+      _toWatchController.add(_cachedToWatch!);
+      _watchedController.add(_cachedWatched!);
     } catch (e) {
-      debugPrint('Error loading from POD: $e');
       // Initialize with empty data if POD fails.
       _cachedToWatch = [];
       _cachedWatched = [];
@@ -269,11 +353,9 @@ class PodFavoritesService extends ChangeNotifier {
         _cachedToWatch = List.from(movies);
         await Future.delayed(const Duration(milliseconds: 500));
       } else {
-        debugPrint('WritePod failed with status: $result');
         throw Exception('WritePod failed with status: $result');
       }
     } catch (e) {
-      debugPrint('Failed to save to-watch list to POD: $e');
       final encoded = jsonEncode(movies.map((m) => m.toJson()).toList());
       await _prefs.setString('to_watch', encoded);
     }
@@ -292,8 +374,6 @@ class PodFavoritesService extends ChangeNotifier {
       await writePod(_watchedFileName, ttlContent, _context, _child);
       _cachedWatched = List.from(movies);
     } catch (e) {
-      debugPrint('Failed to save watched list to POD: $e');
-
       // Fallback to SharedPreferences.
 
       final encoded = jsonEncode(movies.map((m) => m.toJson()).toList());
@@ -318,7 +398,6 @@ class PodFavoritesService extends ChangeNotifier {
       _cachedRatings = Map.from(ratings);
     } catch (e) {
       // Don't log - this is background save for compatibility
-      // debugPrint('Failed to save ratings to POD: $e');
     }
   }
 
@@ -353,56 +432,80 @@ class PodFavoritesService extends ChangeNotifier {
 
   Future<List<Movie>> getToWatch({bool forceRefresh = false}) async {
     // Read from MovieList file instead of cached old TTL data.
-
     if (_toWatchListId != null) {
-      final movieListData = await _movieListService.getMovieList(
-        _toWatchListId!,
-        forceRefresh: forceRefresh,
-      );
-      if (movieListData != null) {
-        final movies = movieListData['movies'] as List<Movie>? ?? [];
-        return _ensureAllContentTypes(movies);
+      try {
+        final movieListData = await _movieListService.getMovieList(
+          _toWatchListId!,
+          forceRefresh: forceRefresh,
+        );
+        if (movieListData != null) {
+          final movies = movieListData['movies'] as List<Movie>? ?? [];
+          return _ensureAllContentTypes(movies);
+        }
+      } catch (e) {
+        debugPrint('❌ [Get ToWatch] Error reading from MovieList: $e');
       }
     }
 
     // Fallback to cached data if MovieList fails.
-
     if (_cachedToWatch != null) {
       return _ensureAllContentTypes(_cachedToWatch!);
     }
 
     // Final fallback to SharedPreferences.
+    try {
+      final fallbackMovies = await _fallbackService.getToWatch();
 
-    final fallbackMovies = await _fallbackService.getToWatch();
-    return _ensureAllContentTypes(fallbackMovies);
+      // Cache the fallback data for next time
+      if (fallbackMovies.isNotEmpty) {
+        _cachedToWatch = fallbackMovies;
+      }
+
+      return _ensureAllContentTypes(fallbackMovies);
+    } catch (e) {
+      debugPrint('❌ [Get ToWatch] SharedPreferences fallback failed: $e');
+      return <Movie>[];
+    }
   }
 
   /// Retrieves the list of watched movies from POD cache.
 
   Future<List<Movie>> getWatched({bool forceRefresh = false}) async {
     // Read from MovieList file instead of cached old TTL data.
-
     if (_watchedListId != null) {
-      final movieListData = await _movieListService.getMovieList(
-        _watchedListId!,
-        forceRefresh: forceRefresh,
-      );
-      if (movieListData != null) {
-        final movies = movieListData['movies'] as List<Movie>? ?? [];
-        return _ensureAllContentTypes(movies);
+      try {
+        final movieListData = await _movieListService.getMovieList(
+          _watchedListId!,
+          forceRefresh: forceRefresh,
+        );
+        if (movieListData != null) {
+          final movies = movieListData['movies'] as List<Movie>? ?? [];
+          return _ensureAllContentTypes(movies);
+        }
+      } catch (e) {
+        debugPrint('❌ [Get Watched] Error reading from MovieList: $e');
       }
     }
 
     // Fallback to cached data if MovieList fails.
-
     if (_cachedWatched != null) {
       return _ensureAllContentTypes(_cachedWatched!);
     }
 
     // Final fallback to SharedPreferences.
+    try {
+      final fallbackMovies = await _fallbackService.getWatched();
 
-    final fallbackMovies = await _fallbackService.getWatched();
-    return _ensureAllContentTypes(fallbackMovies);
+      // Cache the fallback data for next time
+      if (fallbackMovies.isNotEmpty) {
+        _cachedWatched = fallbackMovies;
+      }
+
+      return _ensureAllContentTypes(fallbackMovies);
+    } catch (e) {
+      debugPrint('❌ [Get Watched] SharedPreferences fallback failed: $e');
+      return <Movie>[];
+    }
   }
 
   /// Adds a movie to the to-watch list and saves to POD.
@@ -907,18 +1010,10 @@ class PodFavoritesService extends ChangeNotifier {
         return movieData;
       } else {
         // This is expected for movies that haven't been rated/commented yet.
-
-        debugPrint(
-          '📄 Movie file is empty or not found (expected for new movies)',
-        );
       }
     } catch (e) {
       if (e.toString().contains('does not exist')) {
         // This is expected for movies that haven't been rated/commented yet.
-
-        debugPrint(
-          '📄 Movie file does not exist for ${movie.title} (expected for new movies)',
-        );
       } else {
         debugPrint('❌ Error reading movie file for ${movie.title}: $e');
       }
@@ -963,7 +1058,6 @@ class PodFavoritesService extends ChangeNotifier {
       // Skip saving comments to old format - we use individual movie files now
       // await _saveCommentsToPod(comments);
     } catch (e) {
-      debugPrint('Failed to migrate data to POD: $e');
       rethrow;
     }
   }
@@ -972,6 +1066,71 @@ class PodFavoritesService extends ChangeNotifier {
 
   Future<void> syncWithPod() async {
     await _loadFromPod();
+  }
+
+  /// Retries POD initialization with exponential backoff for web environments.
+  /// This is useful when initial initialization fails due to timing or auth issues.
+
+  Future<void> retryPodInitialization() async {
+    try {
+      final isPodReady = await isPodAvailable();
+      if (!isPodReady) {
+        return;
+      }
+
+      // Initialize user profile if needed
+      await _userProfileService.initializeProfileIfNeeded();
+
+      bool needsStreamRefresh = false;
+
+      // Retry getting MovieList IDs
+      if (_toWatchListId == null) {
+        _toWatchListId =
+            await _movieListService.getOrCreateStandardMovieList('to_watch');
+        if (_toWatchListId != null) {
+          needsStreamRefresh = true;
+        }
+      }
+
+      if (_watchedListId == null) {
+        _watchedListId =
+            await _movieListService.getOrCreateStandardMovieList('watched');
+        if (_watchedListId != null) {
+          needsStreamRefresh = true;
+        }
+      }
+
+      if (needsStreamRefresh) {
+        await refreshUIStreams();
+      }
+    } catch (e) {
+      debugPrint('❌ [Retry Init] POD initialization retry failed: $e');
+    }
+  }
+
+  /// Auto-retry POD initialization with exponential backoff.
+  /// Useful for web environments where initial auth may take time.
+
+  Future<void> autoRetryPodInitialization({int maxRetries = 5}) async {
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      // Check if we already have both IDs
+      if (_toWatchListId != null && _watchedListId != null) {
+        return;
+      }
+
+      await retryPodInitialization();
+
+      // If we got at least one ID, we can stop retrying
+      if (_toWatchListId != null || _watchedListId != null) {
+        return;
+      }
+
+      if (attempt < maxRetries) {
+        // Exponential backoff: 2^attempt seconds
+        final waitTime = Duration(seconds: (2 << (attempt - 1)).clamp(2, 30));
+        await Future.delayed(waitTime);
+      }
+    }
   }
 
   /// Reloads data from POD after app folders are initialized.
@@ -996,7 +1155,7 @@ class PodFavoritesService extends ChangeNotifier {
         await _loadFromPodWithoutKeyValidation();
       }
     } catch (e) {
-      debugPrint('Failed to reload from POD: $e');
+      // Silently handle initialization errors
     }
   }
 
@@ -1046,7 +1205,6 @@ class PodFavoritesService extends ChangeNotifier {
         _watchedController.add(_cachedWatched!);
       }
     } catch (e) {
-      debugPrint('Error loading from POD: $e');
       // Initialize with empty data if POD fails.
       _cachedToWatch = [];
       _cachedWatched = [];
@@ -1067,7 +1225,6 @@ class PodFavoritesService extends ChangeNotifier {
       final loggedIn = await isLoggedIn();
       return loggedIn;
     } catch (e) {
-      debugPrint('POD availability check failed: $e');
       return false;
     }
   }
@@ -1132,11 +1289,30 @@ class PodFavoritesService extends ChangeNotifier {
 
   Future<void> refreshUIStreams() async {
     try {
-      // Don't update streams if MovieList IDs aren't initialised yet.
-      // This prevents showing empty state before MovieList discovery completes.
-
+      // Modified logic: Only skip if BOTH IDs are null AND we have no cached data
+      // This allows showing cached/fallback data even when MovieList discovery fails
       if (_toWatchListId == null && _watchedListId == null) {
-        return;
+        // Check if we have any cached data to show
+        final hasCachedData = (_cachedToWatch?.isNotEmpty == true) ||
+            (_cachedWatched?.isNotEmpty == true);
+
+        if (!hasCachedData) {
+          // Try to load from SharedPreferences as a last resort
+          try {
+            final fallbackToWatch = await _fallbackService.getToWatch();
+            final fallbackWatched = await _fallbackService.getWatched();
+
+            if (fallbackToWatch.isNotEmpty || fallbackWatched.isNotEmpty) {
+              _toWatchController.add(fallbackToWatch);
+              _watchedController.add(fallbackWatched);
+              return;
+            }
+          } catch (fallbackError) {
+            // Fallback also failed, continue without data
+          }
+
+          return;
+        }
       }
 
       final toWatchMovies = await getToWatch(forceRefresh: true);
@@ -1145,8 +1321,433 @@ class PodFavoritesService extends ChangeNotifier {
       _toWatchController.add(toWatchMovies);
       _watchedController.add(watchedMovies);
     } catch (e) {
-      debugPrint('❌ Failed to refresh UI streams: $e');
+      debugPrint('❌ [Stream Update] Failed to refresh UI streams: $e');
+
+      // Try to provide some fallback data even if refresh fails
+      try {
+        if (_cachedToWatch != null) {
+          _toWatchController.add(_cachedToWatch!);
+        }
+        if (_cachedWatched != null) {
+          _watchedController.add(_cachedWatched!);
+        }
+      } catch (fallbackError) {
+        // Fallback failed, continue without updating streams
+      }
     }
+  }
+
+  /// Custom Lists Methods using PODs/MovieListService
+
+  /// Retrieves all custom lists from PODs.
+
+  Future<List<CustomList>> getCustomLists() async {
+    try {
+      final loggedIn = await isLoggedIn();
+
+      if (!loggedIn) {
+        // No custom lists if not logged in - custom lists are account-specific
+        return [];
+      }
+
+      // Get all MovieLists from user profile or scan directory
+      final customLists = <CustomList>[];
+
+      // Always scan directory to ensure we have the latest data
+      // (Cache will be rebuilt during this process)
+
+      // Clear cache to avoid duplicates
+      _customListsCache.clear();
+
+      // Track processed list IDs to avoid duplicates
+      final processedListIds = <String>{};
+
+      // Scan the user_lists directory for MovieList files
+      try {
+        final dirUrl = await getDirUrl('moviestar/data/user_lists');
+        final resources = await getResourcesInContainer(dirUrl);
+
+        for (final fileName in resources.files) {
+          if (fileName.startsWith('MovieList-') && fileName.endsWith('.ttl')) {
+            // Extract the MovieList ID from the filename
+            final movieListId =
+                fileName.replaceAll('MovieList-', '').replaceAll('.ttl', '');
+
+            // Skip if we've already processed this list ID
+            if (processedListIds.contains(movieListId)) {
+              continue;
+            }
+            processedListIds.add(movieListId);
+
+            // Get the MovieList data first to check its name
+            final movieListData =
+                await _movieListService.getMovieList(movieListId);
+            if (movieListData != null) {
+              // Convert MovieList data to CustomList format
+              final customList =
+                  _movieListToCustomList(movieListId, movieListData);
+
+              // Skip standard lists by checking their actual names
+              if (customList.name == 'To Watch' ||
+                  customList.name == 'Watched') {
+                continue;
+              }
+
+              customLists.add(customList);
+              _customListsCache[movieListId] = customList;
+            } else {
+              debugPrint(
+                '❌ [PodFavorites] Failed to load MovieList: $movieListId - data was null',
+              );
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('❌ Error scanning user_lists directory: $e');
+      }
+
+      return customLists;
+    } catch (e) {
+      debugPrint('❌ Failed to get custom lists from POD: $e');
+      // No fallback - custom lists are POD-only
+      return [];
+    }
+  }
+
+  /// Creates a new custom list in PODs.
+
+  Future<CustomList> createCustomList(
+    String name, {
+    String? description,
+  }) async {
+    try {
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        // Cannot create custom lists without login
+        throw Exception('Please log in to create custom lists');
+      }
+
+      // Create the MovieList in PODs
+      final movieListId = await _movieListService.createMovieList(
+        name,
+        movies: [],
+        description: description ?? '',
+      );
+
+      if (movieListId != null) {
+        final newList = CustomList(
+          id: movieListId,
+          name: name,
+          description: description,
+          movieIds: [],
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+        // Update cache
+        _customListsCache[movieListId] = newList;
+
+        // Update stream
+        final allLists = await getCustomLists();
+        _customListsController.add(allLists);
+
+        return newList;
+      } else {
+        throw Exception('Failed to create MovieList in POD');
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to create custom list in POD: $e');
+      // No fallback - custom lists are POD-only
+      rethrow;
+    }
+  }
+
+  /// Updates an existing custom list in PODs.
+
+  Future<void> updateCustomList(CustomList updatedList) async {
+    try {
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        // Cannot update custom lists without login
+        throw Exception('Please log in to update custom lists');
+      }
+
+      // Get the current MovieList data to preserve movies
+      final movieListData =
+          await _movieListService.getMovieList(updatedList.id);
+      if (movieListData == null) {
+        throw Exception('MovieList not found for ID: ${updatedList.id}');
+      }
+
+      // Get the movies from the existing list
+      final movies = movieListData['movies'] as List<Movie>? ?? [];
+
+      // Create updated TTL content with new name/description but same movies
+      final movieListTtl = TurtleSerializer.createMovieList(
+        updatedList.id,
+        updatedList.name,
+        movies: movies,
+        description: updatedList.description,
+      );
+
+      // Write updated content back to POD
+      final fileName = 'user_lists/MovieList-${updatedList.id}.ttl';
+
+      if (!_context.mounted) {
+        throw Exception('Context not mounted, cannot update list');
+      }
+
+      final result = await writePod(
+        fileName,
+        movieListTtl,
+        _context,
+        _child,
+        encrypted: false,
+      );
+
+      if (result != SolidFunctionCallStatus.success) {
+        throw Exception('Failed to write updated list to POD storage');
+      }
+
+      // Update cache
+      _customListsCache[updatedList.id] = updatedList;
+
+      // Update stream
+      final allLists = await getCustomLists();
+      _customListsController.add(allLists);
+    } catch (e) {
+      debugPrint('❌ Failed to update custom list in POD: $e');
+      // No fallback - custom lists are POD-only
+      rethrow;
+    }
+  }
+
+  /// Deletes a custom list from PODs.
+
+  Future<void> deleteCustomList(String listId) async {
+    try {
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        // Cannot delete custom lists without login
+        throw Exception('Please log in to delete custom lists');
+      }
+
+      // Delete the MovieList from PODs
+      final success = await _movieListService.deleteMovieList(listId);
+      if (success) {
+        // Remove from cache
+        _customListsCache.remove(listId);
+
+        // Update stream
+        final allLists = await getCustomLists();
+        _customListsController.add(allLists);
+      } else {
+        throw Exception('Failed to delete MovieList from POD');
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to delete custom list from POD: $e');
+      // No fallback - custom lists are POD-only
+      rethrow;
+    }
+  }
+
+  /// Adds a movie to a custom list in PODs.
+
+  Future<void> addMovieToCustomList(
+    String listId,
+    Movie movie, {
+    String contentType = 'movie',
+  }) async {
+    try {
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        // Fallback to SharedPreferences
+        await _fallbackService.addMovieToCustomList(
+          listId,
+          movie,
+          contentType: contentType,
+        );
+        return;
+      }
+
+      // Add movie to the MovieList in PODs
+      final success = await _movieListService.addMovieToList(
+        listId,
+        movie,
+        contentType: contentType,
+      );
+
+      if (success) {
+        // Update cache
+        if (_customListsCache.containsKey(listId)) {
+          final currentList = _customListsCache[listId]!;
+          if (!currentList.movieIds.contains(movie.id)) {
+            final updatedMovieIds = [...currentList.movieIds, movie.id];
+            _customListsCache[listId] = currentList.copyWith(
+              movieIds: updatedMovieIds,
+            );
+          }
+        }
+
+        // Update stream
+        final allLists = await getCustomLists();
+        _customListsController.add(allLists);
+      } else {
+        throw Exception('Failed to add movie to MovieList in POD');
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to add movie to custom list in POD: $e');
+      // Fallback to SharedPreferences
+      await _fallbackService.addMovieToCustomList(
+        listId,
+        movie,
+        contentType: contentType,
+      );
+    }
+  }
+
+  /// Removes a movie from a custom list in PODs.
+
+  Future<void> removeMovieFromCustomList(String listId, int movieId) async {
+    try {
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        // Cannot modify custom lists without login
+        throw Exception('Please log in to modify custom lists');
+      }
+
+      // Need to get the movie object first
+      // For now, create a minimal Movie object with just the ID
+      final movie = Movie(
+        id: movieId,
+        title: '',
+        overview: '',
+        posterUrl: '',
+        backdropUrl: '',
+        voteAverage: 0,
+        releaseDate: DateTime(1970),
+        genreIds: [],
+      );
+
+      // Remove movie from the MovieList in PODs
+      final success =
+          await _movieListService.removeMovieFromList(listId, movie);
+
+      if (success) {
+        // Update cache
+        if (_customListsCache.containsKey(listId)) {
+          final currentList = _customListsCache[listId]!;
+          final updatedMovieIds =
+              currentList.movieIds.where((id) => id != movieId).toList();
+          _customListsCache[listId] = currentList.copyWith(
+            movieIds: updatedMovieIds,
+          );
+        }
+
+        // Update stream
+        final allLists = await getCustomLists();
+        _customListsController.add(allLists);
+      } else {
+        throw Exception('Failed to remove movie from MovieList in POD');
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to remove movie from custom list in POD: $e');
+      // No fallback - custom lists are POD-only
+      rethrow;
+    }
+  }
+
+  /// Checks if a movie is in a specific custom list.
+
+  Future<bool> isMovieInCustomList(String listId, int movieId) async {
+    try {
+      // First check cache
+      if (_customListsCache.containsKey(listId)) {
+        return _customListsCache[listId]!.movieIds.contains(movieId);
+      }
+
+      // Otherwise, fetch the list
+      final lists = await getCustomLists();
+      final list = lists.firstWhere(
+        (list) => list.id == listId,
+        orElse: () => CustomList(
+          id: '',
+          name: '',
+          movieIds: [],
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      );
+      return list.movieIds.contains(movieId);
+    } catch (e) {
+      debugPrint('❌ Failed to check if movie is in custom list: $e');
+      return false;
+    }
+  }
+
+  /// Gets all custom lists that contain a specific movie.
+
+  Future<List<CustomList>> getCustomListsContainingMovie(int movieId) async {
+    final lists = await getCustomLists();
+    return lists.where((list) => list.movieIds.contains(movieId)).toList();
+  }
+
+  /// Gets movies in a specific custom list.
+
+  Future<List<Movie>> getMoviesInCustomList(String listId) async {
+    try {
+      final loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        // Fallback to SharedPreferences/adapter
+        return [];
+      }
+
+      // Get the MovieList data which includes movie objects
+      final movieListData = await _movieListService.getMovieList(listId);
+      if (movieListData != null && movieListData['movies'] != null) {
+        final movies = List<Movie>.from(movieListData['movies']);
+
+        // Filter out placeholder movies (those with title like "Movie 12345")
+        // But "Nobody 2" should NOT be filtered since it's a real title
+        final validMovies = movies.where((movie) {
+          // Only filter movies with titles exactly matching "Movie 123456" pattern
+          final isPlaceholder = RegExp(r'^Movie \d+$').hasMatch(movie.title);
+          return !isPlaceholder;
+        }).toList();
+        return validMovies;
+      }
+
+      return [];
+    } catch (e) {
+      debugPrint('❌ Failed to get movies in custom list: $e');
+      return [];
+    }
+  }
+
+  /// Helper method to convert MovieList data to CustomList format.
+
+  CustomList _movieListToCustomList(
+    String movieListId,
+    Map<String, dynamic> movieListData,
+  ) {
+    final movies = List<Movie>.from(movieListData['movies'] ?? []);
+    final movieIds = movies.map((m) => m.id).toList();
+
+    return CustomList(
+      id: movieListId,
+      name: movieListData['name'] ?? 'Unnamed List',
+      description: movieListData['description'],
+      movieIds: movieIds,
+      createdAt: DateTime.now(), // MovieList doesn't track creation time yet
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// Legacy method - no longer needed as custom lists are POD-only.
+  /// Custom lists are now account-specific and don't migrate from SharedPreferences.
+
+  Future<void> migrateCustomListsToPod() async {
+    // No migration needed - custom lists are POD-only now
   }
 
   /// Disposes the stream controllers.
@@ -1164,6 +1765,7 @@ class PodFavoritesService extends ChangeNotifier {
 
     _toWatchController.close();
     _watchedController.close();
+    _customListsController.close();
     _fallbackService.dispose();
   }
 }

@@ -95,6 +95,7 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen> {
 
   Future<void> _loadCustomLists() async {
     final lists = await widget.favoritesService.getCustomLists();
+
     setState(() {
       _customLists = lists;
       _isLoading = false;
@@ -517,7 +518,7 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Create your first custom list to organize\nyour movies the way you want!',
+              'Create your first custom list to organize\nyour movies the way you want!\n\nCustom lists are stored in your personal POD\nand require you to be logged in.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,

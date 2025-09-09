@@ -27,6 +27,7 @@
 library;
 
 import 'package:moviestar/constants/timing_constants.dart';
+import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
@@ -59,6 +60,9 @@ class FavoritesServiceAdapter extends FavoritesService {
 
   @override
   Stream<List<Movie>> get watchedMovies => _manager.watchedMovies;
+
+  @override
+  Stream<List<CustomList>> get customLists => _manager.customLists;
 
   @override
   Future<List<Movie>> getToWatch() async {
@@ -236,6 +240,69 @@ class FavoritesServiceAdapter extends FavoritesService {
   /// Checks if POD storage is currently enabled.
 
   bool get isPodStorageEnabled => _manager.isPodStorageEnabled;
+
+  /// Custom Lists Methods - Delegate to manager
+
+  @override
+  Future<List<CustomList>> getCustomLists() async {
+    return _manager.getCustomLists();
+  }
+
+  @override
+  Future<CustomList> createCustomList(
+    String name, {
+    String? description,
+  }) async {
+    return _manager.createCustomList(name, description: description);
+  }
+
+  @override
+  Future<void> updateCustomList(CustomList updatedList) async {
+    await _manager.updateCustomList(updatedList);
+  }
+
+  @override
+  Future<void> deleteCustomList(String listId) async {
+    await _manager.deleteCustomList(listId);
+  }
+
+  @override
+  Future<void> addMovieToCustomList(
+    String listId,
+    Movie movie, {
+    String contentType = 'movie',
+  }) async {
+    await _manager.addMovieToCustomList(
+      listId,
+      movie,
+      contentType: contentType,
+    );
+  }
+
+  @override
+  Future<void> removeMovieFromCustomList(String listId, int movieId) async {
+    await _manager.removeMovieFromCustomList(listId, movieId);
+  }
+
+  @override
+  Future<bool> isMovieInCustomList(String listId, int movieId) async {
+    return _manager.isMovieInCustomList(listId, movieId);
+  }
+
+  @override
+  Future<List<CustomList>> getCustomListsContainingMovie(int movieId) async {
+    return _manager.getCustomListsContainingMovie(movieId);
+  }
+
+  @override
+  Future<List<Movie>> getMoviesInCustomList(String listId) async {
+    return _manager.getMoviesInCustomList(listId);
+  }
+
+  @override
+  Future<List<int>> getMovieIdsInCustomList(String listId) async {
+    return _manager.getMovieIdsInCustomList(listId);
+  }
 
   @override
   void dispose() {

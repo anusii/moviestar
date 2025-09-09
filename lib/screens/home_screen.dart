@@ -688,10 +688,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 },
               ),
             ),
-            loading: () => const Center(
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: CircularProgressIndicator(),
+            loading: () => Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+                  const Gap(12),
+                  Text(
+                    'Loading movies...',
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
               ),
             ),
             error: (error, stack) => _buildSmartErrorWidgetCompact(
@@ -889,9 +911,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     } catch (e) {
       // Handle error gracefully without causing setState after dispose.
 
-      if (mounted) {
-        debugPrint('Error during force refresh: $e');
-      }
+      if (mounted) {}
     }
   }
 
@@ -1286,9 +1306,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         moviesAsync.when(
           data: (cacheResult) =>
               _buildMovieListItems(cacheResult.data, cacheResult.fromCache),
-          loading: () => const Padding(
-            padding: EdgeInsets.all(32),
-            child: Center(child: CircularProgressIndicator()),
+          loading: () => Container(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ),
+                const Gap(12),
+                Text(
+                  'Loading movies...',
+                  style: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
           ),
           error: (error, stack) => Padding(
             padding: const EdgeInsets.all(16),
@@ -1313,9 +1357,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
         }
         if (!snapshot.hasData) {
-          return const Padding(
-            padding: EdgeInsets.all(32),
-            child: Center(child: CircularProgressIndicator()),
+          return Container(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ),
+                const Gap(12),
+                Text(
+                  'Loading To Watch movies...',
+                  style: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
           );
         }
         final movies = snapshot.data!;
@@ -1343,9 +1411,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
         }
         if (!snapshot.hasData) {
-          return const Padding(
-            padding: EdgeInsets.all(32),
-            child: Center(child: CircularProgressIndicator()),
+          return Container(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ),
+                const Gap(12),
+                Text(
+                  'Loading Watched movies...',
+                  style: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
           );
         }
         final movies = snapshot.data!;
@@ -1402,6 +1494,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return StreamBuilder<List<CustomList>>(
       stream: widget.favoritesService.customLists,
       builder: (context, snapshot) {
+        // Show loading indicator while waiting for custom lists.
+
+        if (snapshot.connectionState == ConnectionState.waiting &&
+            !snapshot.hasData) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Loading Custom Lists...',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
+                          ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }
+
         final customLists = snapshot.data ?? [];
         if (customLists.isEmpty) {
           return const SizedBox.shrink();
@@ -1491,6 +1620,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final movieIds = customList.movieIds;
 
+    // If using POD storage, try to get movies from POD first.
+
+    if (widget.favoritesService is FavoritesServiceAdapter) {
+      final adapter = widget.favoritesService as FavoritesServiceAdapter;
+
+      if (adapter.isPodStorageEnabled) {
+        return FutureBuilder<List<Movie>>(
+          future: widget.favoritesService.getMoviesInCustomList(customList.id),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {}
+
+            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              final podMovies = snapshot.data!;
+
+              return _buildMovieCardsFromMovieObjects(podMovies, customList);
+            } else {
+              // Fallback to loading from API.
+
+              return _buildMovieCardsFromIds(movieIds, customList);
+            }
+          },
+        );
+      }
+    }
+
     if (movieIds.isEmpty) {
       return Center(
         child: Padding(
@@ -1503,6 +1657,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }
 
+    return _buildMovieCardsFromIds(movieIds, customList);
+  }
+
+  // Build movie cards from movie objects (when we have full data from PODs).
+
+  Widget _buildMovieCardsFromMovieObjects(
+    List<Movie> movies,
+    CustomList customList,
+  ) {
+    return Scrollbar(
+      controller: _scrollControllers[customList.id] ?? ScrollController(),
+      thickness: 6,
+      radius: const Radius.circular(3),
+      thumbVisibility: true,
+      child: ListView.builder(
+        controller: _scrollControllers[customList.id],
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        itemCount: movies.length,
+        itemBuilder: (context, index) {
+          final movie = movies[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: _buildCustomListMovieCardFromMovie(movie),
+          );
+        },
+      ),
+    );
+  }
+
+  // Build movie cards from IDs (fallback when POD data not available).
+
+  Widget _buildMovieCardsFromIds(List<int> movieIds, CustomList customList) {
     return Scrollbar(
       controller: _scrollControllers[customList.id] ?? ScrollController(),
       thickness: 6,
@@ -1522,6 +1709,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
         },
       ),
+    );
+  }
+
+  // Build a movie card directly from a Movie object using consistent MovieCard styling
+  Widget _buildCustomListMovieCardFromMovie(Movie movie) {
+    return MovieCard.poster(
+      movie: movie,
+      fromCache: true, // Since we got it from PODs
+      favoritesService: widget.favoritesService,
+      parentWidget: widget,
+      onTap: () {
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MovieDetailsScreen(
+                movie: movie,
+                favoritesService: widget.favoritesService,
+                contentType: movie.contentType ?? ContentType.movie,
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -1657,6 +1868,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return StreamBuilder<List<CustomList>>(
       stream: widget.favoritesService.customLists,
       builder: (context, snapshot) {
+        // Show loading indicator while waiting for custom lists.
+
+        if (snapshot.connectionState == ConnectionState.waiting &&
+            !snapshot.hasData) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Loading Custom Lists...',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
+                          ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }
+
         final customLists = snapshot.data ?? [];
         if (customLists.isEmpty) {
           return const SizedBox.shrink();
@@ -1730,6 +1978,52 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }
 
+    // If using POD storage, try to get movies from POD first (same as grid view).
+
+    if (widget.favoritesService is FavoritesServiceAdapter) {
+      final adapter = widget.favoritesService as FavoritesServiceAdapter;
+
+      if (adapter.isPodStorageEnabled) {
+        return FutureBuilder<List<Movie>>(
+          future: widget.favoritesService.getMoviesInCustomList(customList.id),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {}
+
+            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              final podMovies = snapshot.data!;
+
+              return _buildCustomListItemsFromMovieObjects(podMovies);
+            } else {
+              // Fallback to loading from API.
+
+              return _buildCustomListItemsFromIds(movieIds, customList);
+            }
+          },
+        );
+      }
+    }
+
+    return _buildCustomListItemsFromIds(movieIds, customList);
+  }
+
+  // Build list items from movie objects (when we have full data from PODs).
+
+  Widget _buildCustomListItemsFromMovieObjects(List<Movie> movies) {
+    final displayMovies = movies.take(5).toList();
+
+    return Column(
+      children: displayMovies.map((movie) {
+        return _buildCustomListMovieListItemFromMovie(movie);
+      }).toList(),
+    );
+  }
+
+  // Build list items from IDs (fallback when POD data not available).
+
+  Widget _buildCustomListItemsFromIds(
+    List<int> movieIds,
+    CustomList customList,
+  ) {
     final displayMovieIds = movieIds.take(5).toList();
 
     return Column(
@@ -1739,6 +2033,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         final contentType = customList.getContentTypeAt(index);
         return _buildCustomListMovieListItem(movieId, contentType: contentType);
       }).toList(),
+    );
+  }
+
+  // Build a list item directly from a Movie object using consistent MovieCard styling.
+
+  Widget _buildCustomListMovieListItemFromMovie(Movie movie) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: MovieCard.listItem(
+        movie: movie,
+        fromCache: true, // Since we got it from PODs.
+        favoritesService: widget.favoritesService,
+        parentWidget: widget,
+        onTap: () {
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MovieDetailsScreen(
+                  movie: movie,
+                  favoritesService: widget.favoritesService,
+                  contentType: movie.contentType ?? ContentType.movie,
+                ),
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 

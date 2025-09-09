@@ -50,7 +50,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
   /// Service for managing favorite movies.
 
   final FavoritesService favoritesService;
-  final FavoritesServiceManager? favoritesServiceManager;
+  final FavoritesServiceManager favoritesServiceManager;
   final ApiKeyService apiKeyService;
 
   /// Whether this screen was opened from the API key prompt.
@@ -59,12 +59,11 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
   /// Creates a new [SettingsScreen] widget.
 
-  // ignore: avoid-unnecessary-nullable-parameters
   const SettingsScreen({
     super.key,
     required this.favoritesService,
     required this.apiKeyService,
-    this.favoritesServiceManager,
+    required this.favoritesServiceManager,
     this.fromApiKeyPrompt = false,
   });
 

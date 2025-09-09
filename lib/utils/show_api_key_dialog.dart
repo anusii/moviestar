@@ -35,7 +35,7 @@ import 'package:moviestar/services/api_key_service.dart';
 Future<bool> showApiKeyDialog(
   BuildContext context,
   ApiKeyService apiKeyService, {
-  VoidCallback? onApiKeySet,
+  required VoidCallback onApiKeySet,
 }) async {
   final TextEditingController apiKeyController = TextEditingController();
   bool isLoading = false;
@@ -184,7 +184,7 @@ Future<bool> showApiKeyDialog(
                                           ),
                                         );
 
-                                        onApiKeySet?.call();
+                                        onApiKeySet.call();
                                         Navigator.of(dialogContext).pop(true);
                                       }
                                     } catch (e) {

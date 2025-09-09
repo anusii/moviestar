@@ -25,6 +25,9 @@ au](https://solidcommunity.au/docs/moviestar)
 
 ## 0.1 First stable release
 
++ SHOWS supported in other lists [0.0.28 20250909 atangster]
++ WEB lists use busy icon [0.0.27 20250909 atangster]
++ SETTINGS mode to appbar [0.0.26 20250909 atangster]
 + Add sort option to kanban view [0.0.25 20250830 atangster]
 + SETTINGS now contained in SolidScaffold [0.0.24 20250830 tonypioneer]
 + Move to using FILES from solidui [0.0.23 20250830 tonypioneer]

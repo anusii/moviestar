@@ -25,6 +25,7 @@ au](https://solidcommunity.au/docs/moviestar)
 
 ## 0.1 First stable release
 
++ BUGs: TV mis-coded as MOVIE, API key fixes, Secret key fixes [0.0.29 20250910 atangster]
 + SHOWS supported in other lists [0.0.28 20250909 atangster]
 + WEB lists use busy icon [0.0.27 20250909 atangster]
 + SETTINGS mode to appbar [0.0.26 20250909 atangster]

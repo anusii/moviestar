@@ -175,6 +175,89 @@ class ContentService {
     return results.map((tvShow) => ContentItem.fromTVJson(tvShow)).toList();
   }
 
+  // MIXED CONTENT METHODS
+
+  // Gets a mixed list of Now Playing movies and On The Air TV shows.
+
+  Future<List<ContentItem>> getNowPlayingMixedContent() async {
+    await _ensureClientInitialized();
+
+    // Fetch both now playing movies and on the air TV shows.
+
+    final moviesFuture = getNowPlayingMovies();
+    final tvShowsFuture = getOnTheAirTVShows();
+
+    final results = await Future.wait([moviesFuture, tvShowsFuture]);
+    final movies = results[0];
+    final tvShows = results[1];
+
+    // Combine and sort by popularity/relevance.
+
+    final combined = <ContentItem>[];
+    combined.addAll(movies);
+    combined.addAll(tvShows);
+
+    // Sort by vote average to maintain quality.
+
+    combined.sort((a, b) => b.voteAverage.compareTo(a.voteAverage));
+
+    return combined;
+  }
+
+  // Gets a mixed list of Top Rated movies and TV shows.
+
+  Future<List<ContentItem>> getTopRatedMixedContent() async {
+    await _ensureClientInitialized();
+
+    // Fetch both top rated movies and TV shows.
+
+    final moviesFuture = getTopRatedMovies();
+    final tvShowsFuture = getTopRatedTVShows();
+
+    final results = await Future.wait([moviesFuture, tvShowsFuture]);
+    final movies = results[0];
+    final tvShows = results[1];
+
+    // Combine and sort by vote average.
+
+    final combined = <ContentItem>[];
+    combined.addAll(movies);
+    combined.addAll(tvShows);
+
+    // Sort by vote average to maintain quality.
+
+    combined.sort((a, b) => b.voteAverage.compareTo(a.voteAverage));
+
+    return combined;
+  }
+
+  // Gets a mixed list of Upcoming movies and Airing Today TV shows.
+
+  Future<List<ContentItem>> getUpcomingMixedContent() async {
+    await _ensureClientInitialized();
+
+    // Fetch both upcoming movies and airing today TV shows.
+
+    final moviesFuture = getUpcomingMovies();
+    final tvShowsFuture = getAiringTodayTVShows();
+
+    final results = await Future.wait([moviesFuture, tvShowsFuture]);
+    final movies = results[0];
+    final tvShows = results[1];
+
+    // Combine and sort by date/relevance.
+
+    final combined = <ContentItem>[];
+    combined.addAll(movies);
+    combined.addAll(tvShows);
+
+    // Sort by vote average to maintain quality.
+
+    combined.sort((a, b) => b.voteAverage.compareTo(a.voteAverage));
+
+    return combined;
+  }
+
   // SEARCH METHODS
 
   // Searches for content (movies and TV shows) matching the given query.

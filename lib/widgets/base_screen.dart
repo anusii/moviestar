@@ -225,9 +225,9 @@ class BaseScreenFactory {
     required Widget body,
     required TextEditingController searchController,
     String hintText = 'Search...',
-    VoidCallback? onClear,
-    ValueChanged<String>? onChanged,
-    ValueChanged<String>? onSubmitted,
+    required VoidCallback onClear,
+    required ValueChanged<String> onChanged,
+    required ValueChanged<String> onSubmitted,
     bool isLoading = false,
     String? error,
     VoidCallback? onErrorRetry,
@@ -256,7 +256,7 @@ class BaseScreenFactory {
                 color: textColor.withValues(alpha: 0.7),
               ),
               border: InputBorder.none,
-              suffixIcon: searchController.text.isNotEmpty && onClear != null
+              suffixIcon: searchController.text.isNotEmpty
                   ? IconButton(
                       icon: Icon(
                         Icons.clear,

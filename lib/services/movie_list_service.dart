@@ -265,6 +265,7 @@ class MovieListService {
             if (!e.toString().contains('does not exist')) {
               rethrow;
             }
+            if (!_context.mounted) return null;
             result = await readPod(movieFileName, _context, _child);
           }
         } else {

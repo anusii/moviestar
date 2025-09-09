@@ -724,7 +724,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                       await Future.delayed(const Duration(milliseconds: 100));
 
                       // Show success message.
-                      if (mounted) {
+                      if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('API key saved successfully'),

@@ -1019,6 +1019,7 @@ class PodFavoritesService extends ChangeNotifier {
           if (!e.toString().contains('does not exist')) {
             rethrow;
           }
+          if (!_context.mounted) return null;
           try {
             result = await readPod(movieFileName, _context, _child);
           } catch (e2) {

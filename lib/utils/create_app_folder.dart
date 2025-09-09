@@ -194,6 +194,7 @@ Future<SolidFunctionCallStatus> createAppFolder({
               debugPrint(
                 '⚠️  Using unencrypted fallback for folder initialization',
               );
+              if (!context.mounted) throw Exception('Context not mounted');
               initResult = await writePod(
                 '$folderName/init.ttl',
                 initContent,

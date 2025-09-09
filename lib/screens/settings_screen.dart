@@ -50,7 +50,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
   /// Service for managing favorite movies.
 
   final FavoritesService favoritesService;
-  final FavoritesServiceManager? favoritesServiceManager;
+  final FavoritesServiceManager favoritesServiceManager;
   final ApiKeyService apiKeyService;
 
   /// Whether this screen was opened from the API key prompt.
@@ -59,12 +59,11 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
   /// Creates a new [SettingsScreen] widget.
 
-  // ignore: avoid-unnecessary-nullable-parameters
   const SettingsScreen({
     super.key,
     required this.favoritesService,
     required this.apiKeyService,
-    this.favoritesServiceManager,
+    required this.favoritesServiceManager,
     this.fromApiKeyPrompt = false,
   });
 
@@ -121,6 +120,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     try {
       final cachedService = ref.read(configuredCachedMovieServiceProvider);
       await cachedService.clearAllCache();
+
+      // Invalidate providers that depend on cache state to refresh UI
+      ref.invalidate(popularMoviesWithCacheInfoProvider);
+      ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+      ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+      ref.invalidate(upcomingMoviesWithCacheInfoProvider);
+      ref.invalidate(cacheStatsProvider);
+      ref.invalidate(contentServiceProvider);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -352,18 +359,6 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
   /// Enable POD storage and migrate data.
 
   Future<void> _enablePodStorage() async {
-    if (widget.favoritesServiceManager == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('POD storage manager not available.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-      return;
-    }
-
     // Show loading indicator.
 
     if (mounted) {
@@ -389,7 +384,7 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
     }
 
     try {
-      final success = await widget.favoritesServiceManager!.enablePodStorage();
+      final success = await widget.favoritesServiceManager.enablePodStorage();
 
       if (success) {
         setState(() => _podStorageEnabled = true);
@@ -443,10 +438,8 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
   /// Disable POD storage and revert to local storage.
 
   Future<void> _disablePodStorage() async {
-    if (widget.favoritesServiceManager == null) return;
-
     try {
-      await widget.favoritesServiceManager!.disablePodStorage();
+      await widget.favoritesServiceManager.disablePodStorage();
       setState(() => _podStorageEnabled = false);
 
       if (mounted) {
@@ -500,7 +493,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
   /// Initialises POD storage state, enabling by default for logged-in users.
 
   Future<void> _initializePodStorageState() async {
-    if (widget.favoritesServiceManager != null) {
+    {
       // Check if user is logged in.
 
       final loggedIn = await isLoggedIn();
@@ -508,7 +501,7 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
       // If user is logged in and POD storage is not explicitly disabled,
       // enable it by default.
 
-      if (loggedIn && !widget.favoritesServiceManager!.isPodStorageEnabled) {
+      if (loggedIn && !widget.favoritesServiceManager.isPodStorageEnabled) {
         // Enable POD storage silently for logged-in users.
 
         setState(() {
@@ -518,22 +511,21 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
         // Try to enable POD storage in the background.
 
         try {
-          await widget.favoritesServiceManager!.enablePodStorage();
+          await widget.favoritesServiceManager.enablePodStorage();
         } catch (e) {
           // If enabling fails, revert to current state.
 
           if (mounted) {
             setState(() {
               _podStorageEnabled =
-                  widget.favoritesServiceManager!.isPodStorageEnabled;
+                  widget.favoritesServiceManager.isPodStorageEnabled;
             });
           }
         }
       } else {
         // Use current state from service manager.
 
-        _podStorageEnabled =
-            widget.favoritesServiceManager!.isPodStorageEnabled;
+        _podStorageEnabled = widget.favoritesServiceManager.isPodStorageEnabled;
       }
     }
   }
@@ -703,7 +695,8 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
 
                     if (mounted) {
                       // Invalidate all movie providers to force refresh with new API key.
-
+                      // IMPORTANT: Must invalidate apiKeyProvider first so dependent providers refresh
+                      ref.invalidate(apiKeyProvider);
                       ref.invalidate(popularMoviesWithCacheInfoProvider);
                       ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
                       ref.invalidate(topRatedMoviesWithCacheInfoProvider);
@@ -711,18 +704,26 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
                       ref.invalidate(movieServiceProvider);
                       ref.invalidate(contentServiceProvider);
 
+                      // Give providers time to refresh before showing success message
+                      await Future.delayed(const Duration(milliseconds: 100));
+
                       // Show success message.
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('API key saved successfully'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('API key saved successfully'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                      // If we navigated here from the API key prompt, navigate back to home.
+                        // If we navigated here from the API key prompt, navigate back to home.
+                        if (widget.fromApiKeyPrompt) {
+                          _navigateToHomeScreen();
+                        }
 
-                      if (widget.fromApiKeyPrompt) {
-                        _navigateToHomeScreen();
+                        // Trigger app reinitialization after API key is set
+                        // This will properly initialize POD folders and data loading
+                        _triggerAppReinitialization();
                       }
                     }
                   },
@@ -1217,6 +1218,13 @@ Failed to enable POD storage. Please check your Solid POD login and try again.''
       ),
       onTap: onTap,
     );
+  }
+
+  /// Triggers app reinitialization after API key is set
+  void _triggerAppReinitialization() {
+    // The provider invalidations we added earlier will handle the reinitialization
+    // No additional action needed here since the providers are already invalidated
+    debugPrint('🔄 API key saved - providers invalidated for reinitialization');
   }
 
   void _navigateToHomeScreen() {

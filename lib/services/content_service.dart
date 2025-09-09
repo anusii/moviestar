@@ -25,6 +25,8 @@
 
 library;
 
+import 'dart:io';
+
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/api_key_service.dart';
@@ -61,6 +63,12 @@ class ContentService {
     final apiKey = await _apiKeyService.getApiKey();
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
     _searchService = ContentSearchService(_client!);
+
+    // On Linux, add a small delay to ensure services are ready
+    // This helps with search immediately after API key is added
+    if (Platform.isLinux) {
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
   }
 
   // Updates the API key and recreates the network client.
@@ -75,7 +83,7 @@ class ContentService {
   // Ensures the client is initialized before making requests.
 
   Future<void> _ensureClientInitialized() async {
-    if (_client == null) {
+    if (_client == null || _searchService == null) {
       await _initializeClient();
     }
   }
@@ -308,6 +316,10 @@ class ContentService {
     String query,
   ) async {
     await _ensureClientInitialized();
+    if (_searchService == null) {
+      // Fallback: reinitialize if still null
+      await _initializeClient();
+    }
     return await _searchService!.searchContentComprehensive(query);
   }
 

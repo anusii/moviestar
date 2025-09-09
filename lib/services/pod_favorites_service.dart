@@ -887,8 +887,10 @@ class PodFavoritesService extends ChangeNotifier {
         return;
       }
 
-      final movieFileName =
-          'movies/Movie-${movie.id}.ttl'; // Use Movie-ID pattern to match ontology
+      // Use content-type aware file naming: Movie-ID.ttl for movies, TVShow-ID.ttl for TV shows
+      final contentPrefix =
+          (contentType == 'tv' || contentType == 'tvShow') ? 'TVShow' : 'Movie';
+      final movieFileName = 'movies/$contentPrefix-${movie.id}.ttl';
 
       // Use the new ontology-compliant serialization method
       final ttlContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
@@ -984,7 +986,10 @@ class PodFavoritesService extends ChangeNotifier {
   /// Gets the file path for a movie file (used for sharing).
 
   String getMovieFilePath(Movie movie) {
-    return '$basePath/movies/Movie-${movie.id}.ttl'; // Use Movie-ID pattern to match ontology
+    // Use content-type aware file naming based on Movie's contentType field
+    final contentPrefix =
+        movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie';
+    return '$basePath/movies/$contentPrefix-${movie.id}.ttl';
   }
 
   /// Reads movie data from a single movie file.
@@ -998,12 +1003,36 @@ class PodFavoritesService extends ChangeNotifier {
       }
 
       // Use full path for readPod to match where files are actually stored.
-
-      final movieFileName =
-          '$basePath/movies/Movie-${movie.id}.ttl'; // Use Movie-ID pattern
+      // Try both Movie and TVShow file patterns for backward compatibility
+      final movieFileName = '$basePath/movies/Movie-${movie.id}.ttl';
+      final tvShowFileName = '$basePath/movies/TVShow-${movie.id}.ttl';
 
       if (!_context.mounted) return null;
-      final result = await readPod(movieFileName, _context, _child);
+
+      String result = '';
+      // Try TV show file first if movie has TV show content type
+      if (movie.contentType == ContentType.tvShow) {
+        try {
+          result = await readPod(tvShowFileName, _context, _child);
+        } catch (e) {
+          // Fall back to Movie file for backward compatibility
+          if (!e.toString().contains('does not exist')) {
+            rethrow;
+          }
+          if (!_context.mounted) return null;
+          try {
+            result = await readPod(movieFileName, _context, _child);
+          } catch (e2) {
+            // Both files don't exist, that's ok
+            if (!e2.toString().contains('does not exist')) {
+              rethrow;
+            }
+          }
+        }
+      } else {
+        // For movies, just try Movie file
+        result = await readPod(movieFileName, _context, _child);
+      }
 
       if (result.isNotEmpty) {
         final movieData = TurtleSerializer.movieWithUserDataFromTurtle(result);
@@ -1403,7 +1432,10 @@ class PodFavoritesService extends ChangeNotifier {
           }
         }
       } catch (e) {
-        debugPrint('❌ Error scanning user_lists directory: $e');
+        if (!e.toString().contains('does not exist') &&
+            !e.toString().contains('Failed to get resource list')) {
+          debugPrint('❌ Error scanning user_lists directory: $e');
+        }
       }
 
       return customLists;

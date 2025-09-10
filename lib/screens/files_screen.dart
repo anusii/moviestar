@@ -68,49 +68,15 @@ class _FilesScreenState extends State<FilesScreen> with ScreenStateMixin {
               padding: const EdgeInsets.all(Dimensions.xl),
               child: SolidFile(
                 basePath: basePath,
-                currentPath: basePath,
-                showUpload: true,
-                autoConfig: true,
-                onFileSelected: (fileName, filePath) {
-                  debugPrint('File selected: $fileName at $filePath');
-                },
-                onFileDownload: (fileName, filePath) {
-                  debugPrint('Downloading file: $fileName');
-                },
-                onFileDelete: (fileName, filePath) {
-                  debugPrint('Deleting file: $fileName');
-                },
-                onDirectoryChanged: (path) {
-                  debugPrint('Directory changed to: $path');
-                },
-                onImportCsv: (fileName, filePath) {
-                  debugPrint('Importing CSV: $fileName');
-                },
                 uploadCallbacks: SolidFileUploadCallbacks(
-                  onUpload: () {
-                    debugPrint('File upload started');
-                  },
-                  onImportCsv: () {
-                    debugPrint('Importing CSV file');
-                  },
-                  onExportCsv: () {
-                    debugPrint('Exporting data to CSV file');
-                  },
-                  onImportProfile: () {
-                    debugPrint('Importing user profile');
-                  },
-                  onExportProfile: () {
-                    debugPrint('Exporting user profile');
-                  },
-                  onVisualiseJson: () {
-                    debugPrint('Visualising JSON file');
-                  },
-                  onPreviewFile: () {
-                    debugPrint('Previewing file');
-                  },
-                  onConvertToJson: () {
-                    debugPrint('Converting data to JSON');
-                  },
+                  onUpload: () {},
+                  onImportCsv: () {},
+                  onExportCsv: () {},
+                  onImportProfile: () {},
+                  onExportProfile: () {},
+                  onVisualiseJson: () {},
+                  onPreviewFile: () {},
+                  onConvertToJson: () {},
                 ),
               ),
             );

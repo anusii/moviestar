@@ -137,8 +137,8 @@ String formatGenres(List<String>? genres) {
 /// Validates if an image URL is valid and not empty.
 ///
 /// Returns true if the URL starts with http:// or https://.
-bool isValidImageUrl(String? url) {
-  if (url == null || url.trim().isEmpty) {
+bool isValidImageUrl(String url) {
+  if (url.trim().isEmpty) {
     return false;
   }
 

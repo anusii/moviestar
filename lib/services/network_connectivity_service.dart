@@ -93,9 +93,9 @@ class NetworkConnectivityService {
   final InternetConnection _internetConnection;
 
   /// Creates a new NetworkConnectivityService.
-  NetworkConnectivityService({
+  NetworkConnectivityService([
     InternetConnection? internetConnection,
-  }) : _internetConnection = internetConnection ?? InternetConnection();
+  ]) : _internetConnection = internetConnection ?? InternetConnection();
 
   /// Creates a service with custom check options for TMDB endpoints.
   factory NetworkConnectivityService.forTMDB() {
@@ -112,7 +112,7 @@ class NetworkConnectivityService {
       useDefaultOptions: false,
     );
 
-    return NetworkConnectivityService(internetConnection: customConnection);
+    return NetworkConnectivityService(customConnection);
   }
 
   /// Checks if the device has internet connectivity.

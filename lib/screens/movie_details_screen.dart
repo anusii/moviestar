@@ -36,6 +36,7 @@ import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/constants/timing_constants.dart';
+import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
@@ -79,7 +80,8 @@ class MovieDetailsScreen extends StatefulWidget {
 
 /// State class for the movie details screen.
 
-class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
+class _MovieDetailsScreenState extends State<MovieDetailsScreen>
+    with ScreenStateMixin {
   /// Validates if an image URL is valid and not empty.
   ///
   bool _isValidImageUrl(String url) {
@@ -508,8 +510,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
       if (!mounted) return;
 
-      await Navigator.push(
-        context,
+      await safeNavigateTo(
         MaterialPageRoute(
           builder: (context) => Theme(
             data: Theme.of(context),
@@ -627,7 +628,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                   Icons.arrow_back,
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Navigator.pop(context),
                 tooltip: 'Back',
               ),
             ),
@@ -1605,33 +1606,7 @@ class _AddToCustomListsDialogState extends State<_AddToCustomListsDialog> {
         Navigator.pop(context); // Close main dialog
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Row(
-              children: [
-                Icon(
-                  Icons.check_circle_outline,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Created "$name" and added "${widget.movie.title}"',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            margin: const EdgeInsets.all(16),
-            elevation: 6,
-            duration: TimingConstants.snackbarStandardDuration,
+            content: Text('Created "$name" and added "${widget.movie.title}"'),
           ),
         );
       }

@@ -29,11 +29,13 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
@@ -54,7 +56,8 @@ class ComingSoonScreen extends ConsumerStatefulWidget {
 
 /// State class for the coming soon screen.
 
-class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
+class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen>
+    with ScreenStateMixin {
   /// Forces refresh of upcoming movies data.
 
   Future<void> _forceRefresh() async {
@@ -73,68 +76,66 @@ class _ComingSoonScreenState extends ConsumerState<ComingSoonScreen> {
     final upcomingMoviesAsync = ref.watch(upcomingMoviesWithCacheInfoProvider);
     final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: RefreshIndicator(
-        onRefresh: _forceRefresh,
-        child: upcomingMoviesAsync.when(
-          data: (cacheResult) => ListView.builder(
-            itemCount: cacheResult.data.length,
-            itemBuilder: (context, index) {
-              final movie = cacheResult.data[index];
-              return MovieCard.listItem(
-                movie: movie,
-                fromCache: cacheResult.fromCache,
-                cacheAge: cacheResult.cacheAge,
-                cacheOnlyMode: cacheOnlyMode,
-                favoritesService: widget.favoritesService,
-                parentWidget: widget,
-                customSubtitle: Row(
-                  children: [
+    return BaseScreen(
+      title: 'Coming Soon',
+      enableRefresh: true,
+      onRefresh: _forceRefresh,
+      body: upcomingMoviesAsync.when(
+        data: (cacheResult) => ListView.builder(
+          itemCount: cacheResult.data.length,
+          itemBuilder: (context, index) {
+            final movie = cacheResult.data[index];
+            return MovieCard.listItem(
+              movie: movie,
+              fromCache: cacheResult.fromCache,
+              cacheAge: cacheResult.cacheAge,
+              cacheOnlyMode: cacheOnlyMode,
+              favoritesService: widget.favoritesService,
+              parentWidget: widget,
+              customSubtitle: Row(
+                children: [
+                  Text(
+                    'Release: ${DateFormatUtil.formatNumeric(movie.releaseDate)}',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  if (movie.contentType != null) ...[
+                    const Text(' • '),
                     Text(
-                      'Release: ${DateFormatUtil.formatNumeric(movie.releaseDate)}',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      movie.contentType == ContentType.movie ? '🎬' : '📺',
+                      style: const TextStyle(fontSize: 14),
                     ),
-                    if (movie.contentType != null) ...[
-                      const Text(' • '),
-                      Text(
-                        movie.contentType == ContentType.movie ? '🎬' : '📺',
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                      const Text(' '),
-                      Text(
-                        movie.contentType == ContentType.movie
-                            ? 'Movie'
-                            : 'TV Show',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.7),
-                            ),
-                      ),
-                    ],
+                    const Text(' '),
+                    Text(
+                      movie.contentType == ContentType.movie
+                          ? 'Movie'
+                          : 'TV Show',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
+                          ),
+                    ),
                   ],
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MovieDetailsScreen(
-                        movie: movie,
-                        favoritesService: widget.favoritesService,
-                      ),
+                ],
+              ),
+              onTap: () {
+                safeNavigateTo(
+                  MaterialPageRoute(
+                    builder: (context) => MovieDetailsScreen(
+                      movie: movie,
+                      favoritesService: widget.favoritesService,
                     ),
-                  );
-                },
-              );
-            },
-          ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => ErrorDisplayWidget(
-            message: 'Failed to load upcoming movies',
-            onRetry: _forceRefresh,
-          ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => ErrorDisplayWidget(
+          message: 'Failed to load upcoming movies',
+          onRetry: _forceRefresh,
         ),
       ),
     );

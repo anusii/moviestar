@@ -31,6 +31,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
@@ -40,6 +41,7 @@ import 'package:moviestar/services/movie_list_service.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
 
@@ -60,33 +62,31 @@ class ToWatchScreen extends StatefulWidget {
 
 /// State class for the to watch screen.
 
-class _ToWatchScreenState extends State<ToWatchScreen> {
+class _ToWatchScreenState extends State<ToWatchScreen> with ScreenStateMixin {
   /// Currently selected sort criteria.
 
   MovieSortCriteria _sortCriteria = MovieSortCriteria.nameAsc;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        actions: [
-          StreamBuilder<List<Movie>>(
-            stream: widget.favoritesService.toWatchMovies,
-            builder: (context, snapshot) {
-              final hasMovies = snapshot.hasData && snapshot.data!.isNotEmpty;
-              final isPodEnabled =
-                  widget.favoritesService is FavoritesServiceAdapter &&
-                      (widget.favoritesService as FavoritesServiceAdapter)
-                          .isPodStorageEnabled;
+    return BaseScreen(
+      title: 'To Watch',
+      actions: [
+        StreamBuilder<List<Movie>>(
+          stream: widget.favoritesService.toWatchMovies,
+          builder: (context, snapshot) {
+            final hasMovies = snapshot.hasData && snapshot.data!.isNotEmpty;
+            final isPodEnabled =
+                widget.favoritesService is FavoritesServiceAdapter &&
+                    (widget.favoritesService as FavoritesServiceAdapter)
+                        .isPodStorageEnabled;
 
-              return Padding(
-                padding: const EdgeInsets.only(
-                  right: 60.0,
-                ), // Add space to avoid debug banner
-                child: MarkdownTooltip(
-                  message: '''
+            return Padding(
+              padding: const EdgeInsets.only(
+                right: 60.0,
+              ),
+              child: MarkdownTooltip(
+                message: '''
 
 **📤 Share To-Watch List**
 
@@ -99,25 +99,24 @@ Recipients will be able to:
 
 *Requires POD storage to be enabled*
 
-                  ''',
-                  child: IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: (hasMovies && isPodEnabled)
-                        ? () => _shareToWatchList(context, snapshot.data!)
-                        : null,
-                  ),
+                ''',
+                child: IconButton(
+                  icon: const Icon(Icons.share),
+                  onPressed: (hasMovies && isPodEnabled)
+                      ? () => _shareToWatchList(context, snapshot.data!)
+                      : null,
                 ),
-              );
-            },
-          ),
-        ],
-      ),
+              ),
+            );
+          },
+        ),
+      ],
       body: Column(
         children: [
           SortControls(
             selectedCriteria: _sortCriteria,
             onSortChanged: (criteria) {
-              setState(() {
+              safeSetState(() {
                 _sortCriteria = criteria;
               });
             },
@@ -217,8 +216,7 @@ Recipients will be able to:
                         },
                       ),
                       onTap: () {
-                        Navigator.push(
-                          context,
+                        safeNavigateTo(
                           MaterialPageRoute(
                             builder: (context) => MovieDetailsScreen(
                               movie: movie,
@@ -245,15 +243,11 @@ Recipients will be able to:
     List<Movie> movies,
   ) async {
     if (movies.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('No movies to share')));
+      showErrorSnackBar('No movies to share');
       return;
     }
 
     // Store context references before async operations.
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final navigator = Navigator.of(context);
     final theme = Theme.of(context);
 
     try {
@@ -272,14 +266,8 @@ Recipients will be able to:
         description: 'Movies you want to watch',
       );
 
-      if (!mounted) return;
-
       if (listId == null) {
-        if (mounted) {
-          scaffoldMessenger.showSnackBar(
-            const SnackBar(content: Text('Failed to create movie list')),
-          );
-        }
+        showErrorSnackBar('Failed to create movie list');
         return;
       }
 
@@ -290,32 +278,26 @@ Recipients will be able to:
         } catch (e) {
           // Continue with other movies - the batch UI will handle individual failures.
         }
-        if (!mounted) return;
       }
 
       // Navigate to the batch sharing UI.
-      if (mounted) {
-        await navigator.push<bool>(
-          MaterialPageRoute(
-            fullscreenDialog: true,
-            builder: (context) => MovieStarBatchSharingUi(
-              listId: listId,
-              listName: 'To Watch Movies',
-              movies: movies,
-              backgroundColor: theme.scaffoldBackgroundColor,
-              onSharingComplete: () {
-                // Handle completion callback.
-              },
-              child: widget,
-            ),
+      await safeNavigateTo<bool>(
+        MaterialPageRoute(
+          fullscreenDialog: true,
+          builder: (context) => MovieStarBatchSharingUi(
+            listId: listId,
+            listName: 'To Watch Movies',
+            movies: movies,
+            backgroundColor: theme.scaffoldBackgroundColor,
+            onSharingComplete: () {
+              // Handle completion callback.
+            },
+            child: widget,
           ),
-        );
-      }
+        ),
+      );
     } catch (e) {
-      if (mounted) {
-        scaffoldMessenger
-            .showSnackBar(SnackBar(content: Text('Error sharing list: $e')));
-      }
+      showErrorSnackBar('Error sharing list: $e');
     }
   }
 
@@ -327,7 +309,6 @@ Recipients will be able to:
 
       // Check if the file already exists.
       try {
-        if (!mounted) return;
         final existingContent = await readPod(movieFileName, context, widget);
         if (existingContent.isNotEmpty) {
           return;

@@ -28,9 +28,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
 /// Screen that displays all movies in a specific category.
@@ -54,7 +56,8 @@ class MovieCategoryScreen extends ConsumerStatefulWidget {
       _MovieCategoryScreenState();
 }
 
-class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
+class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen>
+    with ScreenStateMixin {
   final ScrollController _scrollController = ScrollController();
   String _sortBy = 'default'; // default, title, rating, year.
 
@@ -141,7 +144,7 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
       selected: isSelected,
       onSelected: (selected) {
         if (selected) {
-          setState(() {
+          safeSetState(() {
             _sortBy = value;
           });
         }
@@ -224,8 +227,7 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
             width: double.infinity,
             favoritesService: widget.favoritesService,
             onTap: () {
-              Navigator.push(
-                context,
+              safeNavigateTo(
                 MaterialPageRoute(
                   builder: (context) => MovieDetailsScreen(
                     movie: movie,
@@ -242,59 +244,41 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.categoryName,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        surfaceTintColor: Theme.of(context).colorScheme.surfaceTint,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-          tooltip: 'Back to home',
-        ),
-        actions: [
-          // Movie count indicator.
-
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(
-              '${widget.movies.length} movies',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
+    return BaseScreen(
+      title: widget.categoryName,
+      automaticallyImplyLeading: true,
+      actions: [
+        // Movie count indicator.
+        Container(
+          margin: const EdgeInsets.only(right: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(16),
           ),
-        ],
-      ),
+          child: Text(
+            '${widget.movies.length} movies',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  fontWeight: FontWeight.w500,
+                ),
+          ),
+        ),
+      ],
       body: Column(
         children: [
           // Sort options.
-
           _buildSortOptions(),
-
           // Movie grid.
-
           Expanded(
             child: _buildMovieGrid(),
           ),
         ],
       ),
-      // Floating action button to scroll to top.
-
       floatingActionButton: ValueListenableBuilder<bool>(
         valueListenable: ValueNotifier(
           false,
         ), // We'll implement scroll-to-top later if needed.
-
         builder: (context, showScrollToTop, child) {
           return FloatingActionButton.small(
             onPressed: () {

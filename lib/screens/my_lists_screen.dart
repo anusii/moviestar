@@ -32,6 +32,7 @@ import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/constants/timing_constants.dart';
+import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
@@ -43,6 +44,7 @@ import 'package:moviestar/services/movie_list_service.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 
 /// A screen that displays all custom movie lists.
@@ -65,29 +67,25 @@ class MyListsScreen extends ConsumerStatefulWidget {
 
 /// State class for the my lists screen.
 
-class _MyListsScreenState extends ConsumerState<MyListsScreen> {
+class _MyListsScreenState extends ConsumerState<MyListsScreen>
+    with ScreenStateMixin {
   // List of all custom lists.
 
   List<CustomList> _customLists = [];
 
-  // Indicates whether the lists are being loaded.
-
-  bool _isLoading = true;
-
   @override
   void initState() {
     super.initState();
+    setLoadingState(true);
     _loadCustomLists();
 
     // Listen to changes in custom lists.
 
     widget.favoritesService.customLists.listen((lists) {
-      if (mounted) {
-        setState(() {
-          _customLists = lists;
-          _isLoading = false;
-        });
-      }
+      safeSetState(() {
+        _customLists = lists;
+      });
+      setLoadingState(false);
     });
   }
 
@@ -96,10 +94,10 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen> {
   Future<void> _loadCustomLists() async {
     final lists = await widget.favoritesService.getCustomLists();
 
-    setState(() {
+    safeSetState(() {
       _customLists = lists;
-      _isLoading = false;
     });
+    setLoadingState(false);
   }
 
   // Shows a dialog to create a new custom list.
@@ -150,40 +148,8 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen> {
                   name,
                   description: description.isEmpty ? null : description,
                 );
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle_outline,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Created "$name" list',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      margin: const EdgeInsets.all(16),
-                      elevation: 6,
-                      duration: TimingConstants.snackbarStandardDuration,
-                    ),
-                  );
-                }
+                safePop();
+                showSuccessSnackBar('Created "$name" list');
               }
             },
             child: const Text('Create'),
@@ -450,21 +416,14 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        foregroundColor: Theme.of(context).colorScheme.onSurface,
-      ),
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _customLists.isEmpty
-              ? _buildEmptyState()
-              : _buildListView(),
+    return BaseScreen(
+      title: 'My Lists',
+      isLoading: isLoading,
+      body: _customLists.isEmpty ? _buildEmptyState() : _buildListView(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showCreateListDialog,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
         icon: const Icon(Icons.add_rounded),
         label: const Text('New List'),
         elevation: 4,
@@ -739,9 +698,7 @@ Edit list name and description, or delete this list.
 
   Future<void> _shareCustomList(CustomList list) async {
     if (list.movieIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No movies to share')),
-      );
+      showInfoSnackBar('No movies to share');
       return;
     }
 

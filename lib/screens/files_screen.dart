@@ -31,16 +31,23 @@ import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/constants/paths.dart';
+import 'package:moviestar/mixins/screen_state_mixin.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 
 /// Screen for managing POD files.
 
-class FilesScreen extends StatelessWidget {
+class FilesScreen extends StatefulWidget {
   const FilesScreen({super.key});
 
   @override
+  State<FilesScreen> createState() => _FilesScreenState();
+}
+
+class _FilesScreenState extends State<FilesScreen> with ScreenStateMixin {
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+    return BaseScreen(
+      title: 'Files',
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {

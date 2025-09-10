@@ -33,6 +33,7 @@ import 'package:rdflib/rdflib.dart';
 import 'package:solidpod/solidpod.dart'
     show tripleMapToTurtle, turtleToTripleMap;
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Utility class for serializing/deserializing movies to/from Turtle format using proper RDF.
@@ -55,6 +56,7 @@ class TurtleSerializer {
   // Define common predicates as URIRefs.
 
   static final movieType = movieNS.withAttr('Movie');
+  static final tvShowType = movieNS.withAttr('TVShow');
   static final movieListType = moviestarOntoNS.withAttr('MovieList');
   static final userType = moviestarOntoNS.withAttr('User');
   static final ratingType = localNS.withAttr('Rating');
@@ -150,8 +152,10 @@ class TurtleSerializer {
 
       for (final movie in movies) {
         final movieResource = localNS.withAttr('movie${movie.id}');
+        final contentType =
+            movie.contentType == ContentType.tvShow ? tvShowType : movieType;
         triples[movieResource] = {
-          rdfType: movieType,
+          rdfType: contentType,
           identifier: Literal('${movie.id}', datatype: XSD.int),
           name: Literal(_escapeString(movie.title)),
           description: Literal(_escapeString(movie.overview)),
@@ -341,7 +345,7 @@ class TurtleSerializer {
       for (final subject in triples.keys) {
         final predicates = triples[subject]!;
 
-        // Check if this is a movie resource - look for various type URIs.
+        // Check if this is a movie or TV show resource - look for various type URIs.
 
         final typeValues =
             predicates['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] ?? [];
@@ -349,14 +353,18 @@ class TurtleSerializer {
         final isMovie = typeValues.any(
           (type) =>
               type.toString().contains('Movie') ||
+              type.toString().contains('TVShow') ||
               type == 'http://schema.org/Movie' ||
-              type == '#Movie',
+              type == 'http://schema.org/TVShow' ||
+              type == '#Movie' ||
+              type == '#TVShow',
         );
 
         if (isMovie) {
           // Extract movie data from predicates.
 
-          final movie = _extractMovieFromTriples(predicates);
+          final movie =
+              _extractMovieFromTriples(predicates, typeValues: typeValues);
           if (movie != null) {
             movies.add(movie);
           }
@@ -525,8 +533,9 @@ class TurtleSerializer {
   /// Extract Movie object from RDF triples.
 
   static Movie? _extractMovieFromTriples(
-    Map<String, List<dynamic>> predicates,
-  ) {
+    Map<String, List<dynamic>> predicates, {
+    List<dynamic>? typeValues,
+  }) {
     try {
       // Try different namespace variations for predicates.
 
@@ -591,6 +600,18 @@ class TurtleSerializer {
               .toList()
           : <int>[];
 
+      // Determine content type from RDF type
+      ContentType? contentType;
+      if (typeValues != null) {
+        final isTvShow = typeValues.any(
+          (type) =>
+              type.toString().contains('TVShow') ||
+              type == 'http://schema.org/TVShow' ||
+              type == '#TVShow',
+        );
+        contentType = isTvShow ? ContentType.tvShow : ContentType.movie;
+      }
+
       return Movie(
         id: id,
         title: title,
@@ -600,6 +621,7 @@ class TurtleSerializer {
         voteAverage: voteAverage,
         releaseDate: releaseDate,
         genreIds: genreIds,
+        contentType: contentType,
       );
     } catch (e) {
       return null;
@@ -733,11 +755,18 @@ class TurtleSerializer {
 
       for (final movie in movies) {
         final movieResource = moviestarDataNS.withAttr('movie-${movie.id}');
+        // Use content-type aware file naming
+        final contentPrefix =
+            movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie';
+        final filePathStr =
+            'moviestar/data/movies/$contentPrefix-${movie.id}.ttl';
+        final contentType =
+            movie.contentType == ContentType.tvShow ? tvShowType : movieType;
         triples[movieResource] = {
-          rdfType: [owlNS.withAttr('NamedIndividual'), movieType],
-          filePath: Literal('moviestar/data/movies/Movie-${movie.id}.ttl'),
+          rdfType: [owlNS.withAttr('NamedIndividual'), contentType],
+          filePath: Literal(filePathStr),
           rdfsLabel: Literal(
-            '|filePath=moviestar/data/movies/Movie-${movie.id}.ttl|',
+            '|filePath=$filePathStr|',
           ),
         };
       }
@@ -761,7 +790,10 @@ class TurtleSerializer {
 
     final movieResource = moviestarDataNS.withAttr('movie-${movie.id}');
     triples[movieResource] = {
-      rdfType: [owlNS.withAttr('NamedIndividual'), movieType],
+      rdfType: [
+        owlNS.withAttr('NamedIndividual'),
+        movie.contentType == ContentType.tvShow ? tvShowType : movieType,
+      ],
       identifier: Literal(
         '${movie.id}',
         datatype: xsdNS.withAttr('positiveInteger'),
@@ -868,6 +900,7 @@ class TurtleSerializer {
       Map<String, String>? sharedWith;
       DateTime? sharedDate;
       final Set<String> movieResourceIds = {};
+      final Map<String, ContentType> movieContentTypes = {};
 
       // Find MovieList resource and extract movie references.
 
@@ -948,6 +981,24 @@ class TurtleSerializer {
             }
           }
         }
+
+        // Check for individual movie resources and their content types
+        else {
+          final movieIdMatch = RegExp(
+            r'movie-(\d+)',
+          ).firstMatch(subject.toString());
+          if (movieIdMatch != null) {
+            final movieId = movieIdMatch.group(1)!;
+            final isTvShow = typeValues.any(
+              (type) =>
+                  type.toString().contains('TVShow') ||
+                  type == 'http://schema.org/TVShow' ||
+                  type == '#TVShow',
+            );
+            movieContentTypes[movieId] =
+                isTvShow ? ContentType.tvShow : ContentType.movie;
+          }
+        }
       }
 
       // Create placeholder Movie objects from the movie references.
@@ -970,6 +1021,7 @@ class TurtleSerializer {
             releaseDate: DateTime.now(),
             voteAverage: 0.0,
             genreIds: [],
+            contentType: movieContentTypes[movieId] ?? ContentType.movie,
           );
           movies.add(movie);
         } catch (e) {
@@ -1045,17 +1097,20 @@ class TurtleSerializer {
         final typeValues =
             predicates['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] ?? [];
 
-        // Check for movie.
+        // Check for movie or TV show.
 
         final isMovie = typeValues.any(
           (type) =>
               type.toString().contains('Movie') ||
+              type.toString().contains('TVShow') ||
               type == 'http://schema.org/Movie' ||
-              type == '#Movie',
+              type == 'http://schema.org/TVShow' ||
+              type == '#Movie' ||
+              type == '#TVShow',
         );
 
         if (isMovie && movie == null) {
-          movie = _extractMovieFromTriples(predicates);
+          movie = _extractMovieFromTriples(predicates, typeValues: typeValues);
 
           // Also check for rating and comment in the same movie resource (new ontology format).
 

@@ -46,8 +46,6 @@ import 'package:moviestar/my_home_page.dart';
 ///   A Widget configured for Solid authentication.
 
 Widget createSolidLogin(BuildContext context, SharedPreferences prefs) {
-  debugPrint('🔍 Setting up Solid login widget');
-
   return Consumer(
     builder: (context, ref, child) {
       final serverUrl = ref.watch(serverURLProvider);
@@ -116,35 +114,20 @@ class ApiKeyCheckWrapper extends StatefulWidget {
 }
 
 class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
-  bool _hasCheckedApiKey = false;
-  // Add static flag to prevent showing dialog multiple times in the same session.
-
-  static final bool _hasShownApiKeyDialogThisSession = false;
-
   @override
   void initState() {
     super.initState();
 
     // Delay the check to ensure the widget is fully built AND POD is authenticated
-    // Wait a bit longer to allow POD authentication and API key fetching to complete
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 1500), () {
-        if (mounted) {
-          _checkApiKey();
-        }
-      });
-    });
-  }
-
-  Future<void> _checkApiKey() async {
-    if (_hasCheckedApiKey || _hasShownApiKeyDialogThisSession) return;
-
-    _hasCheckedApiKey = true;
-
-    // Skip API key check dialog since the new smart error handling covers API key issues.
-    // The app will show proper API key error messages when users try to fetch movie data.
-
-    return;
+    // API key checking is now handled in MyHomePage instead
+    // Wait longer to allow POD authentication and API key fetching to complete
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   Future.delayed(const Duration(seconds: 3), () {
+    //     if (mounted && !_hasCheckedApiKey) {
+    //       _checkApiKey();
+    //     }
+    //   });
+    // });
   }
 
   @override

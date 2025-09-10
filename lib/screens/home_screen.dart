@@ -31,6 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
@@ -71,7 +72,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 // State class for the home screen.
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
   // Map of scroll controllers for different movie categories.
 
   final Map<String, ScrollController> _scrollControllers = {};
@@ -152,7 +153,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (foundApiKeyError != _hasApiKeyError) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          setState(() {
+          safeSetState(() {
             _hasApiKeyError = foundApiKeyError;
             _apiKeyErrorMessage = errorMessage;
           });
@@ -356,8 +357,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // Check if widget is still mounted before navigation.
 
                 if (mounted) {
-                  Navigator.push(
-                    context,
+                  safeNavigateTo(
                     MaterialPageRoute(
                       builder: (context) => MovieDetailsScreen(
                         movie: movie,
@@ -558,8 +558,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               onTap: () {
                 // Check if widget is still mounted before navigation
                 if (mounted) {
-                  Navigator.push(
-                    context,
+                  safeNavigateTo(
                     MaterialPageRoute(
                       builder: (context) => MovieDetailsScreen(
                         movie: movie,
@@ -670,8 +669,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         // Check if widget is still mounted before navigation.
 
                         if (mounted) {
-                          Navigator.push(
-                            context,
+                          safeNavigateTo(
                             MaterialPageRoute(
                               builder: (context) => MovieDetailsScreen(
                                 movie: movie,
@@ -1052,8 +1050,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     List<Movie> movies, {
     bool fromCache = false,
   }) {
-    Navigator.push(
-      context,
+    safeNavigateTo(
       MaterialPageRoute(
         builder: (context) => MovieCategoryScreen(
           categoryName: categoryName,
@@ -1471,8 +1468,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           parentWidget: widget,
           onTap: () {
             if (mounted) {
-              Navigator.push(
-                context,
+              safeNavigateTo(
                 MaterialPageRoute(
                   builder: (context) => MovieDetailsScreen(
                     movie: movie,
@@ -1721,8 +1717,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       parentWidget: widget,
       onTap: () {
         if (mounted) {
-          Navigator.push(
-            context,
+          safeNavigateTo(
             MaterialPageRoute(
               builder: (context) => MovieDetailsScreen(
                 movie: movie,
@@ -1845,8 +1840,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           parentWidget: widget,
           onTap: () {
             if (mounted) {
-              Navigator.push(
-                context,
+              safeNavigateTo(
                 MaterialPageRoute(
                   builder: (context) => MovieDetailsScreen(
                     movie: movie,
@@ -2048,8 +2042,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         parentWidget: widget,
         onTap: () {
           if (mounted) {
-            Navigator.push(
-              context,
+            safeNavigateTo(
               MaterialPageRoute(
                 builder: (context) => MovieDetailsScreen(
                   movie: movie,
@@ -2160,8 +2153,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           parentWidget: widget,
           onTap: () {
             if (mounted) {
-              Navigator.push(
-                context,
+              safeNavigateTo(
                 MaterialPageRoute(
                   builder: (context) => MovieDetailsScreen(
                     movie: movie,
@@ -2180,8 +2172,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   // Navigate to custom list detail screen.
 
   void _navigateToCustomListDetail(CustomList customList) {
-    Navigator.push(
-      context,
+    safeNavigateTo(
       MaterialPageRoute(
         builder: (context) => CustomListDetailScreen(
           customList: customList,
@@ -2208,7 +2199,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
             ref.invalidate(topRatedMoviesWithCacheInfoProvider);
             ref.invalidate(upcomingMoviesWithCacheInfoProvider);
-            setState(() {
+            safeSetState(() {
               _hasApiKeyError = false;
               _apiKeyErrorMessage = null;
             });

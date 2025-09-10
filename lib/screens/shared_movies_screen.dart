@@ -31,6 +31,8 @@ import 'package:gap/gap.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/mixins/screen_state_mixin.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/list_shared_movies.dart';
 
 class SharedMoviesScreen extends StatefulWidget {
@@ -41,8 +43,7 @@ class SharedMoviesScreen extends StatefulWidget {
 }
 
 class _SharedMoviesScreenState extends State<SharedMoviesScreen>
-    with WidgetsBindingObserver {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+    with WidgetsBindingObserver, ScreenStateMixin {
   Future<Map<String, dynamic>?>? _sharedWithMeData;
 
   @override
@@ -79,7 +80,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
   }
 
   void _refreshData() {
-    setState(() {
+    safeSetState(() {
       _sharedWithMeData = _getMoviesSharedWithMe();
     });
   }
@@ -168,7 +169,18 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
             }
           }
         } catch (e) {
-          debugPrint('Error reading resource file $resourceUrl: $e');
+          if (e.toString().contains('enc-keys.ttl') ||
+              e.toString().contains('Invalid content in file') ||
+              e.toString().contains('Duplicated encryption key')) {
+            debugPrint(
+              '⚠️  Encryption key corruption detected for $resourceUrl: $e',
+            );
+            debugPrint(
+              '   Skipping this resource - consider regenerating encryption keys in POD',
+            );
+          } else {
+            debugPrint('Error reading resource file $resourceUrl: $e');
+          }
           // Continue with other files even if one fails.
         }
       }
@@ -666,9 +678,8 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+    return BaseScreen(
+      title: 'Shared Movies',
       body: _buildSharedWithMeTab(),
     );
   }

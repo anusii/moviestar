@@ -32,7 +32,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
-import 'package:moviestar/constants/timing_constants.dart';
+import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
@@ -43,6 +43,7 @@ import 'package:moviestar/services/movie_list_service.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 
 /// A screen that displays the detailed view of a custom movie list.
@@ -71,8 +72,8 @@ class CustomListDetailScreen extends ConsumerStatefulWidget {
 
 // State class for the custom list detail screen.
 
-class _CustomListDetailScreenState
-    extends ConsumerState<CustomListDetailScreen> {
+class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
+    with ScreenStateMixin {
   /// Validates if an image URL is valid and not empty.
 
   bool _isValidImageUrl(String url) {
@@ -140,7 +141,7 @@ class _CustomListDetailScreenState
 
         if (podMovies.isNotEmpty) {
           if (mounted) {
-            setState(() {
+            safeSetState(() {
               for (final movie in podMovies) {
                 _moviesMap[movie.id] = movie;
                 _loadingMovieIds.remove(movie.id);
@@ -182,7 +183,7 @@ class _CustomListDetailScreenState
         continue; // Already loaded or loading.
       }
 
-      setState(() {
+      safeSetState(() {
         _loadingMovieIds.add(movieId);
       });
 
@@ -193,7 +194,7 @@ class _CustomListDetailScreenState
         final movie = await _getContentAsMovieWithType(movieId, contentType);
 
         if (mounted) {
-          setState(() {
+          safeSetState(() {
             _moviesMap[movieId] = movie;
             _loadingMovieIds.remove(movieId);
             _failedMovieIds
@@ -203,7 +204,7 @@ class _CustomListDetailScreenState
       } catch (e) {
         debugPrint('❌ [CustomList] Failed to load movie $movieId from API: $e');
         if (mounted) {
-          setState(() {
+          safeSetState(() {
             _loadingMovieIds.remove(movieId);
             _failedMovieIds.add(movieId);
           });
@@ -328,37 +329,7 @@ class _CustomListDetailScreenState
                 });
                 if (context.mounted) {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          Icon(
-                            Icons.edit_outlined,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Updated "$name" list',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      margin: const EdgeInsets.all(16),
-                      elevation: 6,
-                      duration: TimingConstants.snackbarStandardDuration,
-                    ),
-                  );
+                  showSuccessSnackBar('Updated "$name" list');
                 }
               }
             },
@@ -397,40 +368,7 @@ class _CustomListDetailScreenState
               if (context.mounted) {
                 Navigator.pop(context); // Close dialog.
                 Navigator.pop(context); // Go back to lists screen.
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Row(
-                      children: [
-                        Icon(
-                          Icons.delete_outline,
-                          color: Theme.of(context).colorScheme.onErrorContainer,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Deleted "${_currentList.name}" list',
-                            style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onErrorContainer,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    backgroundColor:
-                        Theme.of(context).colorScheme.errorContainer,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    margin: const EdgeInsets.all(16),
-                    elevation: 6,
-                    duration: TimingConstants.snackbarStandardDuration,
-                  ),
-                );
+                showSuccessSnackBar('Deleted "${_currentList.name}" list');
               }
             },
             child: const Text('Delete'),
@@ -463,45 +401,14 @@ class _CustomListDetailScreenState
     });
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(
-                Icons.remove_circle_outline,
-                color: Theme.of(context).colorScheme.onErrorContainer,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Removed "$movieTitle" from list',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          margin: const EdgeInsets.all(16),
-          elevation: 6,
-          duration: TimingConstants.snackbarStandardDuration,
-        ),
-      );
+      showSuccessSnackBar('Removed "$movieTitle" from list');
     }
   }
 
   // Navigates to the movie details screen.
 
   void _openMovieDetails(Movie movie) {
-    Navigator.push(
-      context,
+    safeNavigateTo(
       MaterialPageRoute(
         builder: (context) => MovieDetailsScreen(
           movie: movie,
@@ -513,15 +420,13 @@ class _CustomListDetailScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_currentList.name),
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        foregroundColor: Theme.of(context).colorScheme.onSurface,
-        actions: [
-          // Share button with tooltip
-          MarkdownTooltip(
-            message: '''
+    return BaseScreen(
+      title: _currentList.name,
+      automaticallyImplyLeading: true,
+      actions: [
+        // Share button with tooltip
+        MarkdownTooltip(
+          message: '''
 
 **📤 Share Custom List**
 
@@ -534,28 +439,26 @@ Recipients will be able to:
 
 *Requires POD storage to be enabled*
 
-            ''',
-            child: IconButton(
-              icon: const Icon(Icons.share),
-              onPressed: _currentList.movieIds.isNotEmpty &&
-                      widget.favoritesService is FavoritesServiceAdapter &&
-                      (widget.favoritesService as FavoritesServiceAdapter)
-                          .isPodStorageEnabled
-                  ? () => _shareCustomList()
-                  : null,
-            ),
+          ''',
+          child: IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: _currentList.movieIds.isNotEmpty &&
+                    widget.favoritesService is FavoritesServiceAdapter &&
+                    (widget.favoritesService as FavoritesServiceAdapter)
+                        .isPodStorageEnabled
+                ? () => _shareCustomList()
+                : null,
           ),
-          // Add padding to move the button away from the right edge to avoid debug banner.
-          Padding(
-            padding: const EdgeInsets.only(right: 60),
-            child: IconButton(
-              icon: const Icon(Icons.more_vert),
-              onPressed: _showListOptions,
-            ),
+        ),
+        // Add padding to move the button away from the right edge to avoid debug banner.
+        Padding(
+          padding: const EdgeInsets.only(right: 60),
+          child: IconButton(
+            icon: const Icon(Icons.more_vert),
+            onPressed: _showListOptions,
           ),
-        ],
-      ),
-      backgroundColor: Theme.of(context).colorScheme.surface,
+        ),
+      ],
       body: Column(
         children: [
           // List info header.
@@ -1005,7 +908,7 @@ Recipients will be able to:
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
                     onPressed: () async {
-                      setState(() {
+                      safeSetState(() {
                         _failedMovieIds.remove(movieId);
                       });
                       await _loadMovies();
@@ -1059,9 +962,7 @@ Recipients will be able to:
 
   Future<void> _shareCustomList() async {
     if (_currentList.movieIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No movies to share')),
-      );
+      showErrorSnackBar('No movies to share');
       return;
     }
 
@@ -1076,16 +977,12 @@ Recipients will be able to:
     }
 
     if (moviesToShare.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Movies are still loading. Please wait.')),
-      );
+      showErrorSnackBar('Movies are still loading. Please wait.');
       return;
     }
 
     // Store context references before async operations.
 
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final navigator = Navigator.of(context);
     final theme = Theme.of(context);
 
     try {
@@ -1110,9 +1007,7 @@ Recipients will be able to:
 
       if (listId == null) {
         if (mounted) {
-          scaffoldMessenger.showSnackBar(
-            const SnackBar(content: Text('Failed to create movie list')),
-          );
+          showErrorSnackBar('Failed to create movie list');
         }
         return;
       }
@@ -1131,7 +1026,7 @@ Recipients will be able to:
       // Navigate to the batch sharing UI.
 
       if (mounted) {
-        await navigator.push<bool>(
+        await safeNavigateTo(
           MaterialPageRoute(
             fullscreenDialog: true,
             builder: (context) => MovieStarBatchSharingUi(
@@ -1149,9 +1044,7 @@ Recipients will be able to:
       }
     } catch (e) {
       if (mounted) {
-        scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text('Error sharing list: $e')),
-        );
+        showErrorSnackBar('Error sharing list: $e');
       }
     }
   }

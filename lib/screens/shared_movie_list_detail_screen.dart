@@ -31,10 +31,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 
 /// Screen to display movies within a shared movie list.
 ///
@@ -69,7 +71,7 @@ class SharedMovieListDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _SharedMovieListDetailScreenState
-    extends ConsumerState<SharedMovieListDetailScreen> {
+    extends ConsumerState<SharedMovieListDetailScreen> with ScreenStateMixin {
   Map<String, String> _movieTitles = {}; // Cache for movie titles.
   bool _loadingTitles = true;
 
@@ -101,7 +103,7 @@ class _SharedMovieListDetailScreenState
       }
 
       if (mounted) {
-        setState(() {
+        safeSetState(() {
           _movieTitles = titles;
           _loadingTitles = false;
         });
@@ -109,7 +111,7 @@ class _SharedMovieListDetailScreenState
     } catch (e) {
       debugPrint('Error loading movie titles: $e');
       if (mounted) {
-        setState(() {
+        safeSetState(() {
           _loadingTitles = false;
         });
       }
@@ -224,7 +226,7 @@ class _SharedMovieListDetailScreenState
       // Dismiss loading indicator.
 
       if (mounted) {
-        Navigator.of(context).pop();
+        Navigator.pop(context);
       }
 
       // Get SharedPreferences and create FavoritesServiceManager.
@@ -242,8 +244,7 @@ class _SharedMovieListDetailScreenState
       // Navigate to MovieDetailsScreen with enhanced shared movie data.
 
       if (mounted) {
-        await Navigator.push(
-          context,
+        await safeNavigateTo(
           MaterialPageRoute(
             builder: (context) => MovieDetailsScreen(
               movie: movie,
@@ -410,12 +411,9 @@ class _SharedMovieListDetailScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.listName),
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
-      ),
+    return BaseScreen(
+      title: widget.listName,
+      automaticallyImplyLeading: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

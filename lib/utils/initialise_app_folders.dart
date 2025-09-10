@@ -137,7 +137,10 @@ Future<void> initialiseAppFolders({
 
     onComplete.call();
   } catch (e) {
-    debugPrint('Error initializing app folders: $e');
+    if (!e.toString().contains('Failed to get resource list') &&
+        !e.toString().contains('does not exist')) {
+      debugPrint('Error initializing app folders: $e');
+    }
   } finally {
     onProgress.call(false);
   }

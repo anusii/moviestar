@@ -34,13 +34,14 @@ import 'package:gap/gap.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/constants/timing_constants.dart';
+import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/content_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/widgets/error_display_widget.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 
 /// Enhanced search screen that supports both movies and TV shows.
 
@@ -62,8 +63,8 @@ class EnhancedSearchScreen extends StatefulWidget {
   State<EnhancedSearchScreen> createState() => _EnhancedSearchScreenState();
 }
 
-//
-class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
+class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
+    with ScreenStateMixin {
   /// Validates if an image URL is valid and not empty.
   bool _isValidImageUrl(String url) {
     if (url.trim().isEmpty) {
@@ -78,14 +79,6 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
   // Controller for the search text field.
 
   final TextEditingController _searchController = TextEditingController();
-
-  // Loading state indicator.
-
-  bool _isLoading = false;
-
-  // Error message if any.
-
-  String? _error;
 
   // Comprehensive search results categorised by search type.
 
@@ -133,10 +126,8 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
 
   Future<void> _searchContent(String query) async {
     if (query.isEmpty) {
-      setState(() {
+      safeSetState(() {
         _searchResults = {};
-        _error = null;
-        _isLoading = false;
       });
       return;
     }
@@ -147,10 +138,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+    setLoadingState(true);
 
     try {
       final results = await widget.contentService.searchContentComprehensive(
@@ -160,19 +148,17 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
       // Only update state if this search is still relevant.
 
       if (_searchController.text == query) {
-        setState(() {
+        safeSetState(() {
           _searchResults = results;
-          _isLoading = false;
         });
+        setLoadingState(false);
       }
     } catch (e) {
       // Only update state if this search is still relevant.
 
-      if (_searchController.text == query) {
-        setState(() {
-          _error = e.toString();
-          _isLoading = false;
-        });
+      if (_searchController.text == query && mounted) {
+        setLoadingState(false);
+        showErrorSnackBar('Search failed: ${e.toString()}');
       }
     }
   }
@@ -350,8 +336,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
               onTap: () {
                 // Navigate to details screen for both movies and TV shows
                 final movie = Movie.fromContentItem(contentItem);
-                Navigator.push(
-                  context,
+                safeNavigateTo(
                   MaterialPageRoute(
                     builder: (context) => MovieDetailsScreen(
                       movie: movie,
@@ -382,24 +367,9 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
             contentType:
                 contentItem.contentType == ContentType.tvShow ? 'tv' : 'movie',
           );
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Added "${movie.title}" to To Watch'),
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-          }
+          showSuccessSnackBar('Added "${movie.title}" to To Watch');
         } catch (e) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error adding to To Watch: $e'),
-                backgroundColor: Theme.of(context).colorScheme.error,
-              ),
-            );
-          }
+          showErrorSnackBar('Error adding to To Watch: $e');
         }
         break;
       case 'watched':
@@ -409,24 +379,9 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
             contentType:
                 contentItem.contentType == ContentType.tvShow ? 'tv' : 'movie',
           );
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Added "${movie.title}" to Watched'),
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-          }
+          showSuccessSnackBar('Added "${movie.title}" to Watched');
         } catch (e) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error adding to Watched: $e'),
-                backgroundColor: Theme.of(context).colorScheme.error,
-              ),
-            );
-          }
+          showErrorSnackBar('Error adding to Watched: $e');
         }
         break;
       case 'custom_lists':
@@ -458,112 +413,72 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: TextField(
-          controller: _searchController,
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-          decoration: InputDecoration(
-            hintText: 'Search movies and TV shows...',
-            hintStyle: TextStyle(
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
-            border: InputBorder.none,
-            suffixIcon: _searchController.text.isNotEmpty
-                ? IconButton(
-                    icon: Icon(
-                      Icons.clear,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
-                    onPressed: () {
-                      _searchController.clear();
-                    },
-                  )
-                : null,
+    return BaseScreenFactory.withSearchBar(
+      searchController: _searchController,
+      hintText: 'Search movies and TV shows...',
+      onClear: () {
+        _searchController.clear();
+        safeSetState(() {});
+      },
+      onChanged: (value) {
+        safeSetState(() {});
+      },
+      onSubmitted: (value) {
+        _debounceTimer?.cancel();
+        _searchContent(value);
+      },
+      isLoading: isLoading,
+      body: _searchResults.isEmpty || _hasNoResults()
+          ? _buildEmptyState()
+          : _buildSearchResults(),
+    );
+  }
+
+  /// Builds the empty state when no search results are available.
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.search,
+            size: 64,
+            color: colorScheme.onSurface.withValues(alpha: 0.4),
           ),
-          onChanged: (value) {
-            // Dynamic search is handled by the listener.
-            // This rebuild is just to show/hide the clear button.
-
-            setState(() {});
-          },
-          onSubmitted: (value) {
-            // Immediate search when user presses Enter.
-
-            _debounceTimer?.cancel();
-            _searchContent(value);
-          },
-        ),
+          const Gap(Gaps.xxl),
+          Text(
+            _searchController.text.isEmpty
+                ? 'Search for movies and TV shows'
+                : _searchController.text.length < 2
+                    ? 'Type at least 2 characters'
+                    : 'No results found',
+            style: textTheme.headlineSmall?.copyWith(
+              color: colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+          ),
+          const Gap(Gaps.m),
+          Text(
+            'Find content by title, actor, or genre',
+            style: textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface.withValues(alpha: 0.4),
+            ),
+          ),
+        ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _error != null
-              ? ErrorDisplayWidget(
-                  message: 'Search failed: $_error',
-                  onRetry: () => _searchContent(_searchController.text),
-                )
-              : _searchResults.isEmpty || _hasNoResults()
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search,
-                            size: 64,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.4),
-                          ),
-                          const Gap(Gaps.xxl),
-                          Text(
-                            _searchController.text.isEmpty
-                                ? 'Search for movies and TV shows'
-                                : _searchController.text.length < 2
-                                    ? 'Type at least 2 characters'
-                                    : 'No results found',
-                            style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.6),
-                              fontSize: 18,
-                            ),
-                          ),
-                          const Gap(Gaps.m),
-                          Text(
-                            'Find content by title, actor, or genre',
-                            style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.4),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildResultsSection(
-                            'title',
-                            _searchResults['title'] ?? [],
-                          ),
-                          _buildResultsSection(
-                            'actor',
-                            _searchResults['actor'] ?? [],
-                          ),
-                          _buildResultsSection(
-                            'genre',
-                            _searchResults['genre'] ?? [],
-                          ),
-                        ],
-                      ),
-                    ),
+    );
+  }
+
+  /// Builds the search results display.
+  Widget _buildSearchResults() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildResultsSection('title', _searchResults['title'] ?? []),
+          _buildResultsSection('actor', _searchResults['actor'] ?? []),
+          _buildResultsSection('genre', _searchResults['genre'] ?? []),
+        ],
+      ),
     );
   }
 

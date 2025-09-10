@@ -31,6 +31,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/favorites_service.dart';
@@ -39,6 +40,7 @@ import 'package:moviestar/services/movie_list_service.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
 
@@ -59,7 +61,7 @@ class MyMoviesScreen extends StatefulWidget {
 
 /// State class for the my movies screen.
 
-class _MyMoviesScreenState extends State<MyMoviesScreen> {
+class _MyMoviesScreenState extends State<MyMoviesScreen> with ScreenStateMixin {
   /// Currently selected sort criteria.
   MovieSortCriteria _sortCriteria = MovieSortCriteria.nameAsc;
 
@@ -97,26 +99,24 @@ class _MyMoviesScreenState extends State<MyMoviesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        actions: [
-          StreamBuilder<List<Movie>>(
-            stream: _ratedMovies,
-            builder: (context, snapshot) {
-              final hasMovies = snapshot.hasData && snapshot.data!.isNotEmpty;
-              final isPodEnabled =
-                  widget.favoritesService is FavoritesServiceAdapter &&
-                      (widget.favoritesService as FavoritesServiceAdapter)
-                          .isPodStorageEnabled;
+    return BaseScreen(
+      title: 'My Movies',
+      actions: [
+        StreamBuilder<List<Movie>>(
+          stream: _ratedMovies,
+          builder: (context, snapshot) {
+            final hasMovies = snapshot.hasData && snapshot.data!.isNotEmpty;
+            final isPodEnabled =
+                widget.favoritesService is FavoritesServiceAdapter &&
+                    (widget.favoritesService as FavoritesServiceAdapter)
+                        .isPodStorageEnabled;
 
-              return Padding(
-                padding: const EdgeInsets.only(
-                  right: 60.0,
-                ),
-                child: MarkdownTooltip(
-                  message: '''
+            return Padding(
+              padding: const EdgeInsets.only(
+                right: 60.0,
+              ),
+              child: MarkdownTooltip(
+                message: '''
 
 **📤 Share My Movies**
 
@@ -130,24 +130,23 @@ Recipients will be able to:
 *Requires POD storage to be enabled*
 
                   ''',
-                  child: IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: (hasMovies && isPodEnabled)
-                        ? () => _shareMyMovies(context, snapshot.data!)
-                        : null,
-                  ),
+                child: IconButton(
+                  icon: const Icon(Icons.share),
+                  onPressed: (hasMovies && isPodEnabled)
+                      ? () => _shareMyMovies(context, snapshot.data!)
+                      : null,
                 ),
-              );
-            },
-          ),
-        ],
-      ),
+              ),
+            );
+          },
+        ),
+      ],
       body: Column(
         children: [
           SortControls(
             selectedCriteria: _sortCriteria,
             onSortChanged: (criteria) {
-              setState(() {
+              safeSetState(() {
                 _sortCriteria = criteria;
               });
             },
@@ -266,14 +265,11 @@ Recipients will be able to:
     List<Movie> movies,
   ) async {
     if (movies.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('No movies to share')));
+      showInfoSnackBar('No movies to share');
       return;
     }
 
     // Store context references before async operations.
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     final theme = Theme.of(context);
 
@@ -296,11 +292,7 @@ Recipients will be able to:
       if (!mounted) return;
 
       if (listId == null) {
-        if (mounted) {
-          scaffoldMessenger.showSnackBar(
-            const SnackBar(content: Text('Failed to create movie list')),
-          );
-        }
+        showErrorSnackBar('Failed to create movie list');
         return;
       }
 
@@ -333,10 +325,7 @@ Recipients will be able to:
         );
       }
     } catch (e) {
-      if (mounted) {
-        scaffoldMessenger
-            .showSnackBar(SnackBar(content: Text('Error sharing list: $e')));
-      }
+      showErrorSnackBar('Error sharing list: $e');
     }
   }
 

@@ -25,6 +25,8 @@
 
 library;
 
+import 'package:flutter/foundation.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moviestar/models/movie.dart';
@@ -46,11 +48,13 @@ class CachingEnabledNotifier extends StateNotifier<bool> {
 
   Future<void> _init() async {
     await _settingsService.initialize();
+    if (!mounted) return;
     state = _settingsService.cachingEnabled;
   }
 
   Future<void> setCachingEnabled(bool enabled) async {
     await _settingsService.setCachingEnabled(enabled);
+    if (!mounted) return;
     state = enabled;
   }
 }
@@ -66,11 +70,13 @@ class CacheOnlyModeNotifier extends StateNotifier<bool> {
 
   Future<void> _init() async {
     await _settingsService.initialize();
+    if (!mounted) return;
     state = _settingsService.cacheOnlyMode;
   }
 
   Future<void> setCacheOnlyMode(bool enabled) async {
     await _settingsService.setCacheOnlyMode(enabled);
+    if (!mounted) return;
     state = enabled;
   }
 }
@@ -88,11 +94,22 @@ class ApiKeyNotifier extends StateNotifier<String?> {
   }
 
   Future<void> _init() async {
-    state = await _apiKeyService.getApiKey();
+    final apiKey = await _apiKeyService.getApiKey();
+    if (!mounted) return;
+    state = apiKey;
   }
 
   void _onApiKeyChanged() async {
-    state = await _apiKeyService.getApiKey();
+    if (!mounted) return;
+    try {
+      final apiKey = await _apiKeyService.getApiKey();
+      if (!mounted) return;
+      state = apiKey;
+    } catch (e) {
+      if (mounted) {
+        debugPrint('Error in ApiKeyNotifier._onApiKeyChanged: $e');
+      }
+    }
   }
 
   @override
@@ -224,11 +241,13 @@ class LocalApiKeyCachingNotifier extends StateNotifier<bool> {
 
   Future<void> _init() async {
     await _settingsService.initialize();
+    if (!mounted) return;
     state = _settingsService.localApiKeyCachingEnabled;
   }
 
   Future<void> setLocalApiKeyCachingEnabled(bool enabled) async {
     await _settingsService.setLocalApiKeyCachingEnabled(enabled);
+    if (!mounted) return;
     state = enabled;
   }
 }
@@ -271,8 +290,18 @@ final configuredCachedMovieServiceProvider =
 final popularMoviesWithCacheInfoProvider =
     FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
-  // Watch cache settings to invalidate when they change.
+  final apiKey = ref.watch(apiKeyProvider);
 
+  // If no API key is set, return empty result instead of cached content
+  if (apiKey == null || apiKey.trim().isEmpty) {
+    return CacheResult<List<Movie>>(
+      data: <Movie>[],
+      fromCache: false,
+      cacheAge: null,
+    );
+  }
+
+  // Watch cache settings to invalidate when they change.
   ref.watch(cachingEnabledProvider);
   ref.watch(cacheOnlyModeProvider);
   return cachedService.getPopularMoviesWithCacheInfo();
@@ -283,8 +312,18 @@ final popularMoviesWithCacheInfoProvider =
 final nowPlayingMoviesWithCacheInfoProvider =
     FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
-  // Watch cache settings to invalidate when they change.
+  final apiKey = ref.watch(apiKeyProvider);
 
+  // If no API key is set, return empty result instead of cached content
+  if (apiKey == null || apiKey.trim().isEmpty) {
+    return CacheResult<List<Movie>>(
+      data: <Movie>[],
+      fromCache: false,
+      cacheAge: null,
+    );
+  }
+
+  // Watch cache settings to invalidate when they change.
   ref.watch(cachingEnabledProvider);
   ref.watch(cacheOnlyModeProvider);
   return cachedService.getNowPlayingMoviesWithCacheInfo();
@@ -295,8 +334,18 @@ final nowPlayingMoviesWithCacheInfoProvider =
 final topRatedMoviesWithCacheInfoProvider =
     FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
-  // Watch cache settings to invalidate when they change.
+  final apiKey = ref.watch(apiKeyProvider);
 
+  // If no API key is set, return empty result instead of cached content
+  if (apiKey == null || apiKey.trim().isEmpty) {
+    return CacheResult<List<Movie>>(
+      data: <Movie>[],
+      fromCache: false,
+      cacheAge: null,
+    );
+  }
+
+  // Watch cache settings to invalidate when they change.
   ref.watch(cachingEnabledProvider);
   ref.watch(cacheOnlyModeProvider);
   return cachedService.getTopRatedMoviesWithCacheInfo();
@@ -307,8 +356,18 @@ final topRatedMoviesWithCacheInfoProvider =
 final upcomingMoviesWithCacheInfoProvider =
     FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
-  // Watch cache settings to invalidate when they change.
+  final apiKey = ref.watch(apiKeyProvider);
 
+  // If no API key is set, return empty result instead of cached content
+  if (apiKey == null || apiKey.trim().isEmpty) {
+    return CacheResult<List<Movie>>(
+      data: <Movie>[],
+      fromCache: false,
+      cacheAge: null,
+    );
+  }
+
+  // Watch cache settings to invalidate when they change.
   ref.watch(cachingEnabledProvider);
   ref.watch(cacheOnlyModeProvider);
   return cachedService.getUpcomingMoviesWithCacheInfo();

@@ -274,14 +274,15 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
         return;
       }
 
-      // Check if the movie file exists (user has rated or commented).
+      // Ensure the movie file exists before sharing. If it doesn't exist,
+      // create it to allow sharing even for movies in To Watch list.
 
       final hasFile = await widget.favoritesService.hasMovieFile(widget.movie);
       if (!hasFile) {
-        _showErrorDialog(
-          'No movie file to share. Please rate or comment on this movie first.',
-        );
-        return;
+        // Create the movie file by setting an empty comment to enable sharing
+        await widget.favoritesService.setMovieComments(widget.movie, '');
+        // Then remove the empty comment to keep the file clean
+        await widget.favoritesService.removeMovieComments(widget.movie);
       }
 
       // Get the movie file path using the service method and make it relative.

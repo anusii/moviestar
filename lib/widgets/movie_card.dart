@@ -37,6 +37,7 @@ import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/utils/movie_display_utils.dart';
 import 'package:moviestar/widgets/quick_actions_dialog.dart';
 
 /// Different display modes for movie cards.
@@ -100,6 +101,22 @@ class MovieCard extends StatefulWidget {
 
   final Widget? parentWidget;
 
+  /// Whether to show the rating in list items.
+
+  final bool showRating;
+
+  /// Whether to show the content type indicator.
+
+  final bool showContentType;
+
+  /// Whether to show the release year.
+
+  final bool showYear;
+
+  /// Whether to enable quick actions on hover.
+
+  final bool enableQuickActions;
+
   /// Creates a movie card widget.
 
   const MovieCard({
@@ -116,6 +133,10 @@ class MovieCard extends StatefulWidget {
     this.customSubtitle,
     this.favoritesService,
     this.parentWidget,
+    this.showRating = true,
+    this.showContentType = true,
+    this.showYear = false,
+    this.enableQuickActions = true,
   });
 
   /// Creates a poster-style movie card.
@@ -132,9 +153,13 @@ class MovieCard extends StatefulWidget {
     this.height,
     this.favoritesService,
     this.parentWidget,
+    this.showContentType = true,
+    this.enableQuickActions = true,
   })  : style = MovieCardStyle.poster,
         trailing = null,
-        customSubtitle = null;
+        customSubtitle = null,
+        showRating = false,
+        showYear = false;
 
   /// Creates a list item-style movie card.
 
@@ -150,6 +175,10 @@ class MovieCard extends StatefulWidget {
     this.customSubtitle,
     this.favoritesService,
     this.parentWidget,
+    this.showRating = true,
+    this.showContentType = true,
+    this.showYear = false,
+    this.enableQuickActions = true,
   })  : style = MovieCardStyle.listItem,
         width = 50,
         height = 75;
@@ -162,19 +191,6 @@ class _MovieCardState extends State<MovieCard> {
   // Overlay entry for the quick actions dialog.
 
   OverlayEntry? _overlayEntry;
-
-  // Validates if an image URL is valid and not empty.
-
-  bool _isValidImageUrl(String url) {
-    if (url.trim().isEmpty) {
-      return false;
-    }
-
-    // Basic URL validation - must start with http:// or https://.
-
-    return url.trim().startsWith('http://') ||
-        url.trim().startsWith('https://');
-  }
 
   // Whether the quick actions dialog is currently shown.
 
@@ -201,15 +217,15 @@ class _MovieCardState extends State<MovieCard> {
     switch (widget.style) {
       case MovieCardStyle.poster:
         return MouseRegion(
-          onEnter: _onCardMouseEnter,
-          onExit: _onCardMouseExit,
+          onEnter: widget.enableQuickActions ? _onCardMouseEnter : null,
+          onExit: widget.enableQuickActions ? _onCardMouseExit : null,
           child: GestureDetector(
             onTap: widget.onTap,
             child: Stack(
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: !_isValidImageUrl(widget.movie.posterUrl)
+                  child: !isValidImageUrl(widget.movie.posterUrl)
                       ? Container(
                           width: widget.width,
                           height: widget.height,
@@ -234,7 +250,7 @@ class _MovieCardState extends State<MovieCard> {
                 _buildCacheIndicator(context),
                 if (widget.cacheOnlyMode == true)
                   _buildOfflineModeIndicator(context),
-                if (widget.movie.contentType != null)
+                if (widget.showContentType && widget.movie.contentType != null)
                   _buildContentTypeIndicator(context),
               ],
             ),
@@ -242,14 +258,14 @@ class _MovieCardState extends State<MovieCard> {
         );
       case MovieCardStyle.listItem:
         return MouseRegion(
-          onEnter: _onCardMouseEnter,
-          onExit: _onCardMouseExit,
+          onEnter: widget.enableQuickActions ? _onCardMouseEnter : null,
+          onExit: widget.enableQuickActions ? _onCardMouseExit : null,
           child: ListTile(
             leading: Stack(
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: !_isValidImageUrl(widget.movie.posterUrl)
+                  child: !isValidImageUrl(widget.movie.posterUrl)
                       ? Container(
                           width: widget.width,
                           height: widget.height,
@@ -286,40 +302,7 @@ class _MovieCardState extends State<MovieCard> {
                   _buildOfflineModeIcon(context),
               ],
             ),
-            subtitle: Row(
-              children: [
-                Expanded(
-                  child: widget.customSubtitle ??
-                      Row(
-                        children: [
-                          Text(
-                            '⭐ ${widget.movie.voteAverage.toStringAsFixed(1)}',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          if (widget.movie.contentType != null) ...[
-                            const Text(' • '),
-                            Text(
-                              widget.movie.contentType == ContentType.movie
-                                  ? '🎬 Movie'
-                                  : '📺 TV Show',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.7),
-                                  ),
-                            ),
-                          ],
-                        ],
-                      ),
-                ),
-                if (widget.fromCache == true && widget.cacheAge != null)
-                  _buildCacheAgeInfo(context),
-              ],
-            ),
+            subtitle: widget.customSubtitle ?? _buildDefaultSubtitle(context),
             trailing: widget.trailing,
             onTap: widget.onTap,
           ),
@@ -549,7 +532,6 @@ class _MovieCardState extends State<MovieCard> {
   /// Builds cache age information for list items.
 
   Widget _buildCacheAgeInfo(BuildContext context) {
-    final ageText = _formatCacheAge(widget.cacheAge!);
     return Container(
       padding:
           const EdgeInsets.symmetric(horizontal: Dimensions.s, vertical: 1),
@@ -558,23 +540,67 @@ class _MovieCardState extends State<MovieCard> {
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        ageText,
+        formatCacheAge(widget.cacheAge!),
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 10),
       ),
     );
   }
 
-  /// Formats cache age into human-readable string.
+  // Builds the default subtitle for list items.
 
-  String _formatCacheAge(Duration age) {
-    if (age.inDays > 0) {
-      return '${age.inDays}d ago';
-    } else if (age.inHours > 0) {
-      return '${age.inHours}h ago';
-    } else if (age.inMinutes > 0) {
-      return '${age.inMinutes}m ago';
-    } else {
-      return 'just now';
+  Widget? _buildDefaultSubtitle(BuildContext context) {
+    final parts = <Widget>[];
+
+    // Add rating if enabled
+    if (widget.showRating) {
+      parts.add(
+        Text(
+          formatMovieRating(widget.movie.voteAverage),
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      );
     }
+
+    // Add year if enabled
+    if (widget.showYear) {
+      final year = formatMovieYear(widget.movie.releaseDate);
+      if (year.isNotEmpty) {
+        if (parts.isNotEmpty) parts.add(const Text(' • '));
+        parts.add(
+          Text(
+            year,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        );
+      }
+    }
+
+    // Add content type if enabled
+    if (widget.showContentType && widget.movie.contentType != null) {
+      if (parts.isNotEmpty) parts.add(const Text(' • '));
+      parts.add(
+        Text(
+          '${getContentTypeIcon(widget.movie.contentType)} ${getContentTypeLabel(widget.movie.contentType)}',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.7),
+              ),
+        ),
+      );
+    }
+
+    if (parts.isEmpty) return null;
+
+    return Row(
+      children: [
+        Expanded(
+          child: Row(children: parts),
+        ),
+        if (widget.fromCache == true && widget.cacheAge != null)
+          _buildCacheAgeInfo(context),
+      ],
+    );
   }
 }

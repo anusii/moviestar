@@ -41,6 +41,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/content_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/utils/movie_display_utils.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 
 /// Enhanced search screen that supports both movies and TV shows.
@@ -65,17 +66,6 @@ class EnhancedSearchScreen extends StatefulWidget {
 
 class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
     with ScreenStateMixin {
-  /// Validates if an image URL is valid and not empty.
-  bool _isValidImageUrl(String url) {
-    if (url.trim().isEmpty) {
-      return false;
-    }
-
-    // Basic URL validation - must start with http:// or https://
-    return url.trim().startsWith('http://') ||
-        url.trim().startsWith('https://');
-  }
-
   // Controller for the search text field.
 
   final TextEditingController _searchController = TextEditingController();
@@ -237,7 +227,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
             return ListTile(
               leading: ClipRRect(
                 borderRadius: BorderRadius.circular(4),
-                child: _isValidImageUrl(contentItem.posterUrl)
+                child: isValidImageUrl(contentItem.posterUrl)
                     ? CachedNetworkImage(
                         imageUrl: contentItem.posterUrl.trim(),
                         width: 50,

@@ -363,8 +363,7 @@ class TurtleSerializer {
         if (isMovie) {
           // Extract movie data from predicates.
 
-          final movie =
-              _extractMovieFromTriples(predicates, typeValues: typeValues);
+          final movie = _extractMovieFromTriples(predicates);
           if (movie != null) {
             movies.add(movie);
           }
@@ -533,9 +532,8 @@ class TurtleSerializer {
   /// Extract Movie object from RDF triples.
 
   static Movie? _extractMovieFromTriples(
-    Map<String, List<dynamic>> predicates, {
-    List<dynamic>? typeValues,
-  }) {
+    Map<String, List<dynamic>> predicates,
+  ) {
     try {
       // Try different namespace variations for predicates.
 
@@ -600,9 +598,13 @@ class TurtleSerializer {
               .toList()
           : <int>[];
 
-      // Determine content type from RDF type
+      // Determine content type from RDF type in predicates
       ContentType? contentType;
-      if (typeValues != null) {
+      final typeValues = predicates['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] ??
+          predicates['type'] ??
+          predicates['#type'] ??
+          [];
+      if (typeValues.isNotEmpty) {
         final isTvShow = typeValues.any(
           (type) =>
               type.toString().contains('TVShow') ||
@@ -1110,7 +1112,7 @@ class TurtleSerializer {
         );
 
         if (isMovie && movie == null) {
-          movie = _extractMovieFromTriples(predicates, typeValues: typeValues);
+          movie = _extractMovieFromTriples(predicates);
 
           // Also check for rating and comment in the same movie resource (new ontology format).
 

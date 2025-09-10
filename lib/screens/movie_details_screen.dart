@@ -43,6 +43,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/utils/date_format_util.dart';
+import 'package:moviestar/utils/movie_display_utils.dart';
 
 /// A screen that displays detailed information about a selected movie.
 
@@ -82,19 +83,6 @@ class MovieDetailsScreen extends StatefulWidget {
 
 class _MovieDetailsScreenState extends State<MovieDetailsScreen>
     with ScreenStateMixin {
-  /// Validates if an image URL is valid and not empty.
-  ///
-  bool _isValidImageUrl(String url) {
-    if (url.trim().isEmpty) {
-      return false;
-    }
-
-    // Basic URL validation - must start with http:// or https://.
-
-    return url.trim().startsWith('http://') ||
-        url.trim().startsWith('https://');
-  }
-
   /// Indicates whether the movie is in the to-watch list.
 
   bool _isInToWatch = false;
@@ -490,14 +478,15 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
         return;
       }
 
-      // Check if the movie file exists (user has rated or commented).
+      // Ensure the movie file exists before sharing. If it doesn't exist,
+      // create it to allow sharing even for movies in To Watch list.
 
       final hasFile = await widget.favoritesService.hasMovieFile(widget.movie);
       if (!hasFile) {
-        _showErrorDialog(
-          'No movie file to share. Please rate or comment on this movie first.',
-        );
-        return;
+        // Create the movie file by setting an empty comment to enable sharing
+        await widget.favoritesService.setMovieComments(widget.movie, '');
+        // Then remove the empty comment to keep the file clean
+        await widget.favoritesService.removeMovieComments(widget.movie);
       }
 
       // Get the movie file path using the service method and make it relative.
@@ -633,7 +622,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
               ),
             ),
             flexibleSpace: FlexibleSpaceBar(
-              background: _isValidImageUrl(widget.movie.backdropUrl)
+              background: isValidImageUrl(widget.movie.backdropUrl)
                   ? CachedNetworkImage(
                       imageUrl: widget.movie.backdropUrl.trim(),
                       fit: BoxFit.cover,

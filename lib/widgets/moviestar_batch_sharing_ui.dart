@@ -37,6 +37,7 @@ import 'package:solidpod/solidpod.dart'
 import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
 
 import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/utils/movie_display_utils.dart';
 
 /// File information for batch sharing
 class ShareableFile {
@@ -490,7 +491,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             trailing: file.movie != null &&
-                                    file.movie!.posterUrl.isNotEmpty
+                                    isValidImageUrl(file.movie!.posterUrl)
                                 ? SizedBox(
                                     width: 40,
                                     height: 60,
@@ -805,7 +806,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                   ],
                 ),
               ),
-              if (file.movie != null && file.movie!.posterUrl.isNotEmpty)
+              if (file.movie != null && isValidImageUrl(file.movie!.posterUrl))
                 SizedBox(
                   width: 30,
                   height: 45,

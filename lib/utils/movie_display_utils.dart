@@ -202,7 +202,7 @@ Widget buildMovieMetadata({
 
   if (contentType != null) {
     parts.add(
-        '${getContentTypeIcon(contentType)} ${getContentTypeLabel(contentType)}',
+      '${getContentTypeIcon(contentType)} ${getContentTypeLabel(contentType)}',
     );
   }
 

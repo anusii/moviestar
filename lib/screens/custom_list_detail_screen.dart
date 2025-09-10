@@ -42,6 +42,7 @@ import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/movie_list_service.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
+import 'package:moviestar/utils/movie_display_utils.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
@@ -74,19 +75,6 @@ class CustomListDetailScreen extends ConsumerStatefulWidget {
 
 class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
     with ScreenStateMixin {
-  /// Validates if an image URL is valid and not empty.
-
-  bool _isValidImageUrl(String url) {
-    if (url.trim().isEmpty) {
-      return false;
-    }
-
-    // Basic URL validation - must start with http:// or https://.
-
-    return url.trim().startsWith('http://') ||
-        url.trim().startsWith('https://');
-  }
-
   // Current custom list (may be updated).
 
   late CustomList _currentList;
@@ -664,7 +652,7 @@ Recipients will be able to:
 
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: _isValidImageUrl(movie.posterUrl)
+                child: isValidImageUrl(movie.posterUrl)
                     ? CachedNetworkImage(
                         imageUrl: movie.posterUrl.trim(),
                         width: 60,

@@ -600,10 +600,11 @@ class TurtleSerializer {
 
       // Determine content type from RDF type in predicates
       ContentType? contentType;
-      final typeValues = predicates['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] ??
-          predicates['type'] ??
-          predicates['#type'] ??
-          [];
+      final typeValues =
+          predicates['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] ??
+              predicates['type'] ??
+              predicates['#type'] ??
+              [];
       if (typeValues.isNotEmpty) {
         final isTvShow = typeValues.any(
           (type) =>

@@ -25,7 +25,6 @@
 
 library;
 
-import 'package:flutter/material.dart';
 
 import 'package:moviestar/models/content_item.dart';
 
@@ -85,26 +84,6 @@ String formatRuntime(int? runtime) {
   }
 }
 
-/// Returns a widget displaying the content type with an appropriate icon.
-///
-/// Shows "🎬 Movie" for movies and "📺 TV Show" for TV shows.
-Widget getContentTypeDisplay(
-  ContentType? contentType, {
-  TextStyle? textStyle,
-}) {
-  if (contentType == null) {
-    return const SizedBox.shrink();
-  }
-
-  final isMovie = contentType == ContentType.movie;
-  final icon = isMovie ? '🎬' : '📺';
-  final label = isMovie ? 'Movie' : 'TV Show';
-
-  return Text(
-    '$icon $label',
-    style: textStyle,
-  );
-}
 
 /// Returns just the content type icon without label.
 ///
@@ -122,17 +101,6 @@ String getContentTypeLabel(ContentType? contentType) {
   return contentType == ContentType.movie ? 'Movie' : 'TV Show';
 }
 
-/// Formats a list of genres into a comma-separated string.
-///
-/// Returns a string with genres separated by commas.
-/// Example: ["Action", "Drama", "Thriller"] -> "Action, Drama, Thriller"
-String formatGenres(List<String>? genres) {
-  if (genres == null || genres.isEmpty) {
-    return '';
-  }
-
-  return genres.join(', ');
-}
 
 /// Validates if an image URL is valid and not empty.
 ///
@@ -161,57 +129,4 @@ String formatCacheAge(Duration age) {
   }
 }
 
-/// Builds a standardized rating widget with optional customization.
-Widget buildRatingWidget(
-  double rating, {
-  TextStyle? textStyle,
-  bool showIcon = true,
-}) {
-  return Text(
-    showIcon ? formatMovieRating(rating) : rating.toStringAsFixed(1),
-    style: textStyle,
-  );
-}
 
-/// Builds a metadata widget combining multiple movie properties.
-///
-/// Can display rating, year, runtime, and content type in a single row.
-Widget buildMovieMetadata({
-  double? rating,
-  dynamic releaseDate,
-  int? runtime,
-  ContentType? contentType,
-  TextStyle? textStyle,
-  String separator = ' • ',
-}) {
-  final parts = <String>[];
-
-  if (rating != null) {
-    parts.add(formatMovieRating(rating));
-  }
-
-  final year = formatMovieYear(releaseDate);
-  if (year.isNotEmpty) {
-    parts.add(year);
-  }
-
-  final runtimeStr = formatRuntime(runtime);
-  if (runtimeStr.isNotEmpty) {
-    parts.add(runtimeStr);
-  }
-
-  if (contentType != null) {
-    parts.add(
-      '${getContentTypeIcon(contentType)} ${getContentTypeLabel(contentType)}',
-    );
-  }
-
-  if (parts.isEmpty) {
-    return const SizedBox.shrink();
-  }
-
-  return Text(
-    parts.join(separator),
-    style: textStyle,
-  );
-}

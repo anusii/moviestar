@@ -6,6 +6,8 @@
 ///
 /// License: https://www.gnu.org/licenses/gpl-3.0.en.html.
 
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:moviestar/models/movie.dart';

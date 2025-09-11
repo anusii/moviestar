@@ -33,6 +33,7 @@ import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/models/movie_list_operation.dart';
 import 'package:moviestar/models/shared_movie_list.dart';
+import 'package:moviestar/services/pod_file_operations_service.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
@@ -94,7 +95,7 @@ class MovieListService {
       // Write to POD.
 
       if (!_context.mounted) return null;
-      final result = await writePod(
+      final result = await PodFileOperationsService.writeFile(
         fileName,
         movieListTtl,
         _context,
@@ -102,7 +103,7 @@ class MovieListService {
         encrypted: false,
       );
 
-      if (result == SolidFunctionCallStatus.success) {
+      if (result.success) {
         // Update cache.
 
         _movieListCache[movieListId] = {
@@ -165,16 +166,17 @@ class MovieListService {
         final filePath = _getMovieListFilePath(movieListId);
 
         if (!_context.mounted) return null;
-        final result = await readPod(
+        final result = await PodFileOperationsService.readFile(
           'moviestar/data/$filePath',
           _context,
           _child,
         );
 
-        if (result.isNotEmpty) {
+        if (result.success && (result.data?.isNotEmpty ?? false)) {
           // Parse the MovieList data using TurtleSerializer.
 
-          final movieListData = TurtleSerializer.movieListFromTurtle(result);
+          final movieListData =
+              TurtleSerializer.movieListFromTurtle(result.data ?? '');
 
           if (movieListData != null) {
             // Load full movie data for each movie reference.
@@ -259,18 +261,33 @@ class MovieListService {
         // For TV shows, try TVShow file first, then fall back to Movie file
         if (contentType == 'tv' || contentType == 'tvShow') {
           try {
-            result = await readPod(tvShowFileName, _context, _child);
+            final readResult = await PodFileOperationsService.readFile(
+              tvShowFileName,
+              _context,
+              _child,
+            );
+            result = readResult.success ? (readResult.data ?? '') : '';
           } catch (e) {
             // Fall back to Movie file for backward compatibility
             if (!e.toString().contains('does not exist')) {
               rethrow;
             }
             if (!_context.mounted) return null;
-            result = await readPod(movieFileName, _context, _child);
+            final readResult = await PodFileOperationsService.readFile(
+              movieFileName,
+              _context,
+              _child,
+            );
+            result = readResult.success ? (readResult.data ?? '') : '';
           }
         } else {
           // For movies, just try Movie file
-          result = await readPod(movieFileName, _context, _child);
+          final readResult = await PodFileOperationsService.readFile(
+            movieFileName,
+            _context,
+            _child,
+          );
+          result = readResult.success ? (readResult.data ?? '') : '';
         }
 
         if (result.isNotEmpty) {
@@ -337,20 +354,20 @@ class MovieListService {
             final filePath = 'user_lists/$fileName';
             if (!_context.mounted) return null;
 
-            final result = await readPod(
+            final result = await PodFileOperationsService.readFile(
               'moviestar/data/$filePath',
               _context,
               _child,
             );
 
-            if (result.isNotEmpty) {
+            if (result.success && (result.data?.isNotEmpty ?? false)) {
               // Check for the specific sdo:name and sdo:description patterns.
 
               final namePattern = RegExp(r'sdo:name\s+"([^"]+)"');
               final descPattern = RegExp(r'sdo:description\s+"([^"]+)"');
 
-              final nameMatch = namePattern.firstMatch(result);
-              final descMatch = descPattern.firstMatch(result);
+              final nameMatch = namePattern.firstMatch(result.data ?? '');
+              final descMatch = descPattern.firstMatch(result.data ?? '');
 
               if (nameMatch != null) {
                 final foundName = nameMatch.group(1)!.trim();
@@ -473,7 +490,7 @@ class MovieListService {
       final filePath = _getMovieListFilePath(movieListId);
 
       if (!_context.mounted) return false;
-      final result = await writePod(
+      final result = await PodFileOperationsService.writeFile(
         filePath,
         updatedTtl,
         _context,
@@ -481,7 +498,7 @@ class MovieListService {
         encrypted: false,
       );
 
-      if (result == SolidFunctionCallStatus.success) {
+      if (result.success) {
         // Update cache with new data.
 
         _movieListCache[movieListId] = {
@@ -530,7 +547,7 @@ class MovieListService {
       );
 
       if (!_context.mounted) return;
-      final result = await writePod(
+      final result = await PodFileOperationsService.writeFile(
         movieFileName,
         ttlContent,
         _context,
@@ -538,7 +555,7 @@ class MovieListService {
         encrypted: false,
       );
 
-      if (result == SolidFunctionCallStatus.success) {
+      if (result.success) {
       } else {
         debugPrint(
           '❌ Failed to create individual movie file for ${movie.title}',
@@ -582,7 +599,7 @@ class MovieListService {
       final filePath = _getMovieListFilePath(movieListId);
 
       if (!_context.mounted) return false;
-      final result = await writePod(
+      final result = await PodFileOperationsService.writeFile(
         filePath,
         updatedTtl,
         _context,
@@ -590,7 +607,7 @@ class MovieListService {
         encrypted: false,
       );
 
-      if (result == SolidFunctionCallStatus.success) {
+      if (result.success) {
         // Update cache with new data.
 
         _movieListCache[movieListId] = {
@@ -1136,7 +1153,7 @@ class MovieListService {
       );
 
       if (!_context.mounted) return false;
-      final result = await writePod(
+      final result = await PodFileOperationsService.writeFile(
         'user_lists/MovieList-$listId.ttl',
         updatedTtl,
         _context,
@@ -1144,7 +1161,7 @@ class MovieListService {
         encrypted: false,
       );
 
-      if (result == SolidFunctionCallStatus.success) {
+      if (result.success) {
         // Update cache.
 
         _movieListCache[listId] = {

@@ -29,6 +29,11 @@ import 'package:solidpod/solidpod.dart' show SolidFunctionCallStatus, getWebId;
 // ignore: implementation_imports
 import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
 
+import 'package:moviestar/models/content_item.dart';
+import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/services/pod_file_operations_service.dart';
+import 'package:moviestar/utils/turtle_serializer.dart';
+
 /// Request model for sharing a file
 class ShareRequest {
   final String fileName;
@@ -323,5 +328,171 @@ class PodSharingService {
       default:
         return 'Unknown status: ${status.name}';
     }
+  }
+
+  /// Generate movie file name based on content type
+  static String getMovieFileName(Movie movie) {
+    final contentPrefix =
+        movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie';
+    return 'movies/$contentPrefix-${movie.id}.ttl';
+  }
+
+  /// Check if a movie file exists in POD
+  static Future<bool> movieFileExists(
+    Movie movie,
+    BuildContext context,
+    Widget child,
+  ) async {
+    final fileName = getMovieFileName(movie);
+    return PodFileOperationsService.fileExists(fileName, context, child);
+  }
+
+  /// Read movie data from POD
+  static Future<Map<String, dynamic>?> readMovieData(
+    Movie movie,
+    BuildContext context,
+    Widget child,
+  ) async {
+    final fileName = getMovieFileName(movie);
+    final result =
+        await PodFileOperationsService.readFile(fileName, context, child);
+
+    if (result.success && result.data != null) {
+      try {
+        return TurtleSerializer.movieWithUserDataFromTurtle(result.data!);
+      } catch (e) {
+        debugPrint('Error parsing movie data: $e');
+        return null;
+      }
+    }
+
+    return null;
+  }
+
+  /// Write movie data to POD
+  static Future<bool> writeMovieData(
+    Movie movie,
+    BuildContext context,
+    Widget child, {
+    double? rating,
+    String? comment,
+  }) async {
+    final fileName = getMovieFileName(movie);
+    final ttlContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
+      movie,
+      rating,
+      comment,
+    );
+
+    final result = await PodFileOperationsService.writeFile(
+      fileName,
+      ttlContent,
+      context,
+      child,
+      encrypted: false,
+    );
+
+    return result.success;
+  }
+
+  /// Share a movie file with enhanced error handling
+  static Future<ShareResult> shareMovieFile(
+    Movie movie,
+    String recipientWebId,
+    BuildContext context,
+    Widget child, {
+    List<String> permissions = const ['read'],
+  }) async {
+    try {
+      // Validate WebID first
+      if (!await validateWebId(recipientWebId)) {
+        return ShareResult.failure('Invalid recipient WebID: $recipientWebId');
+      }
+
+      // Check if movie file exists
+      // ignore: use_build_context_synchronously
+      if (!await movieFileExists(movie, context, child)) {
+        return ShareResult.failure('Movie file does not exist for sharing');
+      }
+
+      final fileName = getMovieFileName(movie);
+
+      // Create share request
+      final shareRequest = ShareRequest(
+        fileName: fileName,
+        displayName: movie.title,
+        permissions: permissions,
+        recipientWebId: recipientWebId,
+        metadata: {
+          'movieId': movie.id,
+          'movieTitle': movie.title,
+          'contentType': movie.contentType?.toString() ?? 'movie',
+        },
+      );
+
+      return await shareFile(shareRequest);
+    } catch (e) {
+      return ShareResult.failure('Error sharing movie file: $e');
+    }
+  }
+
+  /// Batch share multiple movie files
+  static Future<BatchShareResult> shareMultipleMovieFiles(
+    List<Movie> movies,
+    String recipientWebId,
+    BuildContext context,
+    Widget child, {
+    List<String> permissions = const ['read'],
+    void Function(int completed, int total)? onProgress,
+  }) async {
+    final shareRequests = movies
+        .map(
+          (movie) => ShareRequest(
+            fileName: getMovieFileName(movie),
+            displayName: movie.title,
+            permissions: permissions,
+            recipientWebId: recipientWebId,
+            metadata: {
+              'movieId': movie.id,
+              'movieTitle': movie.title,
+              'contentType': movie.contentType?.toString() ?? 'movie',
+            },
+          ),
+        )
+        .toList();
+
+    final batchRequest = BatchShareRequest(
+      requests: shareRequests,
+      recipientWebId: recipientWebId,
+    );
+
+    return await performBatchShare(batchRequest, onProgress: onProgress);
+  }
+
+  /// Create or update a movie file with user data
+  static Future<bool> createOrUpdateMovieFile(
+    Movie movie,
+    BuildContext context,
+    Widget child, {
+    double? rating,
+    String? comment,
+  }) async {
+    // Read existing data first to preserve any existing rating/comment
+    final existingData = await readMovieData(movie, context, child);
+    final existingRating = existingData?['rating'] as double?;
+    final existingComment = existingData?['comment'] as String?;
+
+    // Use provided parameters, fallback to existing data
+    final finalRating = rating ?? existingRating;
+    final finalComment = comment ?? existingComment;
+
+    // ignore: use_build_context_synchronously
+    return await writeMovieData(
+      movie,
+      context, // ignore: use_build_context_synchronously
+      child,
+      rating: finalRating,
+      comment: finalComment,
+    );
   }
 }

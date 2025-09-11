@@ -271,18 +271,15 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
         return;
       }
 
-      // Ensure the movie file exists before sharing.
+      // Ensure the movie file exists before sharing - use simplified approach
       final hasFile = await widget.favoritesService.hasMovieFile(widget.movie);
       if (!hasFile) {
-        // Create the movie file by setting an empty comment to enable sharing
+        // Create a minimal movie file to enable sharing
         await widget.favoritesService.setMovieComments(widget.movie, '');
-        // Then remove the empty comment to keep the file clean
         await widget.favoritesService.removeMovieComments(widget.movie);
       }
 
-      // Movie file path logic is handled by MovieSharingUI
-
-      // Navigate to custom movie sharing UI
+      // Navigate to MovieSharingUI which handles all the complex sharing logic
       if (!mounted) return;
 
       await Navigator.of(context).push(

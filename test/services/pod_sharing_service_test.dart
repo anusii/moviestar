@@ -6,6 +6,8 @@
 ///
 /// License: https://www.gnu.org/licenses/gpl-3.0.en.html.
 
+library;
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:moviestar/services/pod_sharing_service.dart';
 

@@ -26,45 +26,14 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:solidpod/solidpod.dart'
-    show
-        SolidFunctionCallStatus,
-        grantPermission,
-        getWebId,
-        loginIfRequired,
-        getKeyFromUserIfRequired;
+import 'package:solidpod/solidpod.dart' show SolidFunctionCallStatus;
 // ignore: implementation_imports
 import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
 
 import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/services/pod_sharing_service.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
-
-/// File information for batch sharing
-class ShareableFile {
-  final String fileName;
-  final String displayName;
-  final String fileType; // 'movielist' or 'movie'
-  final Movie? movie; // null for movie list
-  List<String> permissions;
-
-  ShareableFile({
-    required this.fileName,
-    required this.displayName,
-    required this.fileType,
-    this.movie,
-    this.permissions = const ['read'],
-  });
-
-  ShareableFile copyWith({required List<String> permissions}) {
-    return ShareableFile(
-      fileName: fileName,
-      displayName: displayName,
-      fileType: fileType,
-      movie: movie,
-      permissions: permissions,
-    );
-  }
-}
+import 'package:moviestar/widgets/common_sharing_ui.dart';
 
 /// Custom MovieStar batch sharing UI that shows all files to be shared
 /// and allows per-file permission configuration
@@ -110,6 +79,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
   // Form controllers
   final formKey = GlobalKey<FormState>();
   final webIdController = TextEditingController();
+  String? validatedWebId;
 
   // List of all files to be shared
   late List<ShareableFile> shareableFiles;
@@ -209,14 +179,10 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
     );
   }
 
-  /// Start the batch sharing process.
-
+  /// Start the batch sharing process using PodSharingService.
   Future<void> _startBatchSharing() async {
-    if (!formKey.currentState!.validate()) return;
-
-    final webId = webIdController.text.trim();
-    if (webId.isEmpty) {
-      _showErrorSnackBar('Please enter a WebID');
+    if (validatedWebId == null) {
+      _showErrorSnackBar('Please enter a valid WebID');
       return;
     }
 
@@ -228,36 +194,14 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
     });
 
     try {
-      // Get owner WebID
-      final ownerWebId = await getWebId();
-      if (ownerWebId == null) {
-        throw Exception('Unable to get owner WebID');
-      }
-
-      // Check if logged in
-      if (!mounted) return;
-      final loggedIn = await loginIfRequired(context);
-      if (!loggedIn) {
-        throw Exception('Login required');
-      }
-
-      // Get encryption key if needed
-      if (!mounted) return;
-      await getKeyFromUserIfRequired(context, widget.child);
-
-      // Prepare recipient list
-      final recipientList = [webId];
-      const recipientType = RecipientType.individual;
-
       int completedCount = 0;
       final totalCount = shareableFiles.length;
 
-      // Share each file in sequence with progress updates
+      // Share each file using PodSharingService
       for (int i = 0; i < shareableFiles.length; i++) {
         final file = shareableFiles[i];
 
         // Skip files with no permissions selected (except movie files which always get read).
-
         if (file.permissions.isEmpty && file.fileType == 'movielist') {
           setState(() {
             sharingProgress[file.fileName] = 'skipped';
@@ -277,25 +221,22 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
           if (!mounted) break;
 
           // Determine permissions: movie files always get read-only.
-
           final permissionsToUse =
               file.fileType == 'movie' ? ['read'] : file.permissions;
 
-          final result = await grantPermission(
-            file.fileName,
-            true, // fileFlag
-            permissionsToUse,
-            recipientType,
-            recipientList,
-            ownerWebId,
-            context,
-            widget.child,
-            isExternalRes: false,
+          // Use PodSharingService for simplified sharing
+          final shareRequest = ShareRequest(
+            fileName: file.fileName,
+            displayName: file.displayName,
+            permissions: permissionsToUse,
+            recipientWebId: validatedWebId!,
+            recipientType: RecipientType.individual,
           );
+          final shareResult = await PodSharingService.shareFile(shareRequest);
+          final success = shareResult.success;
 
           setState(() {
-            sharingResults[file.fileName] = result;
-            if (result == SolidFunctionCallStatus.success) {
+            if (success) {
               sharingProgress[file.fileName] = 'success';
               completedCount++;
             } else {
@@ -304,7 +245,6 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
           });
         } catch (e) {
           setState(() {
-            sharingResults[file.fileName] = SolidFunctionCallStatus.fail;
             sharingProgress[file.fileName] = 'error';
           });
         }
@@ -635,27 +575,15 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                   ),
             ),
             const SizedBox(height: 12),
-            TextFormField(
+            WebIdInput(
               controller: webIdController,
-              decoration: const InputDecoration(
-                labelText: 'Recipient WebID *',
-                hintText: 'https://example.solid.com/profile/card#me',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
-                helperText:
-                    'Enter the WebID of the person you want to share with',
-              ),
-              keyboardType: TextInputType.url,
-              textInputAction: TextInputAction.done,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'WebID is required';
-                }
-                if (!value.startsWith('https://') || !value.contains('#')) {
-                  return 'Please enter a valid WebID';
-                }
-                return null;
+              onValidated: (webId) {
+                setState(() {
+                  validatedWebId = webId;
+                });
               },
+              label: 'Recipient WebID *',
+              hint: 'https://example.solid.com/profile/card#me',
             ),
           ],
         ),
@@ -937,7 +865,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
   /// Build share button
   Widget _buildShareButton() {
     final totalFiles = shareableFiles.length;
-    final hasRecipient = webIdController.text.trim().isNotEmpty;
+    final hasValidRecipient = validatedWebId != null;
     final hasAnyPermissions =
         shareableFiles.any((file) => file.permissions.isNotEmpty);
 
@@ -945,7 +873,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed:
-            hasRecipient && hasAnyPermissions ? _startBatchSharing : null,
+            hasValidRecipient && hasAnyPermissions ? _startBatchSharing : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.primary,
           foregroundColor: Theme.of(context).colorScheme.onPrimary,

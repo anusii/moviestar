@@ -28,13 +28,13 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:markdown_tooltip/markdown_tooltip.dart';
-import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/movie_list_service.dart';
+import 'package:moviestar/services/pod_file_operations_service.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/utils/navigation_utils.dart';
@@ -227,13 +227,12 @@ Recipients will be able to:
       final movieFileName = 'movies/Movie-${movie.id}.ttl';
 
       // Check if the file already exists.
-      try {
-        final existingContent = await readPod(movieFileName, context, widget);
-        if (existingContent.isNotEmpty) {
-          return;
-        }
-      } catch (e) {
-        // File doesn't exist, we'll create it.
+      if (await PodFileOperationsService.fileExists(
+        movieFileName,
+        context,
+        widget,
+      )) {
+        return;
       }
 
       // Get current rating and comments from favorites service.
@@ -250,7 +249,7 @@ Recipients will be able to:
 
       // Write the movie file to POD.
       if (!mounted) return;
-      final result = await writePod(
+      final result = await PodFileOperationsService.writeFile(
         movieFileName,
         ttlContent,
         context,
@@ -258,8 +257,8 @@ Recipients will be able to:
         encrypted: false,
       );
 
-      if (result != SolidFunctionCallStatus.success) {
-        throw Exception('Failed to write movie file to POD');
+      if (!result.success) {
+        throw Exception('Failed to write movie file to POD: ${result.error}');
       }
     } catch (e) {
       rethrow;

@@ -6,6 +6,8 @@
 ///
 /// License: https://www.gnu.org/licenses/gpl-3.0.en.html.
 
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:moviestar/models/movie.dart';
@@ -153,7 +155,7 @@ void main() {
       );
 
       expect(find.byType(TextFormField), findsOneWidget);
-      expect(find.text("Share With"), findsOneWidget);
+      expect(find.text('Share With'), findsOneWidget);
     });
 
     testWidgets('displays share button', (WidgetTester tester) async {

@@ -55,44 +55,7 @@ Future<void> navigateToMovieDetails(
   }
 }
 
-/// Navigates to the movie details screen and returns a result.
-///
-/// This version allows waiting for a result from the details screen.
-Future<T?> navigateToMovieDetailsForResult<T>(
-  BuildContext context,
-  Movie movie,
-  FavoritesService favoritesService,
-) async {
-  return Navigator.push<T>(
-    context,
-    MaterialPageRoute<T>(
-      builder: (context) => MovieDetailsScreen(
-        movie: movie,
-        favoritesService: favoritesService,
-      ),
-    ),
-  );
-}
 
-/// Navigates to movie details and removes all previous routes.
-///
-/// Useful for deep linking or when you want to reset the navigation stack.
-Future<void> navigateToMovieDetailsAndClear(
-  BuildContext context,
-  Movie movie,
-  FavoritesService favoritesService,
-) async {
-  await Navigator.pushAndRemoveUntil(
-    context,
-    MaterialPageRoute<void>(
-      builder: (context) => MovieDetailsScreen(
-        movie: movie,
-        favoritesService: favoritesService,
-      ),
-    ),
-    (route) => false,
-  );
-}
 
 /// Creates a route for the movie details screen.
 ///
@@ -109,52 +72,4 @@ Route<void> createMovieDetailsRoute(
   );
 }
 
-/// Creates a fade transition route for movie details.
-///
-/// Provides a smoother transition animation than the default slide.
-Route<void> createMovieDetailsFadeRoute(
-  Movie movie,
-  FavoritesService favoritesService, {
-  Duration duration = const Duration(milliseconds: 300),
-}) {
-  return PageRouteBuilder<void>(
-    pageBuilder: (context, animation, secondaryAnimation) => MovieDetailsScreen(
-      movie: movie,
-      favoritesService: favoritesService,
-    ),
-    transitionDuration: duration,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return FadeTransition(
-        opacity: animation,
-        child: child,
-      );
-    },
-  );
-}
 
-/// Creates a slide transition route for movie details.
-///
-/// Allows customizing the slide direction for the transition.
-Route<void> createMovieDetailsSlideRoute(
-  Movie movie,
-  FavoritesService favoritesService, {
-  Offset beginOffset = const Offset(1.0, 0.0),
-  Duration duration = const Duration(milliseconds: 300),
-}) {
-  return PageRouteBuilder<void>(
-    pageBuilder: (context, animation, secondaryAnimation) => MovieDetailsScreen(
-      movie: movie,
-      favoritesService: favoritesService,
-    ),
-    transitionDuration: duration,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      final tween = Tween(begin: beginOffset, end: Offset.zero)
-          .chain(CurveTween(curve: Curves.easeInOut));
-
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}

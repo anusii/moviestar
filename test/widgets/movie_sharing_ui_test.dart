@@ -169,7 +169,7 @@ void main() {
       );
 
       expect(
-          find.widgetWithText(ElevatedButton, 'Share Movie'), findsOneWidget);
+          find.widgetWithText(ElevatedButton, 'Share Movie'), findsOneWidget,);
     });
 
     testWidgets('share button is disabled initially',
@@ -239,7 +239,7 @@ void main() {
 
       // Try to scroll
       await tester.drag(
-          find.byType(SingleChildScrollView), const Offset(0, -200));
+          find.byType(SingleChildScrollView), const Offset(0, -200),);
       await tester.pump();
 
       // Should still show all key elements

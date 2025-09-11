@@ -22,12 +22,12 @@ void main() {
       test('validates correct WebID format', () async {
         expect(
           await PodSharingService.validateWebId(
-              'https://pod.example.com/profile/card#me'),
+              'https://pod.example.com/profile/card#me',),
           isTrue,
         );
         expect(
           await PodSharingService.validateWebId(
-              'http://localhost:3000/user/card#me'),
+              'http://localhost:3000/user/card#me',),
           isTrue,
         );
       });

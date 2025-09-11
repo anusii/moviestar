@@ -92,9 +92,13 @@ void main() {
 
       // Should show check icons for selected permissions
       expect(
-          find.byIcon(Icons.check_circle), findsOneWidget,); // READ is selected
-      expect(find.byIcon(Icons.circle_outlined),
-          findsNWidgets(2),); // WRITE and APPEND unselected
+        find.byIcon(Icons.check_circle),
+        findsOneWidget,
+      ); // READ is selected
+      expect(
+        find.byIcon(Icons.circle_outlined),
+        findsNWidgets(2),
+      ); // WRITE and APPEND unselected
     });
 
     testWidgets('PermissionSelector read-only mode',

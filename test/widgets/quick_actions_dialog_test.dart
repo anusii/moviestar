@@ -411,7 +411,8 @@ void main() {
       // Simulate mouse enter
       final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
       await gesture.addPointer(
-          location: tester.getCenter(find.byType(QuickActionsDialog)),);
+        location: tester.getCenter(find.byType(QuickActionsDialog)),
+      );
       addTearDown(gesture.removePointer);
 
       await tester.pump();

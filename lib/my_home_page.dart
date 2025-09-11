@@ -37,6 +37,7 @@ import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/enhanced_search_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
+import 'package:moviestar/services/api_key_service.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
@@ -80,6 +81,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   bool _showSettings = false;
 
+  /// API key service reference for cleanup
+  late final ApiKeyService _apiKeyService;
+
   @override
   void initState() {
     super.initState();
@@ -92,12 +96,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     // Set context for provider-based API key service.
 
-    final apiKeyService = ref.read(apiKeyServiceProvider);
-    apiKeyService.updateContext(context, widget);
+    _apiKeyService = ref.read(apiKeyServiceProvider);
+    _apiKeyService.updateContext(context, widget);
 
     // Listen for API key changes.
 
-    apiKeyService.addListener(_onApiKeyChanged);
+    _apiKeyService.addListener(_onApiKeyChanged);
 
     _loadUserInfo();
     _buildScreens();
@@ -105,8 +109,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   @override
   void dispose() {
-    final apiKeyService = ref.read(apiKeyServiceProvider);
-    apiKeyService.removeListener(_onApiKeyChanged);
+    _apiKeyService.removeListener(_onApiKeyChanged);
 
     // Clear global navigation callback.
 

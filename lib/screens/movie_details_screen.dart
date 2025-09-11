@@ -32,7 +32,6 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:gap/gap.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
-import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/constants/timing_constants.dart';
@@ -44,6 +43,7 @@ import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
+import 'package:moviestar/widgets/movie_sharing_ui.dart';
 
 /// A screen that displays detailed information about a selected movie.
 
@@ -458,12 +458,10 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
     });
   }
 
-  // Shares the movie file using GrantPermissionUi.
-
+  // Shares the movie file using the common sharing UI.
   Future<void> _shareMovie() async {
     try {
       // Check if user has POD storage enabled and is using the adapter.
-
       if (widget.favoritesService is! FavoritesServiceAdapter) {
         _showErrorDialog('POD storage is required for sharing');
         return;
@@ -472,15 +470,12 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
       final adapter = widget.favoritesService as FavoritesServiceAdapter;
 
       // Check if POD storage is enabled.
-
       if (!adapter.isPodStorageEnabled) {
         _showErrorDialog('POD storage must be enabled to share movies');
         return;
       }
 
-      // Ensure the movie file exists before sharing. If it doesn't exist,
-      // create it to allow sharing even for movies in To Watch list.
-
+      // Ensure the movie file exists before sharing.
       final hasFile = await widget.favoritesService.hasMovieFile(widget.movie);
       if (!hasFile) {
         // Create the movie file by setting an empty comment to enable sharing
@@ -489,35 +484,30 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
         await widget.favoritesService.removeMovieComments(widget.movie);
       }
 
-      // Get the movie file path using the service method and make it relative.
+      // Movie file path logic is handled by MovieSharingUI
 
-      final fullPath = adapter.getMovieFilePath(widget.movie);
-      final movieFilePath = fullPath?.replaceFirst('moviestar/data/', '') ??
-          'movies/Movie-${widget.movie.id}.ttl';
-
-      // Navigate directly to GrantPermissionUi with improved theming and pre-selected options.
-
+      // Use our custom movie sharing UI
       if (!mounted) return;
 
-      await safeNavigateTo(
+      await Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => Theme(
-            data: Theme.of(context),
-            child: GrantPermissionUi(
-              fileName: movieFilePath,
-              title: 'Share "${widget.movie.title}"',
-              accessModeList: const ['read'],
-              recipientTypeList: const ['indi'],
-              showAppBar: true,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              child: widget,
-            ),
+          builder: (context) => MovieSharingUI(
+            movie: widget.movie,
+            onSharingComplete: () {
+              Navigator.of(context).pop();
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content:
+                        Text('"${widget.movie.title}" shared successfully'),
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
+                  ),
+                );
+              }
+            },
           ),
         ),
       );
-
-      // Movie sharing is now tracked through POD permission logs automatically.
-      // No need for manual recording.
     } catch (e) {
       _showErrorDialog('Error sharing movie: $e');
     }
@@ -559,16 +549,20 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
 
   Future<void> _loadCustomLists() async {
     if (_isSharedMovie) {
-      setState(() {
-        _customLists = [];
-      });
+      if (mounted) {
+        setState(() {
+          _customLists = [];
+        });
+      }
       return;
     }
 
     final lists = await widget.favoritesService.getCustomLists();
-    setState(() {
-      _customLists = lists;
-    });
+    if (mounted) {
+      setState(() {
+        _customLists = lists;
+      });
+    }
   }
 
   /// Shows a dialog to add the movie to custom lists.

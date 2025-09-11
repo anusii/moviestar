@@ -575,8 +575,8 @@ class PodFavoritesService extends ChangeNotifier {
         _watchedController.add(movies);
 
         // Create/update the movie file to ensure it exists.
-
-        await _createOrUpdateMovieFile(movie);
+        // Pass the contentType to ensure correct file naming (TVShow vs Movie)
+        await _createOrUpdateMovieFile(movie, contentType: contentType);
         return;
       } else {
         debugPrint('❌ Failed to add ${movie.title} to Watched MovieList');
@@ -595,7 +595,8 @@ class PodFavoritesService extends ChangeNotifier {
     }
 
     // Create/update the movie file to ensure it exists.
-    await _createOrUpdateMovieFile(movie);
+    // Pass the contentType to ensure correct file naming (TVShow vs Movie)
+    await _createOrUpdateMovieFile(movie, contentType: contentType);
 
     // Force refresh cache for UI updates.
     _cachedWatched = null;
@@ -716,8 +717,11 @@ class PodFavoritesService extends ChangeNotifier {
       _moviesWithFiles.add(movie.id);
 
       // Create/update the single movie file with the new rating - this is the primary storage now.
-
-      await _createOrUpdateMovieFile(movie, rating: rating);
+      // Use the movie's content type to determine the correct file naming (TVShow vs Movie)
+      final contentType =
+          movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
+      await _createOrUpdateMovieFile(movie,
+          rating: rating, contentType: contentType,);
 
       // Skip backward compatibility saves to avoid encryption warnings.
       // The movie files are now the primary storage.
@@ -736,8 +740,10 @@ class PodFavoritesService extends ChangeNotifier {
     _cachedRatings = ratings;
 
     // Update the single movie file (primary storage) - will remove rating but keep comment if exists.
-
-    await _createOrUpdateMovieFile(movie);
+    // Use the movie's content type to determine the correct file naming (TVShow vs Movie)
+    final contentType =
+        movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
+    await _createOrUpdateMovieFile(movie, contentType: contentType);
 
     // Skip backward compatibility saves to avoid encryption warnings.
   }
@@ -784,8 +790,11 @@ class PodFavoritesService extends ChangeNotifier {
       _moviesWithFiles.add(movie.id);
 
       // Create/update the single movie file with the new comment - this is the primary storage now.
-
-      await _createOrUpdateMovieFile(movie, comment: comments);
+      // Use the movie's content type to determine the correct file naming (TVShow vs Movie)
+      final contentType =
+          movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
+      await _createOrUpdateMovieFile(movie,
+          comment: comments, contentType: contentType,);
 
       // Skip backward compatibility saves to avoid encryption warnings.
       // The movie files are now the primary storage.
@@ -807,8 +816,10 @@ class PodFavoritesService extends ChangeNotifier {
     _cachedComments = comments;
 
     // Update the single movie file (primary storage) - will remove comment but keep rating if exists.
-
-    await _createOrUpdateMovieFile(movie);
+    // Use the movie's content type to determine the correct file naming (TVShow vs Movie)
+    final contentType =
+        movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
+    await _createOrUpdateMovieFile(movie, contentType: contentType);
 
     // Skip backward compatibility saves to avoid encryption warnings.
 
@@ -859,6 +870,12 @@ class PodFavoritesService extends ChangeNotifier {
     String contentType = 'movie',
   }) async {
     try {
+      debugPrint(
+          '🔄 Starting rating/comment save for ${movie.title} (ID: ${movie.id})',);
+      debugPrint('📋 Content type: $contentType');
+      debugPrint('⭐ Rating: $rating');
+      debugPrint('💬 Comment: $comment');
+
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
         debugPrint('❌ User not logged in, skipping movie file update');
@@ -870,27 +887,38 @@ class PodFavoritesService extends ChangeNotifier {
       final existingRating = existingData?['rating'] as double?;
       final existingComment = existingData?['comment'] as String?;
 
+      debugPrint(
+          '📖 Existing data - Rating: $existingRating, Comment: $existingComment',);
+
       // Use provided parameters first, then fallback to cache, then fallback to existing file data
       final currentRating =
           rating ?? _cachedRatings?[movie.id.toString()] ?? existingRating;
       final currentComment =
           comment ?? _cachedComments?[movie.id.toString()] ?? existingComment;
 
+      debugPrint(
+          '💾 Final data to save - Rating: $currentRating, Comment: $currentComment',);
+
       // Create movie file even if no rating/comment data to ensure file exists
       // This prevents "file does not exist" errors when reading movie details
       // Only skip if this would create a completely empty update to an existing file
 
       final hasExistingFile = _moviesWithFiles.contains(movie.id);
+      debugPrint('📁 Has existing file: $hasExistingFile');
+
       if (currentRating == null &&
           (currentComment == null || currentComment.isEmpty) &&
           hasExistingFile) {
+        debugPrint(
+            '⏭️  Skipping save - no data to save and file already exists',);
         return;
       }
 
       // Use content-type aware file naming: Movie-ID.ttl for movies, TVShow-ID.ttl for TV shows
-      final contentPrefix =
-          (contentType == 'tv' || contentType == 'tvShow') ? 'TVShow' : 'Movie';
+      final contentPrefix = contentType == 'tv' ? 'TVShow' : 'Movie';
       final movieFileName = 'movies/$contentPrefix-${movie.id}.ttl';
+
+      debugPrint('📄 File name: $movieFileName (prefix: $contentPrefix)');
 
       // Use the new ontology-compliant serialization method
       final ttlContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
@@ -900,8 +928,13 @@ class PodFavoritesService extends ChangeNotifier {
       );
 
       // Write to POD without encryption to prevent multiple encryption keys.
+      debugPrint('💾 Attempting to write to POD...');
 
-      if (!_context.mounted) return;
+      if (!_context.mounted) {
+        debugPrint('❌ Context not mounted, aborting save');
+        return;
+      }
+
       final result = await writePod(
         movieFileName,
         ttlContent,
@@ -910,7 +943,12 @@ class PodFavoritesService extends ChangeNotifier {
         encrypted: false,
       );
 
+      debugPrint('📊 WritePod result: $result');
+
       if (result == SolidFunctionCallStatus.success) {
+        debugPrint(
+            '✅ Successfully saved rating/comment to POD file: $movieFileName',);
+
         // Success - file saved, now update caches with the final saved data
         _moviesWithFiles.add(movie.id);
 
@@ -918,18 +956,24 @@ class PodFavoritesService extends ChangeNotifier {
         if (currentRating != null) {
           _cachedRatings ??= {};
           _cachedRatings![movie.id.toString()] = currentRating;
+          debugPrint('🔄 Updated rating cache: ${movie.id} -> $currentRating');
         }
         if (currentComment != null && currentComment.isNotEmpty) {
           _cachedComments ??= {};
           _cachedComments![movie.id.toString()] = currentComment;
+          debugPrint(
+              '🔄 Updated comment cache: ${movie.id} -> $currentComment',);
         }
 
         // Only auto-add to watched list when rating is set (not for comments)
         // Comments might be negative ("heard it's bad, don't watch") so shouldn't trigger watched status
         if (currentRating != null) {
           final isAlreadyWatched = await isInWatched(movie);
+          debugPrint(
+              '👁️  Auto-add to watched check - already watched: $isAlreadyWatched',);
 
           if (!isAlreadyWatched) {
+            debugPrint('➕ Adding to watched list...');
             await addToWatched(movie, contentType: contentType);
           }
         }
@@ -1388,22 +1432,42 @@ class PodFavoritesService extends ChangeNotifier {
       // Clear cache to avoid duplicates
       _customListsCache.clear();
 
-      // Track processed list IDs to avoid duplicates
+      // Track processed list IDs and names to avoid duplicates
       final processedListIds = <String>{};
+      final processedListNames = <String>{};
 
       // Scan the user_lists directory for MovieList files
       try {
         final dirUrl = await getDirUrl('moviestar/data/user_lists');
         final resources = await getResourcesInContainer(dirUrl);
 
+        debugPrint(
+            '📂 [PodFavorites] Found ${resources.files.length} files in user_lists directory:',);
+        for (final file in resources.files) {
+          debugPrint('   - $file');
+        }
+
         for (final fileName in resources.files) {
           if (fileName.startsWith('MovieList-') && fileName.endsWith('.ttl')) {
+            // Skip ACL, backup, or other metadata files that might be created during sharing
+            if (fileName.contains('.acl.') ||
+                fileName.contains('_backup') ||
+                fileName.contains('_shared') ||
+                fileName.contains('.meta.') ||
+                fileName.contains('~') ||
+                fileName.startsWith('.')) {
+              debugPrint('⚠️ [PodFavorites] Skipping metadata file: $fileName');
+              continue;
+            }
+
             // Extract the MovieList ID from the filename
             final movieListId =
                 fileName.replaceAll('MovieList-', '').replaceAll('.ttl', '');
 
             // Skip if we've already processed this list ID
             if (processedListIds.contains(movieListId)) {
+              debugPrint(
+                  '⚠️ [PodFavorites] Skipping duplicate MovieList ID: $movieListId',);
               continue;
             }
             processedListIds.add(movieListId);
@@ -1421,6 +1485,15 @@ class PodFavoritesService extends ChangeNotifier {
                   customList.name == 'Watched') {
                 continue;
               }
+
+              // Additional check: Skip if we've already processed this list name
+              // This handles cases where sharing might create copies with different IDs
+              if (processedListNames.contains(customList.name)) {
+                debugPrint(
+                    '⚠️ [PodFavorites] Skipping duplicate list name: ${customList.name} (ID: $movieListId)',);
+                continue;
+              }
+              processedListNames.add(customList.name);
 
               customLists.add(customList);
               _customListsCache[movieListId] = customList;

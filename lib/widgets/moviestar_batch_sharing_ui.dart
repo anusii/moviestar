@@ -144,7 +144,9 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
         fileName: 'user_lists/MovieList-${widget.listId}.ttl',
         displayName: widget.listName,
         fileType: 'movielist',
-        permissions: [], // Start with no permissions checked
+        permissions: [
+          'read',
+        ], // Movie lists must have read permission at minimum
       ),
       // Individual movie files with read-only permissions by default.
 

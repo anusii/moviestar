@@ -15,7 +15,8 @@ import 'package:moviestar/widgets/movie_sharing_ui.dart';
 
 void main() {
   group('Navigation Integration Tests', () {
-    testWidgets('popUntil navigates to home screen correctly', (WidgetTester tester) async {
+    testWidgets('popUntil navigates to home screen correctly',
+        (WidgetTester tester) async {
       // Build a navigation stack with home -> intermediate -> sharing UI
       await tester.pumpWidget(
         MaterialApp(
@@ -67,9 +68,10 @@ void main() {
       expect(find.text('Share "Test Movie"'), findsNothing);
     });
 
-    testWidgets('navigation stack is not corrupted after sharing flow', (WidgetTester tester) async {
+    testWidgets('navigation stack is not corrupted after sharing flow',
+        (WidgetTester tester) async {
       int navigationDepth = 0;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           navigatorObservers: [
@@ -90,7 +92,8 @@ void main() {
                         builder: (context) => MovieSharingUI(
                           movie: _createTestMovie(),
                           onSharingComplete: () {
-                            Navigator.of(context).popUntil((route) => route.isFirst);
+                            Navigator.of(context)
+                                .popUntil((route) => route.isFirst);
                           },
                         ),
                       ),
@@ -110,7 +113,7 @@ void main() {
       // Navigate to sharing UI
       await tester.tap(find.text('Open Sharing'));
       await tester.pumpAndSettle();
-      
+
       // Verify we're on the sharing screen
       expect(find.byType(MovieSharingUI), findsOneWidget);
       expect(find.byIcon(Icons.arrow_back), findsOneWidget);
@@ -118,14 +121,15 @@ void main() {
       // Navigate back
       await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pumpAndSettle();
-      
+
       // Should be back at home screen (depth may vary due to popUntil behavior)
       // The key is that we're back at the home screen
       expect(find.text('Home'), findsOneWidget);
       expect(find.text('Open Sharing'), findsOneWidget);
     });
 
-    testWidgets('handles rapid navigation without crashes', (WidgetTester tester) async {
+    testWidgets('handles rapid navigation without crashes',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
@@ -140,7 +144,8 @@ void main() {
                           builder: (context) => MovieSharingUI(
                             movie: _createTestMovie(),
                             onSharingComplete: () {
-                              Navigator.of(context).popUntil((route) => route.isFirst);
+                              Navigator.of(context)
+                                  .popUntil((route) => route.isFirst);
                             },
                           ),
                         ),
@@ -173,7 +178,7 @@ void main() {
         await tester.tap(find.text('Open Sharing'));
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 100));
-        
+
         // Find specifically the back button and tap it if it exists
         final backButtons = find.byIcon(Icons.arrow_back);
         if (backButtons.evaluate().isNotEmpty) {
@@ -187,9 +192,10 @@ void main() {
       expect(find.text('Open Sharing'), findsOneWidget);
     });
 
-    testWidgets('onSharingComplete callback navigates correctly', (WidgetTester tester) async {
+    testWidgets('onSharingComplete callback navigates correctly',
+        (WidgetTester tester) async {
       bool callbackExecuted = false;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
@@ -204,7 +210,8 @@ void main() {
                         builder: (context) => _MockSharingScreen(
                           onComplete: () {
                             callbackExecuted = true;
-                            Navigator.of(context).popUntil((route) => route.isFirst);
+                            Navigator.of(context)
+                                .popUntil((route) => route.isFirst);
                           },
                         ),
                       ),
@@ -232,7 +239,8 @@ void main() {
       expect(find.text('Mock Sharing'), findsNothing);
     });
 
-    testWidgets('maintains widget state after navigation', (WidgetTester tester) async {
+    testWidgets('maintains widget state after navigation',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: const _StatefulHomeScreen(),
@@ -256,7 +264,8 @@ void main() {
       expect(find.text('Count: 1'), findsOneWidget);
     });
 
-    testWidgets('handles disposed widget state correctly', (WidgetTester tester) async {
+    testWidgets('handles disposed widget state correctly',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
@@ -396,7 +405,8 @@ class _StatefulHomeScreenState extends State<_StatefulHomeScreen> {
                       builder: (context) => MovieSharingUI(
                         movie: _createTestMovie(),
                         onSharingComplete: () {
-                          Navigator.of(context).popUntil((route) => route.isFirst);
+                          Navigator.of(context)
+                              .popUntil((route) => route.isFirst);
                         },
                       ),
                     ),

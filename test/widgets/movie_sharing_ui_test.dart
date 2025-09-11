@@ -58,7 +58,7 @@ void main() {
 
     testWidgets('back button navigates to home', (WidgetTester tester) async {
       bool navigationCalled = false;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Navigator(
@@ -168,10 +168,12 @@ void main() {
         ),
       );
 
-      expect(find.widgetWithText(ElevatedButton, 'Share Movie'), findsOneWidget);
+      expect(
+          find.widgetWithText(ElevatedButton, 'Share Movie'), findsOneWidget);
     });
 
-    testWidgets('share button is disabled initially', (WidgetTester tester) async {
+    testWidgets('share button is disabled initially',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: MovieSharingUI(
@@ -184,11 +186,12 @@ void main() {
       final button = tester.widget<ElevatedButton>(
         find.widgetWithText(ElevatedButton, 'Share Movie'),
       );
-      
+
       expect(button.onPressed, isNull);
     });
 
-    testWidgets('share button enables after valid WebID entry', (WidgetTester tester) async {
+    testWidgets('share button enables after valid WebID entry',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: MovieSharingUI(
@@ -233,18 +236,20 @@ void main() {
       );
 
       expect(find.byType(SingleChildScrollView), findsOneWidget);
-      
+
       // Try to scroll
-      await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -200));
+      await tester.drag(
+          find.byType(SingleChildScrollView), const Offset(0, -200));
       await tester.pump();
-      
+
       // Should still show all key elements
       expect(find.text('Share "Test Movie"'), findsOneWidget);
     });
 
-    testWidgets('calls onSharingComplete callback', (WidgetTester tester) async {
+    testWidgets('calls onSharingComplete callback',
+        (WidgetTester tester) async {
       bool callbackCalled = false;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: MovieSharingUI(
@@ -261,11 +266,12 @@ void main() {
       expect(callbackCalled, isFalse);
     });
 
-    testWidgets('displays correct layout on different screen sizes', (WidgetTester tester) async {
+    testWidgets('displays correct layout on different screen sizes',
+        (WidgetTester tester) async {
       // Test on small screen
       tester.view.physicalSize = const Size(400, 800);
       tester.view.devicePixelRatio = 1.0;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: MovieSharingUI(
@@ -280,7 +286,7 @@ void main() {
       // Test on large screen
       tester.view.physicalSize = const Size(1200, 800);
       tester.view.devicePixelRatio = 1.0;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: MovieSharingUI(
@@ -291,7 +297,7 @@ void main() {
       );
 
       expect(find.byType(MovieSharingUI), findsOneWidget);
-      
+
       // Reset
       tester.view.resetPhysicalSize();
       tester.view.resetDevicePixelRatio();

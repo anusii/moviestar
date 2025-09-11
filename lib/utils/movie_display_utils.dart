@@ -25,7 +25,6 @@
 
 library;
 
-
 import 'package:moviestar/models/content_item.dart';
 
 /// Formats a movie rating with a star emoji.
@@ -84,7 +83,6 @@ String formatRuntime(int? runtime) {
   }
 }
 
-
 /// Returns just the content type icon without label.
 ///
 /// Returns "🎬" for movies and "📺" for TV shows.
@@ -100,7 +98,6 @@ String getContentTypeLabel(ContentType? contentType) {
   if (contentType == null) return '';
   return contentType == ContentType.movie ? 'Movie' : 'TV Show';
 }
-
 
 /// Validates if an image URL is valid and not empty.
 ///
@@ -128,5 +125,3 @@ String formatCacheAge(Duration age) {
     return 'just now';
   }
 }
-
-

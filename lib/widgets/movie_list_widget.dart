@@ -336,4 +336,3 @@ class _MovieListWidgetState extends State<MovieListWidget> {
     return content;
   }
 }
-

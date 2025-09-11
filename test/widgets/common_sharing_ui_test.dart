@@ -47,7 +47,8 @@ void main() {
   });
 
   group('UI Components', () {
-    testWidgets('ShareDialogWrapper builds correctly', (WidgetTester tester) async {
+    testWidgets('ShareDialogWrapper builds correctly',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ShareDialogWrapper(
@@ -64,9 +65,10 @@ void main() {
       expect(find.byIcon(Icons.close), findsOneWidget);
     });
 
-    testWidgets('PermissionSelector shows available permissions', (WidgetTester tester) async {
+    testWidgets('PermissionSelector shows available permissions',
+        (WidgetTester tester) async {
       final selectedPermissions = <String>['read'];
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -87,13 +89,16 @@ void main() {
       expect(find.text('READ'), findsOneWidget);
       expect(find.text('WRITE'), findsOneWidget);
       expect(find.text('APPEND'), findsOneWidget);
-      
+
       // Should show check icons for selected permissions
-      expect(find.byIcon(Icons.check_circle), findsOneWidget); // READ is selected
-      expect(find.byIcon(Icons.circle_outlined), findsNWidgets(2)); // WRITE and APPEND unselected
+      expect(
+          find.byIcon(Icons.check_circle), findsOneWidget); // READ is selected
+      expect(find.byIcon(Icons.circle_outlined),
+          findsNWidgets(2)); // WRITE and APPEND unselected
     });
 
-    testWidgets('PermissionSelector read-only mode', (WidgetTester tester) async {
+    testWidgets('PermissionSelector read-only mode',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -112,9 +117,10 @@ void main() {
       expect(find.byType(Chip), findsOneWidget);
     });
 
-    testWidgets('PermissionSelector enforces read requirement', (WidgetTester tester) async {
+    testWidgets('PermissionSelector enforces read requirement',
+        (WidgetTester tester) async {
       final selectedPermissions = <String>[];
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -133,15 +139,16 @@ void main() {
 
       // Wait for post-frame callback to add required read permission
       await tester.pumpAndSettle();
-      
+
       // Should automatically have read permission
       expect(selectedPermissions, contains('read'));
-      
+
       // Should show lock icon for read permission
       expect(find.byIcon(Icons.lock), findsOneWidget);
     });
 
-    testWidgets('SharingStatusIndicator shows different states', (WidgetTester tester) async {
+    testWidgets('SharingStatusIndicator shows different states',
+        (WidgetTester tester) async {
       // Test idle state
       await tester.pumpWidget(
         const MaterialApp(
@@ -198,7 +205,8 @@ void main() {
       expect(find.text('Retry'), findsOneWidget);
     });
 
-    testWidgets('ShareableItemTile displays file information', (WidgetTester tester) async {
+    testWidgets('ShareableItemTile displays file information',
+        (WidgetTester tester) async {
       final file = ShareableFile(
         fileName: 'test.ttl',
         displayName: 'Test Movie',
@@ -224,7 +232,7 @@ void main() {
 
     // Note: WebIdInput validation test removed due to async validation complexity
     // This would need to be tested with proper async testing setup
-    
+
     testWidgets('WebIdInput creates text field', (WidgetTester tester) async {
       final controller = TextEditingController();
 

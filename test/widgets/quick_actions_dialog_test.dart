@@ -90,7 +90,8 @@ class MockFavoritesService implements FavoritesService {
   Future<CustomList> createCustomList(
     String name, {
     String? description,
-  }) async => CustomList(
+  }) async =>
+      CustomList(
         id: 'test-${name.toLowerCase().replaceAll(' ', '-')}',
         name: name,
         description: description,
@@ -119,7 +120,8 @@ class MockFavoritesService implements FavoritesService {
   Future<bool> isMovieInCustomList(String listId, int movieId) async => false;
 
   @override
-  Future<List<CustomList>> getCustomListsContainingMovie(int movieId) async => [];
+  Future<List<CustomList>> getCustomListsContainingMovie(int movieId) async =>
+      [];
 
   @override
   Future<List<Movie>> getMoviesInCustomList(String listId) async => [];
@@ -180,7 +182,7 @@ void main() {
         genreIds: [28],
         voteAverage: 7.5,
       );
-      
+
       mockService = MockFavoritesService();
     });
 
@@ -203,7 +205,8 @@ void main() {
       expect(find.text('Test Movie'), findsOneWidget);
     });
 
-    testWidgets('displays content type indicator for movie', (WidgetTester tester) async {
+    testWidgets('displays content type indicator for movie',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -223,7 +226,8 @@ void main() {
       expect(find.text('🎬 Movie'), findsOneWidget);
     });
 
-    testWidgets('displays content type indicator for TV show', (WidgetTester tester) async {
+    testWidgets('displays content type indicator for TV show',
+        (WidgetTester tester) async {
       final tvShow = Movie(
         id: 456,
         title: 'Test TV Show',
@@ -290,14 +294,14 @@ void main() {
       );
 
       await tester.pumpAndSettle();
-      
+
       // Initially not bookmarked
       expect(find.byIcon(Icons.bookmark_border), findsOneWidget);
-      
+
       // Tap bookmark button
       await tester.tap(find.byIcon(Icons.bookmark_border));
       await tester.pumpAndSettle();
-      
+
       // Should now be bookmarked
       expect(find.byIcon(Icons.bookmark), findsOneWidget);
     });
@@ -341,7 +345,8 @@ void main() {
       expect(find.text('Your Rating'), findsOneWidget);
     });
 
-    testWidgets('displays no rating text initially', (WidgetTester tester) async {
+    testWidgets('displays no rating text initially',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -360,9 +365,10 @@ void main() {
       expect(find.text('No rating yet'), findsOneWidget);
     });
 
-    testWidgets('does not display share button when no file', (WidgetTester tester) async {
+    testWidgets('does not display share button when no file',
+        (WidgetTester tester) async {
       mockService.setHasFile(false);
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -383,7 +389,7 @@ void main() {
 
     testWidgets('calls onMouseEnter callback', (WidgetTester tester) async {
       bool mouseEnterCalled = false;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -401,12 +407,13 @@ void main() {
       );
 
       await tester.pumpAndSettle();
-      
+
       // Simulate mouse enter
       final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
-      await gesture.addPointer(location: tester.getCenter(find.byType(QuickActionsDialog)));
+      await gesture.addPointer(
+          location: tester.getCenter(find.byType(QuickActionsDialog)));
       addTearDown(gesture.removePointer);
-      
+
       await tester.pump();
       expect(mouseEnterCalled, isTrue);
     });
@@ -428,7 +435,7 @@ void main() {
 
       // The mock service completes synchronously, so loading should be done immediately
       await tester.pumpAndSettle();
-      
+
       // Should show the dialog content after loading completes
       expect(find.byType(QuickActionsDialog), findsOneWidget);
       expect(find.text('Test Movie'), findsOneWidget);

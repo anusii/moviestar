@@ -55,8 +55,6 @@ Future<void> navigateToMovieDetails(
   }
 }
 
-
-
 /// Creates a route for the movie details screen.
 ///
 /// This can be used with custom navigation animations or named routes.
@@ -71,5 +69,3 @@ Route<void> createMovieDetailsRoute(
     ),
   );
 }
-
-

@@ -68,16 +68,7 @@ class _FilesScreenState extends State<FilesScreen> with ScreenStateMixin {
               padding: const EdgeInsets.all(Dimensions.xl),
               child: SolidFile(
                 basePath: basePath,
-                uploadCallbacks: SolidFileUploadCallbacks(
-                  onUpload: () {},
-                  onImportCsv: () {},
-                  onExportCsv: () {},
-                  onImportProfile: () {},
-                  onExportProfile: () {},
-                  onVisualiseJson: () {},
-                  onPreviewFile: () {},
-                  onConvertToJson: () {},
-                ),
+                uploadCallbacks: SolidFileUploadCallbacks.defaults(),
               ),
             );
           },

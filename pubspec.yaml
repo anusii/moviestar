@@ -1,7 +1,7 @@
 name: moviestar
 description: "A modern privacy-first movie discovery and tracking application."
 publish_to: "none"
-version: 0.0.30+7
+version: 0.0.31+7
 
 environment:
   sdk: ">=3.2.3 <4.0.0"
@@ -31,8 +31,6 @@ dependencies:
   intl: any
   internet_connection_checker_plus: ^2.5.2
   markdown_tooltip: ^0.0.8
-
-  path: ^1.9.1
   rdflib: ^0.2.12
   rxdart: ^0.28.0
   shared_preferences: ^2.2.2

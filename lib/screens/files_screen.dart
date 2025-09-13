@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/constants/paths.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 
@@ -63,10 +64,11 @@ class _FilesScreenState extends State<FilesScreen> with ScreenStateMixin {
               );
             }
 
-            return const Padding(
-              padding: EdgeInsets.all(Dimensions.xl),
+            return Padding(
+              padding: const EdgeInsets.all(Dimensions.xl),
               child: SolidFile(
-                basePath: 'moviestar',
+                basePath: basePath,
+                uploadCallbacks: SolidFileUploadCallbacks.defaults(),
               ),
             );
           },

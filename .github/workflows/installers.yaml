@@ -52,6 +52,8 @@ jobs:
           sudo apt-get install -y libgtk-3-dev
           printf '#%.0s' {1..72}; printf '\nclang cmake\n'
           sudo apt-get install -y clang cmake
+          printf '#%.0s' {1..72}; printf '\nlibsecret-1-dev\n'
+          sudo apt-get install -y libsecret-1-dev
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2

@@ -114,7 +114,6 @@ class _SharedMovieListDetailScreenState
             if (actualTitle != null) {
               // We have the actual title from the shared file
               titles[movieId.toString()] = actualTitle;
-              debugPrint('   ✅ Using actual title: $actualTitle');
             } else if (contentType == 'tv') {
               // For TV shows without a parsed title, use a generic title since the cachedMovieService doesn't support TV shows yet
               titles[movieId.toString()] = 'TV Show $movieId';
@@ -407,11 +406,6 @@ class _SharedMovieListDetailScreenState
       // Check if we have filePath information from the movie list
       final providedFilePath = movieData['filePath'] as String?;
 
-      debugPrint('📂 [FetchIndividual] Fetching data for movie $movieId');
-      debugPrint('   - Provided filePath: ${providedFilePath ?? "none"}');
-      debugPrint('   - Owner WebId: $ownerWebId');
-      debugPrint('   - SharedBy WebId: $sharedByWebId');
-
       // First, try to find the individual file in the shared resources
       String? actualSharedUrl =
           await _findIndividualFileInSharedResources(movieId, providedFilePath);
@@ -560,7 +554,6 @@ class _SharedMovieListDetailScreenState
               movieFileContent is String &&
               movieFileContent.isNotEmpty) {
             isTvShow = false;
-            debugPrint('   ✅ Found Movie file at $movieResourceUrl');
             break;
           } else {
             debugPrint('   ❌ Movie file not found at $movieResourceUrl');
@@ -583,7 +576,6 @@ class _SharedMovieListDetailScreenState
                 movieFileContent is String &&
                 movieFileContent.isNotEmpty) {
               isTvShow = true;
-              debugPrint('   ✅ Found TVShow file at $tvShowResourceUrl');
               break;
             } else {
               debugPrint('   ❌ TVShow file not found at $tvShowResourceUrl');

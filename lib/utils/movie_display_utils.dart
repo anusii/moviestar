@@ -62,27 +62,6 @@ String formatMovieYear(dynamic releaseDate) {
   return '';
 }
 
-/// Formats runtime from minutes to a human-readable format.
-///
-/// Converts runtime in minutes to "Xh Ym" format.
-/// Example: 135 -> "2h 15m"
-String formatRuntime(int? runtime) {
-  if (runtime == null || runtime <= 0) {
-    return '';
-  }
-
-  final hours = runtime ~/ 60;
-  final minutes = runtime % 60;
-
-  if (hours > 0 && minutes > 0) {
-    return '${hours}h ${minutes}m';
-  } else if (hours > 0) {
-    return '${hours}h';
-  } else {
-    return '${minutes}m';
-  }
-}
-
 /// Returns just the content type icon without label.
 ///
 /// Returns "🎬" for movies and "📺" for TV shows.

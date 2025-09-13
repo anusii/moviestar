@@ -602,9 +602,6 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
             final displayName =
                 isTvShow ? 'TV Show $movieIdStr' : 'Movie $movieIdStr';
 
-            debugPrint('🎬 [MovieList] Processing movie $movieIdStr:');
-            debugPrint('   - FilePath: ${filePath ?? "not found"}');
-            debugPrint('   - Content type: $contentType');
             debugPrint('   - Display name: $displayName');
 
             return {

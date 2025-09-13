@@ -61,7 +61,7 @@ class ShareResult {
   });
 
   factory ShareResult.success({
-    Map<String, dynamic>? metadata,
+    Map<String, dynamic> metadata = const {},
     SolidFunctionCallStatus? status,
   }) {
     return ShareResult(

@@ -19,23 +19,17 @@ import 'package:moviestar/models/list_operation_models.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/movie_list_service.dart';
 import 'package:moviestar/services/pod_file_operations_service.dart';
+import 'package:moviestar/services/pod_list_cache_manager.dart';
+import 'package:moviestar/services/pod_list_data_converter.dart';
+import 'package:moviestar/services/pod_list_file_validator.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
-import 'package:moviestar/utils/turtle_serializer.dart';
 
 /// Service for managing custom movie lists in POD storage.
 class PodListManagementService {
   final BuildContext _context;
   final Widget _child;
   final MovieListService _movieListService;
-
-  /// Cache for custom lists to avoid frequent POD reads.
-  final Map<String, CustomList> _customListsCache = {};
-
-  /// Track the last time we scanned the directory.
-  DateTime? _lastDirectoryScan;
-
-  /// Cache expiration duration.
-  static const Duration _cacheExpiration = Duration(minutes: 5);
+  final PodListCacheManager _cacheManager = PodListCacheManager();
 
   PodListManagementService(
     this._context,
@@ -53,15 +47,12 @@ class PodListManagementService {
         return ListOperationResult.success(lists: []);
       }
 
-      // Check cache expiration
-      final shouldRefresh = forceRefresh ||
-          _lastDirectoryScan == null ||
-          DateTime.now().difference(_lastDirectoryScan!) > _cacheExpiration;
-
-      if (!shouldRefresh && _customListsCache.isNotEmpty) {
-        return ListOperationResult.success(
-          lists: _customListsCache.values.toList(),
-        );
+      // Check cache
+      if (!_cacheManager.shouldRefresh(forceRefresh: forceRefresh)) {
+        final cachedLists = _cacheManager.getCachedLists();
+        if (cachedLists != null) {
+          return ListOperationResult.success(lists: cachedLists);
+        }
       }
 
       return await _scanAndLoadCustomLists();
@@ -76,7 +67,7 @@ class PodListManagementService {
     final customLists = <CustomList>[];
 
     // Clear cache to rebuild it
-    _customListsCache.clear();
+    _cacheManager.clearForRebuild();
 
     // Track processed list IDs and names to avoid duplicates
     final processedListIds = <String>{};
@@ -87,17 +78,13 @@ class PodListManagementService {
       final dirUrl = await getDirUrl('moviestar/data/user_lists');
       final resources = await getResourcesInContainer(dirUrl);
 
-      debugPrint(
-        '📂 [PodListManagement] Found ${resources.files.length} files in user_lists directory',
-      );
-
       for (final fileName in resources.files) {
-        if (!_isValidMovieListFile(fileName)) {
+        if (!PodListFileValidator.isValidMovieListFile(fileName)) {
           continue;
         }
 
         // Extract the MovieList ID from the filename
-        final movieListId = _extractMovieListId(fileName);
+        final movieListId = PodListFileValidator.extractMovieListId(fileName);
         if (movieListId == null) continue;
 
         // Skip if we've already processed this list ID
@@ -119,20 +106,23 @@ class PodListManagementService {
         }
 
         // Convert MovieList data to CustomList format
-        final customList = _movieListToCustomList(movieListId, movieListData);
+        final customList = PodListDataConverter.movieListToCustomList(
+          movieListId,
+          movieListData,
+        );
 
         // Skip standard lists and duplicates by name
-        if (_isStandardList(customList.name) ||
+        if (PodListFileValidator.isStandardList(customList.name) ||
             processedListNames.contains(customList.name)) {
           continue;
         }
 
         processedListNames.add(customList.name);
         customLists.add(customList);
-        _customListsCache[movieListId] = customList;
+        _cacheManager.cacheList(movieListId, customList);
       }
 
-      _lastDirectoryScan = DateTime.now();
+      _cacheManager.markDirectoryScanned();
       return ListOperationResult.success(lists: customLists);
     } catch (e) {
       if (!e.toString().contains('does not exist') &&
@@ -142,58 +132,6 @@ class PodListManagementService {
       }
       return ListOperationResult.success(lists: []);
     }
-  }
-
-  /// Checks if a filename is a valid MovieList file.
-  bool _isValidMovieListFile(String fileName) {
-    if (!fileName.startsWith('MovieList-') || !fileName.endsWith('.ttl')) {
-      return false;
-    }
-
-    // Skip ACL, backup, or other metadata files that might be created during sharing
-    if (fileName.contains('.acl.') ||
-        fileName.contains('_backup') ||
-        fileName.contains('_shared') ||
-        fileName.contains('.meta.') ||
-        fileName.contains('~') ||
-        fileName.startsWith('.')) {
-      debugPrint('⚠️ [PodListManagement] Skipping metadata file: $fileName');
-      return false;
-    }
-
-    return true;
-  }
-
-  /// Extracts MovieList ID from filename.
-  String? _extractMovieListId(String fileName) {
-    try {
-      return fileName.replaceAll('MovieList-', '').replaceAll('.ttl', '');
-    } catch (e) {
-      return null;
-    }
-  }
-
-  /// Checks if a list name is a standard system list.
-  bool _isStandardList(String name) {
-    return name == 'To Watch' || name == 'Watched';
-  }
-
-  /// Converts MovieList data to CustomList format.
-  CustomList _movieListToCustomList(
-    String movieListId,
-    Map<String, dynamic> movieListData,
-  ) {
-    final movies = List<Movie>.from(movieListData['movies'] ?? []);
-    final movieIds = movies.map((m) => m.id).toList();
-
-    return CustomList(
-      id: movieListId,
-      name: movieListData['name'] ?? 'Unnamed List',
-      description: movieListData['description'],
-      movieIds: movieIds,
-      createdAt: DateTime.now(), // MovieList doesn't track creation time yet
-      updatedAt: DateTime.now(),
-    );
   }
 
   /// Creates a new custom list in PODs.
@@ -230,7 +168,7 @@ class PodListManagementService {
       );
 
       // Update cache
-      _customListsCache[movieListId] = newList;
+      _cacheManager.cacheList(movieListId, newList);
 
       return ListOperationResult.success(list: newList);
     } catch (e) {
@@ -262,15 +200,15 @@ class PodListManagementService {
       final movies = movieListData['movies'] as List<Movie>? ?? [];
 
       // Create updated TTL content with new name/description but same movies
-      final movieListTtl = TurtleSerializer.createMovieList(
+      final movieListTtl = PodListDataConverter.createMovieListTtl(
         updatedList.id,
         updatedList.name,
-        movies: movies,
+        movies,
         description: updatedList.description,
       );
 
       // Write updated content back to POD
-      final fileName = 'user_lists/MovieList-${updatedList.id}.ttl';
+      final fileName = PodListDataConverter.generateFileName(updatedList.id);
 
       if (!_context.mounted) {
         return ListOperationResult.failure('Context not available');
@@ -291,7 +229,7 @@ class PodListManagementService {
       }
 
       // Update cache
-      _customListsCache[updatedList.id] = updatedList;
+      _cacheManager.updateCachedList(updatedList.id, updatedList);
 
       return ListOperationResult.success(list: updatedList);
     } catch (e) {
@@ -319,7 +257,7 @@ class PodListManagementService {
       }
 
       // Remove from cache
-      _customListsCache.remove(listId);
+      _cacheManager.removeCachedList(listId);
 
       return ListOperationResult.success();
     } catch (e) {
@@ -334,12 +272,6 @@ class PodListManagementService {
     Movie movie, {
     String contentType = 'movie',
   }) async {
-    debugPrint('📁 [PodListManagement] addMovieToCustomList called:');
-    debugPrint('   Movie: ${movie.title} (ID: ${movie.id})');
-    debugPrint('   Movie.contentType: ${movie.contentType}');
-    debugPrint('   Parameter contentType: $contentType');
-    debugPrint('   ListId: $listId');
-
     try {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
@@ -361,19 +293,15 @@ class PodListManagementService {
         );
       }
 
-      debugPrint(
-        '📁 [PodListManagement] Successfully added movie to POD MovieList',
-      );
-
       // Update cache
-      if (_customListsCache.containsKey(listId)) {
-        final currentList = _customListsCache[listId]!;
+      if (_cacheManager.containsList(listId)) {
+        final currentList = _cacheManager.getCachedList(listId)!;
         if (!currentList.movieIds.contains(movie.id)) {
           final updatedMovieIds = [...currentList.movieIds, movie.id];
-          _customListsCache[listId] = currentList.copyWith(
-            movieIds: updatedMovieIds,
+          _cacheManager.updateCachedList(
+            listId,
+            currentList.copyWith(movieIds: updatedMovieIds),
           );
-          debugPrint('📁 [PodListManagement] Updated cache for list $listId');
         }
       }
 
@@ -398,16 +326,7 @@ class PodListManagementService {
       }
 
       // Create a minimal Movie object for the removal operation
-      final movie = Movie(
-        id: movieId,
-        title: '',
-        overview: '',
-        posterUrl: '',
-        backdropUrl: '',
-        voteAverage: 0,
-        releaseDate: DateTime(1970),
-        genreIds: [],
-      );
+      final movie = PodListDataConverter.createMinimalMovie(movieId);
 
       // Remove movie from the MovieList in PODs
       final success =
@@ -420,12 +339,13 @@ class PodListManagementService {
       }
 
       // Update cache
-      if (_customListsCache.containsKey(listId)) {
-        final currentList = _customListsCache[listId]!;
+      if (_cacheManager.containsList(listId)) {
+        final currentList = _cacheManager.getCachedList(listId)!;
         final updatedMovieIds =
             currentList.movieIds.where((id) => id != movieId).toList();
-        _customListsCache[listId] = currentList.copyWith(
-          movieIds: updatedMovieIds,
+        _cacheManager.updateCachedList(
+          listId,
+          currentList.copyWith(movieIds: updatedMovieIds),
         );
       }
 
@@ -440,10 +360,6 @@ class PodListManagementService {
 
   /// Gets movies in a specific custom list.
   Future<List<Movie>> getMoviesInCustomList(String listId) async {
-    debugPrint(
-      '📁 [PodListManagement] getMoviesInCustomList called for listId: $listId',
-    );
-
     try {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
@@ -454,42 +370,13 @@ class PodListManagementService {
       final movieListData = await _movieListService.getMovieList(listId);
       if (movieListData != null && movieListData['movies'] != null) {
         final movies = List<Movie>.from(movieListData['movies']);
-        debugPrint(
-          '📁 [PodListManagement] Found ${movies.length} movies in MovieList data:',
-        );
-
-        for (final movie in movies) {
-          debugPrint(
-            '   - ${movie.title} (ID: ${movie.id}, contentType: ${movie.contentType})',
-          );
-        }
 
         // Filter out placeholder movies and TV shows
-        final validMovies = movies.where((movie) {
-          final isMoviePlaceholder =
-              RegExp(r'^Movie \d+$').hasMatch(movie.title);
-          final isTVPlaceholder =
-              RegExp(r'^TV Show \d+$').hasMatch(movie.title);
-          final isValid = !isMoviePlaceholder && !isTVPlaceholder;
+        final validMovies = PodListDataConverter.filterValidMovies(movies);
 
-          if (!isValid) {
-            debugPrint(
-              '📁 [PodListManagement] Filtering out placeholder: ${movie.title}',
-            );
-          }
-
-          return isValid;
-        }).toList();
-
-        debugPrint(
-          '📁 [PodListManagement] After filtering: ${validMovies.length} valid movies',
-        );
         return validMovies;
       }
 
-      debugPrint(
-        '📁 [PodListManagement] No movie data found for listId: $listId',
-      );
       return [];
     } catch (e) {
       debugPrint('❌ Failed to get movies in custom list: $e');
@@ -501,8 +388,8 @@ class PodListManagementService {
   Future<bool> isMovieInCustomList(String listId, int movieId) async {
     try {
       // First check cache
-      if (_customListsCache.containsKey(listId)) {
-        return _customListsCache[listId]!.movieIds.contains(movieId);
+      if (_cacheManager.containsList(listId)) {
+        return _cacheManager.getCachedList(listId)!.movieIds.contains(movieId);
       }
 
       // Otherwise, fetch the list
@@ -510,13 +397,7 @@ class PodListManagementService {
       if (result.success && result.lists != null) {
         final list = result.lists!.firstWhere(
           (list) => list.id == listId,
-          orElse: () => CustomList(
-            id: '',
-            name: '',
-            movieIds: [],
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          ),
+          orElse: PodListDataConverter.createEmptyCustomList,
         );
         return list.movieIds.contains(movieId);
       }
@@ -541,7 +422,6 @@ class PodListManagementService {
 
   /// Clears the cache and forces a refresh on next access.
   void clearCache() {
-    _customListsCache.clear();
-    _lastDirectoryScan = null;
+    _cacheManager.clearCache();
   }
 }

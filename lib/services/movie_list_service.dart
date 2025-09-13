@@ -426,7 +426,6 @@ class MovieListService {
         debugPrint(
           '🔐 Permission/Auth error scanning user_lists directory: $e',
         );
-        debugPrint('🔄 May need to wait for POD authentication to complete');
       } else {
         if (!e.toString().contains('does not exist') &&
             !e.toString().contains('Failed to get resource list')) {

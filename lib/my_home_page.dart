@@ -350,7 +350,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   /// Reinitializes the app after API key is set
   Future<void> reinitializeAfterApiKey() async {
-    debugPrint('🔄 Reinitializing app after API key configuration');
     await _initialiseAppData();
   }
 

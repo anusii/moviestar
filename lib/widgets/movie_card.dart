@@ -141,11 +141,10 @@ class MovieCard extends StatefulWidget {
 
   /// Creates a poster-style movie card.
 
-  // ignore: avoid-unnecessary-nullable-parameters
   const MovieCard.poster({
     super.key,
     required this.movie,
-    this.fromCache,
+    this.fromCache = false,
     this.cacheAge,
     this.cacheOnlyMode,
     this.onTap,
@@ -163,7 +162,6 @@ class MovieCard extends StatefulWidget {
 
   /// Creates a list item-style movie card.
 
-  // ignore: avoid-unnecessary-nullable-parameters
   const MovieCard.listItem({
     super.key,
     required this.movie,

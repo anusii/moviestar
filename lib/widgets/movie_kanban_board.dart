@@ -217,19 +217,10 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     String targetId,
     Movie movie,
   ) {
-    debugPrint('⚡ [OptimisticUI] Adding optimistic movie:');
-    debugPrint('   Movie: ${movie.title} (ID: ${movie.id})');
-    debugPrint('   ContentType: ${movie.contentType}');
-    debugPrint('   Target: $targetType ($targetId)');
-
     final key = _getOperationKey(targetType, targetId);
     _pendingOperations[key] ??= <int>{};
     _pendingOperations[key]!.add(movie.id);
     _optimisticMovies['${movie.id}_$key'] = movie;
-
-    debugPrint(
-      '⚡ [OptimisticUI] Stored movie in _optimisticMovies with key: ${movie.id}_$key',
-    );
 
     setState(() {});
   }
@@ -297,7 +288,6 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         // Addition - add if not already present.
         final movieKey = '${opId}_$key';
         final movie = _optimisticMovies[movieKey];
-        debugPrint('⚡ [OptimisticUI] Looking for movie with key: $movieKey');
 
         if (movie != null) {
           debugPrint(
@@ -305,7 +295,6 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           );
           if (!result.any((m) => m.id == movie.id)) {
             result.add(movie);
-            debugPrint('⚡ [OptimisticUI] Added optimistic movie to result');
           } else {
             debugPrint(
               '⚡ [OptimisticUI] Movie already exists in result, skipping',
@@ -688,7 +677,6 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     String targetId,
     String targetName,
   ) async {
-    debugPrint('🎯 [KanbanDrop] _handleDrop called:');
     debugPrint('   Drag Source: ${dragData.sourceType} (${dragData.sourceId})');
     debugPrint('   Drop Target: $targetType ($targetId)');
     debugPrint('   Movie: ${dragData.movie.title} (ID: ${dragData.movie.id})');
@@ -697,14 +685,12 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     // Don't allow dropping on same column.
 
     if (dragData.sourceType == targetType && dragData.sourceId == targetId) {
-      debugPrint('🎯 [KanbanDrop] Dropping on same column, ignoring');
       return;
     }
 
     // Determine if this is a copy or move operation.
 
     final isCopyOperation = dragData.sourceType == KanbanColumnType.popular;
-    debugPrint('🎯 [KanbanDrop] Is copy operation: $isCopyOperation');
 
     // Apply optimistic UI updates immediately.
 
@@ -746,7 +732,6 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     bool isCopyOperation,
     int operationId,
   ) async {
-    debugPrint('🎬 [KanbanDrag] Starting sync drop operation:');
     debugPrint('   Movie: ${dragData.movie.title} (ID: ${dragData.movie.id})');
     debugPrint('   ContentType: ${dragData.movie.contentType}');
     debugPrint('   Target: $targetType ($targetName)');

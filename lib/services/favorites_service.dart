@@ -186,6 +186,11 @@ class FavoritesService extends ChangeNotifier {
   /// [contentType] specifies whether this is a movie or TV show.
 
   Future<void> addToWatch(Movie movie, {String contentType = 'movie'}) async {
+    debugPrint('📋 [FavoritesService] addToWatch called:');
+    debugPrint('   Movie: ${movie.title} (ID: ${movie.id})');
+    debugPrint('   Movie.contentType: ${movie.contentType}');
+    debugPrint('   Parameter contentType: $contentType');
+
     final toWatch = await getToWatch();
     if (!toWatch.any((m) => m.id == movie.id)) {
       // Ensure contentType is set if not already.
@@ -204,6 +209,8 @@ class FavoritesService extends ChangeNotifier {
               contentType:
                   contentType == 'tv' ? ContentType.tvShow : ContentType.movie,
             );
+
+      debugPrint('📋 [FavoritesService] Final movie contentType: ${movieToAdd.contentType}');
       toWatch.add(movieToAdd);
       await _saveToWatch(toWatch);
       _toWatchController.add(toWatch);
@@ -215,6 +222,11 @@ class FavoritesService extends ChangeNotifier {
   /// [contentType] specifies whether this is a movie or TV show.
 
   Future<void> addToWatched(Movie movie, {String contentType = 'movie'}) async {
+    debugPrint('📋 [FavoritesService] addToWatched called:');
+    debugPrint('   Movie: ${movie.title} (ID: ${movie.id})');
+    debugPrint('   Movie.contentType: ${movie.contentType}');
+    debugPrint('   Parameter contentType: $contentType');
+
     final watched = await getWatched();
     if (!watched.any((m) => m.id == movie.id)) {
       // Ensure contentType is set if not already.
@@ -233,6 +245,8 @@ class FavoritesService extends ChangeNotifier {
               contentType:
                   contentType == 'tv' ? ContentType.tvShow : ContentType.movie,
             );
+
+      debugPrint('📋 [FavoritesService] Final movie contentType: ${movieToAdd.contentType}');
       watched.add(movieToAdd);
       await _saveWatched(watched);
       _watchedController.add(watched);

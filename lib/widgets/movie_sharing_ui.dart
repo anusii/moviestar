@@ -13,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/models/content_item.dart';
+import 'package:moviestar/models/sharing_models.dart';
 import 'package:moviestar/services/pod_sharing_service.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
 import 'package:moviestar/widgets/common_sharing_ui.dart'
@@ -56,14 +58,18 @@ class _MovieSharingUIState extends State<MovieSharingUI> {
     });
 
     try {
+      // Construct file name based on content type
+      final isTV = widget.movie.contentType == ContentType.tvShow;
+      final filePrefix = isTV ? 'TVShow' : 'Movie';
+
       final request = ShareRequest(
-        fileName: 'movies/Movie-${widget.movie.id}.ttl',
+        fileName: 'movies/$filePrefix-${widget.movie.id}.ttl',
         displayName: widget.movie.title,
         permissions: ['read'], // Movies are read-only for security
         recipientWebId: _validatedWebId!,
       );
 
-      final result = await PodSharingService.shareFile(request);
+      final result = await PodSharingService.shareFile(request, context, widget);
 
       setState(() {
         _shareStatus = result.success ? ShareStatus.success : ShareStatus.error;
@@ -217,7 +223,7 @@ class _MovieSharingUIState extends State<MovieSharingUI> {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      'Movie-${widget.movie.id}.ttl',
+                      '${widget.movie.contentType == ContentType.tvShow ? "TVShow" : "Movie"}-${widget.movie.id}.ttl',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             fontFamily: 'monospace',
                             color: Colors.blue[700],

@@ -82,6 +82,7 @@ class _SharedMovieListDetailScreenState
   }
 
   /// Load movie titles from TMDB API for all movies in the list.
+  /// This will also detect and update content types.
 
   Future<void> _loadMovieTitles() async {
     try {
@@ -92,12 +93,42 @@ class _SharedMovieListDetailScreenState
         final movieId =
             int.tryParse(movieData['movieId']?.toString() ?? '0') ?? 0;
         if (movieId > 0) {
+          debugPrint('🔍 [LoadTitles] Loading title for movie ID: $movieId');
+          debugPrint('   - Initial data: ${movieData['fileName']}');
+          debugPrint('   - FilePath: ${movieData['filePath'] ?? "not provided"}');
+
           try {
-            final movie = await cachedMovieService.getMovieDetails(movieId);
-            titles[movieId.toString()] = movie.title;
+            // First try to fetch enhanced data that includes content type detection and actual title
+            final enhancedData = await _fetchIndividualMovieData(movieData);
+            final contentType = enhancedData['content_type'] ?? 'movie';
+
+            // Check if we got an actual title from the TTL file
+            String? actualTitle = await _extractTitleFromEnhancedData(enhancedData);
+
+            debugPrint('   - Enhanced content type: $contentType');
+            debugPrint('   - Extracted title: ${actualTitle ?? "not found"}');
+
+            if (actualTitle != null) {
+              // We have the actual title from the shared file
+              titles[movieId.toString()] = actualTitle;
+              debugPrint('   ✅ Using actual title: $actualTitle');
+            } else if (contentType == 'tv') {
+              // For TV shows without a parsed title, use a generic title since the cachedMovieService doesn't support TV shows yet
+              titles[movieId.toString()] = 'TV Show $movieId';
+            } else {
+              // For movies without a parsed title, use the TMDB API
+              final movie = await cachedMovieService.getMovieDetails(movieId);
+              titles[movieId.toString()] = movie.title;
+            }
           } catch (e) {
-            debugPrint('Error fetching title for movie $movieId: $e');
-            titles[movieId.toString()] = 'Movie $movieId'; // Fallback
+            debugPrint('Error fetching title for content $movieId: $e');
+            // Use content type from enhanced data if available
+            final enhancedData = await _fetchIndividualMovieData(movieData);
+            final contentType = enhancedData['content_type'] ?? 'movie';
+
+            titles[movieId.toString()] = contentType == 'tv'
+                ? 'TV Show $movieId'
+                : 'Movie $movieId'; // Fallback
           }
         }
       }
@@ -109,13 +140,71 @@ class _SharedMovieListDetailScreenState
         });
       }
     } catch (e) {
-      debugPrint('Error loading movie titles: $e');
+      debugPrint('Error loading content titles: $e');
       if (mounted) {
         safeSetState(() {
           _loadingTitles = false;
         });
       }
     }
+  }
+
+  // Find individual file in shared resources by movie ID or filePath.
+
+  Future<String?> _findIndividualFileInSharedResources(String movieId, String? providedFilePath) async {
+    try {
+      // Get the shared resources to look for individual files
+      final sharedResourcesResult = await sharedResources(context, widget);
+
+      if (sharedResourcesResult == SolidFunctionCallStatus.notLoggedIn) {
+        debugPrint('   ❌ Not logged in to check shared resources');
+        return null;
+      }
+
+      if (sharedResourcesResult is! Map) {
+        debugPrint('   ❌ Invalid shared resources data');
+        return null;
+      }
+
+      // Look for individual movie files that match our movie ID
+      for (final entry in sharedResourcesResult.entries) {
+        final resourceUrl = entry.key as String;
+
+        // Check if this is an individual movie file that matches our ID
+        if (resourceUrl.contains('/movies/') && resourceUrl.endsWith('.ttl')) {
+          // Check if the URL contains our movie ID
+          if (resourceUrl.contains('Movie-$movieId.ttl') || resourceUrl.contains('TVShow-$movieId.ttl')) {
+            debugPrint('   🔍 Found matching individual file by ID: $resourceUrl');
+            return resourceUrl;
+          }
+
+          // If we have a providedFilePath, also check for that
+          if (providedFilePath != null && resourceUrl.endsWith(providedFilePath)) {
+            debugPrint('   🔍 Found matching individual file by filePath: $resourceUrl');
+            return resourceUrl;
+          }
+        }
+      }
+
+      debugPrint('   ❌ No individual file found in shared resources for movie $movieId');
+      return null;
+    } catch (e) {
+      debugPrint('   ❌ Error searching shared resources: $e');
+      return null;
+    }
+  }
+
+  // Extract title from enhanced movie data.
+
+  Future<String?> _extractTitleFromEnhancedData(
+    Map<String, dynamic> enhancedData,
+  ) async {
+    // Check if we have a title field in the enhanced data
+    final title = enhancedData['title'] as String?;
+    if (title != null && title.isNotEmpty) {
+      return title;
+    }
+    return null;
   }
 
   // Extract owner name from WebID.
@@ -277,6 +366,7 @@ class _SharedMovieListDetailScreenState
   }
 
   // Attempts to fetch individual movie file data to get ratings and comments.
+  // First tries to find the file in shared resources, then falls back to constructing URLs.
 
   Future<Map<String, dynamic>> _fetchIndividualMovieData(
     Map<String, dynamic> movieData,
@@ -298,48 +388,227 @@ class _SharedMovieListDetailScreenState
       }
 
       final ownerWebId = widget.ownerWebId;
-      final individualMovieFileName = 'movies/Movie-$movieId.ttl';
+      final sharedByWebId = widget.sharedByWebId;
 
-      // Extract base URL from WebID like: https://pods.dev.solidcommunity.au/my-moviestar/profile/card#me.
-      // Should become: https://pods.dev.solidcommunity.au/my-moviestar/.
+      // Check if we have filePath information from the movie list
+      final providedFilePath = movieData['filePath'] as String?;
 
-      final baseUrl = _extractBaseUrlFromWebId(ownerWebId);
-      if (baseUrl == null) {
+      debugPrint('📂 [FetchIndividual] Fetching data for movie $movieId');
+      debugPrint('   - Provided filePath: ${providedFilePath ?? "none"}');
+      debugPrint('   - Owner WebId: $ownerWebId');
+      debugPrint('   - SharedBy WebId: $sharedByWebId');
+
+      // First, try to find the individual file in the shared resources
+      String? actualSharedUrl = await _findIndividualFileInSharedResources(movieId, providedFilePath);
+
+      if (actualSharedUrl != null) {
+        debugPrint('   - Found individual file in shared resources: $actualSharedUrl');
+
+        if (!mounted) return movieData;
+
+        final movieFileContent = await readExternalPod(
+          actualSharedUrl,
+          context,
+          widget,
+        );
+
+        if (movieFileContent != null &&
+            movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
+            movieFileContent is String &&
+            movieFileContent.isNotEmpty) {
+
+          final isTvShow = actualSharedUrl.contains('TVShow-') || (providedFilePath?.startsWith('TVShow-') ?? false);
+
+          debugPrint('   ✅ Successfully read shared individual file (${movieFileContent.length} chars)');
+          debugPrint('   - Detected as: ${isTvShow ? "TV Show" : "Movie"}');
+
+          // Parse and return the enhanced data
+          final parsedData = await _parseIndividualMovieData(movieFileContent);
+
+          if (parsedData != null || isTvShow) {
+            final enhancedData = Map<String, dynamic>.from(movieData);
+            if (parsedData != null) {
+              if (parsedData['title'] != null) {
+                enhancedData['title'] = parsedData['title'];
+                enhancedData['fileName'] = parsedData['title'];
+                debugPrint('   📝 Extracted title: "${parsedData['title']}"');
+              }
+              if (parsedData['rating'] != null) {
+                enhancedData['rating'] = parsedData['rating'];
+              }
+              if (parsedData['comments'] != null) {
+                enhancedData['comments'] = parsedData['comments'];
+              }
+            }
+
+            enhancedData['content_type'] = isTvShow ? 'tv' : 'movie';
+            return enhancedData;
+          }
+        }
+      }
+
+      // Fallback: try to construct URLs manually (existing logic)
+      debugPrint('   - Falling back to manual URL construction...');
+
+      // If we have a filePath from the movie list, use it directly
+      // Otherwise, try both Movie and TVShow file patterns
+      final movieFileName = 'movies/Movie-$movieId.ttl';
+      final tvShowFileName = 'movies/TVShow-$movieId.ttl';
+
+      // We'll try both the owner's and sharer's PODs
+      final ownerBaseUrl = _extractBaseUrlFromWebId(ownerWebId);
+      final sharerBaseUrl = _extractBaseUrlFromWebId(sharedByWebId);
+
+      debugPrint('   - Owner base URL: $ownerBaseUrl');
+      debugPrint('   - Sharer base URL: $sharerBaseUrl');
+
+      if (ownerBaseUrl == null && sharerBaseUrl == null) {
+        debugPrint('   ❌ Could not extract base URLs from WebIDs');
         return movieData;
       }
 
-      // Construct the full resource URL.
+      // Try to read the individual file from the owner's POD.
+      // Use provided filePath if available, otherwise try both Movie and TVShow patterns.
 
-      final resourceUrl = '${baseUrl}moviestar/data/$individualMovieFileName';
+      dynamic movieFileContent;
+      bool isTvShow = false;
 
-      // Try to read the individual movie file from the owner's POD.
+      if (providedFilePath != null) {
+        // We have the exact filePath from the movie list, try both PODs
+        final urlsToTry = <String>[];
 
-      final movieFileContent = await readExternalPod(
-        resourceUrl,
-        context,
-        widget,
-      );
+        if (ownerBaseUrl != null) {
+          urlsToTry.add('${ownerBaseUrl}moviestar/data/movies/$providedFilePath');
+        }
+        if (sharerBaseUrl != null && sharerBaseUrl != ownerBaseUrl) {
+          urlsToTry.add('${sharerBaseUrl}moviestar/data/movies/$providedFilePath');
+        }
+
+        for (final resourceUrl in urlsToTry) {
+          debugPrint('   - Trying URL: $resourceUrl');
+
+          if (!mounted) return movieData;
+
+          movieFileContent = await readExternalPod(
+            resourceUrl,
+            context,
+            widget,
+          );
+
+          if (movieFileContent != null &&
+              movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
+              movieFileContent is String &&
+              movieFileContent.isNotEmpty) {
+            isTvShow = providedFilePath.startsWith('TVShow-');
+            debugPrint('   ✅ Successfully read file from $resourceUrl (${movieFileContent.length} chars)');
+            debugPrint('   - Detected as: ${isTvShow ? "TV Show" : "Movie"}');
+            break; // Success, stop trying other URLs
+          } else {
+            debugPrint('   ❌ Failed to read file from $resourceUrl');
+          }
+        }
+      } else {
+        // Fall back to trying both patterns on both PODs
+        debugPrint('   - Falling back to trying both Movie and TVShow patterns');
+
+        final baseUrlsToTry = <String>[];
+        if (ownerBaseUrl != null) baseUrlsToTry.add(ownerBaseUrl);
+        if (sharerBaseUrl != null && sharerBaseUrl != ownerBaseUrl) {
+          baseUrlsToTry.add(sharerBaseUrl);
+        }
+
+        for (final baseUrl in baseUrlsToTry) {
+          if (!mounted) return movieData;
+
+          // Try Movie file first
+          final movieResourceUrl = '${baseUrl}moviestar/data/$movieFileName';
+          debugPrint('   - Trying Movie pattern: $movieResourceUrl');
+
+          movieFileContent = await readExternalPod(
+            movieResourceUrl,
+            context,
+            widget,
+          );
+
+          if (movieFileContent != null &&
+              movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
+              movieFileContent is String &&
+              movieFileContent.isNotEmpty) {
+            isTvShow = false;
+            debugPrint('   ✅ Found Movie file at $movieResourceUrl');
+            break;
+          } else {
+            debugPrint('   ❌ Movie file not found at $movieResourceUrl');
+
+            // Try TVShow file
+            final tvShowResourceUrl = '${baseUrl}moviestar/data/$tvShowFileName';
+            debugPrint('   - Trying TVShow pattern: $tvShowResourceUrl');
+
+            if (!mounted) return movieData;
+
+            movieFileContent = await readExternalPod(
+              tvShowResourceUrl,
+              context,
+              widget,
+            );
+
+            if (movieFileContent != null &&
+                movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
+                movieFileContent is String &&
+                movieFileContent.isNotEmpty) {
+              isTvShow = true;
+              debugPrint('   ✅ Found TVShow file at $tvShowResourceUrl');
+              break;
+            } else {
+              debugPrint('   ❌ TVShow file not found at $tvShowResourceUrl');
+            }
+          }
+        }
+      }
 
       if (movieFileContent == null ||
-          movieFileContent.isEmpty ||
-          movieFileContent == SolidFunctionCallStatus.notLoggedIn) {
+          movieFileContent == SolidFunctionCallStatus.notLoggedIn ||
+          movieFileContent is! String ||
+          movieFileContent.isEmpty) {
         return movieData;
       }
 
-      // Parse the movie file content to extract rating and comments.
+      // Parse the movie/TV show file content to extract rating and comments.
 
+      debugPrint('   - Parsing TTL content to extract metadata...');
       final parsedData = await _parseIndividualMovieData(movieFileContent);
 
-      if (parsedData != null) {
+      if (parsedData != null || isTvShow) {
         // Merge the parsed data with the original movie data.
 
         final enhancedData = Map<String, dynamic>.from(movieData);
-        if (parsedData['rating'] != null) {
-          enhancedData['rating'] = parsedData['rating'];
+        if (parsedData != null) {
+          if (parsedData['title'] != null) {
+            enhancedData['title'] = parsedData['title'];
+            // Also update the fileName with the actual title
+            enhancedData['fileName'] = parsedData['title'];
+            debugPrint('   📝 Extracted title: "${parsedData['title']}"');
+          }
+          if (parsedData['rating'] != null) {
+            enhancedData['rating'] = parsedData['rating'];
+          }
+          if (parsedData['comments'] != null) {
+            enhancedData['comments'] = parsedData['comments'];
+          }
         }
-        if (parsedData['comments'] != null) {
-          enhancedData['comments'] = parsedData['comments'];
+
+        // Update content type and display name based on what we found
+        if (isTvShow) {
+          enhancedData['content_type'] = 'tv';
+          // Update the fileName to reflect it's a TV show if not already set properly
+          // But only if we don't have a real title
+          if (parsedData?['title'] == null && enhancedData['fileName'] == 'Movie $movieId') {
+            enhancedData['fileName'] = 'TV Show $movieId';
+          }
+        } else {
+          enhancedData['content_type'] = 'movie';
         }
+
         return enhancedData;
       }
 
@@ -350,16 +619,33 @@ class _SharedMovieListDetailScreenState
     }
   }
 
-  // Parses individual movie file content to extract rating and comments.
+  // Parses individual movie file content to extract title, rating and comments.
 
   Future<Map<String, dynamic>?> _parseIndividualMovieData(
     String ttlContent,
   ) async {
     try {
+      debugPrint('   🔬 [ParseTTL] Starting TTL content parsing...');
+
       double? rating;
       String? comments;
+      String? title;
 
       // Try to parse JSON backup data first (more reliable)
+      final movieJsonMatch = RegExp(
+        r'# JSON_MOVIE_DATA: (.+)',
+      ).firstMatch(ttlContent);
+
+      if (movieJsonMatch != null) {
+        debugPrint('   - Found JSON_MOVIE_DATA section');
+        final movieJsonData = movieJsonMatch.group(1)!;
+        final movieData = jsonDecode(movieJsonData) as Map<String, dynamic>;
+        title = movieData['title'] as String?;
+        debugPrint('   - JSON title: "$title"');
+      } else {
+        debugPrint('   - No JSON_MOVIE_DATA found, will try TTL parsing');
+      }
+
       final userJsonMatch = RegExp(
         r'# JSON_USER_DATA: (.+)',
       ).firstMatch(ttlContent);
@@ -373,10 +659,23 @@ class _SharedMovieListDetailScreenState
 
       // If no JSON backup, try TTL parsing (fallback).
 
-      if (rating == null && comments == null) {
+      if (title == null || rating == null || comments == null) {
         final lines = ttlContent.split('\n');
         for (final line in lines) {
           final trimmedLine = line.trim();
+
+          // Extract title.
+
+          if (title == null &&
+              (trimmedLine.contains('schema:name') ||
+               trimmedLine.contains('sdo:name') ||
+               trimmedLine.contains(':name'))) {
+            final match = RegExp(r'"([^"]*)"').firstMatch(trimmedLine);
+            if (match != null) {
+              title = match.group(1);
+              debugPrint('   - Found title in TTL: "$title"');
+            }
+          }
 
           // Extract rating.
 
@@ -398,10 +697,12 @@ class _SharedMovieListDetailScreenState
         }
       }
 
-      if (rating != null || (comments != null && comments.isNotEmpty)) {
-        return {'rating': rating, 'comments': comments};
+      if (title != null || rating != null || (comments != null && comments.isNotEmpty)) {
+        debugPrint('   - Parse results: title="$title", rating=$rating, hasComments=${comments != null && comments.isNotEmpty}');
+        return {'title': title, 'rating': rating, 'comments': comments};
       }
 
+      debugPrint('   - No data extracted from TTL content');
       return null;
     } catch (e) {
       debugPrint('❌ Error parsing individual movie data: $e');

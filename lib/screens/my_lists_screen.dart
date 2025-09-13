@@ -29,21 +29,22 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
-import 'package:solidpod/solidpod.dart';
+import 'package:solidpod/solidpod.dart' show SolidFunctionCallStatus, readPod, writePod;
 
 import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/custom_list.dart';
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/add_movies_to_list_screen.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
+import 'package:moviestar/utils/turtle_serializer.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/movie_list_service.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
-import 'package:moviestar/utils/turtle_serializer.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 
@@ -694,7 +695,41 @@ Edit list name and description, or delete this list.
     );
   }
 
+  // Shows a loading dialog during sharing process.
+  void _showSharingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Preparing to share...',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'This may take a few seconds',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   // Shares the custom list and all movies using batch sharing UI.
+  // Uses the same mechanism as the app bar sharing by loading movies from POD with correct content types.
 
   Future<void> _shareCustomList(CustomList list) async {
     if (list.movieIds.isEmpty) {
@@ -702,44 +737,86 @@ Edit list name and description, or delete this list.
       return;
     }
 
-    // Store context references before async operations.
-
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final navigator = Navigator.of(context);
-    final theme = Theme.of(context);
+    // Show loading dialog
+    _showSharingDialog();
 
     try {
-      // Get movie details for all movies in the list.
-
-      final movieService = ref.read(cachedMovieServiceProvider);
+      // Load movies using the same mechanism as the custom list detail screen
       final moviesToShare = <Movie>[];
 
-      // Load all movies from the list.
+      // First try to load from POD if using POD storage (same as custom list detail screen)
+      if (widget.favoritesService is FavoritesServiceAdapter &&
+          (widget.favoritesService as FavoritesServiceAdapter).isPodStorageEnabled) {
 
-      for (final movieId in list.movieIds) {
+        final movieListService = MovieListService(
+          context,
+          widget,
+          UserProfileService(context, widget),
+        );
+
         try {
-          final movie = await movieService.getMovieDetails(movieId);
-          moviesToShare.add(movie);
-        } catch (e) {
-          // Skip movies that can't be loaded.
+          // Try to find existing movie list in POD that matches our custom list
+          final listId = list.id;
+          final movieListData = await movieListService.getMovieList(listId);
 
-          continue;
+          if (movieListData != null && movieListData['movies'] is List) {
+            // Use the movies from POD which have correct content types
+            final podMovies = (movieListData['movies'] as List).cast<Movie>();
+            moviesToShare.addAll(podMovies);
+          }
+        } catch (e) {
+          debugPrint('Failed to load from POD: $e');
+        }
+      }
+
+      // If we didn't get movies from POD, load from API with content type correction
+      if (moviesToShare.isEmpty) {
+        final movieService = ref.read(cachedMovieServiceProvider);
+
+        for (int index = 0; index < list.movieIds.length; index++) {
+          final movieId = list.movieIds[index];
+          try {
+            final movie = await movieService.getMovieDetails(movieId);
+
+            // Determine content type from the list's stored content types
+            final contentTypeString = list.getContentTypeAt(index);
+            final contentType = contentTypeString == 'tv'
+                ? ContentType.tvShow
+                : ContentType.movie;
+
+            // Create a new movie with the correct content type
+            final movieWithContentType = Movie(
+              id: movie.id,
+              title: movie.title,
+              overview: movie.overview,
+              posterUrl: movie.posterUrl,
+              backdropUrl: movie.backdropUrl,
+              voteAverage: movie.voteAverage,
+              releaseDate: movie.releaseDate,
+              genreIds: movie.genreIds,
+              contentType: contentType,
+            );
+
+            moviesToShare.add(movieWithContentType);
+          } catch (e) {
+            debugPrint('Failed to load movie $movieId: $e');
+          }
         }
       }
 
       if (moviesToShare.isEmpty) {
-        if (mounted) {
-          scaffoldMessenger.showSnackBar(
-            const SnackBar(content: Text('Unable to load movies for sharing')),
-          );
-        }
+        showErrorSnackBar('Movies are still loading. Please wait.');
         return;
       }
 
+      // Check mounted before using context after async operations.
       if (!mounted) return;
 
-      // Create MovieList service to create the list file first.
+      // Store context references before async operations.
+      final theme = Theme.of(context);
 
+      // Create MovieList service to create the list file first.
+      if (!mounted) return;
       final userProfileService = UserProfileService(context, widget);
       final movieListService = MovieListService(
         context,
@@ -748,7 +825,6 @@ Edit list name and description, or delete this list.
       );
 
       // Create the MovieList TTL file.
-
       final listId = await movieListService.createMovieList(
         list.name,
         movies: moviesToShare,
@@ -759,15 +835,12 @@ Edit list name and description, or delete this list.
 
       if (listId == null) {
         if (mounted) {
-          scaffoldMessenger.showSnackBar(
-            const SnackBar(content: Text('Failed to create movie list')),
-          );
+          showErrorSnackBar('Failed to create movie list');
         }
         return;
       }
 
       // Ensure all individual movie files exist before sharing.
-
       for (final movie in moviesToShare) {
         try {
           await _createMovieFileIfNotExists(movie);
@@ -778,9 +851,8 @@ Edit list name and description, or delete this list.
       }
 
       // Navigate to the batch sharing UI.
-
       if (mounted) {
-        await navigator.push<bool>(
+        await safeNavigateTo(
           MaterialPageRoute(
             fullscreenDialog: true,
             builder: (context) => MovieStarBatchSharingUi(
@@ -798,9 +870,12 @@ Edit list name and description, or delete this list.
       }
     } catch (e) {
       if (mounted) {
-        scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text('Error sharing list: $e')),
-        );
+        showErrorSnackBar('Error sharing list: $e');
+      }
+    } finally {
+      // Dismiss loading dialog
+      if (mounted) {
+        Navigator.of(context).pop();
       }
     }
   }
@@ -809,7 +884,10 @@ Edit list name and description, or delete this list.
 
   Future<void> _createMovieFileIfNotExists(Movie movie) async {
     try {
-      final movieFileName = 'movies/Movie-${movie.id}.ttl';
+      // Construct file name based on content type
+      final isTV = movie.contentType == ContentType.tvShow;
+      final filePrefix = isTV ? 'TVShow' : 'Movie';
+      final movieFileName = 'movies/$filePrefix-${movie.id}.ttl';
 
       // Check if the file already exists.
 
@@ -855,4 +933,5 @@ Edit list name and description, or delete this list.
       rethrow;
     }
   }
+
 }

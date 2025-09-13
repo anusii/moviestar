@@ -15,44 +15,12 @@ import 'package:flutter/material.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/models/custom_list.dart';
+import 'package:moviestar/models/list_operation_models.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/movie_list_service.dart';
 import 'package:moviestar/services/pod_file_operations_service.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
-
-/// Result model for list operations.
-class ListOperationResult {
-  final bool success;
-  final String? error;
-  final CustomList? list;
-  final List<CustomList>? lists;
-
-  const ListOperationResult({
-    required this.success,
-    this.error,
-    this.list,
-    this.lists,
-  });
-
-  factory ListOperationResult.success({
-    CustomList? list,
-    List<CustomList>? lists,
-  }) {
-    return ListOperationResult(
-      success: true,
-      list: list,
-      lists: lists,
-    );
-  }
-
-  factory ListOperationResult.failure(String error) {
-    return ListOperationResult(
-      success: false,
-      error: error,
-    );
-  }
-}
 
 /// Service for managing custom movie lists in POD storage.
 class PodListManagementService {
@@ -366,6 +334,12 @@ class PodListManagementService {
     Movie movie, {
     String contentType = 'movie',
   }) async {
+    debugPrint('📁 [PodListManagement] addMovieToCustomList called:');
+    debugPrint('   Movie: ${movie.title} (ID: ${movie.id})');
+    debugPrint('   Movie.contentType: ${movie.contentType}');
+    debugPrint('   Parameter contentType: $contentType');
+    debugPrint('   ListId: $listId');
+
     try {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
@@ -387,6 +361,8 @@ class PodListManagementService {
         );
       }
 
+      debugPrint('📁 [PodListManagement] Successfully added movie to POD MovieList');
+
       // Update cache
       if (_customListsCache.containsKey(listId)) {
         final currentList = _customListsCache[listId]!;
@@ -395,6 +371,7 @@ class PodListManagementService {
           _customListsCache[listId] = currentList.copyWith(
             movieIds: updatedMovieIds,
           );
+          debugPrint('📁 [PodListManagement] Updated cache for list $listId');
         }
       }
 
@@ -461,6 +438,8 @@ class PodListManagementService {
 
   /// Gets movies in a specific custom list.
   Future<List<Movie>> getMoviesInCustomList(String listId) async {
+    debugPrint('📁 [PodListManagement] getMoviesInCustomList called for listId: $listId');
+
     try {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
@@ -471,16 +450,30 @@ class PodListManagementService {
       final movieListData = await _movieListService.getMovieList(listId);
       if (movieListData != null && movieListData['movies'] != null) {
         final movies = List<Movie>.from(movieListData['movies']);
+        debugPrint('📁 [PodListManagement] Found ${movies.length} movies in MovieList data:');
 
-        // Filter out placeholder movies (those with titles exactly matching "Movie 123456" pattern)
+        for (final movie in movies) {
+          debugPrint('   - ${movie.title} (ID: ${movie.id}, contentType: ${movie.contentType})');
+        }
+
+        // Filter out placeholder movies and TV shows
         final validMovies = movies.where((movie) {
-          final isPlaceholder = RegExp(r'^Movie \d+$').hasMatch(movie.title);
-          return !isPlaceholder;
+          final isMoviePlaceholder = RegExp(r'^Movie \d+$').hasMatch(movie.title);
+          final isTVPlaceholder = RegExp(r'^TV Show \d+$').hasMatch(movie.title);
+          final isValid = !isMoviePlaceholder && !isTVPlaceholder;
+
+          if (!isValid) {
+            debugPrint('📁 [PodListManagement] Filtering out placeholder: ${movie.title}');
+          }
+
+          return isValid;
         }).toList();
 
+        debugPrint('📁 [PodListManagement] After filtering: ${validMovies.length} valid movies');
         return validMovies;
       }
 
+      debugPrint('📁 [PodListManagement] No movie data found for listId: $listId');
       return [];
     } catch (e) {
       debugPrint('❌ Failed to get movies in custom list: $e');

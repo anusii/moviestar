@@ -25,118 +25,14 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:solidpod/solidpod.dart' show SolidFunctionCallStatus, getWebId;
-// ignore: implementation_imports
-import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
+import 'package:solidpod/solidpod.dart'
+    show SolidFunctionCallStatus, getWebId, grantPermission, loginIfRequired, getKeyFromUserIfRequired;
 
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/models/sharing_models.dart';
 import 'package:moviestar/services/pod_file_operations_service.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
-
-/// Request model for sharing a file
-class ShareRequest {
-  final String fileName;
-  final String displayName;
-  final List<String> permissions;
-  final String recipientWebId;
-  final RecipientType recipientType;
-  final Map<String, dynamic>? metadata;
-
-  const ShareRequest({
-    required this.fileName,
-    required this.displayName,
-    required this.permissions,
-    required this.recipientWebId,
-    this.recipientType = RecipientType.individual,
-    this.metadata,
-  });
-}
-
-/// Result model for sharing operations
-class ShareResult {
-  final bool success;
-  final String? error;
-  final Map<String, dynamic>? metadata;
-  final SolidFunctionCallStatus? status;
-
-  const ShareResult({
-    required this.success,
-    this.error,
-    this.metadata,
-    this.status,
-  });
-
-  factory ShareResult.success({Map<String, dynamic>? metadata}) {
-    return ShareResult(
-      success: true,
-      metadata: metadata,
-    );
-  }
-
-  factory ShareResult.failure(String error, {SolidFunctionCallStatus? status}) {
-    return ShareResult(
-      success: false,
-      error: error,
-      status: status,
-    );
-  }
-}
-
-/// Request model for batch sharing
-class BatchShareRequest {
-  final List<ShareRequest> requests;
-  final String recipientWebId;
-  final bool stopOnError;
-
-  const BatchShareRequest({
-    required this.requests,
-    required this.recipientWebId,
-    this.stopOnError = false,
-  });
-}
-
-/// Result model for batch sharing operations
-class BatchShareResult {
-  final List<ShareResult> results;
-  final int successCount;
-  final int failureCount;
-  final bool allSuccessful;
-
-  BatchShareResult({
-    required this.results,
-  })  : successCount = results.where((r) => r.success).length,
-        failureCount = results.where((r) => !r.success).length,
-        allSuccessful = results.every((r) => r.success);
-}
-
-/// Permission request model
-class PermissionRequest {
-  final String fileName;
-  final String webId;
-  final List<String> permissions;
-  final RecipientType recipientType;
-
-  const PermissionRequest({
-    required this.fileName,
-    required this.webId,
-    required this.permissions,
-    this.recipientType = RecipientType.individual,
-  });
-}
-
-/// Permission result model
-class PermissionResult {
-  final bool granted;
-  final String? error;
-  final SolidFunctionCallStatus? status;
-
-  const PermissionResult({
-    required this.granted,
-    this.error,
-    this.status,
-  });
-}
 
 /// Service class for POD sharing operations
 class PodSharingService {
@@ -194,42 +90,74 @@ class PodSharingService {
     }
   }
 
-  /// Share a single file (Note: This is a simplified version for testing)
-  /// In real implementation, this would need BuildContext and Widget parameters
-  static Future<ShareResult> shareFile(ShareRequest request) async {
+  /// Share a single file using real POD permission granting
+  static Future<ShareResult> shareFile(
+    ShareRequest request,
+    BuildContext context,
+    Widget widget,
+  ) async {
     try {
-      // Note: In real implementation, we would need BuildContext for these calls:
-      // await loginIfRequired(context);
-      // await getKeyFromUserIfRequired(context, widget);
+      // Check if context is still mounted before async operations
+      if (!context.mounted) {
+        return ShareResult.failure('Context no longer mounted');
+      }
+
+      // Ensure user is logged in and has proper keys
+      await loginIfRequired(context);
+      if (!context.mounted) {
+        return ShareResult.failure('Context no longer mounted');
+      }
+
+      await getKeyFromUserIfRequired(context, widget);
+      if (!context.mounted) {
+        return ShareResult.failure('Context no longer mounted');
+      }
 
       // Validate WebID
       if (!await validateWebId(request.recipientWebId)) {
         return ShareResult.failure('Invalid WebID: ${request.recipientWebId}');
       }
 
-      // Note: In real implementation, we would use the actual grantPermission call:
-      // final result = await grantPermission(
-      //   request.fileName,
-      //   true, // fileFlag
-      //   request.permissions,
-      //   request.recipientType,
-      //   [request.recipientWebId],
-      //   ownerWebId,
-      //   context,
-      //   widget,
-      //   isExternalRes: false,
-      // );
+      // Get current user's WebID
+      final ownerWebId = await getCurrentWebId();
+      if (ownerWebId == null) {
+        return ShareResult.failure('Unable to get current user WebID');
+      }
 
-      // For now, simulate success for testing
-      return ShareResult.success(
-        metadata: {
-          'fileName': request.fileName,
-          'displayName': request.displayName,
-          'recipientWebId': request.recipientWebId,
-          'permissions': request.permissions,
-          'timestamp': DateTime.now().toIso8601String(),
-        },
+      if (!context.mounted) {
+        return ShareResult.failure('Context no longer mounted');
+      }
+
+      // Grant permission using actual solidpod call
+      final result = await grantPermission(
+        request.fileName,
+        true, // fileFlag - this is a file, not a folder
+        request.permissions,
+        request.recipientType,
+        [request.recipientWebId],
+        ownerWebId,
+        context,
+        widget,
+        isExternalRes: false,
       );
+
+      if (result == SolidFunctionCallStatus.success) {
+        return ShareResult.success(
+          metadata: {
+            'fileName': request.fileName,
+            'displayName': request.displayName,
+            'recipientWebId': request.recipientWebId,
+            'permissions': request.permissions,
+            'timestamp': DateTime.now().toIso8601String(),
+          },
+          status: result,
+        );
+      } else {
+        return ShareResult.failure(
+          'Failed to grant permission: $result',
+          status: result,
+        );
+      }
     } catch (e) {
       return ShareResult.failure('Error sharing file: $e');
     }
@@ -237,13 +165,15 @@ class PodSharingService {
 
   /// Share multiple files
   static Future<BatchShareResult> shareMultipleFiles(
-    List<ShareRequest> requests, {
+    List<ShareRequest> requests,
+    BuildContext context,
+    Widget widget, {
     bool stopOnError = false,
   }) async {
     final results = <ShareResult>[];
 
     for (final request in requests) {
-      final result = await shareFile(request);
+      final result = await shareFile(request, context, widget);
       results.add(result);
 
       if (!result.success && stopOnError) {
@@ -254,20 +184,73 @@ class PodSharingService {
     return BatchShareResult(results: results);
   }
 
-  /// Grant permissions for a file (Note: Simplified for testing)
-  /// In real implementation, this would need BuildContext and Widget parameters
+  /// Grant permissions for a file using real POD calls
   static Future<PermissionResult> grantPermissions(
     PermissionRequest request,
+    BuildContext context,
+    Widget widget,
   ) async {
     try {
-      // Note: In real implementation, we would need BuildContext for these calls:
-      // await loginIfRequired(context);
-      // await getKeyFromUserIfRequired(context, widget);
+      // Check if context is still mounted before async operations
+      if (!context.mounted) {
+        return const PermissionResult(
+          granted: false,
+          error: 'Context no longer mounted',
+        );
+      }
 
-      // For testing, simulate success
-      return const PermissionResult(
-        granted: true,
-        error: null,
+      // Ensure user is logged in and has proper keys
+      await loginIfRequired(context);
+      if (!context.mounted) {
+        return const PermissionResult(
+          granted: false,
+          error: 'Context no longer mounted',
+        );
+      }
+
+      await getKeyFromUserIfRequired(context, widget);
+      if (!context.mounted) {
+        return const PermissionResult(
+          granted: false,
+          error: 'Context no longer mounted',
+        );
+      }
+
+      // Get current user's WebID
+      final ownerWebId = await getCurrentWebId();
+      if (ownerWebId == null) {
+        return const PermissionResult(
+          granted: false,
+          error: 'Unable to get current user WebID',
+        );
+      }
+
+      if (!context.mounted) {
+        return const PermissionResult(
+          granted: false,
+          error: 'Context no longer mounted',
+        );
+      }
+
+      // Grant permission using actual solidpod call
+      final result = await grantPermission(
+        request.fileName,
+        true, // fileFlag
+        request.permissions,
+        request.recipientType,
+        [request.webId],
+        ownerWebId,
+        context,
+        widget,
+        isExternalRes: false,
+      );
+
+      return PermissionResult(
+        granted: result == SolidFunctionCallStatus.success,
+        error: result == SolidFunctionCallStatus.success
+            ? null
+            : 'Failed to grant permission: $result',
+        status: result,
       );
     } catch (e) {
       return PermissionResult(
@@ -279,7 +262,9 @@ class PodSharingService {
 
   /// Perform batch sharing with progress callback
   static Future<BatchShareResult> performBatchShare(
-    BatchShareRequest request, {
+    BatchShareRequest request,
+    BuildContext context,
+    Widget widget, {
     void Function(int completed, int total)? onProgress,
   }) async {
     final results = <ShareResult>[];
@@ -295,6 +280,8 @@ class PodSharingService {
           recipientType: shareRequest.recipientType,
           metadata: shareRequest.metadata,
         ),
+        context,
+        widget,
       );
 
       results.add(result);
@@ -409,10 +396,18 @@ class PodSharingService {
         return ShareResult.failure('Invalid recipient WebID: $recipientWebId');
       }
 
+      // Check if context is still mounted before checking movie file
+      if (!context.mounted) {
+        return ShareResult.failure('Context no longer mounted');
+      }
+
       // Check if movie file exists
-      // ignore: use_build_context_synchronously
       if (!await movieFileExists(movie, context, child)) {
         return ShareResult.failure('Movie file does not exist for sharing');
+      }
+
+      if (!context.mounted) {
+        return ShareResult.failure('Context no longer mounted');
       }
 
       final fileName = getMovieFileName(movie);
@@ -430,7 +425,7 @@ class PodSharingService {
         },
       );
 
-      return await shareFile(shareRequest);
+      return await shareFile(shareRequest, context, child);
     } catch (e) {
       return ShareResult.failure('Error sharing movie file: $e');
     }
@@ -466,7 +461,7 @@ class PodSharingService {
       recipientWebId: recipientWebId,
     );
 
-    return await performBatchShare(batchRequest, onProgress: onProgress);
+    return await performBatchShare(batchRequest, context, child, onProgress: onProgress);
   }
 
   /// Create or update a movie file with user data

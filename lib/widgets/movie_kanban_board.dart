@@ -32,6 +32,7 @@ import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/models/app_error.dart';
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
@@ -216,10 +217,18 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     String targetId,
     Movie movie,
   ) {
+    debugPrint('⚡ [OptimisticUI] Adding optimistic movie:');
+    debugPrint('   Movie: ${movie.title} (ID: ${movie.id})');
+    debugPrint('   ContentType: ${movie.contentType}');
+    debugPrint('   Target: $targetType ($targetId)');
+
     final key = _getOperationKey(targetType, targetId);
     _pendingOperations[key] ??= <int>{};
     _pendingOperations[key]!.add(movie.id);
     _optimisticMovies['${movie.id}_$key'] = movie;
+
+    debugPrint('⚡ [OptimisticUI] Stored movie in _optimisticMovies with key: ${movie.id}_$key');
+
     setState(() {});
   }
 
@@ -272,15 +281,30 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       return originalMovies;
     }
 
+    debugPrint('⚡ [OptimisticUI] Getting movies with optimistic updates for $type ($id):');
+    debugPrint('   Key: $key');
+    debugPrint('   Pending ops: $pendingOps');
+    debugPrint('   Original movies: ${originalMovies.length}');
+
     final result = List<Movie>.from(originalMovies);
 
     for (final opId in pendingOps) {
       if (opId > 0) {
         // Addition - add if not already present.
+        final movieKey = '${opId}_$key';
+        final movie = _optimisticMovies[movieKey];
+        debugPrint('⚡ [OptimisticUI] Looking for movie with key: $movieKey');
 
-        final movie = _optimisticMovies['${opId}_$key'];
-        if (movie != null && !result.any((m) => m.id == movie.id)) {
-          result.add(movie);
+        if (movie != null) {
+          debugPrint('⚡ [OptimisticUI] Found optimistic movie: ${movie.title} (contentType: ${movie.contentType})');
+          if (!result.any((m) => m.id == movie.id)) {
+            result.add(movie);
+            debugPrint('⚡ [OptimisticUI] Added optimistic movie to result');
+          } else {
+            debugPrint('⚡ [OptimisticUI] Movie already exists in result, skipping');
+          }
+        } else {
+          debugPrint('⚡ [OptimisticUI] Movie not found in _optimisticMovies for key: $movieKey');
         }
       } else {
         // Removal - remove if present.
@@ -574,7 +598,11 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           // Handle custom list copy operations.
           if (action.startsWith('copy_custom_')) {
             final listId = action.substring('copy_custom_'.length);
-            await widget.favoritesService.addMovieToCustomList(listId, movie);
+            await widget.favoritesService.addMovieToCustomList(
+              listId,
+              movie,
+              contentType: movie.contentType == ContentType.tvShow ? 'tv' : 'movie',
+            );
           }
       }
 
@@ -649,15 +677,23 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     String targetId,
     String targetName,
   ) async {
+    debugPrint('🎯 [KanbanDrop] _handleDrop called:');
+    debugPrint('   Drag Source: ${dragData.sourceType} (${dragData.sourceId})');
+    debugPrint('   Drop Target: $targetType ($targetId)');
+    debugPrint('   Movie: ${dragData.movie.title} (ID: ${dragData.movie.id})');
+    debugPrint('   Movie ContentType: ${dragData.movie.contentType}');
+
     // Don't allow dropping on same column.
 
     if (dragData.sourceType == targetType && dragData.sourceId == targetId) {
+      debugPrint('🎯 [KanbanDrop] Dropping on same column, ignoring');
       return;
     }
 
     // Determine if this is a copy or move operation.
 
     final isCopyOperation = dragData.sourceType == KanbanColumnType.popular;
+    debugPrint('🎯 [KanbanDrop] Is copy operation: $isCopyOperation');
 
     // Apply optimistic UI updates immediately.
 
@@ -699,6 +735,12 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     bool isCopyOperation,
     int operationId,
   ) async {
+    debugPrint('🎬 [KanbanDrag] Starting sync drop operation:');
+    debugPrint('   Movie: ${dragData.movie.title} (ID: ${dragData.movie.id})');
+    debugPrint('   ContentType: ${dragData.movie.contentType}');
+    debugPrint('   Target: $targetType ($targetName)');
+    debugPrint('   Copy operation: $isCopyOperation');
+
     _updateQueueStatus(operationId, OperationStatus.inProgress);
     try {
       // Ensure movie file exists before adding to user lists.
@@ -707,14 +749,23 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       // Add to target list.
       switch (targetType) {
         case KanbanColumnType.toWatch:
-          await widget.favoritesService.addToWatch(dragData.movie);
+          final contentTypeString = dragData.movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
+          debugPrint('🎬 [KanbanDrag] Adding to ToWatch with contentType string: $contentTypeString');
+          await widget.favoritesService.addToWatch(dragData.movie, contentType: contentTypeString);
           break;
         case KanbanColumnType.watched:
-          await widget.favoritesService.addToWatched(dragData.movie);
+          final contentTypeString = dragData.movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
+          debugPrint('🎬 [KanbanDrag] Adding to Watched with contentType string: $contentTypeString');
+          await widget.favoritesService.addToWatched(dragData.movie, contentType: contentTypeString);
           break;
         case KanbanColumnType.customList:
-          await widget.favoritesService
-              .addMovieToCustomList(targetId, dragData.movie);
+          final contentTypeString = dragData.movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
+          debugPrint('🎬 [KanbanDrag] Adding to custom list with contentType string: $contentTypeString');
+          await widget.favoritesService.addMovieToCustomList(
+            targetId,
+            dragData.movie,
+            contentType: contentTypeString,
+          );
           break;
         case KanbanColumnType.popular:
         // Can't drop into popular.
@@ -2046,6 +2097,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                                       categoryId: 'popular',
                                       fromCache: popularCacheResult.fromCache,
                                       columnType: KanbanColumnType.popular,
+                                      isLoading: popularMovies.isEmpty &&
+                                          !popularCacheResult.fromCache,
                                     ),
 
                                     // To Watch Column.
@@ -2108,8 +2161,98 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
               },
             );
           },
-          loading: () => const Center(
-            child: CircularProgressIndicator(),
+          loading: () => StreamBuilder<List<Movie>>(
+            stream: widget.favoritesService.toWatchMovies,
+            builder: (context, toWatchSnapshot) {
+              return StreamBuilder<List<Movie>>(
+                stream: widget.favoritesService.watchedMovies,
+                builder: (context, watchedSnapshot) {
+                  return StreamBuilder<List<CustomList>>(
+                    stream: widget.favoritesService.customLists,
+                    builder: (context, customListsSnapshot) {
+                      final toWatchMovies = toWatchSnapshot.data ?? [];
+                      final watchedMovies = watchedSnapshot.data ?? [];
+                      final customLists = customListsSnapshot.data ?? [];
+
+                      return Stack(
+                        children: [
+                          Scrollbar(
+                            controller: _horizontalScrollController,
+                            thumbVisibility: true,
+                            trackVisibility: true,
+                            thickness: 8,
+                            radius: const Radius.circular(4),
+                            child: SingleChildScrollView(
+                              controller: _horizontalScrollController,
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Popular Movies Column (Loading State).
+                                  _buildKanbanColumn(
+                                    title: 'Popular',
+                                    movies: [],
+                                    categoryId: 'popular',
+                                    fromCache: false,
+                                    columnType: KanbanColumnType.popular,
+                                    isLoading: true,
+                                  ),
+
+                                  // To Watch Column.
+                                  _buildKanbanColumn(
+                                    title: 'To Watch',
+                                    movies: toWatchMovies,
+                                    categoryId: 'towatch',
+                                    fromCache: false,
+                                    columnType: KanbanColumnType.toWatch,
+                                    isLoading:
+                                        toWatchSnapshot.connectionState ==
+                                                ConnectionState.waiting &&
+                                            !toWatchSnapshot.hasData,
+                                  ),
+
+                                  // Watched Column.
+                                  _buildKanbanColumn(
+                                    title: 'Watched',
+                                    movies: watchedMovies,
+                                    categoryId: 'watched',
+                                    fromCache: false,
+                                    columnType: KanbanColumnType.watched,
+                                    isLoading:
+                                        watchedSnapshot.connectionState ==
+                                                ConnectionState.waiting &&
+                                            !watchedSnapshot.hasData,
+                                  ),
+
+                                  // Custom List Columns.
+                                  ...customLists.map(
+                                    (customList) =>
+                                        _buildCustomListColumn(customList),
+                                  ),
+
+                                  // Show loading placeholder for custom lists if they're still loading
+                                  if (customListsSnapshot.connectionState ==
+                                          ConnectionState.waiting &&
+                                      customLists.isEmpty)
+                                    _buildCustomListLoadingColumn(),
+                                ],
+                              ),
+                            ),
+                          ),
+                          // Progress indicator overlay.
+                          if (_operationQueue.isNotEmpty)
+                            Positioned(
+                              bottom: 20,
+                              right: 20,
+                              child: _buildProgressIndicator(),
+                            ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              );
+            },
           ),
           error: (error, stack) => _buildSmartErrorWidget(error, stack),
         );

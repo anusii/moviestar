@@ -12,8 +12,8 @@ import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/models/content_item.dart';
+import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/models/sharing_models.dart';
 import 'package:moviestar/services/pod_sharing_service.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
@@ -69,7 +69,8 @@ class _MovieSharingUIState extends State<MovieSharingUI> {
         recipientWebId: _validatedWebId!,
       );
 
-      final result = await PodSharingService.shareFile(request, context, widget);
+      final result =
+          await PodSharingService.shareFile(request, context, widget);
 
       setState(() {
         _shareStatus = result.success ? ShareStatus.success : ShareStatus.error;

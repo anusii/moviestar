@@ -227,7 +227,9 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     _pendingOperations[key]!.add(movie.id);
     _optimisticMovies['${movie.id}_$key'] = movie;
 
-    debugPrint('⚡ [OptimisticUI] Stored movie in _optimisticMovies with key: ${movie.id}_$key');
+    debugPrint(
+      '⚡ [OptimisticUI] Stored movie in _optimisticMovies with key: ${movie.id}_$key',
+    );
 
     setState(() {});
   }
@@ -281,7 +283,9 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       return originalMovies;
     }
 
-    debugPrint('⚡ [OptimisticUI] Getting movies with optimistic updates for $type ($id):');
+    debugPrint(
+      '⚡ [OptimisticUI] Getting movies with optimistic updates for $type ($id):',
+    );
     debugPrint('   Key: $key');
     debugPrint('   Pending ops: $pendingOps');
     debugPrint('   Original movies: ${originalMovies.length}');
@@ -296,15 +300,21 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         debugPrint('⚡ [OptimisticUI] Looking for movie with key: $movieKey');
 
         if (movie != null) {
-          debugPrint('⚡ [OptimisticUI] Found optimistic movie: ${movie.title} (contentType: ${movie.contentType})');
+          debugPrint(
+            '⚡ [OptimisticUI] Found optimistic movie: ${movie.title} (contentType: ${movie.contentType})',
+          );
           if (!result.any((m) => m.id == movie.id)) {
             result.add(movie);
             debugPrint('⚡ [OptimisticUI] Added optimistic movie to result');
           } else {
-            debugPrint('⚡ [OptimisticUI] Movie already exists in result, skipping');
+            debugPrint(
+              '⚡ [OptimisticUI] Movie already exists in result, skipping',
+            );
           }
         } else {
-          debugPrint('⚡ [OptimisticUI] Movie not found in _optimisticMovies for key: $movieKey');
+          debugPrint(
+            '⚡ [OptimisticUI] Movie not found in _optimisticMovies for key: $movieKey',
+          );
         }
       } else {
         // Removal - remove if present.
@@ -601,7 +611,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
             await widget.favoritesService.addMovieToCustomList(
               listId,
               movie,
-              contentType: movie.contentType == ContentType.tvShow ? 'tv' : 'movie',
+              contentType:
+                  movie.contentType == ContentType.tvShow ? 'tv' : 'movie',
             );
           }
       }
@@ -749,18 +760,29 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       // Add to target list.
       switch (targetType) {
         case KanbanColumnType.toWatch:
-          final contentTypeString = dragData.movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
-          debugPrint('🎬 [KanbanDrag] Adding to ToWatch with contentType string: $contentTypeString');
-          await widget.favoritesService.addToWatch(dragData.movie, contentType: contentTypeString);
+          final contentTypeString =
+              dragData.movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
+          debugPrint(
+            '🎬 [KanbanDrag] Adding to ToWatch with contentType string: $contentTypeString',
+          );
+          await widget.favoritesService
+              .addToWatch(dragData.movie, contentType: contentTypeString);
           break;
         case KanbanColumnType.watched:
-          final contentTypeString = dragData.movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
-          debugPrint('🎬 [KanbanDrag] Adding to Watched with contentType string: $contentTypeString');
-          await widget.favoritesService.addToWatched(dragData.movie, contentType: contentTypeString);
+          final contentTypeString =
+              dragData.movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
+          debugPrint(
+            '🎬 [KanbanDrag] Adding to Watched with contentType string: $contentTypeString',
+          );
+          await widget.favoritesService
+              .addToWatched(dragData.movie, contentType: contentTypeString);
           break;
         case KanbanColumnType.customList:
-          final contentTypeString = dragData.movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
-          debugPrint('🎬 [KanbanDrag] Adding to custom list with contentType string: $contentTypeString');
+          final contentTypeString =
+              dragData.movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
+          debugPrint(
+            '🎬 [KanbanDrag] Adding to custom list with contentType string: $contentTypeString',
+          );
           await widget.favoritesService.addMovieToCustomList(
             targetId,
             dragData.movie,

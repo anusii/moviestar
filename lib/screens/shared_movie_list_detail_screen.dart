@@ -95,7 +95,9 @@ class _SharedMovieListDetailScreenState
         if (movieId > 0) {
           debugPrint('🔍 [LoadTitles] Loading title for movie ID: $movieId');
           debugPrint('   - Initial data: ${movieData['fileName']}');
-          debugPrint('   - FilePath: ${movieData['filePath'] ?? "not provided"}');
+          debugPrint(
+            '   - FilePath: ${movieData['filePath'] ?? "not provided"}',
+          );
 
           try {
             // First try to fetch enhanced data that includes content type detection and actual title
@@ -103,7 +105,8 @@ class _SharedMovieListDetailScreenState
             final contentType = enhancedData['content_type'] ?? 'movie';
 
             // Check if we got an actual title from the TTL file
-            String? actualTitle = await _extractTitleFromEnhancedData(enhancedData);
+            String? actualTitle =
+                await _extractTitleFromEnhancedData(enhancedData);
 
             debugPrint('   - Enhanced content type: $contentType');
             debugPrint('   - Extracted title: ${actualTitle ?? "not found"}');
@@ -151,7 +154,10 @@ class _SharedMovieListDetailScreenState
 
   // Find individual file in shared resources by movie ID or filePath.
 
-  Future<String?> _findIndividualFileInSharedResources(String movieId, String? providedFilePath) async {
+  Future<String?> _findIndividualFileInSharedResources(
+    String movieId,
+    String? providedFilePath,
+  ) async {
     try {
       // Get the shared resources to look for individual files
       final sharedResourcesResult = await sharedResources(context, widget);
@@ -173,20 +179,28 @@ class _SharedMovieListDetailScreenState
         // Check if this is an individual movie file that matches our ID
         if (resourceUrl.contains('/movies/') && resourceUrl.endsWith('.ttl')) {
           // Check if the URL contains our movie ID
-          if (resourceUrl.contains('Movie-$movieId.ttl') || resourceUrl.contains('TVShow-$movieId.ttl')) {
-            debugPrint('   🔍 Found matching individual file by ID: $resourceUrl');
+          if (resourceUrl.contains('Movie-$movieId.ttl') ||
+              resourceUrl.contains('TVShow-$movieId.ttl')) {
+            debugPrint(
+              '   🔍 Found matching individual file by ID: $resourceUrl',
+            );
             return resourceUrl;
           }
 
           // If we have a providedFilePath, also check for that
-          if (providedFilePath != null && resourceUrl.endsWith(providedFilePath)) {
-            debugPrint('   🔍 Found matching individual file by filePath: $resourceUrl');
+          if (providedFilePath != null &&
+              resourceUrl.endsWith(providedFilePath)) {
+            debugPrint(
+              '   🔍 Found matching individual file by filePath: $resourceUrl',
+            );
             return resourceUrl;
           }
         }
       }
 
-      debugPrint('   ❌ No individual file found in shared resources for movie $movieId');
+      debugPrint(
+        '   ❌ No individual file found in shared resources for movie $movieId',
+      );
       return null;
     } catch (e) {
       debugPrint('   ❌ Error searching shared resources: $e');
@@ -399,10 +413,13 @@ class _SharedMovieListDetailScreenState
       debugPrint('   - SharedBy WebId: $sharedByWebId');
 
       // First, try to find the individual file in the shared resources
-      String? actualSharedUrl = await _findIndividualFileInSharedResources(movieId, providedFilePath);
+      String? actualSharedUrl =
+          await _findIndividualFileInSharedResources(movieId, providedFilePath);
 
       if (actualSharedUrl != null) {
-        debugPrint('   - Found individual file in shared resources: $actualSharedUrl');
+        debugPrint(
+          '   - Found individual file in shared resources: $actualSharedUrl',
+        );
 
         if (!mounted) return movieData;
 
@@ -416,10 +433,12 @@ class _SharedMovieListDetailScreenState
             movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
             movieFileContent is String &&
             movieFileContent.isNotEmpty) {
+          final isTvShow = actualSharedUrl.contains('TVShow-') ||
+              (providedFilePath?.startsWith('TVShow-') ?? false);
 
-          final isTvShow = actualSharedUrl.contains('TVShow-') || (providedFilePath?.startsWith('TVShow-') ?? false);
-
-          debugPrint('   ✅ Successfully read shared individual file (${movieFileContent.length} chars)');
+          debugPrint(
+            '   ✅ Successfully read shared individual file (${movieFileContent.length} chars)',
+          );
           debugPrint('   - Detected as: ${isTvShow ? "TV Show" : "Movie"}');
 
           // Parse and return the enhanced data
@@ -478,10 +497,12 @@ class _SharedMovieListDetailScreenState
         final urlsToTry = <String>[];
 
         if (ownerBaseUrl != null) {
-          urlsToTry.add('${ownerBaseUrl}moviestar/data/movies/$providedFilePath');
+          urlsToTry
+              .add('${ownerBaseUrl}moviestar/data/movies/$providedFilePath');
         }
         if (sharerBaseUrl != null && sharerBaseUrl != ownerBaseUrl) {
-          urlsToTry.add('${sharerBaseUrl}moviestar/data/movies/$providedFilePath');
+          urlsToTry
+              .add('${sharerBaseUrl}moviestar/data/movies/$providedFilePath');
         }
 
         for (final resourceUrl in urlsToTry) {
@@ -500,7 +521,9 @@ class _SharedMovieListDetailScreenState
               movieFileContent is String &&
               movieFileContent.isNotEmpty) {
             isTvShow = providedFilePath.startsWith('TVShow-');
-            debugPrint('   ✅ Successfully read file from $resourceUrl (${movieFileContent.length} chars)');
+            debugPrint(
+              '   ✅ Successfully read file from $resourceUrl (${movieFileContent.length} chars)',
+            );
             debugPrint('   - Detected as: ${isTvShow ? "TV Show" : "Movie"}');
             break; // Success, stop trying other URLs
           } else {
@@ -509,7 +532,9 @@ class _SharedMovieListDetailScreenState
         }
       } else {
         // Fall back to trying both patterns on both PODs
-        debugPrint('   - Falling back to trying both Movie and TVShow patterns');
+        debugPrint(
+          '   - Falling back to trying both Movie and TVShow patterns',
+        );
 
         final baseUrlsToTry = <String>[];
         if (ownerBaseUrl != null) baseUrlsToTry.add(ownerBaseUrl);
@@ -541,7 +566,8 @@ class _SharedMovieListDetailScreenState
             debugPrint('   ❌ Movie file not found at $movieResourceUrl');
 
             // Try TVShow file
-            final tvShowResourceUrl = '${baseUrl}moviestar/data/$tvShowFileName';
+            final tvShowResourceUrl =
+                '${baseUrl}moviestar/data/$tvShowFileName';
             debugPrint('   - Trying TVShow pattern: $tvShowResourceUrl');
 
             if (!mounted) return movieData;
@@ -602,7 +628,8 @@ class _SharedMovieListDetailScreenState
           enhancedData['content_type'] = 'tv';
           // Update the fileName to reflect it's a TV show if not already set properly
           // But only if we don't have a real title
-          if (parsedData?['title'] == null && enhancedData['fileName'] == 'Movie $movieId') {
+          if (parsedData?['title'] == null &&
+              enhancedData['fileName'] == 'Movie $movieId') {
             enhancedData['fileName'] = 'TV Show $movieId';
           }
         } else {
@@ -668,8 +695,8 @@ class _SharedMovieListDetailScreenState
 
           if (title == null &&
               (trimmedLine.contains('schema:name') ||
-               trimmedLine.contains('sdo:name') ||
-               trimmedLine.contains(':name'))) {
+                  trimmedLine.contains('sdo:name') ||
+                  trimmedLine.contains(':name'))) {
             final match = RegExp(r'"([^"]*)"').firstMatch(trimmedLine);
             if (match != null) {
               title = match.group(1);
@@ -697,8 +724,12 @@ class _SharedMovieListDetailScreenState
         }
       }
 
-      if (title != null || rating != null || (comments != null && comments.isNotEmpty)) {
-        debugPrint('   - Parse results: title="$title", rating=$rating, hasComments=${comments != null && comments.isNotEmpty}');
+      if (title != null ||
+          rating != null ||
+          (comments != null && comments.isNotEmpty)) {
+        debugPrint(
+          '   - Parse results: title="$title", rating=$rating, hasComments=${comments != null && comments.isNotEmpty}',
+        );
         return {'title': title, 'rating': rating, 'comments': comments};
       }
 

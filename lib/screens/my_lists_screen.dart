@@ -29,22 +29,23 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
-import 'package:solidpod/solidpod.dart' show SolidFunctionCallStatus, readPod, writePod;
+import 'package:solidpod/solidpod.dart'
+    show SolidFunctionCallStatus, readPod, writePod;
 
 import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
-import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/content_item.dart';
+import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/add_movies_to_list_screen.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
-import 'package:moviestar/utils/turtle_serializer.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/movie_list_service.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
+import 'package:moviestar/utils/turtle_serializer.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 
@@ -746,8 +747,8 @@ Edit list name and description, or delete this list.
 
       // First try to load from POD if using POD storage (same as custom list detail screen)
       if (widget.favoritesService is FavoritesServiceAdapter &&
-          (widget.favoritesService as FavoritesServiceAdapter).isPodStorageEnabled) {
-
+          (widget.favoritesService as FavoritesServiceAdapter)
+              .isPodStorageEnabled) {
         final movieListService = MovieListService(
           context,
           widget,
@@ -933,5 +934,4 @@ Edit list name and description, or delete this list.
       rethrow;
     }
   }
-
 }

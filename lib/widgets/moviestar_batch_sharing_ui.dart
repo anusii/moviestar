@@ -30,8 +30,8 @@ import 'package:solidpod/solidpod.dart' show SolidFunctionCallStatus;
 // ignore: implementation_imports
 import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
 
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/models/content_item.dart';
+import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/models/sharing_models.dart';
 import 'package:moviestar/services/pod_sharing_service.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
@@ -243,7 +243,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
             recipientWebId: validatedWebId!,
             recipientType: RecipientType.individual,
           );
-          final shareResult = await PodSharingService.shareFile(shareRequest, context, widget);
+          final shareResult =
+              await PodSharingService.shareFile(shareRequest, context, widget);
           final success = shareResult.success;
 
           setState(() {

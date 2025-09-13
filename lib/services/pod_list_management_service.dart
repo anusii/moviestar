@@ -361,7 +361,9 @@ class PodListManagementService {
         );
       }
 
-      debugPrint('📁 [PodListManagement] Successfully added movie to POD MovieList');
+      debugPrint(
+        '📁 [PodListManagement] Successfully added movie to POD MovieList',
+      );
 
       // Update cache
       if (_customListsCache.containsKey(listId)) {
@@ -438,7 +440,9 @@ class PodListManagementService {
 
   /// Gets movies in a specific custom list.
   Future<List<Movie>> getMoviesInCustomList(String listId) async {
-    debugPrint('📁 [PodListManagement] getMoviesInCustomList called for listId: $listId');
+    debugPrint(
+      '📁 [PodListManagement] getMoviesInCustomList called for listId: $listId',
+    );
 
     try {
       final loggedIn = await isLoggedIn();
@@ -450,30 +454,42 @@ class PodListManagementService {
       final movieListData = await _movieListService.getMovieList(listId);
       if (movieListData != null && movieListData['movies'] != null) {
         final movies = List<Movie>.from(movieListData['movies']);
-        debugPrint('📁 [PodListManagement] Found ${movies.length} movies in MovieList data:');
+        debugPrint(
+          '📁 [PodListManagement] Found ${movies.length} movies in MovieList data:',
+        );
 
         for (final movie in movies) {
-          debugPrint('   - ${movie.title} (ID: ${movie.id}, contentType: ${movie.contentType})');
+          debugPrint(
+            '   - ${movie.title} (ID: ${movie.id}, contentType: ${movie.contentType})',
+          );
         }
 
         // Filter out placeholder movies and TV shows
         final validMovies = movies.where((movie) {
-          final isMoviePlaceholder = RegExp(r'^Movie \d+$').hasMatch(movie.title);
-          final isTVPlaceholder = RegExp(r'^TV Show \d+$').hasMatch(movie.title);
+          final isMoviePlaceholder =
+              RegExp(r'^Movie \d+$').hasMatch(movie.title);
+          final isTVPlaceholder =
+              RegExp(r'^TV Show \d+$').hasMatch(movie.title);
           final isValid = !isMoviePlaceholder && !isTVPlaceholder;
 
           if (!isValid) {
-            debugPrint('📁 [PodListManagement] Filtering out placeholder: ${movie.title}');
+            debugPrint(
+              '📁 [PodListManagement] Filtering out placeholder: ${movie.title}',
+            );
           }
 
           return isValid;
         }).toList();
 
-        debugPrint('📁 [PodListManagement] After filtering: ${validMovies.length} valid movies');
+        debugPrint(
+          '📁 [PodListManagement] After filtering: ${validMovies.length} valid movies',
+        );
         return validMovies;
       }
 
-      debugPrint('📁 [PodListManagement] No movie data found for listId: $listId');
+      debugPrint(
+        '📁 [PodListManagement] No movie data found for listId: $listId',
+      );
       return [];
     } catch (e) {
       debugPrint('❌ Failed to get movies in custom list: $e');

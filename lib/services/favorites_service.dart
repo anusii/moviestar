@@ -210,7 +210,9 @@ class FavoritesService extends ChangeNotifier {
                   contentType == 'tv' ? ContentType.tvShow : ContentType.movie,
             );
 
-      debugPrint('📋 [FavoritesService] Final movie contentType: ${movieToAdd.contentType}');
+      debugPrint(
+        '📋 [FavoritesService] Final movie contentType: ${movieToAdd.contentType}',
+      );
       toWatch.add(movieToAdd);
       await _saveToWatch(toWatch);
       _toWatchController.add(toWatch);
@@ -246,7 +248,9 @@ class FavoritesService extends ChangeNotifier {
                   contentType == 'tv' ? ContentType.tvShow : ContentType.movie,
             );
 
-      debugPrint('📋 [FavoritesService] Final movie contentType: ${movieToAdd.contentType}');
+      debugPrint(
+        '📋 [FavoritesService] Final movie contentType: ${movieToAdd.contentType}',
+      );
       watched.add(movieToAdd);
       await _saveWatched(watched);
       _watchedController.add(watched);

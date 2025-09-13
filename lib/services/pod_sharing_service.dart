@@ -26,7 +26,12 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:solidpod/solidpod.dart'
-    show SolidFunctionCallStatus, getWebId, grantPermission, loginIfRequired, getKeyFromUserIfRequired;
+    show
+        SolidFunctionCallStatus,
+        getWebId,
+        grantPermission,
+        loginIfRequired,
+        getKeyFromUserIfRequired;
 
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
@@ -461,7 +466,12 @@ class PodSharingService {
       recipientWebId: recipientWebId,
     );
 
-    return await performBatchShare(batchRequest, context, child, onProgress: onProgress);
+    return await performBatchShare(
+      batchRequest,
+      context,
+      child,
+      onProgress: onProgress,
+    );
   }
 
   /// Create or update a movie file with user data

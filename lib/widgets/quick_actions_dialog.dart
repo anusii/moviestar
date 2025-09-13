@@ -29,13 +29,13 @@ import 'package:flutter/material.dart';
 
 import 'package:gap/gap.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
-import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
+import 'package:moviestar/widgets/movie_sharing_ui.dart';
 
 /// A floating dialog that shows quick actions for a movie card on hover.
 
@@ -254,12 +254,10 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
     }
   }
 
-  // Shares the movie file using GrantPermissionUi.
-
+  // Shares the movie file using the custom movie sharing UI.
   Future<void> _shareMovie() async {
     try {
       // Check if user has POD storage enabled and is using the adapter.
-
       if (widget.favoritesService is! FavoritesServiceAdapter) {
         _showErrorDialog('POD storage is required for sharing');
         return;
@@ -268,47 +266,38 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
       final adapter = widget.favoritesService as FavoritesServiceAdapter;
 
       // Check if POD storage is enabled.
-
       if (!adapter.isPodStorageEnabled) {
         _showErrorDialog('POD storage must be enabled to share movies');
         return;
       }
 
-      // Ensure the movie file exists before sharing. If it doesn't exist,
-      // create it to allow sharing even for movies in To Watch list.
-
+      // Ensure the movie file exists before sharing - use simplified approach
       final hasFile = await widget.favoritesService.hasMovieFile(widget.movie);
       if (!hasFile) {
-        // Create the movie file by setting an empty comment to enable sharing
+        // Create a minimal movie file to enable sharing
         await widget.favoritesService.setMovieComments(widget.movie, '');
-        // Then remove the empty comment to keep the file clean
         await widget.favoritesService.removeMovieComments(widget.movie);
       }
 
-      // Get the movie file path using the service method and make it relative.
-
-      final fullPath = adapter.getMovieFilePath(widget.movie);
-      final movieFilePath = fullPath?.replaceFirst('moviestar/data/', '') ??
-          'movies/Movie-${widget.movie.id}.ttl';
-
-      // Navigate directly to GrantPermissionUi.
-
+      // Navigate to MovieSharingUI which handles all the complex sharing logic
       if (!mounted) return;
 
-      await Navigator.push(
-        context,
+      await Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => Theme(
-            data: Theme.of(context),
-            child: GrantPermissionUi(
-              fileName: movieFilePath,
-              title: 'Share "${widget.movie.title}"',
-              accessModeList: const ['read'],
-              recipientTypeList: const ['indi'],
-              showAppBar: true,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              child: widget.parentWidget ?? widget,
-            ),
+          builder: (context) => MovieSharingUI(
+            movie: widget.movie,
+            onSharingComplete: () {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content:
+                        Text('"${widget.movie.title}" shared successfully'),
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
+                  ),
+                );
+              }
+            },
           ),
         ),
       );

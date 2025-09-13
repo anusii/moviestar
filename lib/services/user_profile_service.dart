@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/services/api_key_service.dart';
+import 'package:moviestar/services/pod_file_operations_service.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/utils/pod_path_helper.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
@@ -136,7 +137,7 @@ class UserProfileService {
       // Write to POD profile.
 
       if (!_context.mounted) return false;
-      final result = await writePod(
+      final result = await PodFileOperationsService.writeFile(
         'profile/profile.ttl',
         profileTtl,
         _context,
@@ -144,7 +145,7 @@ class UserProfileService {
         encrypted: false,
       );
 
-      if (result == SolidFunctionCallStatus.success) {
+      if (result.success) {
         // Update cache.
 
         _cachedProfile = {
@@ -189,7 +190,7 @@ class UserProfileService {
       // Write to POD.
 
       if (!_context.mounted) return null;
-      final result = await writePod(
+      final result = await PodFileOperationsService.writeFile(
         'keys/ApiKey-$apiKeyId.ttl',
         apiKeyTtl,
         _context,
@@ -197,7 +198,7 @@ class UserProfileService {
         encrypted: false,
       );
 
-      if (result == SolidFunctionCallStatus.success) {
+      if (result.success) {
         return apiKeyId;
       }
 
@@ -250,18 +251,20 @@ class UserProfileService {
 
       final readPath = await getReadPath('profile/profile.ttl');
       if (!_context.mounted) return null;
-      final result = await readPod(readPath, _context, _child);
+      final result =
+          await PodFileOperationsService.readFile(readPath, _context, _child);
 
-      if (result.isNotEmpty) {
+      if (result.success && (result.data?.isNotEmpty ?? false)) {
+        final content = result.data!;
         // Parse the TTL content to extract API key and MovieList references.
         // Note: The TTL now uses static prefixes (moviestar-data:) to match ontology structure.
 
         final apiKeyMatch = RegExp(
           r'moviestar-data:ApiKey-([a-zA-Z0-9]+)',
-        ).firstMatch(result);
+        ).firstMatch(content);
         final movieListMatches = RegExp(
           r'moviestar-data:MovieList-([a-zA-Z0-9]+)',
-        ).allMatches(result);
+        ).allMatches(content);
 
         final extractedData = <String, dynamic>{};
 
@@ -306,9 +309,11 @@ class UserProfileService {
         final readPath = await getReadPath('profile/profile.ttl');
         if (!_context.mounted) return null;
 
-        final result = await readPod(readPath, _context, _child);
+        final result =
+            await PodFileOperationsService.readFile(readPath, _context, _child);
 
-        if (result.isNotEmpty) {
+        if (result.success && (result.data?.isNotEmpty ?? false)) {
+          final content = result.data!;
           // Parse the profile data properly, including MovieList IDs.
 
           final webId = await getCurrentUserWebId();
@@ -317,7 +322,7 @@ class UserProfileService {
 
             final movieListMatches = RegExp(
               r'moviestar-data:MovieList-([a-zA-Z0-9]+)',
-            ).allMatches(result);
+            ).allMatches(content);
             final movieListIds =
                 movieListMatches.map((m) => m.group(1)!).toList();
 

@@ -27,7 +27,6 @@ import 'package:flutter/material.dart';
 
 import 'package:gap/gap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/models/movie.dart';
@@ -35,6 +34,7 @@ import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/screens/shared_movie_list_detail_screen.dart';
 import 'package:moviestar/services/favorites_service_adapter.dart';
 import 'package:moviestar/services/favorites_service_manager.dart';
+import 'package:moviestar/widgets/common_sharing_ui.dart';
 
 class ListSharedMovies extends StatefulWidget {
   final Map<String, dynamic>
@@ -52,111 +52,31 @@ class ListSharedMovies extends StatefulWidget {
 }
 
 class _ListSharedMoviesState extends State<ListSharedMovies> {
-  // Share a movie using the GrantPermissionUi.
-
+  // Share a movie using the common sharing UI.
   Future<void> _shareMovie(Movie movie, String movieFilePath) async {
     try {
-      // Store the current navigation context.
-
-      final currentContext = context;
-
-      // Navigate to GrantPermissionUi with custom app bar and proper navigation.
-
-      final result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          fullscreenDialog: true,
-          builder: (navContext) => Theme(
-            data: Theme.of(currentContext).copyWith(),
-            child: Scaffold(
-              backgroundColor: Theme.of(currentContext).scaffoldBackgroundColor,
-              appBar: AppBar(
-                title: Text('Share "${movie.title}"'),
-                backgroundColor:
-                    Theme.of(currentContext).appBarTheme.backgroundColor,
-                foregroundColor:
-                    Theme.of(currentContext).appBarTheme.foregroundColor,
-                leading: IconButton(
-                  icon: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        currentContext,
-                      ).colorScheme.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.arrow_back,
-                      color: Theme.of(currentContext).colorScheme.primary,
-                      size: 20,
-                    ),
-                  ),
-                  onPressed: () {
-                    // Ensure we properly return to the main navigation context.
-
-                    Navigator.of(navContext).pop(null);
-                  },
-                  tooltip: 'Back to My Movies',
-                ),
-                actions: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      color: Theme.of(currentContext).colorScheme.onSurface,
-                    ),
-                    onPressed: () {
-                      Navigator.of(navContext).pop(null);
-                    },
-                    tooltip: 'Cancel',
-                  ),
-                ],
-              ),
-              body: GrantPermissionUi(
-                fileName: movieFilePath,
-                title: '',
-                accessModeList: const ['read'],
-                recipientTypeList: const ['indi'],
-                showAppBar: false,
-                backgroundColor:
-                    Theme.of(currentContext).scaffoldBackgroundColor,
-                child: widget,
-              ),
-            ),
-          ),
-        ),
+      final result = await navigateToGrantPermissionUi(
+        context: context,
+        fileName: movieFilePath,
+        title: 'Share "${movie.title}"',
+        accessModeList: const ['read'],
+        recipientTypeList: const ['indi'],
+        returnWidget: widget,
       );
 
-      // Ensure we're back in the correct context after navigation.
-
       if (mounted) {
-        // Add a small delay to ensure navigation has fully completed.
+        // Refresh the parent screen data
+        widget.onDataChanged();
 
-        await Future.delayed(const Duration(milliseconds: 100));
-
-        if (mounted) {
-          // Refresh the parent screen data regardless of result.
-
-          widget.onDataChanged();
-
-          // Force a rebuild to ensure the UI is properly refreshed.
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              setState(() {});
-            }
-          });
-        }
-      }
-
-      if (mounted) {
+        // Show result message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              result != null
+              result == true
                   ? 'Movie "${movie.title}" shared successfully'
                   : 'Share cancelled for "${movie.title}"',
             ),
-            backgroundColor: result != null
+            backgroundColor: result == true
                 ? Theme.of(context).colorScheme.tertiary
                 : Theme.of(context).colorScheme.secondary,
           ),

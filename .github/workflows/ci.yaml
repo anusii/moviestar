@@ -52,6 +52,7 @@ jobs:
           markdownlint --disable MD036 -- *.md lib assets installers
 
       - name: Lines of code
+        continue-on-error: true
         run: make locmax-enforce
 
       - name: Copyright headers

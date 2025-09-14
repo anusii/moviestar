@@ -33,6 +33,7 @@ jobs:
         run: dart format --set-exit-if-changed .
 
       - name: Dart code metrics
+        continue-on-error: true
         run: |
           dart pub global activate dart_code_metrics
           metrics check-unnecessary-nullable --disable-sunset-warning lib

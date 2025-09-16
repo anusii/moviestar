@@ -14,7 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/widgets/movie_kanban_board.dart';
 import 'package:rxdart/rxdart.dart';
 

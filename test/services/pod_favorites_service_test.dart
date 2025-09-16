@@ -7,8 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/services/pod_favorites_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/pod/pod_favorites_service.dart';
 
 void main() {
   group('PodFavoritesService Public API Tests', () {

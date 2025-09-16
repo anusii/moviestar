@@ -84,6 +84,10 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen>
     // Listen to changes in custom lists.
 
     widget.favoritesService.customLists.listen((lists) {
+      print('🎬 [MyListsScreen] Received custom lists update: ${lists.length} lists');
+      for (final list in lists) {
+        print('🎬 [MyListsScreen] List: ${list.name} (ID: ${list.id})');
+      }
       safeSetState(() {
         _customLists = lists;
       });
@@ -94,7 +98,12 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen>
   // Loads all custom lists.
 
   Future<void> _loadCustomLists() async {
+    print('🎬 [MyListsScreen] _loadCustomLists called');
     final lists = await widget.favoritesService.getCustomLists();
+    print('🎬 [MyListsScreen] getCustomLists returned ${lists.length} lists');
+    for (final list in lists) {
+      print('🎬 [MyListsScreen] Direct load - List: ${list.name} (ID: ${list.id})');
+    }
 
     safeSetState(() {
       _customLists = lists;

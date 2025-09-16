@@ -87,10 +87,24 @@ class NetworkClient {
       final separator = endpoint.contains('?') ? '&' : '?';
       final url = '$baseUrl/$endpoint${separator}api_key=$apiKey';
 
+      print('🔍 [NetworkClient] Making GET request to: $baseUrl/$endpoint');
+      print('🔍 [NetworkClient] API key present: ${apiKey.isNotEmpty ? 'Yes (${apiKey.length} chars)' : 'No'}');
+
       final response = await _client.get(Uri.parse(url)).timeout(_timeout);
 
+      print('🔍 [NetworkClient] Response status: ${response.statusCode}');
+      if (response.statusCode != 200) {
+        print('🔍 [NetworkClient] Response body: ${response.body}');
+      }
+
       if (response.statusCode == 200) {
-        return json.decode(response.body) as Map<String, dynamic>;
+        final jsonData = json.decode(response.body) as Map<String, dynamic>;
+        print('🔍 [NetworkClient] Response contains results: ${jsonData.containsKey('results')}');
+        if (jsonData.containsKey('results')) {
+          final resultsList = jsonData['results'] as List<dynamic>;
+          print('🔍 [NetworkClient] Results count: ${resultsList.length}');
+        }
+        return jsonData;
       } else {
         throw NetworkException(
           'Failed to load data from $endpoint',

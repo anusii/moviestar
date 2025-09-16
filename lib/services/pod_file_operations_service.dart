@@ -12,7 +12,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:solidpod/solidpod.dart';
+import 'package:solidpod/solidpod.dart' as solidpod show SolidFunctionCallStatus, writePod, readPod, deleteFile;
 
 import 'package:moviestar/utils/is_logged_in.dart';
 
@@ -77,7 +77,7 @@ class PodFileOperationsService {
         }
 
         // Attempt to read the file
-        final result = await readPod(fileName, context, child);
+        final result = await solidpod.readPod(fileName, context, child);
 
         if (result.isNotEmpty) {
           return PodFileOperationResult.success(result);
@@ -152,7 +152,7 @@ class PodFileOperationsService {
         }
 
         // Attempt to write the file
-        final result = await writePod(
+        final result = await solidpod.writePod(
           fileName,
           content,
           context,
@@ -160,7 +160,7 @@ class PodFileOperationsService {
           encrypted: encrypted,
         );
 
-        if (result == SolidFunctionCallStatus.success) {
+        if (result == solidpod.SolidFunctionCallStatus.success) {
           return PodFileOperationResult.success();
         } else {
           throw Exception('WritePod failed with status: $result');
@@ -235,21 +235,10 @@ class PodFileOperationsService {
         );
       }
 
-      // Note: deletePod is not available in current POD API
-      // For now, return a not-implemented error
-      return PodFileOperationResult.failure(
-        'File deletion not implemented in current POD API',
-      );
+      // Use SolidPOD's deleteFile function directly
+      await solidpod.deleteFile(fileName);
 
-      // TODO: Implement file deletion when POD API supports it
-      // final result = await deletePod(fileName, context, child);
-      // if (result == SolidFunctionCallStatus.success) {
-      //   return PodFileOperationResult.success();
-      // } else {
-      //   return PodFileOperationResult.failure(
-      //     'DeletePod failed with status: $result',
-      //   );
-      // }
+      return PodFileOperationResult.success();
     } catch (e) {
       return PodFileOperationResult.failure(
         'Failed to delete file: ${e.toString()}',

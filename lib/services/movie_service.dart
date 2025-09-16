@@ -47,17 +47,22 @@ class MovieService {
 
   /// Service for managing the API key.
 
-  final ApiKeyService _apiKeyService;
+  final ApiKeyService? _apiKeyService;
 
   /// Creates a new MovieService instance.
 
-  MovieService(ApiKeyService apiKeyService) : _apiKeyService = apiKeyService {
+  MovieService(ApiKeyService? apiKeyService) : _apiKeyService = apiKeyService {
     _initializeClient();
   }
 
   /// Initializes the network client with the API key from secure storage.
 
   Future<void> _initializeClient() async {
+    if (_apiKeyService == null) {
+      _client = NetworkClient(baseUrl: _baseUrl, apiKey: '');
+      _contentService = ContentService(null);
+      return;
+    }
     final apiKey = await _apiKeyService.getApiKey();
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
     _contentService = ContentService(_apiKeyService);
@@ -66,6 +71,7 @@ class MovieService {
   /// Updates the API key and recreates the network client.
 
   Future<void> updateApiKey() async {
+    if (_apiKeyService == null) return;
     _client?.dispose();
     _contentService?.dispose();
     // Reset to null to force recreation.

@@ -128,12 +128,18 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
       return;
     }
 
+    print('🔍 [EnhancedSearchScreen] Starting search for: "$query"');
     setLoadingState(true);
 
     try {
       final results = await widget.contentService.searchContentComprehensive(
         query,
       );
+
+      print('🔍 [EnhancedSearchScreen] Search results for "$query": ${results.length} categories');
+      for (final entry in results.entries) {
+        print('🔍 [EnhancedSearchScreen] Category "${entry.key}": ${entry.value.length} items');
+      }
 
       // Only update state if this search is still relevant.
 
@@ -144,6 +150,8 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
         setLoadingState(false);
       }
     } catch (e) {
+      print('🔍 [EnhancedSearchScreen] Search failed for "$query": $e');
+
       // Only update state if this search is still relevant.
 
       if (_searchController.text == query && mounted) {

@@ -335,6 +335,15 @@ class TurtleSerializer {
         return decoded.map((movie) => Movie.fromJson(movie)).toList();
       }
 
+      // Try to parse individual movie JSON backup format.
+      final movieJsonMatch =
+          RegExp(r'# JSON_MOVIE_DATA: (.+)').firstMatch(ttlContent);
+      if (movieJsonMatch != null) {
+        final movieJsonData = movieJsonMatch.group(1)!;
+        final movieData = jsonDecode(movieJsonData) as Map<String, dynamic>;
+        return [Movie.fromJson(movieData)];
+      }
+
       // Parse using proper RDF if no JSON backup.
 
       final triples = turtleToTripleMap(ttlContent);

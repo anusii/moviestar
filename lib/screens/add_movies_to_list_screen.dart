@@ -144,7 +144,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     safeSetState(() => _error = null);
 
     try {
-      final contentService = ref.read(contentServiceProvider);
+      final contentService = await ref.read(directContentServiceProvider.future);
       final popularMixedContent = await contentService.getPopularMixedContent();
 
       // Remove content already in the list.
@@ -196,7 +196,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     });
 
     try {
-      final contentService = ref.read(contentServiceProvider);
+      final contentService = await ref.read(directContentServiceProvider.future);
       final results = await contentService.searchContentComprehensive(query);
 
       // Filter out content already in the list.

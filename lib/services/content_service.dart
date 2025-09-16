@@ -49,20 +49,51 @@ class ContentService {
 
   // Service for managing the API key.
 
-  final ApiKeyService _apiKeyService;
+  final ApiKeyService? _apiKeyService;
 
   // Creates a new ContentService instance.
 
-  ContentService(ApiKeyService apiKeyService) : _apiKeyService = apiKeyService {
+  ContentService(ApiKeyService? apiKeyService)
+      : _apiKeyService = apiKeyService {
     _initializeClient();
+  }
+
+  // Creates a new ContentService instance with a direct API key.
+
+  ContentService.withApiKey(String? apiKey) : _apiKeyService = null {
+    _initializeClientWithApiKey(apiKey);
   }
 
   // Initializes the network client with the API key from secure storage.
 
   Future<void> _initializeClient() async {
+    print('🔍 [ContentService] _initializeClient called');
+    if (_apiKeyService == null) {
+      print('🔍 [ContentService] No API key service, creating empty client');
+      _client = NetworkClient(baseUrl: _baseUrl, apiKey: '');
+      _searchService = ContentSearchService(_client!);
+      return;
+    }
     final apiKey = await _apiKeyService.getApiKey();
+    print('🔍 [ContentService] Got API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}');
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
     _searchService = ContentSearchService(_client!);
+    print('🔍 [ContentService] Client initialized with API key');
+
+    // On Linux, add a small delay to ensure services are ready
+    // This helps with search immediately after API key is added
+    if (Platform.isLinux) {
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+  }
+
+  // Initializes the network client with a direct API key.
+
+  Future<void> _initializeClientWithApiKey(String? apiKey) async {
+    print('🔍 [ContentService] _initializeClientWithApiKey called with API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}');
+    _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
+    _searchService = ContentSearchService(_client!);
+    print('🔍 [ContentService] Client initialized with direct API key');
 
     // On Linux, add a small delay to ensure services are ready
     // This helps with search immediately after API key is added
@@ -74,6 +105,7 @@ class ContentService {
   // Updates the API key and recreates the network client.
 
   Future<void> updateApiKey() async {
+    if (_apiKeyService == null) return;
     _client?.dispose();
     _client = null;
     _searchService = null;
@@ -315,11 +347,16 @@ class ContentService {
   Future<Map<String, List<ContentItem>>> searchContentComprehensive(
     String query,
   ) async {
+    print('🔍 [ContentService] searchContentComprehensive called with query: "$query"');
     await _ensureClientInitialized();
+    print('🔍 [ContentService] Client initialized, _searchService is null: ${_searchService == null}');
     if (_searchService == null) {
+      print('🔍 [ContentService] _searchService is null, reinitializing...');
       // Fallback: reinitialize if still null
       await _initializeClient();
+      print('🔍 [ContentService] After reinit, _searchService is null: ${_searchService == null}');
     }
+    print('🔍 [ContentService] Calling _searchService.searchContentComprehensive');
     return await _searchService!.searchContentComprehensive(query);
   }
 

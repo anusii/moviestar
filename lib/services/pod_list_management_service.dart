@@ -330,7 +330,7 @@ class PodListManagementService {
 
       // Remove movie from the MovieList in PODs
       final success =
-          await _movieListService.removeMovieFromList(listId, movie);
+          await _movieListService.removeMovieFromList(listId, movie.id);
 
       if (!success) {
         return ListOperationResult.failure(

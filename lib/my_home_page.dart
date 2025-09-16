@@ -94,10 +94,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     );
     _favoritesService = FavoritesServiceAdapter(_favoritesServiceManager);
 
-    // Set context for provider-based API key service.
-
-    _apiKeyService = ref.read(apiKeyServiceProvider);
-    _apiKeyService.updateContext(context, widget);
+    // Create API key service directly with context
+    _apiKeyService = ApiKeyService(context, widget);
 
     // Listen for API key changes.
 
@@ -192,10 +190,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   }
 
   void _buildScreens() {
-    final apiKeyService = ref.read(apiKeyServiceProvider);
     _menuItems = SolidScaffoldConfig.createMenuItems(
       favoritesService: _favoritesService,
-      apiKeyService: apiKeyService,
+      apiKeyService: _apiKeyService,
       favoritesServiceManager: _favoritesServiceManager,
     );
 
@@ -212,8 +209,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       // Check if API key is present and show dialog immediately if missing
       bool hasApiKey = false;
       try {
-        final apiKeyService = ref.read(apiKeyServiceProvider);
-        final apiKey = await apiKeyService.getApiKey();
+        final apiKey = await _apiKeyService.getApiKey();
         hasApiKey = apiKey != null && apiKey.trim().isNotEmpty;
 
         if (!hasApiKey) {
@@ -223,7 +219,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             if (mounted) {
               final apiKeySet = await showApiKeyDialog(
                 context,
-                apiKeyService,
+                _apiKeyService,
                 onApiKeySet: () {
                   // Reinitialize after API key is set
                   reinitializeAfterApiKey();
@@ -311,19 +307,31 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   /// Handles the search action.
 
-  void _handleSearch() {
+  void _handleSearch() async {
     if (mounted) {
-      // Get the content service - it will be fresh due to provider dependencies
-      final contentService = ref.read(contentServiceProvider);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => EnhancedSearchScreen(
-            favoritesService: _favoritesService,
-            contentService: contentService,
-          ),
-        ),
-      );
+      try {
+        // Get the content service with proper API key
+        final contentService = await ref.read(directContentServiceProvider.future);
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EnhancedSearchScreen(
+                favoritesService: _favoritesService,
+                contentService: contentService,
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        print('🔍 [MyHomePage] Failed to get content service: $e');
+        // Show error or fallback
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Search is not available at the moment')),
+          );
+        }
+      }
     }
   }
 
@@ -479,7 +487,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           ),
           body: SettingsScreen(
             favoritesService: _favoritesService,
-            apiKeyService: ref.read(apiKeyServiceProvider),
+            apiKeyService: _apiKeyService,
             favoritesServiceManager: _favoritesServiceManager,
           ),
         ),

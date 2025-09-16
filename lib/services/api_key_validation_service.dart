@@ -85,13 +85,16 @@ class ApiKeyValidationResult {
 
 /// Service for validating API key configuration and status.
 class ApiKeyValidationService {
-  final ApiKeyService _apiKeyService;
+  final ApiKeyService? _apiKeyService;
 
   const ApiKeyValidationService(this._apiKeyService);
 
   /// Checks the current API key configuration and validity.
   Future<ApiKeyValidationResult> validateApiKey() async {
     try {
+      if (_apiKeyService == null) {
+        return ApiKeyValidationResult.unknown('API key service not available');
+      }
       // First check if an API key is configured
       final apiKey = await _apiKeyService.getApiKey();
 
@@ -119,6 +122,7 @@ class ApiKeyValidationService {
   /// Quick check if API key is configured (no validation).
   Future<bool> hasApiKey() async {
     try {
+      if (_apiKeyService == null) return false;
       final apiKey = await _apiKeyService.getApiKey();
       return apiKey != null && apiKey.trim().isNotEmpty;
     } catch (e) {

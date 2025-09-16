@@ -1710,6 +1710,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
                   sortCriteria: _columnSortCriteria[customList.id] ??
                       MovieSortCriteria.nameAsc,
                   maxItems: _maxItemsPerColumn,
+                  optimisticMovies: _optimisticMovies,
                   buildMovieItem: (movie, index) => _buildMovieItem(
                     movie,
                     customList.id,
@@ -2168,98 +2169,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
               },
             );
           },
-          loading: () => StreamBuilder<List<Movie>>(
-            stream: widget.favoritesService.toWatchMovies,
-            builder: (context, toWatchSnapshot) {
-              return StreamBuilder<List<Movie>>(
-                stream: widget.favoritesService.watchedMovies,
-                builder: (context, watchedSnapshot) {
-                  return StreamBuilder<List<CustomList>>(
-                    stream: widget.favoritesService.customLists,
-                    builder: (context, customListsSnapshot) {
-                      final toWatchMovies = toWatchSnapshot.data ?? [];
-                      final watchedMovies = watchedSnapshot.data ?? [];
-                      final customLists = customListsSnapshot.data ?? [];
-
-                      return Stack(
-                        children: [
-                          Scrollbar(
-                            controller: _horizontalScrollController,
-                            thumbVisibility: true,
-                            trackVisibility: true,
-                            thickness: 8,
-                            radius: const Radius.circular(4),
-                            child: SingleChildScrollView(
-                              controller: _horizontalScrollController,
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Popular Movies Column (Loading State).
-                                  _buildKanbanColumn(
-                                    title: 'Popular',
-                                    movies: [],
-                                    categoryId: 'popular',
-                                    fromCache: false,
-                                    columnType: KanbanColumnType.popular,
-                                    isLoading: true,
-                                  ),
-
-                                  // To Watch Column.
-                                  _buildKanbanColumn(
-                                    title: 'To Watch',
-                                    movies: toWatchMovies,
-                                    categoryId: 'towatch',
-                                    fromCache: false,
-                                    columnType: KanbanColumnType.toWatch,
-                                    isLoading:
-                                        toWatchSnapshot.connectionState ==
-                                                ConnectionState.waiting &&
-                                            !toWatchSnapshot.hasData,
-                                  ),
-
-                                  // Watched Column.
-                                  _buildKanbanColumn(
-                                    title: 'Watched',
-                                    movies: watchedMovies,
-                                    categoryId: 'watched',
-                                    fromCache: false,
-                                    columnType: KanbanColumnType.watched,
-                                    isLoading:
-                                        watchedSnapshot.connectionState ==
-                                                ConnectionState.waiting &&
-                                            !watchedSnapshot.hasData,
-                                  ),
-
-                                  // Custom List Columns.
-                                  ...customLists.map(
-                                    (customList) =>
-                                        _buildCustomListColumn(customList),
-                                  ),
-
-                                  // Show loading placeholder for custom lists if they're still loading
-                                  if (customListsSnapshot.connectionState ==
-                                          ConnectionState.waiting &&
-                                      customLists.isEmpty)
-                                    _buildCustomListLoadingColumn(),
-                                ],
-                              ),
-                            ),
-                          ),
-                          // Progress indicator overlay.
-                          if (_operationQueue.isNotEmpty)
-                            Positioned(
-                              bottom: 20,
-                              right: 20,
-                              child: _buildProgressIndicator(),
-                            ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              );
-            },
+          loading: () => const Center(
+            child: CircularProgressIndicator(),
           ),
           error: (error, stack) => _buildSmartErrorWidget(error, stack),
         );
@@ -2277,6 +2188,7 @@ class _CustomListMoviesWidget extends ConsumerStatefulWidget {
   final MovieSortCriteria sortCriteria;
   final int maxItems;
   final Widget Function(Movie movie, int index) buildMovieItem;
+  final Map<String, Movie> optimisticMovies;
 
   const _CustomListMoviesWidget({
     required this.movieIds,
@@ -2285,6 +2197,7 @@ class _CustomListMoviesWidget extends ConsumerStatefulWidget {
     required this.sortCriteria,
     required this.maxItems,
     required this.buildMovieItem,
+    required this.optimisticMovies,
   });
 
   @override
@@ -2307,12 +2220,24 @@ class _CustomListMoviesWidgetState
   @override
   void didUpdateWidget(_CustomListMoviesWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Reload if movie IDs changed or sort criteria changed.
+    // Check if we need to load new movies (only load missing ones, don't reload all)
+    final newMovieIds = widget.movieIds.where((id) =>
+        !oldWidget.movieIds.contains(id) &&
+        !_moviesMap.containsKey(id) &&
+        !widget.optimisticMovies.containsKey('${id}_customList_${widget.customList.id}')).toList();
 
-    if (oldWidget.movieIds.length != widget.movieIds.length ||
-        !oldWidget.movieIds.every((id) => widget.movieIds.contains(id)) ||
-        oldWidget.sortCriteria != widget.sortCriteria) {
+    // If sort criteria changed, reload all
+    if (oldWidget.sortCriteria != widget.sortCriteria) {
       _loadMovies();
+    }
+    // If we have new movie IDs from optimistic updates, load only those
+    else if (newMovieIds.isNotEmpty) {
+      _loadNewMovies(newMovieIds);
+    }
+    // If movies were removed or optimistic movies changed, just update the UI
+    else if (oldWidget.movieIds.length != widget.movieIds.length ||
+             oldWidget.optimisticMovies != widget.optimisticMovies) {
+      setState(() {}); // Trigger rebuild with current data
     }
   }
 
@@ -2328,6 +2253,35 @@ class _CustomListMoviesWidgetState
       return Movie.fromContentItem(tvShowContent);
     } else {
       return await cachedMovieService.getMovieDetails(contentId);
+    }
+  }
+
+  /// Load only specific new movies (for optimistic updates)
+  Future<void> _loadNewMovies(List<int> movieIds) async {
+    for (final movieId in movieIds) {
+      if (_moviesMap.containsKey(movieId) || _loadingMovieIds.contains(movieId)) {
+        continue;
+      }
+
+      _loadingMovieIds.add(movieId);
+      try {
+        final contentType = widget.customList.getContentTypeAt(
+          widget.movieIds.indexOf(movieId),
+        );
+        final movie = await _getContentAsMovieWithType(movieId, contentType);
+        if (mounted) {
+          setState(() {
+            _moviesMap[movieId] = movie;
+            _loadingMovieIds.remove(movieId);
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _loadingMovieIds.remove(movieId);
+          });
+        }
+      }
     }
   }
 
@@ -2413,7 +2367,14 @@ class _CustomListMoviesWidgetState
 
     final loadedMovies = <Movie>[];
     for (final movieId in widget.movieIds) {
-      final movie = _moviesMap[movieId];
+      Movie? movie = _moviesMap[movieId];
+
+      // If not found in loaded movies, check optimistic movies
+      if (movie == null) {
+        final optimisticKey = '${movieId}_customList_${widget.customList.id}';
+        movie = widget.optimisticMovies[optimisticKey];
+      }
+
       if (movie != null) {
         loadedMovies.add(movie);
       }
@@ -2426,7 +2387,10 @@ class _CustomListMoviesWidgetState
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading && _moviesMap.isEmpty) {
+    final sortedMovies = _getSortedMovies();
+
+    // Only show loading if we have no movies at all (including optimistic ones)
+    if (_isLoading && _moviesMap.isEmpty && sortedMovies.isEmpty) {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(Dimensions.xl),
@@ -2435,7 +2399,6 @@ class _CustomListMoviesWidgetState
       );
     }
 
-    final sortedMovies = _getSortedMovies();
     final displayMovies = sortedMovies.take(widget.maxItems).toList();
 
     return ListView.builder(

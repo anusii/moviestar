@@ -15,7 +15,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/models/sharing_models.dart';
-import 'package:moviestar/services/pod_sharing_service.dart';
+import 'package:moviestar/core/services/pod/pod_sharing_service.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
 import 'package:moviestar/widgets/common_sharing_ui.dart'
     show SharingStatusIndicator, WebIdInput, ShareStatus;

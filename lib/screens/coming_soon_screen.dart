@@ -33,7 +33,7 @@ import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';

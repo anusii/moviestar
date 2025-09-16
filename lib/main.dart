@@ -37,7 +37,7 @@ import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/theme_provider.dart';
-import 'package:moviestar/services/cache_settings_service.dart';
+import 'package:moviestar/core/services/cache/cache_settings_service.dart';
 import 'package:moviestar/utils/is_desktop.dart';
 
 /// Main entry point for the Movie Star application.

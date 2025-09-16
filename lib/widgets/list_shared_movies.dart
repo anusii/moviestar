@@ -32,8 +32,8 @@ import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/screens/shared_movie_list_detail_screen.dart';
-import 'package:moviestar/services/favorites_service_adapter.dart';
-import 'package:moviestar/services/favorites_service_manager.dart';
+import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
+import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
 import 'package:moviestar/widgets/common_sharing_ui.dart';
 
 class ListSharedMovies extends StatefulWidget {

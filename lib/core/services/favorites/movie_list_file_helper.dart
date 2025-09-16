@@ -15,8 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/services/pod_file_operations_service.dart';
-import 'package:moviestar/services/pod_operations_mixin.dart';
+import 'package:moviestar/core/services/pod/pod_file_operations_service.dart';
+import 'package:moviestar/core/services/pod/pod_operations_mixin.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 
 /// Helper class for MovieList file operations.

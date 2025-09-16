@@ -29,7 +29,7 @@ import 'package:flutter/material.dart';
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 
 /// Navigates to the movie details screen with the specified movie.
 ///

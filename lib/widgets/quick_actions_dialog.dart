@@ -33,8 +33,8 @@ import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/services/favorites_service_adapter.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
 import 'package:moviestar/widgets/movie_sharing_ui.dart';
 
 /// A floating dialog that shows quick actions for a movie card on hover.

@@ -34,8 +34,8 @@ import 'package:solidpod/solidpod.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/services/favorites_service_adapter.dart';
-import 'package:moviestar/services/favorites_service_manager.dart';
+import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
+import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 
 /// Screen to display movies within a shared movie list.

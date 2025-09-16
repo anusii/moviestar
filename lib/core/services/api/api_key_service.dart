@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solidpod/solidpod.dart' show getWebId;
 
-import 'package:moviestar/services/base_pod_service.dart';
-import 'package:moviestar/services/cache_settings_service.dart';
+import 'package:moviestar/core/services/pod/base_pod_service.dart';
+import 'package:moviestar/core/services/cache/cache_settings_service.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 
 /// Compact service for managing API keys with POD and secure storage.

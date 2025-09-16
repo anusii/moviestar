@@ -17,11 +17,11 @@ import 'package:solidpod/solidpod.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/list_operation_models.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/services/movie_list_service.dart';
-import 'package:moviestar/services/pod_file_operations_service.dart';
-import 'package:moviestar/services/pod_list_cache_manager.dart';
-import 'package:moviestar/services/pod_list_data_converter.dart';
-import 'package:moviestar/services/pod_list_file_validator.dart';
+import 'package:moviestar/core/services/favorites/movie_list_service.dart';
+import 'package:moviestar/core/services/pod/pod_file_operations_service.dart';
+import 'package:moviestar/core/services/cache/pod_list_cache_manager.dart';
+import 'package:moviestar/core/services/pod/pod_list_data_converter.dart';
+import 'package:moviestar/core/services/pod/pod_list_file_validator.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 
 /// Service for managing custom movie lists in POD storage.

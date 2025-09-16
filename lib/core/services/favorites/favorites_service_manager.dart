@@ -33,8 +33,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/services/pod_favorites_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/pod/pod_favorites_service.dart';
 
 /// Manager that switches between local and POD storage based on user preferences.
 

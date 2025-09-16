@@ -27,7 +27,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:moviestar/services/pod_file_operations_service.dart';
+import 'package:moviestar/core/services/pod/pod_file_operations_service.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 
 /// Result of a POD file operation.

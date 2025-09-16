@@ -31,7 +31,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/constants/timing_constants.dart';
-import 'package:moviestar/services/cache_settings_service.dart';
+import 'package:moviestar/core/services/cache/cache_settings_service.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/utils/pod_path_helper.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';

@@ -39,9 +39,9 @@ import 'package:moviestar/screens/my_movies_screen.dart';
 import 'package:moviestar/screens/shared_movies_screen.dart';
 import 'package:moviestar/screens/to_watch_screen.dart';
 import 'package:moviestar/screens/watched_screen.dart';
-import 'package:moviestar/services/api_key_service.dart';
-import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/services/favorites_service_manager.dart';
+import 'package:moviestar/core/services/api/api_key_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
 
 /// MovieStar-specific SolidScaffold configuration.
 ///

@@ -34,12 +34,12 @@ import 'package:solidpod/solidpod.dart' show getWebId;
 
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/services/api_key_service.dart';
-import 'package:moviestar/services/cache_settings_service.dart';
-import 'package:moviestar/services/cached_movie_service.dart';
-import 'package:moviestar/services/content_service.dart';
-import 'package:moviestar/services/hive_movie_cache_service.dart';
-import 'package:moviestar/services/movie_service.dart';
+import 'package:moviestar/core/services/api/api_key_service.dart';
+import 'package:moviestar/core/services/cache/cache_settings_service.dart';
+import 'package:moviestar/core/services/cache/cached_movie_service.dart';
+import 'package:moviestar/core/services/api/content_service.dart';
+import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
+import 'package:moviestar/core/services/api/movie_service.dart';
 import 'package:moviestar/utils/network_client.dart';
 
 /// A simple API key service that returns the provided API key directly.

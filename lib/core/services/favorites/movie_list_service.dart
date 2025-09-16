@@ -9,10 +9,10 @@ import 'package:flutter/material.dart';
 
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/services/base_pod_service.dart';
-import 'package:moviestar/services/movie_list_file_helper.dart';
-import 'package:moviestar/services/movie_list_operations_helper.dart';
-import 'package:moviestar/services/pod_operations_mixin.dart';
+import 'package:moviestar/core/services/pod/base_pod_service.dart';
+import 'package:moviestar/core/services/favorites/movie_list_file_helper.dart';
+import 'package:moviestar/core/services/favorites/movie_list_operations_helper.dart';
+import 'package:moviestar/core/services/pod/pod_operations_mixin.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 

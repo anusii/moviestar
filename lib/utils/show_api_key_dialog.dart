@@ -28,7 +28,7 @@ import 'package:flutter/services.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:moviestar/services/api_key_service.dart';
+import 'package:moviestar/core/services/api/api_key_service.dart';
 
 /// Shows the API key setup dialog.
 /// Returns true if API key was successfully set, false otherwise.

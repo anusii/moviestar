@@ -28,8 +28,8 @@ library;
 import 'dart:developer' as developer;
 
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/services/hive_movie_cache_service.dart';
-import 'package:moviestar/services/movie_service.dart';
+import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
+import 'package:moviestar/core/services/api/movie_service.dart';
 
 /// A cached service that wraps MovieService with Hive caching capabilities.
 

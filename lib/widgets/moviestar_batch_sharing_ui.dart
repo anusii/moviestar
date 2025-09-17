@@ -30,7 +30,9 @@ import 'package:solidpod/solidpod.dart' show SolidFunctionCallStatus;
 // ignore: implementation_imports
 import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
 
+import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/models/sharing_models.dart';
 import 'package:moviestar/services/pod_sharing_service.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
 import 'package:moviestar/widgets/common_sharing_ui.dart';
@@ -121,13 +123,20 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
       // Individual movie files with read-only permissions by default.
 
       ...widget.movies.map(
-        (movie) => ShareableFile(
-          fileName: 'movies/Movie-${movie.id}.ttl',
-          displayName: movie.title,
-          fileType: 'movie',
-          movie: movie,
-          permissions: ['read'], // Movie files default to read-only
-        ),
+        (movie) {
+          // Construct file name based on content type
+          final isTV = movie.contentType == ContentType.tvShow;
+          final filePrefix = isTV ? 'TVShow' : 'Movie';
+          final fileType = isTV ? 'tv' : 'movie';
+
+          return ShareableFile(
+            fileName: 'movies/$filePrefix-${movie.id}.ttl',
+            displayName: movie.title,
+            fileType: fileType,
+            movie: movie,
+            permissions: ['read'], // Movie files default to read-only
+          );
+        },
       ),
     ];
   }
@@ -201,7 +210,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
       for (int i = 0; i < shareableFiles.length; i++) {
         final file = shareableFiles[i];
 
-        // Skip files with no permissions selected (except movie files which always get read).
+        // Skip files with no permissions selected (except movie/TV files which always get read).
         if (file.permissions.isEmpty && file.fileType == 'movielist') {
           setState(() {
             sharingProgress[file.fileName] = 'skipped';
@@ -220,9 +229,11 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
         try {
           if (!mounted) break;
 
-          // Determine permissions: movie files always get read-only.
+          // Determine permissions: movie and TV files always get read-only.
           final permissionsToUse =
-              file.fileType == 'movie' ? ['read'] : file.permissions;
+              (file.fileType == 'movie' || file.fileType == 'tv')
+                  ? ['read']
+                  : file.permissions;
 
           // Use PodSharingService for simplified sharing
           final shareRequest = ShareRequest(
@@ -232,7 +243,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
             recipientWebId: validatedWebId!,
             recipientType: RecipientType.individual,
           );
-          final shareResult = await PodSharingService.shareFile(shareRequest);
+          final shareResult =
+              await PodSharingService.shareFile(shareRequest, context, widget);
           final success = shareResult.success;
 
           setState(() {
@@ -682,7 +694,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
   /// Movie files show read-only permissions that cannot be changed.
 
   Widget _buildFilePermissionItem(int index, ShareableFile file) {
-    final isMovieFile = file.fileType == 'movie';
+    final isIndividualFile = file.fileType == 'movie' || file.fileType == 'tv';
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -691,7 +703,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
         ),
         borderRadius: BorderRadius.circular(8),
-        color: isMovieFile
+        color: isIndividualFile
             ? Theme.of(context)
                 .colorScheme
                 .surfaceContainerHighest
@@ -705,7 +717,9 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
           Row(
             children: [
               Icon(
-                file.fileType == 'movielist' ? Icons.list_alt : Icons.movie,
+                file.fileType == 'movielist'
+                    ? Icons.list_alt
+                    : (file.fileType == 'tv' ? Icons.tv : Icons.movie),
                 size: 20,
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -725,7 +739,9 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
                     Text(
                       file.fileType == 'movielist'
                           ? 'Movie List'
-                          : 'Movie File (Read-only)',
+                          : file.fileType == 'tv'
+                              ? 'TV Show File (Read-only)'
+                              : 'Movie File (Read-only)',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context)
                                 .colorScheme
@@ -763,7 +779,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
 
           // Permission checkboxes or read-only indicator.
 
-          if (isMovieFile)
+          if (isIndividualFile)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
@@ -815,10 +831,10 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
     String label,
   ) {
     final isChecked = file.permissions.contains(permission);
-    final isMovieFile = file.fileType == 'movie';
+    final isIndividualFile = file.fileType == 'movie' || file.fileType == 'tv';
 
     return InkWell(
-      onTap: isMovieFile
+      onTap: isIndividualFile
           ? null
           : () {
               final newPermissions = List<String>.from(file.permissions);
@@ -834,7 +850,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
         children: [
           Checkbox(
             value: isChecked,
-            onChanged: isMovieFile
+            onChanged: isIndividualFile
                 ? null
                 : (value) {
                     final newPermissions = List<String>.from(file.permissions);
@@ -849,7 +865,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
           Text(
             label,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: isMovieFile
+                  color: isIndividualFile
                       ? Theme.of(context)
                           .colorScheme
                           .onSurface

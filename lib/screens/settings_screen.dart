@@ -1188,7 +1188,6 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
   void _triggerAppReinitialization() {
     // The provider invalidations we added earlier will handle the reinitialization
     // No additional action needed here since the providers are already invalidated
-    debugPrint('🔄 API key saved - providers invalidated for reinitialization');
   }
 
   void _navigateToHomeScreen() {

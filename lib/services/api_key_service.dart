@@ -551,15 +551,6 @@ class ApiKeyService extends ChangeNotifier {
   Future<void> debugApiKeyState() async {
     try {
       debugPrint('🔍 === API Key Debug State ===');
-      final webId = await _getCurrentUserWebId();
-      debugPrint('👤 Current user WebID: $webId');
-
-      final loggedIn = await isLoggedIn();
-      debugPrint('🔐 Logged in: $loggedIn');
-
-      final cachingEnabled =
-          _cacheSettingsService?.localApiKeyCachingEnabled ?? false;
-      debugPrint('💾 Local caching enabled: $cachingEnabled');
 
       final podApiKey = await _getApiKeyFromPod();
       debugPrint(

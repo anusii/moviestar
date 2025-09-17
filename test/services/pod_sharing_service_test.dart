@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:moviestar/models/sharing_models.dart';
 import 'package:moviestar/services/pod_sharing_service.dart';
 
 void main() {

@@ -901,13 +901,6 @@ class PodFavoritesService extends ChangeNotifier {
     String contentType = 'movie',
   }) async {
     try {
-      debugPrint(
-        '🔄 Starting rating/comment save for ${movie.title} (ID: ${movie.id})',
-      );
-      debugPrint('📋 Content type: $contentType');
-      debugPrint('⭐ Rating: $rating');
-      debugPrint('💬 Comment: $comment');
-
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
         debugPrint('❌ User not logged in, skipping movie file update');
@@ -919,26 +912,17 @@ class PodFavoritesService extends ChangeNotifier {
       final existingRating = existingData?['rating'] as double?;
       final existingComment = existingData?['comment'] as String?;
 
-      debugPrint(
-        '📖 Existing data - Rating: $existingRating, Comment: $existingComment',
-      );
-
       // Use provided parameters first, then fallback to cache, then fallback to existing file data
       final currentRating =
           rating ?? _cachedRatings?[movie.id.toString()] ?? existingRating;
       final currentComment =
           comment ?? _cachedComments?[movie.id.toString()] ?? existingComment;
 
-      debugPrint(
-        '💾 Final data to save - Rating: $currentRating, Comment: $currentComment',
-      );
-
       // Create movie file even if no rating/comment data to ensure file exists
       // This prevents "file does not exist" errors when reading movie details
       // Only skip if this would create a completely empty update to an existing file
 
       final hasExistingFile = _moviesWithFiles.contains(movie.id);
-      debugPrint('📁 Has existing file: $hasExistingFile');
 
       if (currentRating == null &&
           (currentComment == null || currentComment.isEmpty) &&
@@ -950,7 +934,6 @@ class PodFavoritesService extends ChangeNotifier {
       }
 
       // Use PodSharingService for movie file operations
-      debugPrint('💾 Attempting to write to POD using PodSharingService...');
 
       if (!_context.mounted) {
         debugPrint('❌ Context not mounted, aborting save');
@@ -965,13 +948,7 @@ class PodFavoritesService extends ChangeNotifier {
         comment: currentComment,
       );
 
-      debugPrint('📊 WriteMovieData result: $success');
-
       if (success) {
-        debugPrint(
-          '✅ Successfully saved rating/comment to POD file',
-        );
-
         // Success - file saved, now update caches with the final saved data
         _moviesWithFiles.add(movie.id);
 
@@ -979,26 +956,18 @@ class PodFavoritesService extends ChangeNotifier {
         if (currentRating != null) {
           _cachedRatings ??= {};
           _cachedRatings![movie.id.toString()] = currentRating;
-          debugPrint('🔄 Updated rating cache: ${movie.id} -> $currentRating');
         }
         if (currentComment != null && currentComment.isNotEmpty) {
           _cachedComments ??= {};
           _cachedComments![movie.id.toString()] = currentComment;
-          debugPrint(
-            '🔄 Updated comment cache: ${movie.id} -> $currentComment',
-          );
         }
 
         // Only auto-add to watched list when rating is set (not for comments)
         // Comments might be negative ("heard it's bad, don't watch") so shouldn't trigger watched status
         if (currentRating != null) {
           final isAlreadyWatched = await isInWatched(movie);
-          debugPrint(
-            '👁️  Auto-add to watched check - already watched: $isAlreadyWatched',
-          );
 
           if (!isAlreadyWatched) {
-            debugPrint('➕ Adding to watched list...');
             await addToWatched(movie, contentType: contentType);
           }
         }

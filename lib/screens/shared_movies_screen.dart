@@ -110,6 +110,13 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
 
       // Filter for movie files and movie list files, then fetch their content.
 
+      debugPrint(
+        '🔍 [SharedResources] Found ${sharedResourcesResult.length} shared resources:',
+      );
+      for (final entry in sharedResourcesResult.entries) {
+        debugPrint('   - ${entry.key}');
+      }
+
       for (final entry in sharedResourcesResult.entries) {
         final resourceUrl = entry.key as String;
         final resourceInfo = entry.value as Map;
@@ -238,12 +245,12 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
       double? rating;
       String? comments;
 
-      // Extract movie ID from URL (e.g. Movie-123.ttl -> 123).
+      // Extract movie/TV show ID from URL (e.g. Movie-123.ttl or TVShow-123.ttl -> 123).
 
       final urlParts = resourceUrl.split('/');
       final fileName = urlParts.last;
       final idMatch = RegExp(
-        r'Movie-(\w+)\.ttl',
+        r'(?:Movie|TVShow)-(\w+)\.ttl',
         caseSensitive: false,
       ).firstMatch(fileName);
       if (idMatch != null) {
@@ -376,9 +383,14 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
         }
       }
 
-      // If we still couldn't parse the title, use a fallback.
+      // If we still couldn't parse the title, use a fallback based on file type.
 
-      movieTitle ??= 'Movie ${movieId ?? 'Unknown'}';
+      if (movieTitle == null) {
+        final isTvShow = fileName.toLowerCase().startsWith('tvshow-');
+        movieTitle = isTvShow
+            ? 'TV Show ${movieId ?? 'Unknown'}'
+            : 'Movie ${movieId ?? 'Unknown'}';
+      }
 
       final rawOwner = resourceInfo['owner'] ?? resourceInfo['ownerWebId'];
       final rawSharedBy =
@@ -406,6 +418,9 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
         }
       }
 
+      // Detect content type based on file name
+      final isTvShow = fileName.toLowerCase().startsWith('tvshow-');
+
       final result = {
         'fileName': movieTitle,
         'owner': _formatWebId(finalOwner),
@@ -428,6 +443,8 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
         'releaseDate': releaseDate,
         'voteAverage': voteAverage ?? 0.0,
         'genreIds': genreIds ?? <int>[],
+        // Content type detection based on file prefix
+        'content_type': isTvShow ? 'tv' : 'movie',
       };
 
       return result;
@@ -449,6 +466,8 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
       String? listId;
       String? description;
       List<String> movieIds = [];
+      Map<String, String> movieFilePaths =
+          {}; // Store filePath for each movie ID
 
       // Extract list ID from URL (e.g. MovieList-abc123.ttl -> abc123).
 
@@ -508,6 +527,27 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
             }
           }
         }
+
+        // Extract filePath information for each movie
+        if (trimmedLine.contains('moviestar-onto:filePath') ||
+            trimmedLine.contains(':filePath')) {
+          // Look for patterns like: moviestar-data:movie-1396 followed by filePath
+          // or find the filePath and associate it with the most recent movie ID
+          final filePathMatch = RegExp(
+            r'"moviestar/data/movies/((?:Movie|TVShow)-(\w+)\.ttl)"',
+          ).firstMatch(trimmedLine);
+          if (filePathMatch != null) {
+            final fullFileName =
+                filePathMatch.group(1); // "TVShow-1396.ttl" or "Movie-1396.ttl"
+            final movieId = filePathMatch.group(2); // "1396"
+            if (movieId != null && fullFileName != null) {
+              movieFilePaths[movieId] = fullFileName;
+              debugPrint(
+                '📁 [MovieList] Found filePath for movie $movieId: $fullFileName',
+              );
+            }
+          }
+        }
       }
 
       // Use fallback values if not found.
@@ -553,20 +593,30 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
         'movieCount': movieIds.length, // Use extracted movie IDs count.
 
         'movieIds': movieIds,
-        'movies': movieIds
-            .map(
-              (movieIdStr) => {
-                'movieId': movieIdStr,
-                'fileName':
-                    'Movie $movieIdStr', // Placeholder - will fetch details on-demand.
-                'owner': _formatWebId(finalOwner),
-                'ownerWebId': finalOwner, // Inherit from parent list.
+        'movies': movieIds.map(
+          (movieIdStr) {
+            // Determine content type from filePath if available
+            final filePath = movieFilePaths[movieIdStr];
+            final isTvShow = filePath?.startsWith('TVShow-') ?? false;
+            final contentType = isTvShow ? 'tv' : 'movie';
+            final displayName =
+                isTvShow ? 'TV Show $movieIdStr' : 'Movie $movieIdStr';
 
-                'sharedBy': _formatWebId(finalSharedBy),
-                'sharedByWebId': finalSharedBy, // Inherit from parent list
-              },
-            )
-            .toList(),
+            debugPrint('   - Display name: $displayName');
+
+            return {
+              'movieId': movieIdStr,
+              'fileName':
+                  displayName, // Will be replaced with actual title in SharedMovieListDetailScreen
+              'owner': _formatWebId(finalOwner),
+              'ownerWebId': finalOwner, // Inherit from parent list.
+              'sharedBy': _formatWebId(finalSharedBy),
+              'sharedByWebId': finalSharedBy, // Inherit from parent list
+              'content_type': contentType,
+              'filePath': filePath, // Store the actual file path for reference
+            };
+          },
+        ).toList(),
         'owner': _formatWebId(finalOwner),
         'ownerWebId': finalOwner, // Store full WebID for URL construction
         'sharedBy': _formatWebId(finalSharedBy),

@@ -946,6 +946,39 @@ Recipients will be able to:
     );
   }
 
+  // Shows a loading dialog during sharing process.
+  void _showSharingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Preparing to share...',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'This may take a few seconds',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   // Shares the custom list and all movies using batch sharing UI.
 
   Future<void> _shareCustomList() async {
@@ -953,6 +986,9 @@ Recipients will be able to:
       showErrorSnackBar('No movies to share');
       return;
     }
+
+    // Show loading dialog
+    _showSharingDialog();
 
     // Get all loaded movies from the current list.
 
@@ -1033,6 +1069,11 @@ Recipients will be able to:
     } catch (e) {
       if (mounted) {
         showErrorSnackBar('Error sharing list: $e');
+      }
+    } finally {
+      // Dismiss loading dialog
+      if (mounted) {
+        Navigator.of(context).pop();
       }
     }
   }

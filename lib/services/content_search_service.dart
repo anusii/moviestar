@@ -43,26 +43,28 @@ class ContentSearchService {
   Future<List<ContentItem>> searchContent(String query) async {
     final allContent = <ContentItem>[];
 
-    // Search movies.
+    try {
+      // Search movies.
+      final movieResults = await _client.getJsonList(
+        'search/movie?query=${Uri.encodeComponent(query)}',
+      );
+      allContent.addAll(
+        movieResults.map((movie) => ContentItem.fromMovieJson(movie)),
+      );
 
-    final movieResults = await _client.getJsonList(
-      'search/movie?query=${Uri.encodeComponent(query)}',
-    );
-    allContent
-        .addAll(movieResults.map((movie) => ContentItem.fromMovieJson(movie)));
+      // Search TV shows.
+      final tvResults = await _client.getJsonList(
+        'search/tv?query=${Uri.encodeComponent(query)}',
+      );
+      allContent.addAll(tvResults.map((tv) => ContentItem.fromTVJson(tv)));
 
-    // Search TV shows.
+      // Sort by vote average for better results.
+      allContent.sort((a, b) => b.voteAverage.compareTo(a.voteAverage));
 
-    final tvResults = await _client.getJsonList(
-      'search/tv?query=${Uri.encodeComponent(query)}',
-    );
-    allContent.addAll(tvResults.map((tv) => ContentItem.fromTVJson(tv)));
-
-    // Sort by vote average for better results.
-
-    allContent.sort((a, b) => b.voteAverage.compareTo(a.voteAverage));
-
-    return allContent;
+      return allContent;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Searches for movies matching the given query (backward compatibility).
@@ -310,7 +312,6 @@ class ContentSearchService {
 
     try {
       // Search by title.
-
       results['title'] = await searchContent(query);
     } catch (e) {
       results['title'] = [];
@@ -318,7 +319,6 @@ class ContentSearchService {
 
     try {
       // Search by actor.
-
       results['actor'] = await searchContentByActor(query);
     } catch (e) {
       results['actor'] = [];
@@ -326,7 +326,6 @@ class ContentSearchService {
 
     try {
       // Search by genre.
-
       results['genre'] = await searchContentByGenre(query);
     } catch (e) {
       results['genre'] = [];

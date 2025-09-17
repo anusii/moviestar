@@ -57,6 +57,8 @@ import 'package:moviestar/shared/widgets/home/home_api_error_overlay.dart';
 import 'package:moviestar/shared/widgets/home/home_to_watch_section.dart';
 import 'package:moviestar/shared/widgets/home/home_watched_section.dart';
 import 'package:moviestar/shared/widgets/home/home_custom_list_builder.dart';
+import 'package:moviestar/shared/widgets/home/home_movie_list_items.dart';
+import 'package:moviestar/shared/widgets/home/home_cache_badges.dart';
 
 /// Main home screen of the Movie Star application, displaying featured and
 /// trending movies.
@@ -244,7 +246,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
                 error: (error, stack) => const SizedBox.shrink(),
               ),
               const Gap(8),
-              _buildSectionCacheIndicator(moviesAsync, cacheOnlyMode),
+              HomeCacheBadges.buildSectionCacheIndicator(moviesAsync, cacheOnlyMode),
             ],
           ),
         ),
@@ -343,155 +345,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
     );
   }
 
-  // Builds cache indicator for section headers.
-
-  Widget _buildSectionCacheIndicator(
-    AsyncValue<CacheResult<List<Movie>>> moviesAsync,
-    bool cacheOnlyMode,
-  ) {
-    return moviesAsync.when(
-      data: (cacheResult) {
-        if (cacheOnlyMode) {
-          return _buildOfflineModeBadge();
-        }
-
-        if (cacheResult.fromCache && cacheResult.cacheAge != null) {
-          return _buildCacheAgeBadge(cacheResult.cacheAge!);
-        }
-
-        if (cacheResult.fromCache) {
-          return _buildCacheBadge();
-        } else {
-          return _buildNetworkBadge();
-        }
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
-    );
-  }
-
-  // Builds offline mode badge.
-
-  Widget _buildOfflineModeBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: Colors.orange,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.offline_pin, size: 12, color: Colors.white),
-          Gap(4),
-          Text(
-            'OFFLINE',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Builds cache age badge.
-
-  Widget _buildCacheAgeBadge(Duration cacheAge) {
-    final ageText = _formatCacheAge(cacheAge);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: Colors.green.withValues(alpha: 0.8),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.offline_bolt, size: 12, color: Colors.white),
-          const Gap(4),
-          Text(
-            ageText,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Builds cache badge for fresh cache data.
-
-  Widget _buildCacheBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: Colors.green,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.offline_bolt, size: 12, color: Colors.white),
-          Gap(4),
-          Text(
-            'CACHED',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Builds network badge for fresh data.
-
-  Widget _buildNetworkBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: Colors.blue.withValues(alpha: 0.8),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.wifi, size: 12, color: Colors.white),
-          Gap(4),
-          Text(
-            'LIVE',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Formats cache age into human-readable string.
-
-  String _formatCacheAge(Duration age) {
-    if (age.inDays > 0) {
-      return '${age.inDays}d old';
-    } else if (age.inHours > 0) {
-      return '${age.inHours}h old';
-    } else if (age.inMinutes > 0) {
-      return '${age.inMinutes}m old';
-    } else {
-      return 'cached';
-    }
-  }
 
   // Forces refresh of all movie data.
 
@@ -696,16 +549,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
             parentWidget: widget,
             onNavigate: safeNavigateTo,
             scrollController: _scrollControllers['toWatch']!,
-            buildCacheAgeBadge: _buildCacheAgeBadge,
-            buildMovieListItems: _buildMovieListItems,
+            buildCacheAgeBadge: HomeCacheBadges.buildCacheAgeBadge,
+            buildMovieListItems: (movies, fromCache) => HomeMovieListItems(
+              movies: movies,
+              fromCache: fromCache,
+              favoritesService: widget.favoritesService,
+              parentWidget: widget,
+              onNavigate: safeNavigateTo,
+            ),
           ),
           HomeWatchedSection(
             favoritesService: widget.favoritesService,
             parentWidget: widget,
             onNavigate: safeNavigateTo,
             scrollController: _scrollControllers['watched']!,
-            buildCacheAgeBadge: _buildCacheAgeBadge,
-            buildMovieListItems: _buildMovieListItems,
+            buildCacheAgeBadge: HomeCacheBadges.buildCacheAgeBadge,
+            buildMovieListItems: (movies, fromCache) => HomeMovieListItems(
+              movies: movies,
+              fromCache: fromCache,
+              favoritesService: widget.favoritesService,
+              parentWidget: widget,
+              onNavigate: safeNavigateTo,
+            ),
           ),
           HomeCustomListBuilder(
             favoritesService: widget.favoritesService,
@@ -778,8 +643,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
             parentWidget: widget,
             onNavigate: safeNavigateTo,
             scrollController: _scrollControllers['toWatch']!,
-            buildCacheAgeBadge: _buildCacheAgeBadge,
-            buildMovieListItems: _buildMovieListItems,
+            buildCacheAgeBadge: HomeCacheBadges.buildCacheAgeBadge,
+            buildMovieListItems: (movies, fromCache) => HomeMovieListItems(
+              movies: movies,
+              fromCache: fromCache,
+              favoritesService: widget.favoritesService,
+              parentWidget: widget,
+              onNavigate: safeNavigateTo,
+            ),
             showAsListItems: true,
           )),
           _buildListSection('Watched', HomeWatchedSection(
@@ -787,8 +658,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
             parentWidget: widget,
             onNavigate: safeNavigateTo,
             scrollController: _scrollControllers['watched']!,
-            buildCacheAgeBadge: _buildCacheAgeBadge,
-            buildMovieListItems: _buildMovieListItems,
+            buildCacheAgeBadge: HomeCacheBadges.buildCacheAgeBadge,
+            buildMovieListItems: (movies, fromCache) => HomeMovieListItems(
+              movies: movies,
+              fromCache: fromCache,
+              favoritesService: widget.favoritesService,
+              parentWidget: widget,
+              onNavigate: safeNavigateTo,
+            ),
             showAsListItems: true,
           )),
 
@@ -959,7 +836,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
         ),
         moviesAsync.when(
           data: (cacheResult) =>
-              _buildMovieListItems(cacheResult.data, cacheResult.fromCache),
+              HomeMovieListItems(
+                movies: cacheResult.data,
+                fromCache: cacheResult.fromCache,
+                favoritesService: widget.favoritesService,
+                parentWidget: widget,
+                onNavigate: safeNavigateTo,
+              ),
           loading: () => Container(
             padding: const EdgeInsets.all(32),
             child: Column(
@@ -1004,40 +887,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
   // Build list items for Watched movies.
 
 
-  // Build list items for a list of movies.
-
-  Widget _buildMovieListItems(List<Movie> movies, bool fromCache) {
-    if (movies.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.all(16),
-        child: Text('No movies available'),
-      );
-    }
-
-    return Column(
-      children: movies.take(5).map((movie) {
-        return MovieCard.listItem(
-          movie: movie,
-          fromCache: fromCache,
-          favoritesService: widget.favoritesService,
-          parentWidget: widget,
-          onTap: () {
-            if (mounted) {
-              safeNavigateTo(
-                MaterialPageRoute(
-                  builder: (context) => MovieDetailsScreen(
-                    movie: movie,
-                    favoritesService: widget.favoritesService,
-                    contentType: movie.contentType ?? ContentType.movie,
-                  ),
-                ),
-              );
-            }
-          },
-        );
-      }).toList(),
-    );
-  }
 
 
 

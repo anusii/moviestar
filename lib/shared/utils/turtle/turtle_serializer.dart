@@ -232,4 +232,22 @@ class TurtleSerializer {
     return TurtleBaseSerializer.generateId();
   }
 
+  // ====== NAMESPACE METHODS ======
+
+  /// Static namespace bindings to match ontology structure exactly.
+  static Map<String, Namespace> _getOntologyNamespaces() {
+    return TurtleNamespaceManager.getOntologyNamespaces();
+  }
+
+  // ====== PRIVATE HELPER METHODS ======
+
+  /// Escapes special characters in strings for TTL format.
+  static String _escapeString(String input) {
+    return TurtleBaseSerializer.escapeString(input);
+  }
+
+  /// Escapes and sanitizes strings for TTL format.
+  static String _escapeAndSanitizeString(String input) {
+    return TurtleBaseSerializer.escapeAndSanitizeString(input);
+  }
 }

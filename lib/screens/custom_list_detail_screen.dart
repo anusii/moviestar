@@ -41,11 +41,12 @@ import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
 import 'package:moviestar/core/services/favorites/movie_list_service.dart';
 import 'package:moviestar/services/user_profile_service.dart';
-import 'package:moviestar/utils/date_format_util.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
+import 'package:moviestar/shared/widgets/custom_list_detail/list_header_widget.dart';
+import 'package:moviestar/shared/widgets/custom_list_detail/list_movie_grid.dart';
 
 /// A screen that displays the detailed view of a custom movie list.
 
@@ -450,108 +451,58 @@ Recipients will be able to:
       body: Column(
         children: [
           // List info header.
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          radius: 24,
-                          child: Text(
-                            _currentList.name.isNotEmpty
-                                ? _currentList.name[0].toUpperCase()
-                                : 'L',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _currentList.name,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              if (_currentList.description != null &&
-                                  _currentList.description!.isNotEmpty) ...[
-                                const SizedBox(height: 4),
-                                Text(
-                                  _currentList.description!,
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.movie,
-                          size: 16,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${_currentList.movieCount} movies',
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Icon(
-                          Icons.access_time,
-                          size: 16,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Updated ${DateFormatUtil.formatShort(_currentList.updatedAt)}',
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          ListHeaderWidget(
+            customList: _currentList,
+            totalMovies: _currentList.movieIds.length,
+            loadedMovies: _moviesMap.length,
+            onOptionsPressed: _showListOptions,
           ),
 
           // Movies list.
           Expanded(
             child: _currentList.movieIds.isEmpty
                 ? _buildEmptyState()
-                : _buildMoviesList(),
+                : ListMovieGrid(
+                    movieIds: _currentList.movieIds,
+                    moviesMap: _moviesMap,
+                    loadingMovieIds: _loadingMovieIds,
+                    failedMovieIds: _failedMovieIds,
+                    onRemoveMovie: _removeMovieFromList,
+                    onRetryLoad: _retryLoadMovie,
+                    onRefresh: _loadMovies,
+                    favoritesService: widget.favoritesService,
+                  ),
           ),
         ],
       ),
     );
+  }
+
+  /// Retry loading a specific movie.
+  Future<void> _retryLoadMovie(int movieId) async {
+    setState(() {
+      _failedMovieIds.remove(movieId);
+      _loadingMovieIds.add(movieId);
+    });
+
+    // Load the specific movie
+    try {
+      final movie = await _getContentAsMovieWithType(movieId, 'movie');
+
+      if (mounted) {
+        setState(() {
+          _moviesMap[movieId] = movie;
+          _loadingMovieIds.remove(movieId);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _loadingMovieIds.remove(movieId);
+          _failedMovieIds.add(movieId);
+        });
+      }
+    }
   }
 
   // Builds the empty state when there are no movies in the list.

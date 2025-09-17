@@ -70,19 +70,16 @@ void main() {
       expect(service.getCustomListsContainingMovie, isA<Function>());
       expect(service.getMoviesInCustomList, isA<Function>());
 
-      // POD sync methods
+      // POD sync methods (only methods that exist)
       expect(service.migrateToPod, isA<Function>());
       expect(service.syncWithPod, isA<Function>());
-      expect(service.retryPodInitialization, isA<Function>());
-      expect(service.autoRetryPodInitialization, isA<Function>());
       expect(service.reloadFromPod, isA<Function>());
       expect(service.isPodAvailable, isA<Function>());
       expect(service.refreshUIStreams, isA<Function>());
       expect(service.migrateCustomListsToPod, isA<Function>());
 
-      // File methods
+      // File methods (only methods that exist)
       expect(service.hasMovieFile, isA<Function>());
-      expect(service.getMovieFilePath, isA<Function>());
 
       // Service extends ChangeNotifier
       expect(service, isA<ChangeNotifier>());

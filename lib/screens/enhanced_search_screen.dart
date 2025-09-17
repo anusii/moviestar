@@ -29,20 +29,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:gap/gap.dart';
-
-import 'package:moviestar/constants/dimensions.dart';
-import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/content_item.dart';
-import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/core/services/api/content_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/utils/movie_display_utils.dart';
 import 'package:moviestar/widgets/base_screen.dart';
+import 'package:moviestar/shared/widgets/search/search_results_display.dart';
+import 'package:moviestar/shared/widgets/search/search_empty_state.dart';
+import 'package:moviestar/shared/widgets/search/add_to_custom_lists_dialog.dart';
 
 /// Enhanced search screen that supports both movies and TV shows.
 
@@ -98,48 +93,40 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
     super.dispose();
   }
 
-  // Called when search text changes.
+  // Called when search text changes to initiate debounced search.
 
   void _onSearchChanged() {
-    // Cancel previous timer if it exists.
-
     _debounceTimer?.cancel();
 
-    // Start new timer for debouncing.
+    final query = _searchController.text.trim();
 
-    _debounceTimer = Timer(_debounceDuration, () {
-      _searchContent(_searchController.text);
-    });
-  }
-
-  // Searches for content based on the provided query.
-
-  Future<void> _searchContent(String query) async {
-    if (query.isEmpty) {
+    if (query.isEmpty || query.length < 2) {
       safeSetState(() {
         _searchResults = {};
       });
       return;
     }
 
-    // Don't search if query is too short.
+    _debounceTimer = Timer(_debounceDuration, () {
+      _searchContent(query);
+    });
+  }
 
-    if (query.length < 2) {
-      return;
-    }
+  // Performs the search API call using the content service.
 
-    print('🔍 [EnhancedSearchScreen] Starting search for: "$query"');
+  Future<void> _searchContent(String query) async {
+    if (query.isEmpty || query.length < 2) return;
+
     setLoadingState(true);
 
     try {
-      final results = await widget.contentService.searchContentComprehensive(
-        query,
-      );
+      print('🔍 [EnhancedSearchScreen] Searching for: "$query"');
 
-      print('🔍 [EnhancedSearchScreen] Search results for "$query": ${results.length} categories');
-      for (final entry in results.entries) {
-        print('🔍 [EnhancedSearchScreen] Category "${entry.key}": ${entry.value.length} items');
-      }
+      final results = await widget.contentService.searchContentComprehensive(query);
+
+      print(
+        '🔍 [EnhancedSearchScreen] Results found: ${results.entries.map((e) => '${e.key}: ${e.value.length}').join(', ')}',
+      );
 
       // Only update state if this search is still relevant.
 
@@ -159,197 +146,6 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
         showErrorSnackBar('Search failed: ${e.toString()}');
       }
     }
-  }
-
-  // Builds a section of search results for a specific category.
-
-  Widget _buildResultsSection(String category, List<ContentItem> content) {
-    if (content.isEmpty) return const SizedBox.shrink();
-
-    String categoryTitle;
-    IconData categoryIcon;
-
-    switch (category) {
-      case 'title':
-        categoryTitle = 'By Title';
-        categoryIcon = Icons.search;
-        break;
-      case 'actor':
-        categoryTitle = 'By Actor';
-        categoryIcon = Icons.person;
-        break;
-      case 'genre':
-        categoryTitle = 'By Genre';
-        categoryIcon = Icons.category;
-        break;
-      default:
-        categoryTitle = category;
-        categoryIcon = Icons.search;
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(Dimensions.xl),
-          child: Row(
-            children: [
-              Icon(
-                categoryIcon,
-                color: Theme.of(context).colorScheme.primary,
-                size: 20,
-              ),
-              const Gap(Gaps.m),
-              Text(
-                categoryTitle,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Gap(Gaps.m),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '${content.length}',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: content.length,
-          itemBuilder: (context, index) {
-            final contentItem = content[index];
-            return ListTile(
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: isValidImageUrl(contentItem.posterUrl)
-                    ? CachedNetworkImage(
-                        imageUrl: contentItem.posterUrl.trim(),
-                        width: 50,
-                        height: 75,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            const Center(child: CircularProgressIndicator()),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
-                      )
-                    : Container(
-                        width: 50,
-                        height: 75,
-                        color: Colors.grey[300],
-                        child: const Icon(
-                          Icons.movie,
-                          color: Colors.grey,
-                        ),
-                      ),
-              ),
-              title: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      contentItem.title,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    contentItem.contentTypeIcon,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '⭐ ${contentItem.voteAverage.toStringAsFixed(1)}',
-                    style: TextStyle(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
-                  ),
-                  Text(
-                    '${contentItem.contentTypeLabel} • ${contentItem.releaseYear}',
-                    style: TextStyle(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.5),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-              trailing: PopupMenuButton<String>(
-                icon: const Icon(Icons.playlist_add),
-                tooltip: 'Add to List',
-                onSelected: (value) => _handleListAction(value, contentItem),
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'to_watch',
-                    child: Row(
-                      children: [
-                        Icon(Icons.bookmark_add_outlined),
-                        SizedBox(width: 8),
-                        Text('Add to To Watch'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'watched',
-                    child: Row(
-                      children: [
-                        Icon(Icons.check_circle_outline),
-                        SizedBox(width: 8),
-                        Text('Add to Watched'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'custom_lists',
-                    child: Row(
-                      children: [
-                        Icon(Icons.library_add_outlined),
-                        SizedBox(width: 8),
-                        Text('Add to Custom Lists'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              onTap: () {
-                // Navigate to details screen for both movies and TV shows
-                final movie = Movie.fromContentItem(contentItem);
-                safeNavigateTo(
-                  MaterialPageRoute(
-                    builder: (context) => MovieDetailsScreen(
-                      movie: movie,
-                      favoritesService: widget.favoritesService,
-                      contentType: contentItem.contentType,
-                    ),
-                  ),
-                );
-              },
-            );
-          },
-        ),
-        const Gap(Gaps.xxl),
-      ],
-    );
   }
 
   // Handles list actions from the popup menu.
@@ -389,15 +185,13 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
   }
 
   // Shows a dialog to add content item to custom lists.
-
   void _showAddToCustomListsDialog(ContentItem contentItem) {
-    // Convert ContentItem to Movie for list operations (works for both movies and TV shows)
     final movie = Movie.fromContentItem(contentItem);
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return _AddToCustomListsDialog(
+        return AddToCustomListsDialog(
           movie: movie,
           originalContentItem: contentItem,
           favoritesService: widget.favoritesService,
@@ -426,547 +220,15 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
         _searchContent(value);
       },
       isLoading: isLoading,
-      body: _searchResults.isEmpty || _hasNoResults()
-          ? _buildEmptyState()
-          : _buildSearchResults(),
+      body: _searchResults.isEmpty || SearchResultsDisplay.hasNoResults(_searchResults)
+          ? SearchEmptyState(searchController: _searchController)
+          : SearchResultsDisplay(
+              searchResults: _searchResults,
+              favoritesService: widget.favoritesService,
+              onNavigate: safeNavigateTo,
+              onHandleListAction: _handleListAction,
+            ),
     );
   }
 
-  /// Builds the empty state when no search results are available.
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.search,
-            size: 64,
-            color: colorScheme.onSurface.withValues(alpha: 0.4),
-          ),
-          const Gap(Gaps.xxl),
-          Text(
-            _searchController.text.isEmpty
-                ? 'Search for movies and TV shows'
-                : _searchController.text.length < 2
-                    ? 'Type at least 2 characters'
-                    : 'No results found',
-            style: textTheme.headlineSmall?.copyWith(
-              color: colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
-          ),
-          const Gap(Gaps.m),
-          Text(
-            'Find content by title, actor, or genre',
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface.withValues(alpha: 0.4),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Builds the search results display.
-  Widget _buildSearchResults() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildResultsSection('title', _searchResults['title'] ?? []),
-          _buildResultsSection('actor', _searchResults['actor'] ?? []),
-          _buildResultsSection('genre', _searchResults['genre'] ?? []),
-        ],
-      ),
-    );
-  }
-
-  // Check if all search result categories are empty.
-
-  bool _hasNoResults() {
-    return (_searchResults['title']?.isEmpty ?? true) &&
-        (_searchResults['actor']?.isEmpty ?? true) &&
-        (_searchResults['genre']?.isEmpty ?? true);
-  }
-}
-
-/// Dialog for adding a movie to custom lists.
-class _AddToCustomListsDialog extends StatefulWidget {
-  final Movie movie;
-  final ContentItem originalContentItem;
-  final FavoritesService favoritesService;
-  final VoidCallback onListsUpdated;
-
-  const _AddToCustomListsDialog({
-    required this.movie,
-    required this.originalContentItem,
-    required this.favoritesService,
-    required this.onListsUpdated,
-  });
-
-  @override
-  State<_AddToCustomListsDialog> createState() =>
-      _AddToCustomListsDialogState();
-}
-
-class _AddToCustomListsDialogState extends State<_AddToCustomListsDialog> {
-  final TextEditingController _newListController = TextEditingController();
-  final Set<String> _selectedListIds = {};
-  List<CustomList> _customLists = [];
-  bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadCustomLists();
-  }
-
-  @override
-  void dispose() {
-    _newListController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _loadCustomLists() async {
-    try {
-      final lists = await widget.favoritesService.getCustomLists();
-      setState(() {
-        _customLists = lists;
-      });
-      await _loadMovieListStatus();
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading lists: $e')),
-        );
-      }
-    }
-  }
-
-  Future<void> _loadMovieListStatus() async {
-    for (final list in _customLists) {
-      final isInList = await widget.favoritesService.isMovieInCustomList(
-        list.id,
-        widget.movie.id,
-      );
-      if (isInList) {
-        _selectedListIds.add(list.id);
-      }
-    }
-    setState(() {});
-  }
-
-  Future<void> _refreshCustomListCounts() async {
-    try {
-      final lists = await widget.favoritesService.getCustomLists();
-      setState(() {
-        _customLists = lists;
-      });
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error refreshing lists: $e')),
-        );
-      }
-    }
-  }
-
-  Future<void> _toggleMovieInList(String listId, bool add) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      if (add) {
-        // Determine content type based on the original ContentItem
-        final contentType =
-            widget.originalContentItem.contentType == ContentType.tvShow
-                ? 'tv'
-                : 'movie';
-        await widget.favoritesService.addMovieToCustomList(
-          listId,
-          widget.movie,
-          contentType: contentType,
-        );
-        _selectedListIds.add(listId);
-      } else {
-        await widget.favoritesService
-            .removeMovieFromCustomList(listId, widget.movie.id);
-        _selectedListIds.remove(listId);
-      }
-
-      // Refresh the custom lists to update counts without losing selection state
-      await _refreshCustomListCounts();
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating list: $e')),
-        );
-      }
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Container(
-        width: double.maxFinite,
-        constraints: const BoxConstraints(maxHeight: 500),
-        child: Column(
-          children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .primaryContainer
-                    .withValues(alpha: 0.3),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.playlist_add,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Add to Lists',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                        Text(
-                          widget.movie.title,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .surface
-                          .withValues(alpha: 0.8),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Lists content
-            Expanded(
-              child: _customLists.isNotEmpty
-                  ? ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _customLists.length,
-                      itemBuilder: (context, index) {
-                        final list = _customLists[index];
-                        final isSelected = _selectedListIds.contains(list.id);
-
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .outline
-                                      .withValues(alpha: 0.2),
-                              width: isSelected ? 2 : 1,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                            color: isSelected
-                                ? Theme.of(context)
-                                    .colorScheme
-                                    .primaryContainer
-                                    .withValues(alpha: 0.1)
-                                : null,
-                          ),
-                          child: CheckboxListTile(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            secondary: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Theme.of(context).colorScheme.primary,
-                                    Theme.of(context).colorScheme.secondary,
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  list.name.isNotEmpty
-                                      ? list.name[0].toUpperCase()
-                                      : 'L',
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            title: Text(
-                              list.name,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                            subtitle: Row(
-                              children: [
-                                Icon(
-                                  Icons.movie,
-                                  size: 14,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '${list.movieCount} items',
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            value: isSelected,
-                            activeColor: Theme.of(context).colorScheme.primary,
-                            onChanged: _isLoading
-                                ? null
-                                : (value) =>
-                                    _toggleMovieInList(list.id, value ?? false),
-                          ),
-                        );
-                      },
-                    )
-                  : _buildEmptyListsState(),
-            ),
-
-            // Create new list button
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .surfaceContainerHighest
-                    .withValues(alpha: 0.3),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(16),
-                  bottomRight: Radius.circular(16),
-                ),
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _isLoading ? null : _showCreateNewListDialog,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Create New List'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
-                    foregroundColor:
-                        Theme.of(context).colorScheme.onPrimaryContainer,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyListsState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.playlist_add_outlined,
-              size: 64,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurfaceVariant
-                  .withValues(alpha: 0.6),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No Custom Lists Yet',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Create your first custom list to organize your movies and TV shows!',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showCreateNewListDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Create New List'),
-        content: TextField(
-          controller: _newListController,
-          decoration: const InputDecoration(
-            labelText: 'List Name',
-            hintText: 'Enter a name for your list...',
-            border: OutlineInputBorder(),
-          ),
-          autofocus: true,
-          onSubmitted: (_) => _createNewListAndAdd(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: _createNewListAndAdd,
-            child: const Text('Create & Add'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _createNewListAndAdd() async {
-    final name = _newListController.text.trim();
-    if (name.isEmpty) return;
-
-    Navigator.pop(context); // Close create dialog
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final newList = await widget.favoritesService.createCustomList(name);
-      final contentType =
-          widget.originalContentItem.contentType == ContentType.tvShow
-              ? 'tv'
-              : 'movie';
-      await widget.favoritesService.addMovieToCustomList(
-        newList.id,
-        widget.movie,
-        contentType: contentType,
-      );
-      _selectedListIds.add(newList.id);
-      _newListController.clear();
-      widget.onListsUpdated();
-
-      if (mounted) {
-        Navigator.pop(context); // Close main dialog
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(
-                  Icons.check_circle_outline,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Created "$name" and added "${widget.movie.title}"',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            margin: const EdgeInsets.all(16),
-            elevation: 6,
-            duration: TimingConstants.snackbarStandardDuration,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error creating list: $e')),
-        );
-      }
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
 }

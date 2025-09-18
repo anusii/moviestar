@@ -171,7 +171,7 @@ class TurtleSerializer {
     String? apiKey,
     String? dobString,
     String? genderString,
-    List<String>? movieListIds,
+    required List<String> movieListIds,
   }) {
     return UserProfileTurtleSerializer.createUserProfile(
       userWebId,

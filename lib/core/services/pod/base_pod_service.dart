@@ -30,19 +30,6 @@ import 'package:flutter/material.dart';
 import 'package:moviestar/core/services/pod/pod_file_operations_service.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 
-/// Result of a POD file operation.
-class FileOperationResult {
-  final bool success;
-  final String? data;
-  final String? error;
-
-  const FileOperationResult({
-    required this.success,
-    this.data,
-    this.error,
-  });
-}
-
 /// Base class for services that interact with Solid POD storage.
 /// Provides common functionality for login validation, context checking,.
 /// and POD file operations while preserving exact existing behavior.

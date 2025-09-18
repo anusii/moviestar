@@ -42,29 +42,6 @@ import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/network_client.dart';
 
-/// A simple API key service that returns the provided API key directly.
-/// This bypasses the complex POD/secure storage chain when we already have the key.
-class DirectApiKeyService {
-  final String? _apiKey;
-
-  DirectApiKeyService(this._apiKey);
-
-  Future<String?> getApiKey() async {
-    debugPrint(
-      '🔑 [DirectApiKeyService] Returning API key: ${_apiKey != null ? 'Present (${_apiKey.length} chars)' : 'NULL'}',
-    );
-    return _apiKey;
-  }
-
-  void addListener(VoidCallback listener) {
-    // No-op since the key doesn't change
-  }
-
-  void removeListener(VoidCallback listener) {
-    // No-op since the key doesn't change
-  }
-}
-
 /// A MovieService that initializes with a direct API key instead of using ApiKeyService.
 /// This bypasses the complex POD/secure storage chain when we already have the key.
 class DirectMovieService extends MovieService {

@@ -21,16 +21,12 @@ class ApiSettingsPanel extends ConsumerStatefulWidget {
   final Function(String title, List<Widget> children) buildSection;
   final ApiKeyService apiKeyService;
   final bool fromApiKeyPrompt;
-  final VoidCallback? onNavigateToHome;
-  final VoidCallback? onTriggerAppReinitialization;
 
   const ApiSettingsPanel({
     super.key,
     required this.buildSection,
     required this.apiKeyService,
     this.fromApiKeyPrompt = false,
-    this.onNavigateToHome,
-    this.onTriggerAppReinitialization,
   });
 
   @override

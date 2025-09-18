@@ -44,7 +44,7 @@ class PodFavoritesService extends BasePodService {
   PodFavoritesService(
     super.context,
     super.child, {
-    VoidCallback? onInitialLoadComplete,
+    required VoidCallback onInitialLoadComplete,
   }) : _onInitialLoadComplete = onInitialLoadComplete {
     _streamManager = PodFavoritesStreamManager();
     _fileManager = PodFavoritesFileManager(context, child);

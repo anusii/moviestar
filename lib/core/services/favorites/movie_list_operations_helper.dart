@@ -107,8 +107,9 @@ class MovieListOperationsHelper with PodOperationsMixin {
         _child,
       );
 
-      if (!validateContext(_context))
+      if (!validateContext(_context)) {
         return false; // ignore: use_build_context_synchronously
+      }
 
       debugPrint(
         '🎬 [MovieListOperationsHelper] Delete file result: success=${result.success}, error=${result.error}',

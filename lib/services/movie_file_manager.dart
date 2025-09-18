@@ -193,10 +193,14 @@ class MovieFileManager {
     final finalRating = rating ?? existingRating;
     final finalComment = comment ?? existingComment;
 
-    // ignore: use_build_context_synchronously
+    // Check if context is still mounted after async operation
+    if (!context.mounted) {
+      return false;
+    }
+
     return await writeMovieData(
       movie,
-      context, // ignore: use_build_context_synchronously
+      context,
       child,
       rating: finalRating,
       comment: finalComment,

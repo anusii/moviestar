@@ -27,6 +27,41 @@ import 'package:solidpod/solidpod.dart' show SolidFunctionCallStatus;
 // ignore: implementation_imports
 import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
 
+import 'package:moviestar/models/movie.dart';
+
+/// Represents a file that can be shared with permissions.
+class ShareableFile {
+  final String fileName;
+  final String displayName;
+  final String fileType;
+  final List<String> permissions;
+  final Movie? movie;
+
+  const ShareableFile({
+    required this.fileName,
+    required this.displayName,
+    required this.fileType,
+    required this.permissions,
+    this.movie,
+  });
+
+  ShareableFile copyWith({
+    String? fileName,
+    String? displayName,
+    String? fileType,
+    List<String>? permissions,
+    Movie? movie,
+  }) {
+    return ShareableFile(
+      fileName: fileName ?? this.fileName,
+      displayName: displayName ?? this.displayName,
+      fileType: fileType ?? this.fileType,
+      permissions: permissions ?? this.permissions,
+      movie: movie ?? this.movie,
+    );
+  }
+}
+
 /// Request model for sharing a file.
 class ShareRequest {
   final String fileName;

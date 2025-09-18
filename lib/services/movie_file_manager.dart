@@ -16,7 +16,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/models/sharing_models.dart';
 import 'package:moviestar/services/share_operation_handler.dart';
 import 'package:moviestar/services/webid_validator.dart';
-import 'package:moviestar/utils/turtle_serializer.dart';
+import 'package:moviestar/utils/serializer.dart';
 
 /// Handles movie file operations for POD sharing.
 class MovieFileManager {

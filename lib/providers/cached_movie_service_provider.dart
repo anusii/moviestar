@@ -32,7 +32,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solidpod/solidpod.dart' show getWebId;
 
-import 'package:moviestar/core/services/api/api_key_service.dart';
+import 'package:moviestar/core/services/api/key_service.dart';
 import 'package:moviestar/core/services/api/content_service.dart';
 import 'package:moviestar/core/services/api/movie_service.dart';
 import 'package:moviestar/core/services/cache/cache_settings_service.dart';

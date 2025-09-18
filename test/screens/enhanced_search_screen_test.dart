@@ -15,7 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:moviestar/screens/enhanced_search_screen.dart';
 import 'package:moviestar/core/services/api/content_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/service.dart';
 
 void main() {
   group('EnhancedSearchScreen Tests', () {

@@ -17,9 +17,9 @@ import 'package:solidpod/solidpod.dart' show tripleMapToTurtle;
 
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/shared/utils/turtle/turtle_base_serializer.dart';
-import 'package:moviestar/shared/utils/turtle/turtle_namespace_manager.dart';
-import 'package:moviestar/shared/utils/turtle/turtle_parsing_utils.dart';
+import 'package:moviestar/shared/utils/turtle/base_serializer.dart';
+import 'package:moviestar/shared/utils/turtle/namespace_manager.dart';
+import 'package:moviestar/shared/utils/turtle/parsing_utils.dart';
 
 /// Handles MovieList ↔ Turtle serialization operations.
 class MovieListTurtleSerializer extends TurtleBaseSerializer {

@@ -10,7 +10,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solidpod/solidpod.dart' show getWebId;
 
 import 'package:moviestar/core/services/pod/base_pod_service.dart';
-import 'package:moviestar/utils/turtle_serializer.dart';
+import 'package:moviestar/utils/serializer.dart';
 
 /// Compact service for managing API keys with POD and secure storage.
 /// Uses BasePodService infrastructure for common POD operations.

@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
-import 'package:moviestar/core/services/api/api_key_validation_service.dart';
+import 'package:moviestar/core/services/api/key_validation_service.dart';
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
 import 'package:moviestar/core/services/network/network_connectivity_service.dart';
 import 'package:moviestar/models/app_error.dart';

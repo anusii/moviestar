@@ -14,7 +14,7 @@ import 'package:moviestar/core/services/pod/pod_favorites_file_manager.dart';
 import 'package:moviestar/core/services/pod/pod_favorites_stream_manager.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/utils/turtle_serializer.dart';
+import 'package:moviestar/utils/serializer.dart';
 
 /// Handles movie-specific operations for POD favorites service.
 class PodFavoritesMovieOperations {

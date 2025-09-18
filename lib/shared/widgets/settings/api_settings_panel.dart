@@ -14,7 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:moviestar/core/services/api/api_key_service.dart';
+import 'package:moviestar/core/services/api/key_service.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 
 class ApiSettingsPanel extends ConsumerStatefulWidget {

@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
+import 'package:moviestar/core/services/favorites/service.dart';
+import 'package:moviestar/core/services/favorites/service_adapter.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/movie.dart';

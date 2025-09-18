@@ -30,14 +30,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
-import 'package:moviestar/shared/widgets/home/home_api_error_overlay.dart';
-import 'package:moviestar/shared/widgets/home/home_error_handler.dart';
-import 'package:moviestar/shared/widgets/home/home_view_modes.dart';
+import 'package:moviestar/shared/widgets/home/api_error_overlay.dart';
+import 'package:moviestar/shared/widgets/home/error_handler.dart';
+import 'package:moviestar/shared/widgets/home/view_modes.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 
 /// Main home screen of the Movie Star application, displaying featured and.

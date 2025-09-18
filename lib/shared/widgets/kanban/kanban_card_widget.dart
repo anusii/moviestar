@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/constants/ui_constants.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/widgets/movie_card.dart';

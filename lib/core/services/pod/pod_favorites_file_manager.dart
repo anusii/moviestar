@@ -32,7 +32,7 @@ import 'package:moviestar/core/services/pod/pod_operations_mixin.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
-import 'package:moviestar/utils/turtle_serializer.dart';
+import 'package:moviestar/utils/serializer.dart';
 
 /// Manages movie file operations for PodFavoritesService.
 /// Extracted to reduce main service file size while preserving exact behavior.

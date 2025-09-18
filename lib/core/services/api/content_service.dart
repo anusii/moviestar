@@ -27,7 +27,7 @@ library;
 
 import 'dart:io';
 
-import 'package:moviestar/core/services/api/api_key_service.dart';
+import 'package:moviestar/core/services/api/key_service.dart';
 import 'package:moviestar/core/services/network/content_search_service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';

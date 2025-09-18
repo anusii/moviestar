@@ -14,8 +14,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
+import 'package:moviestar/core/services/favorites/service.dart';
+import 'package:moviestar/core/services/favorites/service_adapter.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';

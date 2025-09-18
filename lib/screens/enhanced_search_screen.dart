@@ -30,7 +30,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:moviestar/core/services/api/content_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';

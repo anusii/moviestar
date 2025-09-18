@@ -23,7 +23,7 @@
 
 library;
 
-import 'package:moviestar/core/services/api/api_key_service.dart';
+import 'package:moviestar/core/services/api/key_service.dart';
 
 /// Result of API key validation.
 class ApiKeyValidationResult {

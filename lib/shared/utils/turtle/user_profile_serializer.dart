@@ -11,8 +11,8 @@ library;
 import 'package:rdflib/rdflib.dart';
 import 'package:solidpod/solidpod.dart' show tripleMapToTurtle;
 
-import 'package:moviestar/shared/utils/turtle/turtle_base_serializer.dart';
-import 'package:moviestar/shared/utils/turtle/turtle_namespace_manager.dart';
+import 'package:moviestar/shared/utils/turtle/base_serializer.dart';
+import 'package:moviestar/shared/utils/turtle/namespace_manager.dart';
 
 /// Handles User profile ↔ Turtle serialization operations.
 class UserProfileTurtleSerializer extends TurtleBaseSerializer {

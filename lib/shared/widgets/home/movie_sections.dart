@@ -14,13 +14,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/shared/widgets/home/home_cache_badges.dart';
+import 'package:moviestar/shared/widgets/home/cache_badges.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
 /// Widget that displays popular, now playing, top rated, and upcoming movie sections.

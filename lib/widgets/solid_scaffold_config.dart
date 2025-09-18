@@ -30,8 +30,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solidui/solidui.dart';
 
-import 'package:moviestar/core/services/api/api_key_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/api/key_service.dart';
+import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/coming_soon_screen.dart';

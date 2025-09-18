@@ -44,6 +44,18 @@ class MovieListService extends BasePodService with PodOperationsMixin {
   }) async {
     return await executePodOperation(
       operation: () async {
+        // Check if a custom list with this name already exists
+        debugPrint('🎬 [MovieListService] Checking for existing list with name: $listName');
+        final existingListId = await _fileHelper.findExistingMovieList(
+          'custom', // Use 'custom' as list type for user-created lists
+          listName,
+        );
+
+        if (existingListId != null) {
+          debugPrint('⚠️ [MovieListService] List "$listName" already exists with ID: $existingListId - returning existing');
+          return existingListId;
+        }
+
         final movieListId = TurtleSerializer.generateId();
         final movieListTtl = TurtleSerializer.createMovieList(
           movieListId,

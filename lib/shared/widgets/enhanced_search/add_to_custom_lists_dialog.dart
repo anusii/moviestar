@@ -265,7 +265,9 @@ class _AddToCustomListsDialogState extends State<AddToCustomListsDialog> {
                         child: TextField(
                           controller: _newListController,
                           decoration: InputDecoration(
-                            hintText: 'List name',
+                            hintText: 'Enter a unique list name...',
+                            helperText: 'Tip: Use unique names to avoid duplicates',
+                            helperMaxLines: 2,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),

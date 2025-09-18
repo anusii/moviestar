@@ -36,8 +36,10 @@ class ListCreationDialogWidget {
               controller: nameController,
               decoration: const InputDecoration(
                 labelText: 'List Name',
-                hintText: 'Enter a name for your list...',
+                hintText: 'Enter a unique name for your list...',
                 border: OutlineInputBorder(),
+                helperText: 'Tip: Use unique names to avoid duplicates',
+                helperMaxLines: 2,
               ),
               autofocus: true,
             ),

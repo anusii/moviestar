@@ -389,8 +389,10 @@ class _AddToListsDialogState extends State<AddToListsDialog> {
           controller: _newListController,
           decoration: const InputDecoration(
             labelText: 'List Name',
-            hintText: 'Enter a name for your list...',
+            hintText: 'Enter a unique name for your list...',
             border: OutlineInputBorder(),
+            helperText: 'Tip: Use unique names to avoid duplicates',
+            helperMaxLines: 2,
           ),
           autofocus: true,
           onSubmitted: (_) => _createNewListAndAdd(),

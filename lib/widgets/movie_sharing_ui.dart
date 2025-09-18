@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 
-import 'package:moviestar/core/services/pod/pod_sharing_service.dart';
+import 'package:moviestar/core/services/pod/sharing_service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/models/sharing_models.dart';

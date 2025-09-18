@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:moviestar/core/services/pod/pod_operations_mixin.dart';
+import 'package:moviestar/core/services/pod/operations_mixin.dart';
 
 /// Test class using PodOperationsMixin
 class TestMixinClass with PodOperationsMixin {

@@ -35,7 +35,7 @@ import 'package:solidui/solidui.dart';
 import 'package:moviestar/core/services/api/key_service.dart';
 import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/core/services/favorites/service_adapter.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
+import 'package:moviestar/core/services/favorites/service_manager.dart';
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';

@@ -31,9 +31,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/core/services/favorites/movie_list_service.dart';
 import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/core/services/favorites/service_adapter.dart';
-import 'package:moviestar/core/services/favorites/movie_list_service.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';

@@ -32,11 +32,11 @@ import 'package:gap/gap.dart';
 
 import 'package:moviestar/core/services/api/key_service.dart';
 import 'package:moviestar/core/services/favorites/service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
+import 'package:moviestar/core/services/favorites/service_manager.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
-import 'package:moviestar/shared/widgets/settings/api_settings_panel.dart';
+import 'package:moviestar/shared/widgets/settings/api_panel.dart';
 import 'package:moviestar/shared/widgets/settings/cache_management_panel.dart';
-import 'package:moviestar/shared/widgets/settings/pod_settings_panel.dart';
+import 'package:moviestar/shared/widgets/settings/pod_panel.dart';
 import 'package:moviestar/shared/widgets/settings/preferences_panel.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 
@@ -219,34 +219,5 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       ),
       onTap: onTap,
     );
-  }
-
-  /// Triggers app reinitialization after API key is set.
-  void _triggerAppReinitialization() {
-    // The provider invalidations we added earlier will handle the reinitialization
-    // No additional action needed here since the providers are already invalidated
-  }
-
-  void _navigateToHomeScreen() {
-    // Navigate back to the main home screen.
-
-    Navigator.of(context).popUntil((route) => route.isFirst);
-
-    // Find the MyHomePage instance.
-
-    final scaffoldContext = context;
-
-    // Try to find the nearest ancestor of type MyHomePage (or its State) and select the Home tab (index 0).
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Use the scaffold to show a message to the user.
-
-      ScaffoldMessenger.of(scaffoldContext).showSnackBar(
-        const SnackBar(
-          content: Text('Movie data will now load with your new API key'),
-          backgroundColor: Colors.blue,
-        ),
-      );
-    });
   }
 }

@@ -15,8 +15,8 @@ import 'package:moviestar/core/services/pod/favorites/pod_favorites_cache_manage
 import 'package:moviestar/core/services/pod/favorites/pod_favorites_file_handler.dart';
 import 'package:moviestar/core/services/pod/favorites/pod_favorites_list_operations.dart';
 import 'package:moviestar/core/services/pod/favorites/pod_favorites_movie_operations.dart';
-import 'package:moviestar/core/services/pod/pod_favorites_file_manager.dart';
-import 'package:moviestar/core/services/pod/pod_favorites_stream_manager.dart';
+import 'package:moviestar/core/services/pod/favorites_file_manager.dart';
+import 'package:moviestar/core/services/pod/favorites_stream_manager.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/user_profile_service.dart';

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:moviestar/core/services/pod/pod_favorites_service.dart';
+import 'package:moviestar/core/services/pod/favorites_service.dart';
 
 void main() {
   group('PodFavoritesService Public API Tests', () {
@@ -25,7 +25,11 @@ void main() {
         MaterialApp(
           home: Builder(
             builder: (context) {
-              service = PodFavoritesService(context, Container());
+              service = PodFavoritesService(
+                context,
+                Container(),
+                onInitialLoadComplete: () {},
+              );
               return Container();
             },
           ),

@@ -28,7 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:solidpod/solidpod.dart';
 
 import 'package:moviestar/core/services/api/key_service.dart';
-import 'package:moviestar/core/services/pod/pod_file_operations_service.dart';
+import 'package:moviestar/core/services/pod/file_operations_service.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/utils/pod_path_helper.dart';
 import 'package:moviestar/utils/serializer.dart';

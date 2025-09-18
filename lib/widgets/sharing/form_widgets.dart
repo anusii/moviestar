@@ -25,7 +25,7 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:moviestar/core/services/pod/pod_sharing_service.dart';
+import 'package:moviestar/core/services/pod/sharing_service.dart';
 
 /// Permission selector widget for choosing access levels.
 class PermissionSelector extends StatefulWidget {

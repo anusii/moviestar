@@ -35,8 +35,8 @@ import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/shared/widgets/search/add_to_custom_lists_dialog.dart';
-import 'package:moviestar/shared/widgets/search/search_empty_state.dart';
-import 'package:moviestar/shared/widgets/search/search_results_display.dart';
+import 'package:moviestar/shared/widgets/search/empty_state.dart';
+import 'package:moviestar/shared/widgets/search/results_display.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 
 /// Enhanced search screen that supports both movies and TV shows.

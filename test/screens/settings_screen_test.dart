@@ -13,7 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:moviestar/screens/settings_screen.dart';
 import 'package:moviestar/core/services/api/key_service.dart';
 import 'package:moviestar/core/services/favorites/service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
+import 'package:moviestar/core/services/favorites/service_manager.dart';
 
 // Simple test that verifies the SettingsScreen class can be instantiated
 void main() {

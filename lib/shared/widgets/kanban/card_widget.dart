@@ -17,7 +17,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
-import 'kanban_board_controller.dart';
+import 'board_controller.dart';
 
 /// Kanban card widget with drag functionality and status indicators.
 class KanbanCardWidget extends StatelessWidget {

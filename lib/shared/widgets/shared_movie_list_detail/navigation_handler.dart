@@ -12,11 +12,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/core/services/favorites/service_adapter.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
+import 'package:moviestar/core/services/favorites/service_manager.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/shared/widgets/shared_movie_list_detail/shared_list_data_loader.dart';
+import 'package:moviestar/shared/widgets/shared_movie_list_detail/data_loader.dart';
 
 /// Handles navigation operations for shared movie list detail screen.
 class SharedListNavigationHandler {

@@ -21,12 +21,12 @@ import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
 // Import extracted kanban components
-import 'package:moviestar/shared/widgets/kanban/kanban_board_controller.dart';
-import 'package:moviestar/shared/widgets/kanban/kanban_card_widget.dart';
-import 'package:moviestar/shared/widgets/kanban/kanban_column_widget.dart';
-import 'package:moviestar/shared/widgets/kanban/kanban_drag_handler.dart';
-import 'package:moviestar/shared/widgets/kanban/kanban_search_filter.dart';
-import 'package:moviestar/shared/widgets/kanban/kanban_settings_panel.dart';
+import 'package:moviestar/shared/widgets/kanban/board_controller.dart';
+import 'package:moviestar/shared/widgets/kanban/card_widget.dart';
+import 'package:moviestar/shared/widgets/kanban/column_widget.dart';
+import 'package:moviestar/shared/widgets/kanban/drag_handler.dart';
+import 'package:moviestar/shared/widgets/kanban/search_filter.dart';
+import 'package:moviestar/shared/widgets/kanban/settings_panel.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 
 /// Custom Kanban board widget for displaying movies in columns.

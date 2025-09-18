@@ -34,10 +34,10 @@ import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/screens/add_movies_to_list_screen.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
+import 'package:moviestar/shared/widgets/lists/empty_state.dart';
 import 'package:moviestar/shared/widgets/lists/list_dialogs.dart';
 import 'package:moviestar/shared/widgets/lists/list_item_card.dart';
 import 'package:moviestar/shared/widgets/lists/list_sharing_handler.dart';
-import 'package:moviestar/shared/widgets/lists/lists_empty_state.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 
 /// A screen that displays all custom movie lists.

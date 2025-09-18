@@ -21,7 +21,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
 
-import 'kanban_board_controller.dart';
+import 'board_controller.dart';
 
 /// Column data for building kanban columns.
 class KanbanColumnData {

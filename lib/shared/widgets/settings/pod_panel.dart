@@ -14,7 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/constants/timing_constants.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
+import 'package:moviestar/core/services/favorites/service_manager.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 
 class PodSettingsPanel extends ConsumerStatefulWidget {

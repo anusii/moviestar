@@ -30,7 +30,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/core/services/favorites/service_adapter.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
+import 'package:moviestar/core/services/favorites/service_manager.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/screens/shared_movie_list_detail_screen.dart';

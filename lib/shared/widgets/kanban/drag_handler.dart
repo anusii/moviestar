@@ -19,7 +19,7 @@ import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 
-import 'kanban_board_controller.dart';
+import 'board_controller.dart';
 
 /// Handler for all drag and drop operations in the kanban board.
 class KanbanDragHandler {

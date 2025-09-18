@@ -32,7 +32,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:moviestar/core/services/favorites/service.dart';
-import 'package:moviestar/core/services/pod/pod_favorites_service.dart';
+import 'package:moviestar/core/services/pod/favorites_service.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 

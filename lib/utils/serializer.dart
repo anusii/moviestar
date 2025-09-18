@@ -13,11 +13,11 @@ library;
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/shared/utils/turtle/api_key_serializer.dart';
+import 'package:moviestar/shared/utils/turtle/base_serializer.dart';
 import 'package:moviestar/shared/utils/turtle/movie_list_serializer.dart';
 import 'package:moviestar/shared/utils/turtle/movie_serializer.dart';
-import 'package:moviestar/shared/utils/turtle/rating_comment_serializer.dart';
-import 'package:moviestar/shared/utils/turtle/base_serializer.dart';
 import 'package:moviestar/shared/utils/turtle/namespace_manager.dart';
+import 'package:moviestar/shared/utils/turtle/rating_comment_serializer.dart';
 import 'package:moviestar/shared/utils/turtle/user_profile_serializer.dart';
 
 /// Facade class maintaining complete backward compatibility with original TurtleSerializer.

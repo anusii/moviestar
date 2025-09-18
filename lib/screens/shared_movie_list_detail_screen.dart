@@ -10,9 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moviestar/mixins/screen_state_mixin.dart';
-import 'package:moviestar/shared/widgets/shared_movie_list_detail/shared_list_data_loader.dart';
-import 'package:moviestar/shared/widgets/shared_movie_list_detail/shared_list_movie_processor.dart';
-import 'package:moviestar/shared/widgets/shared_movie_list_detail/shared_list_navigation_handler.dart';
+import 'package:moviestar/shared/widgets/shared_movie_list_detail/data_loader.dart';
+import 'package:moviestar/shared/widgets/shared_movie_list_detail/movie_processor.dart';
+import 'package:moviestar/shared/widgets/shared_movie_list_detail/navigation_handler.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 
 /// Screen to display movies within a shared movie list using decomposed components.

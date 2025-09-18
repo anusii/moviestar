@@ -28,8 +28,8 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:solidpod/solidpod.dart' show GrantPermissionUi;
 
-import 'package:moviestar/widgets/sharing/sharing_components.dart';
-import 'package:moviestar/widgets/sharing/sharing_form_widgets.dart';
+import 'package:moviestar/widgets/sharing/components.dart';
+import 'package:moviestar/widgets/sharing/form_widgets.dart';
 
 /// Sharing status indicator.
 class SharingStatusIndicator extends StatelessWidget {

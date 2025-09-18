@@ -25,8 +25,8 @@
 
 library;
 
-import 'package:moviestar/core/services/api/key_service.dart';
 import 'package:moviestar/core/services/api/content_service.dart';
+import 'package:moviestar/core/services/api/key_service.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/network_client.dart';
 

@@ -9,7 +9,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:moviestar/core/services/pod/pod_favorites_file_manager.dart';
+import 'package:moviestar/core/services/pod/favorites_file_manager.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Handles file operations for POD favorites service.

@@ -10,8 +10,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import 'package:moviestar/core/services/favorites/movie_list_service.dart';
-import 'package:moviestar/core/services/pod/pod_favorites_file_manager.dart';
-import 'package:moviestar/core/services/pod/pod_favorites_stream_manager.dart';
+import 'package:moviestar/core/services/pod/favorites_file_manager.dart';
+import 'package:moviestar/core/services/pod/favorites_stream_manager.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/serializer.dart';

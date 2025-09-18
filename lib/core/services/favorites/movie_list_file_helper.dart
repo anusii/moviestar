@@ -51,7 +51,7 @@ class MovieListFileHelper with PodOperationsMixin {
         encrypted: false,
       );
     } catch (e) {
-      debugPrint('❌ Error creating movie file: $e');
+      // Error creating movie file
     }
   }
 
@@ -109,7 +109,7 @@ class MovieListFileHelper with PodOperationsMixin {
       } else {}
     } catch (e) {
       if (!isFileNotFoundError(e)) {
-        debugPrint('❌ Error loading movie data for $movieId: $e');
+        // Error loading movie data
       }
     }
     return null;
@@ -126,7 +126,7 @@ class MovieListFileHelper with PodOperationsMixin {
           .toList();
     } catch (e) {
       if (!isFileNotFoundError(e) && !isPermissionError(e)) {
-        debugPrint('❌ Error scanning user_lists directory: $e');
+        // Error scanning directory
       }
       return [];
     }
@@ -160,11 +160,11 @@ class MovieListFileHelper with PodOperationsMixin {
             }
           }
         } catch (e) {
-          debugPrint('❌ Error reading MovieList $fileName: $e');
+          // Error reading MovieList file
         }
       }
     } catch (e) {
-      debugPrint('❌ Error finding existing MovieList: $e');
+      // Error finding existing MovieList
     }
     return null;
   }

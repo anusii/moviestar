@@ -199,13 +199,6 @@ class KanbanBoardController extends ChangeNotifier {
       return originalMovies;
     }
 
-    debugPrint(
-      '⚡ [OptimisticUI] Getting movies with optimistic updates for $type ($id):',
-    );
-    debugPrint('   Key: $key');
-    debugPrint('   Pending ops: $pendingOps');
-    debugPrint('   Original movies: ${originalMovies.length}');
-
     final result = List<Movie>.from(originalMovies);
 
     for (final opId in pendingOps) {
@@ -215,26 +208,17 @@ class KanbanBoardController extends ChangeNotifier {
         final movie = _optimisticMovies[movieKey];
 
         if (movie != null) {
-          debugPrint(
-            '⚡ [OptimisticUI] Found optimistic movie: ${movie.title} (contentType: ${movie.contentType})',
-          );
           if (!result.any((m) => m.id == movie.id)) {
             result.add(movie);
-          } else {
-            debugPrint(
-              '⚡ [OptimisticUI] Movie already exists in result, skipping',
-            );
-          }
+          } else {}
         }
       } else {
         // Removal - remove from result
         final movieId = -opId;
         result.removeWhere((m) => m.id == movieId);
-        debugPrint('⚡ [OptimisticUI] Removed movie ID: $movieId');
       }
     }
 
-    debugPrint('   Result movies: ${result.length}');
     return result;
   }
 

@@ -83,7 +83,6 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
         );
       }
     } catch (e) {
-      debugPrint('❌ Error sharing movie: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -325,7 +324,6 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
                   }
                 }
               } catch (e) {
-                debugPrint('Error navigating: $e');
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

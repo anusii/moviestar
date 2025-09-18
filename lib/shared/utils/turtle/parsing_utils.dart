@@ -10,8 +10,6 @@ library;
 
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-
 import 'package:solidpod/solidpod.dart' show turtleToTripleMap;
 
 import 'package:moviestar/models/content_item.dart';
@@ -182,7 +180,6 @@ class TurtleParsingUtils {
     try {
       return turtleToTripleMap(ttlContent);
     } catch (e) {
-      debugPrint('⚠️ Failed to parse TTL content: $e');
       return null;
     }
   }

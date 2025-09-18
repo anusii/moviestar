@@ -51,7 +51,6 @@ class MovieFileManager {
       try {
         return TurtleSerializer.movieWithUserDataFromTurtle(result.data!);
       } catch (e) {
-        debugPrint('Error parsing movie data: $e');
         return null;
       }
     }

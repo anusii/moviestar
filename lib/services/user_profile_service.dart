@@ -64,7 +64,6 @@ class UserProfileService {
       final webId = await getWebId();
       return webId;
     } catch (e) {
-      debugPrint('❌ Failed to get current user web ID: $e');
       return null;
     }
   }
@@ -80,13 +79,11 @@ class UserProfileService {
     try {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
-        debugPrint('❌ User not logged in, cannot create profile');
         return false;
       }
 
       final webId = await getCurrentUserWebId();
       if (webId == null) {
-        debugPrint('❌ Could not get Web ID for user');
         return false;
       }
 
@@ -161,10 +158,8 @@ class UserProfileService {
         return true;
       }
 
-      debugPrint('❌ Failed to write profile to POD');
       return false;
     } catch (e) {
-      debugPrint('❌ Exception in create/update user profile: $e');
       return false;
     }
   }
@@ -204,10 +199,8 @@ class UserProfileService {
         return apiKeyId;
       }
 
-      debugPrint('❌ Failed to write API key file to POD');
       return null;
     } catch (e) {
-      debugPrint('❌ Exception creating API key file: $e');
       return null;
     }
   }
@@ -234,7 +227,6 @@ class UserProfileService {
 
       return null;
     } catch (e) {
-      debugPrint('❌ Exception finding existing API key file: $e');
       return null;
     }
   }
@@ -245,7 +237,6 @@ class UserProfileService {
     try {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
-        debugPrint('❌ User not logged in, cannot load profile');
         return null;
       }
 
@@ -284,9 +275,7 @@ class UserProfileService {
 
       return null;
     } catch (e) {
-      if (!e.toString().contains('does not exist')) {
-        debugPrint('❌ Error loading existing profile: $e');
-      }
+      if (!e.toString().contains('does not exist')) {}
       return null;
     }
   }
@@ -295,37 +284,25 @@ class UserProfileService {
 
   Future<Map<String, dynamic>?> getUserProfile() async {
     try {
-      debugPrint('🎬 [UserProfileService] getUserProfile called');
-
       // First check cache.
 
       if (_cachedProfile != null) {
-        debugPrint('🎬 [UserProfileService] Returning cached profile');
         return _cachedProfile;
       }
 
       final loggedIn = await isLoggedIn();
-      debugPrint('🎬 [UserProfileService] Logged in: $loggedIn');
       if (!loggedIn) return null;
 
       // Try to read profile from POD.
 
       if (!_context.mounted) return null;
       try {
-        debugPrint(
-          '🎬 [UserProfileService] Getting read path for profile/profile.ttl',
-        );
         final readPath = await getReadPath('profile/profile.ttl');
-        debugPrint('🎬 [UserProfileService] Read path: $readPath');
         if (!_context.mounted) return null;
 
-        debugPrint('🎬 [UserProfileService] Reading profile file...');
         final result =
             await PodFileOperationsService.readFile(readPath, _context, _child);
 
-        debugPrint(
-          '🎬 [UserProfileService] Read result success: ${result.success}, data length: ${result.data?.length ?? 0}',
-        );
         if (result.success && (result.data?.isNotEmpty ?? false)) {
           final content = result.data!;
           // Parse the profile data properly, including MovieList IDs.
@@ -349,21 +326,14 @@ class UserProfileService {
             };
             return _cachedProfile;
           }
-        } else {
-          debugPrint('🎬 [UserProfileService] Profile file not found or empty');
-        }
+        } else {}
       } catch (e) {
         if (!e.toString().contains('does not exist')) {
-          debugPrint('❌ Failed to read profile from POD: $e');
-        } else {
-          debugPrint('🎬 [UserProfileService] Profile file does not exist: $e');
-        }
+        } else {}
       }
 
-      debugPrint('🎬 [UserProfileService] No profile found, returning null');
       return null;
     } catch (e) {
-      debugPrint('❌ Failed to get user profile: $e');
       return null;
     }
   }
@@ -372,35 +342,22 @@ class UserProfileService {
 
   Future<bool> addMovieListToProfile(String movieListId) async {
     try {
-      debugPrint(
-        '🎬 [UserProfileService] addMovieListToProfile called: $movieListId',
-      );
-
       var profile = await getUserProfile();
       if (profile == null) {
-        debugPrint('🎬 [UserProfileService] No profile found, creating one...');
         // Create a basic profile first
         final created = await createOrUpdateUserProfile();
         if (created) {
           profile = await getUserProfile();
-          debugPrint(
-            '🎬 [UserProfileService] Profile created, retry getting it: ${profile != null}',
-          );
         }
         if (profile == null) {
-          debugPrint('🎬 [UserProfileService] Failed to create or get profile');
           return false;
         }
       }
 
       final movieListIds = List<String>.from(profile['movieListIds'] ?? []);
-      debugPrint('🎬 [UserProfileService] Current movieListIds: $movieListIds');
 
       if (!movieListIds.contains(movieListId)) {
         movieListIds.add(movieListId);
-        debugPrint(
-          '🎬 [UserProfileService] Added new list ID, updating profile with: $movieListIds',
-        );
 
         final success = await createOrUpdateUserProfile(
           apiKey: profile['apiKey'],
@@ -408,14 +365,11 @@ class UserProfileService {
           genderString: profile['gender'],
           movieListIds: movieListIds,
         );
-        debugPrint('🎬 [UserProfileService] Profile update success: $success');
         return success;
       }
 
-      debugPrint('🎬 [UserProfileService] List ID already exists in profile');
       return true;
     } catch (e) {
-      debugPrint('❌ Failed to add movie list to profile: $e');
       return false;
     }
   }
@@ -441,7 +395,6 @@ class UserProfileService {
 
       return true;
     } catch (e) {
-      debugPrint('❌ Failed to remove movie list from profile: $e');
       return false;
     }
   }
@@ -459,7 +412,6 @@ class UserProfileService {
 
       return true;
     } catch (e) {
-      debugPrint('❌ Failed to initialize profile: $e');
       return false;
     }
   }

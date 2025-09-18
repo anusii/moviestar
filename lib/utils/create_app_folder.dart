@@ -62,19 +62,12 @@ Future<SolidFunctionCallStatus> createAppFolder({
         if (e.toString().contains('Duplicated encryption key') ||
             e.toString().contains('Invalid content in file') ||
             e.toString().contains('enc-keys.ttl')) {
-          debugPrint(
-            'Encryption key issue detected during folder creation (attempt $attempt/3): $e',
-          );
-
           if (attempt < 3) {
             // Wait with exponential backoff before retrying.
             await Future.delayed(Duration(milliseconds: 500 * attempt));
             // Retrying silently
             continue;
           } else {
-            debugPrint(
-              'Max retries reached for folder creation - continuing with empty resource list',
-            );
             // Continue with empty lists - we'll try to create the folder anyway.
             existingFolders = [];
             existingFiles = [];
@@ -91,7 +84,6 @@ Future<SolidFunctionCallStatus> createAppFolder({
 
     bool existsAsDir = existingFolders.contains(folderName);
     if (existsAsDir) {
-      debugPrint('App folder $folderName already exists as directory');
       onSuccess.call();
       return SolidFunctionCallStatus.success;
     }
@@ -100,9 +92,6 @@ Future<SolidFunctionCallStatus> createAppFolder({
 
     bool existsAsFile = existingFiles.contains(folderName);
     if (existsAsFile) {
-      debugPrint(
-        'Removing existing file $folderName before creating directory',
-      );
       if (!context.mounted) return SolidFunctionCallStatus.fail;
 
       // Full path for deletion needs to include basePath (e.g. moviestar/data).
@@ -111,7 +100,6 @@ Future<SolidFunctionCallStatus> createAppFolder({
     }
 
     if (!context.mounted) {
-      debugPrint('Widget is no longer mounted, skipping folder creation.');
       return SolidFunctionCallStatus.fail;
     }
 
@@ -132,11 +120,7 @@ Future<SolidFunctionCallStatus> createAppFolder({
         if (e.toString().contains('Duplicated encryption key') ||
             e.toString().contains('Invalid content in file') ||
             e.toString().contains('enc-keys.ttl')) {
-          if (attempt == 1) {
-            debugPrint(
-              '⚠️  Encryption key issue detected - retrying resource scan',
-            );
-          }
+          if (attempt == 1) {}
           if (attempt < 3) {
             await Future.delayed(Duration(milliseconds: 500 * attempt));
             continue;
@@ -180,20 +164,13 @@ Future<SolidFunctionCallStatus> createAppFolder({
           if (e.toString().contains('Duplicated encryption key') ||
               e.toString().contains('Invalid content in file') ||
               e.toString().contains('enc-keys.ttl')) {
-            if (attempt == 1) {
-              debugPrint(
-                '⚠️  Encryption key issue detected - retrying folder creation',
-              );
-            }
+            if (attempt == 1) {}
             if (attempt < 3) {
               await Future.delayed(Duration(milliseconds: 500 * attempt));
               continue;
             }
             // For the final attempt, try creating without encryption as fallback
             if (attempt == 3) {
-              debugPrint(
-                '⚠️  Using unencrypted fallback for folder initialization',
-              );
               if (!context.mounted) throw Exception('Context not mounted');
               initResult = await writePod(
                 '$folderName/init.ttl',
@@ -219,7 +196,6 @@ Future<SolidFunctionCallStatus> createAppFolder({
 
     return result;
   } catch (e) {
-    debugPrint('Error creating app folder: $e');
     return SolidFunctionCallStatus.fail;
   } finally {
     onProgressChange.call(false);

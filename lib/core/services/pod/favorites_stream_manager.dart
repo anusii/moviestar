@@ -23,8 +23,6 @@
 
 library;
 
-import 'package:flutter/foundation.dart';
-
 import 'package:rxdart/rxdart.dart';
 
 import 'package:moviestar/models/custom_list.dart';
@@ -75,14 +73,7 @@ class PodFavoritesStreamManager {
 
   /// Updates the custom lists stream with new data.
   void updateCustomLists(List<CustomList> lists) {
-    debugPrint(
-      '🎬 [PodFavoritesStreamManager] updateCustomLists called with ${lists.length} lists',
-    );
-    debugPrint(
-      '🎬 [PodFavoritesStreamManager] Stream has ${_customListsController.hasListener ? "listeners" : "no listeners"}',
-    );
     _customListsController.add(lists);
-    debugPrint('🎬 [PodFavoritesStreamManager] Stream updated');
   }
 
   /// Checks if to-watch stream has listeners.

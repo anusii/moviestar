@@ -61,21 +61,18 @@ abstract class BasePodService extends ChangeNotifier {
       if (requiresLogin) {
         final loggedIn = await isLoggedIn();
         if (!loggedIn) {
-          debugPrint('❌ User not logged in, cannot execute $operationName');
           return null;
         }
       }
 
       // Check context validity if required
       if (checkContext && !context.mounted) {
-        debugPrint('❌ Context not mounted, cannot execute $operationName');
         return null;
       }
 
       // Execute the actual operation
       return await operation();
     } catch (e) {
-      debugPrint('❌ Error in $operationName: $e');
       return null;
     }
   }
@@ -145,24 +142,24 @@ abstract class BasePodService extends ChangeNotifier {
   /// Standard debug logging format used across all services.
   @protected
   void logDebug(String message, {bool isError = false}) {
-    debugPrint(isError ? '❌ $message' : message);
+    // Logging disabled
   }
 
   /// Standard success logging format.
   @protected
   void logSuccess(String message) {
-    debugPrint('✅ $message');
+    // Logging disabled
   }
 
   /// Standard info logging format.
   @protected
   void logInfo(String message) {
-    debugPrint('ℹ️ $message');
+    // Logging disabled
   }
 
   /// Standard warning logging format.
   @protected
   void logWarning(String message) {
-    debugPrint('⚠️ $message');
+    // Logging disabled
   }
 }

@@ -66,12 +66,6 @@ void main() async {
   Hive.registerAdapter(ContentItemAdapter());
   Hive.registerAdapter(ContentTypeAdapter());
 
-  // Globally remove [debugPrint] messages.
-
-  // debugPrint = (String? message, {int? wrapWidth}) {
-  //   null;
-  // };
-
   // Ensure Flutter bindings are initialized for async operations
 
   WidgetsFlutterBinding.ensureInitialized();

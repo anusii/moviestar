@@ -49,17 +49,12 @@ mixin PodOperationsMixin {
         final isLastAttempt = attempt == maxRetries;
 
         if (isLastAttempt) {
-          debugPrint('❌ $operationName failed after $maxRetries attempts: $e');
           return null;
         }
 
         // Calculate delay with exponential backoff if enabled
         final delay =
             exponentialBackoff ? initialDelay * attempt : initialDelay;
-
-        debugPrint(
-          '⚠️ $operationName attempt $attempt failed, retrying in ${delay.inSeconds}s: $e',
-        );
 
         await Future.delayed(delay);
       }
@@ -71,7 +66,6 @@ mixin PodOperationsMixin {
   /// Returns true if valid, false otherwise.
   bool validateContext(BuildContext context) {
     if (!context.mounted) {
-      debugPrint('❌ Context not mounted');
       return false;
     }
     return true;
@@ -82,7 +76,6 @@ mixin PodOperationsMixin {
   Future<bool> validateLogin() async {
     final loggedIn = await isLoggedIn();
     if (!loggedIn) {
-      debugPrint('❌ User not logged in');
       return false;
     }
     return true;

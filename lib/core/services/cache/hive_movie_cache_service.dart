@@ -25,8 +25,6 @@
 
 library;
 
-import 'package:flutter/material.dart';
-
 import 'package:hive/hive.dart';
 
 import 'package:moviestar/models/movie.dart';
@@ -159,7 +157,6 @@ class HiveMovieCacheService {
       _timestampBox = await Hive.openBox<DateTime>('cache_timestamps');
       _isInitialized = true;
     } catch (e) {
-      debugPrint('Error initializing Hive cache service: $e');
       rethrow;
     }
   }
@@ -188,7 +185,6 @@ class HiveMovieCacheService {
 
       await _timestampBox!.put(category.value, DateTime.now());
     } catch (e) {
-      debugPrint('Error caching movies for ${category.value}: $e');
       rethrow;
     }
   }
@@ -207,7 +203,6 @@ class HiveMovieCacheService {
 
       return cachedData.cast<Movie>();
     } catch (e) {
-      debugPrint('Error retrieving cached movies for ${category.value}: $e');
       return null;
     }
   }
@@ -225,7 +220,6 @@ class HiveMovieCacheService {
 
       return age <= ttl;
     } catch (e) {
-      debugPrint('Error checking cache validity for ${category.value}: $e');
       return false;
     }
   }
@@ -260,9 +254,6 @@ class HiveMovieCacheService {
         cachedAt: timestamp,
       );
     } catch (e) {
-      debugPrint(
-        'Error getting movies with cache info for ${category.value}: $e',
-      );
       return null;
     }
   }
@@ -275,7 +266,6 @@ class HiveMovieCacheService {
       await _movieBox!.delete(category.value);
       await _timestampBox!.delete(category.value);
     } catch (e) {
-      debugPrint('Error clearing cache for ${category.value}: $e');
       rethrow;
     }
   }
@@ -288,7 +278,6 @@ class HiveMovieCacheService {
       await _movieBox!.clear();
       await _timestampBox!.clear();
     } catch (e) {
-      debugPrint('Error clearing all cache: $e');
       rethrow;
     }
   }
@@ -314,7 +303,6 @@ class HiveMovieCacheService {
         'age': age,
       };
     } catch (e) {
-      debugPrint('Error getting cache metadata for ${category.value}: $e');
       return null;
     }
   }
@@ -331,7 +319,7 @@ class HiveMovieCacheService {
       }
       _isInitialized = false;
     } catch (e) {
-      debugPrint('Error disposing Hive service: $e');
+      // Silently handle disposal errors
     }
   }
 }

@@ -10,8 +10,6 @@ library;
 
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-
 import 'package:rdflib/rdflib.dart';
 import 'package:solidpod/solidpod.dart' show tripleMapToTurtle;
 
@@ -174,14 +172,14 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
                     (key, value) => MapEntry(key, value.toString()),
                   );
                 } catch (e) {
-                  debugPrint('⚠️ Failed to parse permissions JSON: $e');
+                  // Failed to parse permissions JSON
                 }
               } else if (predicate.contains('sharedDate')) {
                 // Parse shared date.
                 try {
                   sharedDate = DateTime.parse(value);
                 } catch (e) {
-                  debugPrint('⚠️ Failed to parse shared date: $e');
+                  // Failed to parse shared date
                 }
               } else if (predicate.contains('hasMovie')) {
                 // Extract movie resource references.
@@ -233,7 +231,7 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
           );
           movies.add(movie);
         } catch (e) {
-          debugPrint('❌ Failed to parse movie ID $movieId: $e');
+          // Failed to create movie from data
         }
       }
 
@@ -247,7 +245,6 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
         'sharedDate': sharedDate,
       };
     } catch (e) {
-      debugPrint('❌ Error parsing MovieList from TTL: $e');
       return null;
     }
   }

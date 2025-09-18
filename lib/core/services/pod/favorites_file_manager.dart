@@ -96,7 +96,6 @@ class PodFavoritesFileManager with PodOperationsMixin {
     try {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
-        debugPrint('❌ User not logged in, cannot update movie file');
         return;
       }
 
@@ -118,9 +117,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
         }
       } catch (e) {
         // File doesn't exist yet, that's okay
-        if (!e.toString().contains('does not exist')) {
-          debugPrint('❌ Error reading existing movie file: $e');
-        }
+        if (!e.toString().contains('does not exist')) {}
       }
 
       // Prepare updated data
@@ -135,7 +132,6 @@ class PodFavoritesFileManager with PodOperationsMixin {
       );
 
       if (!_context.mounted) {
-        debugPrint('❌ Context not mounted, cannot write movie file');
         return;
       }
 
@@ -150,12 +146,9 @@ class PodFavoritesFileManager with PodOperationsMixin {
 
       if (result.success) {
         _moviesWithFiles.add(movie.id);
-        debugPrint('✅ Movie file updated for ${movie.title}');
-      } else {
-        debugPrint('❌ Failed to write movie file for ${movie.title}');
-      }
+      } else {}
     } catch (e) {
-      debugPrint('❌ Error updating movie file: $e');
+      // Failed to add movie file
     }
   }
 
@@ -202,9 +195,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
         return TurtleSerializer.movieWithUserDataFromTurtle(result.data!);
       }
     } catch (e) {
-      if (!e.toString().contains('does not exist')) {
-        debugPrint('❌ Error reading movie file: $e');
-      }
+      if (!e.toString().contains('does not exist')) {}
     }
     return null;
   }
@@ -237,7 +228,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
         return null; // TODO: Convert Map<String, dynamic> to Movie
       }
     } catch (e) {
-      debugPrint('❌ Error loading movie data for ID $movieId: $e');
+      // Failed to parse movie data
     }
     return null;
   }
@@ -250,7 +241,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
         return movieListData['movies'] as List<Movie>? ?? [];
       }
     } catch (e) {
-      debugPrint('❌ Error parsing movie list data: $e');
+      // Failed to parse movie list from turtle
     }
     return null;
   }
@@ -260,7 +251,6 @@ class PodFavoritesFileManager with PodOperationsMixin {
     try {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
-        debugPrint('❌ User not logged in, cannot load movie details');
         return null;
       }
 
@@ -270,10 +260,6 @@ class PodFavoritesFileManager with PodOperationsMixin {
           : 'Movie';
       final movieFilePath =
           'moviestar/data/movies/$contentTypeStr-${placeholderMovie.id}.ttl';
-
-      debugPrint(
-        '🎬 [PodFavoritesFileManager] Attempting to read: $movieFilePath',
-      );
 
       if (!_context.mounted) return null;
 
@@ -285,33 +271,16 @@ class PodFavoritesFileManager with PodOperationsMixin {
       );
 
       if (result.success && (result.data?.isNotEmpty ?? false)) {
-        debugPrint(
-          '🎬 [PodFavoritesFileManager] Found movie file (${result.data!.length} chars)',
-        );
-
         // Parse the movie details from the TTL content
         final movieList = TurtleSerializer.moviesFromTurtle(result.data!);
 
         if (movieList.isNotEmpty) {
           final movieData = movieList.first;
-          debugPrint(
-            '🎬 [PodFavoritesFileManager] Successfully parsed movie details: ${movieData.title}',
-          );
           return movieData;
-        } else {
-          debugPrint(
-            '🎬 [PodFavoritesFileManager] Failed to parse movie from TTL content - empty list',
-          );
-        }
-      } else {
-        debugPrint(
-          '🎬 [PodFavoritesFileManager] Movie file not found or empty: $movieFilePath',
-        );
-      }
+        } else {}
+      } else {}
     } catch (e) {
-      debugPrint(
-        '❌ Error loading full movie details for ${placeholderMovie.id}: $e',
-      );
+      // Failed to load full movie details
     }
 
     return null;

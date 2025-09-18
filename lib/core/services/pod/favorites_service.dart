@@ -77,27 +77,14 @@ class PodFavoritesService extends BasePodService {
     );
 
     // Initialize by loading favorites from POD
-    debugPrint('🎬 [PodFavoritesService] Constructor called - initializing...');
     loadFavorites().then((_) {
-      debugPrint(
-        '🎬 [PodFavoritesService] Initial loadFavorites completed successfully',
-      );
       // Notify manager that initial loading is complete
       if (_onInitialLoadComplete != null) {
-        debugPrint(
-          '🎬 [PodFavoritesService] Calling onInitialLoadComplete callback',
-        );
         _onInitialLoadComplete();
       }
     }).catchError((error) {
-      debugPrint(
-        '🎬 [PodFavoritesService] Error loading initial favorites: $error',
-      );
       // Even on error, notify that loading attempt is complete
       if (_onInitialLoadComplete != null) {
-        debugPrint(
-          '🎬 [PodFavoritesService] Calling onInitialLoadComplete callback (after error)',
-        );
         _onInitialLoadComplete();
       }
     });
@@ -126,7 +113,6 @@ class PodFavoritesService extends BasePodService {
 
   /// Loads the user's favorites from POD.
   Future<void> loadFavorites() async {
-    debugPrint('🎬 [PodFavoritesService] loadFavorites() called');
     await executePodOperation(
       operation: () async {
         final favoritesData = await _fileHandler.loadFavoritesData();

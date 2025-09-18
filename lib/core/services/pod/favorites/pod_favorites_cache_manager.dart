@@ -5,8 +5,6 @@
 
 library;
 
-import 'package:flutter/foundation.dart';
-
 import 'package:moviestar/core/services/pod/favorites_file_manager.dart';
 import 'package:moviestar/core/services/pod/favorites_stream_manager.dart';
 import 'package:moviestar/models/movie.dart';
@@ -90,7 +88,6 @@ class PodFavoritesCacheManager {
 
   /// Logs cache statistics.
   void logCacheStats() {
-    final stats = getCacheStats();
-    debugPrint('🎬 [PodFavoritesCacheManager] Cache stats: $stats');
+    getCacheStats();
   }
 }

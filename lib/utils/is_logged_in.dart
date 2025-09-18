@@ -38,7 +38,6 @@ Future<bool> isLoggedIn() async {
 
     final webId = await getWebId();
     if (webId == null || webId.isEmpty) {
-      //debugPrint('⚠️ No WebID found, user is not logged in');
       return false;
     }
 
@@ -48,7 +47,6 @@ Future<bool> isLoggedIn() async {
 
     return loggedIn;
   } catch (e) {
-    //debugPrint('⚠️ Error checking login status: $e');
     return false;
   }
 }

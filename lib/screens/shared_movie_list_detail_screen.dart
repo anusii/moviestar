@@ -92,7 +92,6 @@ class _SharedMovieListDetailScreenState
         });
       }
     } catch (e) {
-      debugPrint('Error loading content titles: $e');
       if (mounted) {
         safeSetState(() {
           _loadingTitles = false;

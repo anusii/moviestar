@@ -78,10 +78,6 @@ Future<void> initialiseAppFolders({
         // Handle encryption key conflicts gracefully.
 
         if (e.toString().contains('Duplicated encryption key')) {
-          debugPrint(
-            'Encryption key conflict detected (attempt $attempt/3) - this is caused by orphaned encryption keys from deleted files',
-          );
-
           if (attempt < NetworkConstants.maxRetryAttempts) {
             // Wait with exponential backoff before retrying.
 
@@ -90,12 +86,8 @@ Future<void> initialiseAppFolders({
                 milliseconds: NetworkConstants.backoffBaseDelayMs * attempt,
               ),
             );
-            debugPrint('Retrying resource scan...');
             continue;
           } else {
-            debugPrint(
-              'Max retries reached - continuing with empty folder list',
-            );
             // Continue with empty list - we'll try to create all folders.
 
             existingFolders = [];
@@ -123,13 +115,10 @@ Future<void> initialiseAppFolders({
 
             onProgress.call(inProgress);
           },
-          onSuccess: () {
-            debugPrint('Successfully created $folder folder');
-          },
+          onSuccess: () {},
         );
 
         if (result != SolidFunctionCallStatus.success) {
-          debugPrint('Failed to create $folder folder');
           // Continue with other folders even if one fails.
         }
       }
@@ -138,9 +127,7 @@ Future<void> initialiseAppFolders({
     onComplete.call();
   } catch (e) {
     if (!e.toString().contains('Failed to get resource list') &&
-        !e.toString().contains('does not exist')) {
-      debugPrint('Error initializing app folders: $e');
-    }
+        !e.toString().contains('does not exist')) {}
   } finally {
     onProgress.call(false);
   }

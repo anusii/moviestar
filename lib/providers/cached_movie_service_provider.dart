@@ -25,9 +25,6 @@
 
 library;
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solidpod/solidpod.dart' show getWebId;
@@ -56,16 +53,8 @@ class DirectMovieService extends MovieService {
 
   /// Initializes the service with the provided API key directly.
   void _initializeWithDirectApiKey() {
-    debugPrint(
-      '🔑 [DirectMovieService] Initializing with API key: ${_apiKey != null ? 'Present (${_apiKey.length} chars)' : 'NULL'}',
-    );
-
     // Create NetworkClient directly without ContentService to avoid type compatibility issues
     _directClient = NetworkClient(baseUrl: _baseUrl, apiKey: _apiKey ?? '');
-
-    debugPrint(
-      '🔑 [DirectMovieService] NetworkClient created directly with API key',
-    );
   }
 
   /// Ensures our direct client is initialized.
@@ -77,11 +66,7 @@ class DirectMovieService extends MovieService {
 
   @override
   Future<List<Movie>> getPopularMovies() async {
-    debugPrint('🔑 [DirectMovieService] getPopularMovies() called');
     await _ensureDirectClientInitialized();
-    debugPrint(
-      '🔑 [DirectMovieService] Client initialized, fetching mixed content directly',
-    );
 
     // Fetch both popular movies and TV shows directly
     final moviesFuture = _directClient!.getJsonList('movie/popular');
@@ -102,9 +87,6 @@ class DirectMovieService extends MovieService {
     combined.addAll(tvItems);
     combined.sort((a, b) => b.voteAverage.compareTo(a.voteAverage));
 
-    debugPrint(
-      '🔑 [DirectMovieService] Got ${combined.length} content items directly',
-    );
     return combined.map((content) => Movie.fromContentItem(content)).toList();
   }
 
@@ -227,9 +209,6 @@ class DirectMovieService extends MovieService {
 
   @override
   Future<Movie> getMovieDetails(int movieId) async {
-    debugPrint(
-      '🔑 [DirectMovieService] getMovieDetails called for ID: $movieId',
-    );
     await _ensureDirectClientInitialized();
 
     // Use direct client instead of going through ContentService
@@ -239,9 +218,6 @@ class DirectMovieService extends MovieService {
       return Movie.fromContentItem(contentItem);
     } catch (e) {
       // Try TV endpoint if movie fails (for TV shows)
-      debugPrint(
-        '🔑 [DirectMovieService] Movie endpoint failed, trying TV endpoint: $e',
-      );
       final data = await _directClient!.getJson('tv/$movieId');
       final contentItem = ContentItem.fromTVJson(data);
       return Movie.fromContentItem(contentItem);
@@ -250,7 +226,6 @@ class DirectMovieService extends MovieService {
 
   @override
   void dispose() {
-    debugPrint('🔑 [DirectMovieService] Disposing services');
     _directClient?.dispose();
     _directClient = null;
     super.dispose();
@@ -315,41 +290,26 @@ class ApiKeyNotifier extends StateNotifier<String?> {
   }
 
   Future<void> _init() async {
-    debugPrint(
-      '🔑 [ApiKeyNotifier] Initializing - service: ${_apiKeyService != null ? 'available' : 'NULL'}',
-    );
     if (_apiKeyService == null) {
-      debugPrint('🔑 [ApiKeyNotifier] No API service available');
       return;
     }
     try {
       final apiKey = await _apiKeyService.getApiKey();
-      debugPrint(
-        '🔑 [ApiKeyNotifier] Got API key: ${apiKey != null ? 'YES (${apiKey.length} chars)' : 'NULL'}',
-      );
       if (!mounted) return;
       state = apiKey;
     } catch (e) {
-      debugPrint('🔑 [ApiKeyNotifier] ERROR getting API key: $e');
+      // Failed to get API key
     }
   }
 
   void _onApiKeyChanged() async {
-    debugPrint(
-      '🔑 [ApiKeyNotifier] API key changed - mounted: $mounted, service: ${_apiKeyService != null}',
-    );
     if (!mounted || _apiKeyService == null) return;
     try {
       final apiKey = await _apiKeyService.getApiKey();
-      debugPrint(
-        '🔑 [ApiKeyNotifier] Updated API key: ${apiKey != null ? 'YES (${apiKey.length} chars)' : 'NULL'}',
-      );
       if (!mounted) return;
       state = apiKey;
     } catch (e) {
-      if (mounted) {
-        debugPrint('🔑 [ApiKeyNotifier] ERROR in _onApiKeyChanged: $e');
-      }
+      if (mounted) {}
     }
   }
 
@@ -371,7 +331,6 @@ final apiKeyServiceProvider = Provider<ApiKeyService?>((ref) {
 
 /// Direct API key provider that accesses secure storage without service dependency
 final directApiKeyProvider = FutureProvider<String?>((ref) async {
-  debugPrint('🔑 [DirectApiKeyProvider] Starting direct API key fetch');
   try {
     const storage = FlutterSecureStorage(
       aOptions: AndroidOptions(),
@@ -390,28 +349,18 @@ final directApiKeyProvider = FutureProvider<String?>((ref) async {
       if (webId != null && webId.isNotEmpty) {
         final userKey = 'user_api_key_$webId';
         apiKey = await storage.read(key: userKey);
-        debugPrint(
-          '🔑 [DirectApiKeyProvider] Tried user key: ${apiKey != null ? 'FOUND' : 'NOT FOUND'}',
-        );
       }
     } catch (e) {
-      debugPrint('🔑 [DirectApiKeyProvider] Failed to get webId: $e');
+      // Failed to read API key from storage
     }
 
     // Try legacy key if user key not found
     if (apiKey == null || apiKey.isEmpty) {
       apiKey = await storage.read(key: 'movie_db_api_key');
-      debugPrint(
-        '🔑 [DirectApiKeyProvider] Tried legacy key: ${apiKey != null ? 'FOUND' : 'NOT FOUND'}',
-      );
     }
 
-    debugPrint(
-      '🔑 [DirectApiKeyProvider] Final result: ${apiKey != null ? 'SUCCESS (${apiKey.length} chars)' : 'NULL'}',
-    );
     return apiKey;
   } catch (e) {
-    debugPrint('🔑 [DirectApiKeyProvider] ERROR: $e');
     return null;
   }
 });
@@ -430,16 +379,11 @@ final movieServiceProvider = Provider.autoDispose<MovieService>((ref) {
   final apiKeyAsync = ref.watch(directApiKeyProvider);
   final apiKey = apiKeyAsync.valueOrNull;
 
-  debugPrint(
-    '🔑 [MovieServiceProvider] Creating DirectMovieService with API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',
-  );
-
   // Create a DirectMovieService that uses the API key directly
   final movieService = DirectMovieService(apiKey);
 
   // Ensure proper disposal.
   ref.onDispose(() {
-    debugPrint('🔑 [MovieServiceProvider] Disposing DirectMovieService');
     movieService.dispose();
   });
 
@@ -580,10 +524,6 @@ final configuredCachedMovieServiceProvider =
   final cachingEnabled = ref.watch(cachingEnabledProvider);
   final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
 
-  debugPrint(
-    '🔑 [ConfiguredCachedMovieServiceProvider] Creating cached service with movieService type: ${movieService.runtimeType}',
-  );
-
   final cachedService = CachedMovieService(
     movieService,
     cacheService,
@@ -594,9 +534,6 @@ final configuredCachedMovieServiceProvider =
   // Ensure proper disposal.
 
   ref.onDispose(() {
-    debugPrint(
-      '🔑 [ConfiguredCachedMovieServiceProvider] Disposing cached service',
-    );
     cachedService.dispose();
   });
 
@@ -607,19 +544,12 @@ final configuredCachedMovieServiceProvider =
 
 final popularMoviesWithCacheInfoProvider =
     FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
-  debugPrint('🎬 [PopularMoviesProvider] Starting to fetch popular movies');
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
   final apiKeyAsync = ref.watch(directApiKeyProvider);
   final apiKey = apiKeyAsync.valueOrNull;
-  debugPrint(
-    '🎬 [PopularMoviesProvider] API Key status: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',
-  );
 
   // If no API key is set, return empty result instead of cached content
   if (apiKey == null || apiKey.trim().isEmpty) {
-    debugPrint(
-      '🎬 [PopularMoviesProvider] No API key configured - returning empty result',
-    );
     return CacheResult<List<Movie>>(
       data: <Movie>[],
       fromCache: false,
@@ -630,17 +560,10 @@ final popularMoviesWithCacheInfoProvider =
   // Watch cache settings to invalidate when they change.
   ref.watch(cachingEnabledProvider);
   ref.watch(cacheOnlyModeProvider);
-  debugPrint(
-    '🎬 [PopularMoviesProvider] Calling cachedService.getPopularMoviesWithCacheInfo()',
-  );
   try {
     final result = await cachedService.getPopularMoviesWithCacheInfo();
-    debugPrint(
-      '🎬 [PopularMoviesProvider] Success: got ${result.data.length} movies from ${result.fromCache ? 'cache' : 'API'}',
-    );
     return result;
   } catch (e) {
-    debugPrint('🎬 [PopularMoviesProvider] ERROR: $e');
     rethrow;
   }
 });
@@ -652,15 +575,9 @@ final nowPlayingMoviesWithCacheInfoProvider =
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
   final apiKeyAsync = ref.watch(directApiKeyProvider);
   final apiKey = apiKeyAsync.valueOrNull;
-  debugPrint(
-    '🎬 [NowPlayingProvider] API Key status: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',
-  );
 
   // If no API key is set, return empty result instead of cached content
   if (apiKey == null || apiKey.trim().isEmpty) {
-    debugPrint(
-      '🎬 [NowPlayingProvider] No API key configured - returning empty result',
-    );
     return CacheResult<List<Movie>>(
       data: <Movie>[],
       fromCache: false,
@@ -681,15 +598,9 @@ final topRatedMoviesWithCacheInfoProvider =
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
   final apiKeyAsync = ref.watch(directApiKeyProvider);
   final apiKey = apiKeyAsync.valueOrNull;
-  debugPrint(
-    '🎬 [TopRatedProvider] API Key status: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',
-  );
 
   // If no API key is set, return empty result instead of cached content
   if (apiKey == null || apiKey.trim().isEmpty) {
-    debugPrint(
-      '🎬 [TopRatedProvider] No API key configured - returning empty result',
-    );
     return CacheResult<List<Movie>>(
       data: <Movie>[],
       fromCache: false,
@@ -710,15 +621,9 @@ final upcomingMoviesWithCacheInfoProvider =
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
   final apiKeyAsync = ref.watch(directApiKeyProvider);
   final apiKey = apiKeyAsync.valueOrNull;
-  debugPrint(
-    '🎬 [UpcomingProvider] API Key status: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',
-  );
 
   // If no API key is set, return empty result instead of cached content
   if (apiKey == null || apiKey.trim().isEmpty) {
-    debugPrint(
-      '🎬 [UpcomingProvider] No API key configured - returning empty result',
-    );
     return CacheResult<List<Movie>>(
       data: <Movie>[],
       fromCache: false,

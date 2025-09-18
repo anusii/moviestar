@@ -40,11 +40,6 @@ class KanbanDragHandler {
     String targetId,
     String targetName,
   ) async {
-    debugPrint('   Drag Source: ${dragData.sourceType} (${dragData.sourceId})');
-    debugPrint('   Drop Target: $targetType ($targetId)');
-    debugPrint('   Movie: ${dragData.movie.title} (ID: ${dragData.movie.id})');
-    debugPrint('   Movie ContentType: ${dragData.movie.contentType}');
-
     // Don't allow dropping on same column
     if (dragData.sourceType == targetType && dragData.sourceId == targetId) {
       return;
@@ -89,11 +84,6 @@ class KanbanDragHandler {
     bool isCopyOperation,
     int operationId,
   ) async {
-    debugPrint('   Movie: ${dragData.movie.title} (ID: ${dragData.movie.id})');
-    debugPrint('   ContentType: ${dragData.movie.contentType}');
-    debugPrint('   Target: $targetType ($targetName)');
-    debugPrint('   Copy operation: $isCopyOperation');
-
     controller.updateQueueStatus(operationId, OperationStatus.inProgress);
     try {
       // Ensure movie file exists before adding to user lists
@@ -104,9 +94,6 @@ class KanbanDragHandler {
         case KanbanColumnType.toWatch:
           final contentTypeString =
               dragData.movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
-          debugPrint(
-            '🎬 [KanbanDrag] Adding to ToWatch with contentType string: $contentTypeString',
-          );
           await favoritesService.addToWatch(
             dragData.movie,
             contentType: contentTypeString,
@@ -115,9 +102,6 @@ class KanbanDragHandler {
         case KanbanColumnType.watched:
           final contentTypeString =
               dragData.movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
-          debugPrint(
-            '🎬 [KanbanDrag] Adding to Watched with contentType string: $contentTypeString',
-          );
           await favoritesService.addToWatched(
             dragData.movie,
             contentType: contentTypeString,
@@ -126,9 +110,6 @@ class KanbanDragHandler {
         case KanbanColumnType.customList:
           final contentTypeString =
               dragData.movie.contentType == ContentType.tvShow ? 'tv' : 'movie';
-          debugPrint(
-            '🎬 [KanbanDrag] Adding to custom list with contentType string: $contentTypeString',
-          );
           await favoritesService.addMovieToCustomList(
             targetId,
             dragData.movie,
@@ -227,9 +208,6 @@ class KanbanDragHandler {
       }
     } catch (e) {
       // If checking fails, continue anyway - the favorites service should handle creation
-      debugPrint(
-        'Warning: Could not verify movie file existence for ${movie.title}: $e',
-      );
     }
   }
 

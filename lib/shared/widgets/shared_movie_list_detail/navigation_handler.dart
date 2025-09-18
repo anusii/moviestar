@@ -44,13 +44,6 @@ class SharedListNavigationHandler {
       final movieId =
           int.tryParse(movieData['movieId']?.toString() ?? '0') ?? 0;
 
-      debugPrint(
-        '🎬 [SharedListNavigationHandler] Navigating to movie details for ID: $movieId',
-      );
-      debugPrint(
-        '🎬 [SharedListNavigationHandler] Using provided favoritesService: ${favoritesService != null}',
-      );
-
       if (movieId == 0) {
         throw Exception('Invalid movie ID');
       }
@@ -89,13 +82,6 @@ class SharedListNavigationHandler {
               .toList() ??
           <int>[];
 
-      debugPrint('🎬 [SharedListNavigationHandler] Movie data debug:');
-      debugPrint('   - Title: $movieTitle');
-      debugPrint('   - Poster URL: $posterUrl');
-      debugPrint('   - Vote Average: $voteAverage');
-      debugPrint('   - Release Date: $releaseDate');
-      debugPrint('   - Available fields: ${enhancedMovieData.keys.toList()}');
-
       final movie = Movie(
         id: movieId,
         title: movieTitle,
@@ -107,10 +93,6 @@ class SharedListNavigationHandler {
         genreIds: genreIds,
       );
 
-      debugPrint(
-        '🎬 [SharedListNavigationHandler] Created Movie object directly: ${movie.title}',
-      );
-
       // Dismiss loading indicator
       if (context.mounted) {
         Navigator.pop(context);
@@ -119,15 +101,9 @@ class SharedListNavigationHandler {
       // Use provided favorites service or create a minimal one for shared context.
       FavoritesService finalFavoritesService;
       if (favoritesService != null) {
-        debugPrint(
-          '🎬 [SharedListNavigationHandler] Using provided favorites service',
-        );
         finalFavoritesService = favoritesService!;
       } else {
         // Create a minimal favorites service for shared viewing context
-        debugPrint(
-          '🎬 [SharedListNavigationHandler] Creating fallback favorites service for shared context',
-        );
         final prefs = await SharedPreferences.getInstance();
         if (!context.mounted) return;
 
@@ -167,7 +143,6 @@ class SharedListNavigationHandler {
       ).popUntil((route) => route.isFirst);
     }
 
-    debugPrint('Error navigating to movie details: $error');
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

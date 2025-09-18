@@ -38,7 +38,6 @@ class MovieListOperationsHelper with PodOperationsMixin {
     try {
       final movieList = await _getMovieList(movieListId);
       if (movieList == null) {
-        debugPrint('❌ MovieList $movieListId not found');
         return false;
       }
 
@@ -57,7 +56,6 @@ class MovieListOperationsHelper with PodOperationsMixin {
         currentMovies,
       );
     } catch (e) {
-      debugPrint('❌ Failed to add movie to list: $e');
       return false;
     }
   }
@@ -77,29 +75,18 @@ class MovieListOperationsHelper with PodOperationsMixin {
         currentMovies,
       );
     } catch (e) {
-      debugPrint('❌ Failed to remove movie from list: $e');
       return false;
     }
   }
 
   /// Deletes a MovieList.
   Future<bool> deleteMovieList(String movieListId) async {
-    debugPrint(
-      '🎬 [MovieListOperationsHelper] deleteMovieList called for: $movieListId',
-    );
-
     if (!await validateContextAndLogin(_context)) {
-      debugPrint(
-        '🎬 [MovieListOperationsHelper] Context/login validation failed',
-      );
       return false;
     }
 
     try {
       final filePath = 'moviestar/data/${getMovieListFilePath(movieListId)}';
-      debugPrint(
-        '🎬 [MovieListOperationsHelper] Attempting to delete file: $filePath',
-      );
 
       if (!_context.mounted) return false;
 
@@ -113,40 +100,20 @@ class MovieListOperationsHelper with PodOperationsMixin {
         return false;
       }
 
-      debugPrint(
-        '🎬 [MovieListOperationsHelper] Delete file result: success=${result.success}, error=${result.error}',
-      );
-
       if (result.success) {
         _cache.remove(movieListId);
-        debugPrint(
-          '🎬 [MovieListOperationsHelper] Removing movie list from user profile...',
-        );
 
         final profileUpdateSuccess =
             await _userProfileService.removeMovieListFromProfile(movieListId);
-        debugPrint(
-          '🎬 [MovieListOperationsHelper] Profile update result: $profileUpdateSuccess',
-        );
 
         if (profileUpdateSuccess) {
-          debugPrint(
-            '✅ [MovieListOperationsHelper] Successfully deleted MovieList $movieListId',
-          );
           return true;
         } else {
-          debugPrint(
-            '❌ [MovieListOperationsHelper] Failed to update user profile after file deletion',
-          );
           return false;
         }
-      } else {
-        debugPrint(
-          '❌ [MovieListOperationsHelper] POD file deletion failed: ${result.error}',
-        );
-      }
+      } else {}
     } catch (e) {
-      debugPrint('❌ [MovieListOperationsHelper] Exception during delete: $e');
+      // Failed to remove movie from list
     }
     return false;
   }
@@ -167,7 +134,6 @@ class MovieListOperationsHelper with PodOperationsMixin {
 
       return await _writeMovieListFile(movieListId, updatedTtl);
     } catch (e) {
-      debugPrint('❌ Failed to update movie list name: $e');
       return false;
     }
   }
@@ -197,53 +163,32 @@ class MovieListOperationsHelper with PodOperationsMixin {
         currentMovies,
       );
     } catch (e) {
-      debugPrint('❌ Failed to batch add movies: $e');
       return false;
     }
   }
 
   /// Gets all MovieLists for the current user.
   Future<List<Map<String, dynamic>>> getAllMovieLists() async {
-    debugPrint('🎬 [MovieListOperationsHelper] getAllMovieLists called');
     if (!await validateContextAndLogin(_context)) {
-      debugPrint(
-        '🎬 [MovieListOperationsHelper] Context/login validation failed',
-      );
       return [];
     }
 
     try {
       final profile = await _userProfileService.getUserProfile();
-      debugPrint(
-        '🎬 [MovieListOperationsHelper] Got user profile: ${profile != null}',
-      );
 
       final movieListIds = profile?['movieListIds'] as List<String>? ?? [];
-      debugPrint(
-        '🎬 [MovieListOperationsHelper] Found ${movieListIds.length} movie list IDs: $movieListIds',
-      );
 
       final movieLists = <Map<String, dynamic>>[];
 
       for (final id in movieListIds) {
-        debugPrint('🎬 [MovieListOperationsHelper] Fetching movie list: $id');
         final movieList = await _getMovieList(id);
         if (movieList != null) {
-          debugPrint(
-            '🎬 [MovieListOperationsHelper] Got movie list: ${movieList['name']}',
-          );
           movieLists.add(movieList);
-        } else {
-          debugPrint('🎬 [MovieListOperationsHelper] Movie list $id not found');
-        }
+        } else {}
       }
 
-      debugPrint(
-        '🎬 [MovieListOperationsHelper] Returning ${movieLists.length} movie lists',
-      );
       return movieLists;
     } catch (e) {
-      debugPrint('❌ Failed to get all movie lists: $e');
       return [];
     }
   }

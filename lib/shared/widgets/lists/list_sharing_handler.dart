@@ -237,7 +237,7 @@ class ListSharingHandler {
           moviesToShare.addAll(podMovies);
         }
       } catch (e) {
-        debugPrint('Failed to load from POD: $e');
+        // Failed to get movies from POD
       }
     }
 
@@ -267,7 +267,7 @@ class ListSharingHandler {
 
           moviesToShare.add(movieWithContentType);
         } catch (e) {
-          debugPrint('Failed to load movie $movieId: $e');
+          // Failed to fetch movie details
         }
       }
     }

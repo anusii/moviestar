@@ -147,9 +147,7 @@ class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
           return;
         }
       } catch (e) {
-        debugPrint(
-          '⚠️ [CustomList] Failed to load movies from POD: $e, falling back to API',
-        );
+        // Failed to load cached movies
       }
     }
 
@@ -188,7 +186,6 @@ class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
           });
         }
       } catch (e) {
-        debugPrint('❌ [CustomList] Failed to load movie $movieId from API: $e');
         if (mounted) {
           safeSetState(() {
             _loadingMovieIds.remove(movieId);

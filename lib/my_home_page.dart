@@ -214,7 +214,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
         if (!hasApiKey) {
           // Show API key dialog immediately but continue with POD initialization
-          debugPrint('⚠️  No API key configured - showing setup dialog');
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             if (mounted) {
               final apiKeySet = await showApiKeyDialog(
@@ -227,15 +226,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               );
               if (!apiKeySet) {
                 // If user dismissed without setting API key, they can still use POD features
-                debugPrint(
-                  '⚠️  User dismissed API key dialog - movie features unavailable',
-                );
               }
             }
           });
         }
       } catch (e) {
-        debugPrint('⚠️  Error checking API key during initialization: $e');
+        // Failed to initialize API services
       }
 
       // Always initialize POD folders regardless of API key status
@@ -265,13 +261,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               try {
                 final enabled =
                     await _favoritesServiceManager.enablePodStorage();
-                if (!enabled) {
-                  debugPrint(
-                    '❌ [MyHomePage] Failed to automatically enable POD storage',
-                  );
-                }
+                if (!enabled) {}
               } catch (e) {
-                debugPrint('❌ [MyHomePage] Error enabling POD storage: $e');
+                // Failed to enable POD storage
               }
             }
 

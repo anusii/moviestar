@@ -96,12 +96,10 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
       final sharedResourcesResult = await sharedResources(context, widget);
 
       if (sharedResourcesResult == SolidFunctionCallStatus.notLoggedIn) {
-        debugPrint('❌ User not logged in to POD');
         return null;
       }
 
       if (sharedResourcesResult is! Map) {
-        debugPrint('❌ Invalid shared resources data: $sharedResourcesResult');
         return null;
       }
 
@@ -109,13 +107,6 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
       final Map<String, dynamic> movieListData = {};
 
       // Filter for movie files and movie list files, then fetch their content.
-
-      debugPrint(
-        '🔍 [SharedResources] Found ${sharedResourcesResult.length} shared resources:',
-      );
-      for (final entry in sharedResourcesResult.entries) {
-        debugPrint('   - ${entry.key}');
-      }
 
       for (final entry in sharedResourcesResult.entries) {
         final resourceUrl = entry.key as String;
@@ -179,15 +170,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
           if (e.toString().contains('enc-keys.ttl') ||
               e.toString().contains('Invalid content in file') ||
               e.toString().contains('Duplicated encryption key')) {
-            debugPrint(
-              '⚠️  Encryption key corruption detected for $resourceUrl: $e',
-            );
-            debugPrint(
-              '   Skipping this resource - consider regenerating encryption keys in POD',
-            );
-          } else {
-            debugPrint('Error reading resource file $resourceUrl: $e');
-          }
+          } else {}
           // Continue with other files even if one fails.
         }
       }
@@ -204,7 +187,6 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
 
       return combinedData.isNotEmpty ? combinedData : null;
     } catch (e) {
-      debugPrint('Error fetching shared movies: $e');
       return null;
     }
   }
@@ -449,7 +431,6 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
 
       return result;
     } catch (e) {
-      debugPrint('❌ Error parsing movie data: $e');
       return null;
     }
   }
@@ -542,9 +523,6 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
             final movieId = filePathMatch.group(2); // "1396"
             if (movieId != null && fullFileName != null) {
               movieFilePaths[movieId] = fullFileName;
-              debugPrint(
-                '📁 [MovieList] Found filePath for movie $movieId: $fullFileName',
-              );
             }
           }
         }
@@ -602,8 +580,6 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
             final displayName =
                 isTvShow ? 'TV Show $movieIdStr' : 'Movie $movieIdStr';
 
-            debugPrint('   - Display name: $displayName');
-
             return {
               'movieId': movieIdStr,
               'fileName':
@@ -629,7 +605,6 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
 
       return result;
     } catch (e) {
-      debugPrint('❌ Error parsing movie list data: $e');
       return null;
     }
   }

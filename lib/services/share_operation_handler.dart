@@ -29,7 +29,6 @@ class ShareOperationHandler {
       final webId = await getWebId();
       return webId;
     } catch (e) {
-      debugPrint('Error getting WebID: $e');
       return null;
     }
   }

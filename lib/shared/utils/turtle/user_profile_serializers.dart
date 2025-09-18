@@ -11,6 +11,7 @@ library;
 import 'package:rdflib/rdflib.dart';
 import 'package:solidpod/solidpod.dart' show tripleMapToTurtle;
 
+import 'package:moviestar/shared/utils/turtle/turtle_namespace_manager.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 
 /// Utility class for serializing/deserializing user profiles and API keys to/from Turtle format.
@@ -73,7 +74,7 @@ class UserProfileSerializers {
     // Use ontology-compliant namespace bindings.
     return tripleMapToTurtle(
       triples,
-      bindNamespaces: TurtleSerializer.getOntologyNamespaces(),
+      bindNamespaces: TurtleNamespaceManager.getOntologyNamespaces(),
     );
   }
 
@@ -103,7 +104,7 @@ class UserProfileSerializers {
     // Use ontology-compliant namespace bindings.
     return tripleMapToTurtle(
       triples,
-      bindNamespaces: TurtleSerializer.getOntologyNamespaces(),
+      bindNamespaces: TurtleNamespaceManager.getOntologyNamespaces(),
     );
   }
 

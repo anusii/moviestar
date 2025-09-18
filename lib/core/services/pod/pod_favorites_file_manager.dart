@@ -227,15 +227,13 @@ class PodFavoritesFileManager with PodOperationsMixin {
       if (!_context.mounted) return null;
 
       final result = await PodFileOperationsService.readFile(
-        filePath ?? '',
+        filePath,
         _context,
         _child,
       );
 
       if (result.success && (result.data?.isNotEmpty ?? false)) {
-        final movieData =
-            TurtleSerializer.movieWithUserDataFromTurtle(result.data!);
-        // Convert Map to Movie if needed - for now return null since conversion is complex
+        // TODO: Convert Map<String, dynamic> to Movie
         return null; // TODO: Convert Map<String, dynamic> to Movie
       }
     } catch (e) {

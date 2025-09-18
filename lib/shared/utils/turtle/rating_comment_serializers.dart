@@ -17,6 +17,7 @@ import 'package:solidpod/solidpod.dart'
     show tripleMapToTurtle, turtleToTripleMap;
 
 import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/utils/turtle/turtle_utils.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 
 /// Utility class for serializing/deserializing ratings and comments to/from Turtle format.
@@ -67,8 +68,7 @@ class RatingCommentSerializers {
       triples[commentResource] = {
         TurtleSerializer.rdfType: TurtleSerializer.commentType,
         TurtleSerializer.movieId: Literal(entry.key, datatype: XSD.int),
-        TurtleSerializer.text:
-            Literal(TurtleSerializer.escapeString(entry.value)),
+        TurtleSerializer.text: Literal(TurtleUtils.escapeString(entry.value)),
       };
     }
 
@@ -210,14 +210,13 @@ class RatingCommentSerializers {
     triples[movieResource] = {
       TurtleSerializer.rdfType: TurtleSerializer.movieType,
       TurtleSerializer.identifier: Literal('${movie.id}', datatype: XSD.int),
-      TurtleSerializer.name:
-          Literal(TurtleSerializer.escapeString(movie.title)),
+      TurtleSerializer.name: Literal(TurtleUtils.escapeString(movie.title)),
       TurtleSerializer.description:
-          Literal(TurtleSerializer.escapeString(movie.overview)),
+          Literal(TurtleUtils.escapeString(movie.overview)),
       TurtleSerializer.image:
-          Literal(TurtleSerializer.escapeString(movie.posterUrl)),
+          Literal(TurtleUtils.escapeString(movie.posterUrl)),
       TurtleSerializer.thumbnailUrl:
-          Literal(TurtleSerializer.escapeString(movie.backdropUrl)),
+          Literal(TurtleUtils.escapeString(movie.backdropUrl)),
       TurtleSerializer.aggregateRating:
           Literal('${movie.voteAverage}', datatype: XSD.double),
       TurtleSerializer.datePublished: Literal(
@@ -248,7 +247,7 @@ class RatingCommentSerializers {
       triples[userCommentResource] = {
         TurtleSerializer.rdfType: TurtleSerializer.commentType,
         TurtleSerializer.movieId: Literal('${movie.id}', datatype: XSD.int),
-        TurtleSerializer.text: Literal(TurtleSerializer.escapeString(comment)),
+        TurtleSerializer.text: Literal(TurtleUtils.escapeString(comment)),
       };
 
       // Link the movie to the user comment

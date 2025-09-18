@@ -64,7 +64,6 @@ class MovieListFileHelper with PodOperationsMixin {
       final movieFileName = 'moviestar/data/movies/Movie-$movieId.ttl';
       final tvShowFileName = 'moviestar/data/movies/TVShow-$movieId.ttl';
 
-
       if (!_context.mounted) return null;
 
       String result = '';
@@ -106,10 +105,8 @@ class MovieListFileHelper with PodOperationsMixin {
         if (movieData != null && movieData['movie'] is Movie) {
           final movie = movieData['movie'] as Movie;
           return movie;
-        } else {
-        }
-      } else {
-      }
+        } else {}
+      } else {}
     } catch (e) {
       if (!isFileNotFoundError(e)) {
         debugPrint('❌ Error loading movie data for $movieId: $e');

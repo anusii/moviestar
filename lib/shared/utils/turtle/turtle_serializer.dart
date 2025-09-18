@@ -11,8 +11,6 @@
 
 library;
 
-import 'package:rdflib/rdflib.dart';
-
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/shared/utils/turtle/api_key_turtle_serializer.dart';
 import 'package:moviestar/shared/utils/turtle/movie_list_turtle_serializer.dart';
@@ -230,24 +228,5 @@ class TurtleSerializer {
   /// Generates a unique ID for resources.
   static String generateId() {
     return TurtleBaseSerializer.generateId();
-  }
-
-  // ====== NAMESPACE METHODS ======
-
-  /// Static namespace bindings to match ontology structure exactly.
-  static Map<String, Namespace> _getOntologyNamespaces() {
-    return TurtleNamespaceManager.getOntologyNamespaces();
-  }
-
-  // ====== PRIVATE HELPER METHODS ======
-
-  /// Escapes special characters in strings for TTL format.
-  static String _escapeString(String input) {
-    return TurtleBaseSerializer.escapeString(input);
-  }
-
-  /// Escapes and sanitizes strings for TTL format.
-  static String _escapeAndSanitizeString(String input) {
-    return TurtleBaseSerializer.escapeAndSanitizeString(input);
   }
 }

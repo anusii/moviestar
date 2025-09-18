@@ -16,6 +16,7 @@ import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
 
 import 'package:moviestar/core/services/pod/pod_sharing_service.dart';
 import 'package:moviestar/models/sharing_models.dart';
+import 'package:moviestar/widgets/sharing/sharing_components.dart';
 
 /// Handler for batch sharing operations.
 class BatchSharingHandler {

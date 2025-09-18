@@ -36,8 +36,10 @@ void main() {
       expect(settingsScreen, isA<SettingsScreen>());
       expect(settingsScreen.favoritesService, equals(mockFavoritesService));
       expect(settingsScreen.apiKeyService, equals(mockApiKeyService));
-      expect(settingsScreen.favoritesServiceManager,
-          equals(mockFavoritesServiceManager));
+      expect(
+        settingsScreen.favoritesServiceManager,
+        equals(mockFavoritesServiceManager),
+      );
     });
 
     testWidgets('SettingsScreen handles constructor parameters',

@@ -92,8 +92,6 @@ class FavoritesServiceManager extends ChangeNotifier {
       _podService = PodFavoritesService(
         _context,
         _child,
-        _prefs,
-        _localService,
         onInitialLoadComplete: () {
           debugPrint(
             '🎬 [FavoritesServiceManager] POD service initial load complete - POD service will manage its own stream',
@@ -557,8 +555,6 @@ class FavoritesServiceManager extends ChangeNotifier {
       _podService = PodFavoritesService(
         _context,
         _child,
-        _prefs,
-        _localService,
         onInitialLoadComplete: () {
           debugPrint(
             '🎬 [FavoritesServiceManager] POD service initial load complete - POD service will manage its own stream',

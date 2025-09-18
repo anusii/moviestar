@@ -14,8 +14,6 @@ import 'package:moviestar/core/services/favorites/movie_list_service.dart';
 import 'package:moviestar/core/services/pod/base_pod_service.dart';
 import 'package:moviestar/core/services/pod/pod_favorites_file_manager.dart';
 import 'package:moviestar/core/services/pod/pod_favorites_stream_manager.dart';
-import 'package:moviestar/core/services/pod/pod_list_management_service.dart';
-import 'package:moviestar/core/services/pod/pod_sharing_service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
@@ -24,8 +22,6 @@ import 'package:moviestar/services/user_profile_service.dart';
 /// Compact POD-based service for managing favorite movies using composition.
 /// Uses BasePodService infrastructure and helper classes for common operations.
 class PodFavoritesService extends BasePodService {
-  final SharedPreferences _prefs;
-  final FavoritesService _fallbackService;
   final Set<int> _moviesWithFiles = {};
   final Map<int, Movie> _movieCache = {};
 
@@ -33,21 +29,17 @@ class PodFavoritesService extends BasePodService {
   late final PodFavoritesFileManager _fileManager;
   late final MovieListService _movieListService;
   late final UserProfileService _userProfileService;
-  late final PodListManagementService _listManagementService;
-  late final PodSharingService _sharingService;
 
   PodFavoritesService(
     super.context,
     super.child,
-    this._prefs,
-    this._fallbackService,
+    SharedPreferences prefs,
+    FavoritesService fallbackService,
   ) {
     _streamManager = PodFavoritesStreamManager();
     _fileManager = PodFavoritesFileManager(context, child);
     _userProfileService = UserProfileService(context, child);
     _movieListService = MovieListService(context, child, _userProfileService);
-    _listManagementService = PodListManagementService(context, child);
-    _sharingService = PodSharingService(context, child);
   }
 
   /// Stream of to-watch movies.
@@ -193,7 +185,9 @@ class PodFavoritesService extends BasePodService {
           CustomList(
             id: id,
             name: name,
-            movies: movies,
+            movieIds: movies.map((m) => m.id).toList(),
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
           ),
         );
       }
@@ -220,7 +214,7 @@ class PodFavoritesService extends BasePodService {
             contentType:
                 movie.contentType == ContentType.tvShow ? 'tvShow' : 'movie',
           );
-          await _fileManager.createOrUpdateMovieFile(movie, null, null);
+          await _fileManager.createOrUpdateMovieFile(movie);
           _movieCache[movie.id] = movie;
           _moviesWithFiles.add(movie.id);
 

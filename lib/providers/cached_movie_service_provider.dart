@@ -72,7 +72,6 @@ class DirectMovieService extends MovieService {
 
   final String? _apiKey;
   NetworkClient? _directClient;
-  DirectApiKeyService? _directApiKeyService;
 
   DirectMovieService(this._apiKey) : super(null) {
     _initializeWithDirectApiKey();
@@ -277,7 +276,6 @@ class DirectMovieService extends MovieService {
     debugPrint('🔑 [DirectMovieService] Disposing services');
     _directClient?.dispose();
     _directClient = null;
-    _directApiKeyService = null;
     super.dispose();
   }
 }
@@ -495,7 +493,6 @@ final contentServiceProvider = Provider<ContentService>((ref) {
 final directContentServiceProvider =
     FutureProvider<ContentService>((ref) async {
   final apiKey = await ref.watch(directApiKeyProvider.future);
-
 
   // Use the new constructor that accepts API key directly
   final contentService = ContentService.withApiKey(apiKey);

@@ -16,11 +16,9 @@ import 'package:moviestar/screens/shared_movie_list_detail_screen.dart';
 
 void main() {
   group('SharedMovieListDetailScreen Tests', () {
-    late SharedPreferences mockPrefs;
-
     setUpAll(() async {
       SharedPreferences.setMockInitialValues({});
-      mockPrefs = await SharedPreferences.getInstance();
+      await SharedPreferences.getInstance();
     });
 
     testWidgets('should create widget with required parameters',

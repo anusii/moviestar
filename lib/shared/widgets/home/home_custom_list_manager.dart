@@ -536,9 +536,7 @@ class HomeCustomListManager {
                   ),
                 ),
           title: Text(movie.title),
-          subtitle: movie.releaseDate != null
-              ? Text(movie.releaseDate.year.toString())
-              : null,
+          subtitle: Text(movie.releaseDate.year.toString()),
           onTap: () => _navigateToMovieDetails(movie),
         );
       }).toList(),

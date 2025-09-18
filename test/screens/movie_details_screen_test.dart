@@ -99,8 +99,11 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
   }
 
   @override
-  Future<void> addMovieToCustomList(String listId, Movie movie,
-      {String contentType = 'movie'}) async {
+  Future<void> addMovieToCustomList(
+    String listId,
+    Movie movie, {
+    String contentType = 'movie',
+  }) async {
     // Find the list and add movie
     final listIndex = _customLists.indexWhere((l) => l.id == listId);
     if (listIndex != -1) {
@@ -164,8 +167,10 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
   }
 
   @override
-  Future<CustomList> createCustomList(String name,
-      {String? description}) async {
+  Future<CustomList> createCustomList(
+    String name, {
+    String? description,
+  }) async {
     final newList = CustomList(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: name,

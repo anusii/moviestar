@@ -54,23 +54,6 @@ class MovieDetailsHeader extends StatelessWidget {
     this.sharedMovieData,
   });
 
-  String _getSharedByText() {
-    if (!isSharedMovie || sharedMovieData == null) return 'Unknown';
-
-    final sharedBy = sharedMovieData!['sharedBy'] as String?;
-    final sharedByWebId = sharedMovieData!['sharedByWebId'] as String?;
-
-    if (sharedBy != null && sharedBy.isNotEmpty && sharedBy != 'Unknown') {
-      return sharedBy;
-    }
-
-    if (sharedByWebId != null && sharedByWebId.isNotEmpty) {
-      return sharedByWebId;
-    }
-
-    return 'Unknown';
-  }
-
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(

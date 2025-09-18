@@ -29,7 +29,6 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:moviestar/core/services/api/api_key_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
@@ -72,21 +71,9 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen>
     with ScreenStateMixin {
-  /// Launch a URL in the browser.
-
-  Future<void> _launchUrl(Uri url) async {
-    if (!await launchUrl(url)) {
-      throw Exception('Could not launch $url');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-
-    // Update ApiKeyService context for POD operations.
-
-    widget.apiKeyService.updateContext(context, widget);
   }
 
   @override

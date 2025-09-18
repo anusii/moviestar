@@ -79,8 +79,6 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen>
     _loadCustomLists();
 
     widget.favoritesService.customLists.listen((lists) {
-      for (final list in lists) {
-      }
       safeSetState(() {
         _customLists = lists;
       });
@@ -90,8 +88,6 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen>
 
   Future<void> _loadCustomLists() async {
     final lists = await widget.favoritesService.getCustomLists();
-    for (final list in lists) {
-    }
 
     safeSetState(() {
       _customLists = lists;

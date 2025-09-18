@@ -164,15 +164,17 @@ class MovieListService extends BasePodService {
     String displayName, {
     List<Movie> initialMovies = const [],
   }) async {
-    return await retryOperation(
+    return await executePodOperation(
       operation: () async {
         String? existingId = await _fileHelper.findExistingMovieList(
           listType,
           displayName,
         );
 
-        debugPrint('✅ Found existing $listType MovieList: $existingId');
-        return existingId;
+        if (existingId != null) {
+          debugPrint('✅ Found existing $listType MovieList: $existingId');
+          return existingId;
+        }
 
         final description = _getListDescription(listType);
         return await createMovieList(
@@ -182,7 +184,6 @@ class MovieListService extends BasePodService {
         );
       },
       operationName: 'initializeMovieList($listType)',
-      maxRetries: 3,
     );
   }
 

@@ -120,10 +120,8 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
     setLoadingState(true);
 
     try {
-
       final results =
           await widget.contentService.searchContentComprehensive(query);
-
 
       // Only update state if this search is still relevant.
 
@@ -134,7 +132,6 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
         setLoadingState(false);
       }
     } catch (e) {
-
       // Only update state if this search is still relevant.
 
       if (_searchController.text == query && mounted) {

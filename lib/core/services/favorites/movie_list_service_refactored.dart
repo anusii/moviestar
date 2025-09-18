@@ -289,14 +289,6 @@ class MovieListService with PodOperationsMixin {
 
         debugPrint('✅ Found existing $listType MovieList: $existingId');
         return existingId;
-
-        // Create new list
-        final description = _getListDescription(listType);
-        return await createMovieList(
-          displayName,
-          movies: initialMovies,
-          description: description,
-        );
       },
       operationName: 'initializeMovieList($listType)',
       maxRetries: 3,
@@ -309,7 +301,7 @@ class MovieListService with PodOperationsMixin {
     return 'user_lists/MovieList-$movieListId.ttl';
   }
 
-  String _getListDescription(String listType) {
+  String getListDescription(String listType) {
     switch (listType) {
       case 'to_watch':
         return 'Movies you want to watch';

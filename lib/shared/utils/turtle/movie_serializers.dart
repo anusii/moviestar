@@ -18,6 +18,8 @@ import 'package:solidpod/solidpod.dart'
 
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/shared/utils/turtle/turtle_namespace_manager.dart';
+import 'package:moviestar/utils/turtle/turtle_utils.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 
 /// Utility class for serializing/deserializing movies and movie lists to/from Turtle format.
@@ -31,7 +33,7 @@ class MovieSerializers {
     triples[listResource] = {
       TurtleSerializer.rdfType: TurtleSerializer.movieListType,
       TurtleSerializer.nameProperty:
-          Literal(TurtleSerializer.escapeString(listName)),
+          Literal(TurtleUtils.escapeString(listName)),
     };
 
     // Add movie references to the list only if there are movies.
@@ -52,14 +54,13 @@ class MovieSerializers {
           TurtleSerializer.rdfType: contentType,
           TurtleSerializer.identifier:
               Literal('${movie.id}', datatype: XSD.int),
-          TurtleSerializer.name:
-              Literal(TurtleSerializer.escapeString(movie.title)),
+          TurtleSerializer.name: Literal(TurtleUtils.escapeString(movie.title)),
           TurtleSerializer.description:
-              Literal(TurtleSerializer.escapeString(movie.overview)),
+              Literal(TurtleUtils.escapeString(movie.overview)),
           TurtleSerializer.image:
-              Literal(TurtleSerializer.escapeString(movie.posterUrl)),
+              Literal(TurtleUtils.escapeString(movie.posterUrl)),
           TurtleSerializer.thumbnailUrl:
-              Literal(TurtleSerializer.escapeString(movie.backdropUrl)),
+              Literal(TurtleUtils.escapeString(movie.backdropUrl)),
           TurtleSerializer.aggregateRating: Literal(
             '${movie.voteAverage}',
             datatype: XSD.double,
@@ -277,10 +278,9 @@ class MovieSerializers {
         TurtleSerializer.movieListType,
       ],
       TurtleSerializer.identifier: Literal(movieListId),
-      TurtleSerializer.name:
-          Literal(TurtleSerializer.escapeAndSanitizeString(listName)),
+      TurtleSerializer.name: Literal(TurtleUtils.escapeString(listName)),
       TurtleSerializer.description: Literal(
-        TurtleSerializer.escapeAndSanitizeString(
+        TurtleUtils.escapeString(
           description ?? 'List of movies: $listName',
         ),
       ),
@@ -353,7 +353,7 @@ class MovieSerializers {
     // Use ontology-compliant namespace bindings.
     return tripleMapToTurtle(
       triples,
-      bindNamespaces: TurtleSerializer.getOntologyNamespaces(),
+      bindNamespaces: TurtleNamespaceManager.getOntologyNamespaces(),
     );
   }
 

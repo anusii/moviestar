@@ -7,19 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/core/services/pod/pod_favorites_service.dart';
 
 void main() {
   group('PodFavoritesService Public API Tests', () {
     late PodFavoritesService service;
-    late SharedPreferences prefs;
-    late FavoritesService fallbackService;
 
     setUpAll(() async {
       TestWidgetsFlutterBinding.ensureInitialized();
       SharedPreferences.setMockInitialValues({});
-      prefs = await SharedPreferences.getInstance();
+      await SharedPreferences.getInstance();
     });
 
     testWidgets('Service exposes all required public APIs',
@@ -28,9 +25,7 @@ void main() {
         MaterialApp(
           home: Builder(
             builder: (context) {
-              fallbackService = FavoritesService(prefs);
-              service = PodFavoritesService(
-                  context, Container(), prefs, fallbackService);
+              service = PodFavoritesService(context, Container());
               return Container();
             },
           ),

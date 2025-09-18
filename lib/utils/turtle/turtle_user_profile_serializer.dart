@@ -76,7 +76,6 @@ class TurtleUserProfileSerializer {
       ),
     );
 
-
     // Try to serialize using the graph
     try {
       graph.serialize(format: 'turtle');
@@ -84,8 +83,7 @@ class TurtleUserProfileSerializer {
       if (graph.serializedString.isNotEmpty) {
         return graph.serializedString;
       }
-    } catch (e) {
-    }
+    } catch (e) {}
 
     // Fallback: create manual TTL for user profile
     final buffer = StringBuffer();
@@ -165,8 +163,7 @@ class TurtleUserProfileSerializer {
       if (graph.serializedString.isNotEmpty) {
         return graph.serializedString;
       }
-    } catch (e) {
-    }
+    } catch (e) {}
 
     // Fallback: create manual TTL for movie list
     final buffer = StringBuffer();
@@ -244,8 +241,7 @@ class TurtleUserProfileSerializer {
       if (graph.serializedString.isNotEmpty) {
         return graph.serializedString;
       }
-    } catch (e) {
-    }
+    } catch (e) {}
 
     // Fallback: create manual TTL for API key
     final buffer = StringBuffer();
@@ -461,13 +457,11 @@ class TurtleUserProfileSerializer {
         movieUris = movieUriSet.toList();
       }
 
-
       final movies = <Map<String, dynamic>>[];
       final ratings = <String, double>{};
       final comments = <String, String>{};
 
       for (final movieUri in movieUris) {
-
         // Extract movie data
         final movieData = _extractMovieDataFromGraph(graph, movieUri);
 
@@ -495,8 +489,7 @@ class TurtleUserProfileSerializer {
           if (comment != null) {
             comments[movieId] = comment;
           }
-        } else {
-        }
+        } else {}
       }
 
       return {
@@ -524,8 +517,7 @@ class TurtleUserProfileSerializer {
           .firstMatch(uriString);
       if (idMatch != null) {
         movieData['id'] = int.tryParse(idMatch.group(2)!) ?? 0;
-      } else {
-      }
+      } else {}
 
       // Extract title - try both schema.org name and moviestar ontology name
       var nameTriples =

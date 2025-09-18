@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solidpod/solidpod.dart' show getWebId;
 
-import 'package:moviestar/core/services/cache/cache_settings_service.dart';
 import 'package:moviestar/core/services/pod/base_pod_service.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 
@@ -28,16 +27,10 @@ class ApiKeyService extends BasePodService {
     mOptions: const MacOsOptions(synchronizable: false),
   );
 
-  final BuildContext _context;
-  final Widget _child;
-  final CacheSettingsService _cacheSettings;
-
   String? _cachedApiKey;
   DateTime? _lastCacheTime;
 
-  ApiKeyService(this._context, this._child)
-      : _cacheSettings = CacheSettingsService.instance,
-        super(_context, _child);
+  ApiKeyService(BuildContext context, Widget child) : super(context, child);
 
   /// Gets the API key from cache, POD, or secure storage.
   Future<String?> getApiKey() async {
@@ -257,11 +250,5 @@ class ApiKeyService extends BasePodService {
   String createApiKeyFileName(String webId) {
     final hash = webId.hashCode.abs().toString();
     return 'api-key-$hash.ttl';
-  }
-
-  /// Updates context for the service (compatibility method).
-  void updateContext(BuildContext newContext, [Widget? newChild]) {
-    // Context update logic if needed
-    logDebug('Context updated for ApiKeyService');
   }
 }

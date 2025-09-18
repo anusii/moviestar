@@ -11,7 +11,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solidpod/solidpod.dart' show getWebId;
 
 import 'package:moviestar/constants/timing_constants.dart';
-import 'package:moviestar/core/services/cache/cache_settings_service.dart';
 import 'package:moviestar/core/services/pod/base_pod_service.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 
@@ -29,15 +28,10 @@ class ApiKeyService extends BasePodService {
     mOptions: const MacOsOptions(synchronizable: false),
   );
 
-  final BuildContext _context;
-  final Widget _child;
-  final CacheSettingsService _cacheSettings;
-
   String? _cachedApiKey;
   DateTime? _lastCacheTime;
 
-  ApiKeyService(this._context, this._child, this._cacheSettings)
-      : super(_context, _child);
+  ApiKeyService(BuildContext context, Widget child) : super(context, child);
 
   /// Gets the API key from cache, POD, or secure storage.
   Future<String?> getApiKey() async {
@@ -62,7 +56,7 @@ class ApiKeyService extends BasePodService {
     await executePodOperation(
       operation: () async {
         // Save to POD first
-        final podSuccess = await _saveApiKeyToPod(apiKey);
+        await _saveApiKeyToPod(apiKey);
 
         // Always save to local storage as backup
         await _saveApiKeyToLocalStorage(apiKey);

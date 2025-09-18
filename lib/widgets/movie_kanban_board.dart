@@ -25,12 +25,9 @@ import 'package:moviestar/shared/widgets/kanban/kanban_board_controller.dart';
 import 'package:moviestar/shared/widgets/kanban/kanban_card_widget.dart';
 import 'package:moviestar/shared/widgets/kanban/kanban_column_widget.dart';
 import 'package:moviestar/shared/widgets/kanban/kanban_drag_handler.dart';
-import 'package:moviestar/shared/widgets/kanban/kanban_list_operations.dart'
-    hide KanbanColumnType;
 import 'package:moviestar/shared/widgets/kanban/kanban_search_filter.dart';
 import 'package:moviestar/shared/widgets/kanban/kanban_settings_panel.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
-import 'package:moviestar/widgets/sort_controls.dart';
 
 /// Custom Kanban board widget for displaying movies in columns.
 /// Now serves as an orchestrator for the extracted kanban components.
@@ -52,8 +49,6 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   late KanbanDragHandler _dragHandler;
   late KanbanSearchController _searchController;
   late KanbanSettingsController _settingsController;
-
-  final int _maxItemsPerColumn = 8;
 
   @override
   void initState() {
@@ -410,42 +405,6 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           customList: customList,
         );
       },
-    );
-  }
-
-  /// Build custom list column (legacy - kept for reference).
-  Widget _buildCustomListColumn(CustomList customList) {
-    final movieIds = customList.movieIds.take(_maxItemsPerColumn * 2).toList();
-
-    return SizedBox(
-      width: 220,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: Dimensions.m),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-          ),
-        ),
-        child: CustomListMoviesWidget(
-          movieIds: movieIds,
-          customList: customList,
-          favoritesService: widget.favoritesService,
-          sortCriteria: _kanbanController.columnSortCriteria[customList.id] ??
-              MovieSortCriteria.nameAsc,
-          maxItems: _settingsController.settings.maxItemsPerColumn,
-          optimisticMovies: const {}, // TODO: Integrate optimistic movies from controller
-          buildMovieItem: (movie, index) => _buildMovieItem(
-            movie,
-            customList.id,
-            fromCache: true,
-            columnType: KanbanColumnType.customList,
-            columnId: customList.id,
-            columnName: customList.name,
-          ),
-        ),
-      ),
     );
   }
 }

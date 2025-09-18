@@ -87,17 +87,12 @@ class NetworkClient {
       final separator = endpoint.contains('?') ? '&' : '?';
       final url = '$baseUrl/$endpoint${separator}api_key=$apiKey';
 
-
       final response = await _client.get(Uri.parse(url)).timeout(_timeout);
 
-      if (response.statusCode != 200) {
-      }
+      if (response.statusCode != 200) {}
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body) as Map<String, dynamic>;
-        if (jsonData.containsKey('results')) {
-          final resultsList = jsonData['results'] as List<dynamic>;
-        }
         return jsonData;
       } else {
         throw NetworkException(

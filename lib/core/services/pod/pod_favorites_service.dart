@@ -9,9 +9,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/core/services/favorites/movie_list_service.dart';
 import 'package:moviestar/core/services/pod/base_pod_service.dart';
 import 'package:moviestar/core/services/pod/favorites/pod_favorites_cache_manager.dart';
@@ -20,8 +17,6 @@ import 'package:moviestar/core/services/pod/favorites/pod_favorites_list_operati
 import 'package:moviestar/core/services/pod/favorites/pod_favorites_movie_operations.dart';
 import 'package:moviestar/core/services/pod/pod_favorites_file_manager.dart';
 import 'package:moviestar/core/services/pod/pod_favorites_stream_manager.dart';
-import 'package:moviestar/core/services/pod/pod_list_management_service.dart';
-import 'package:moviestar/core/services/pod/pod_sharing_service.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/user_profile_service.dart';
@@ -29,8 +24,6 @@ import 'package:moviestar/services/user_profile_service.dart';
 /// POD-based service for managing favorite movies using decomposed operations.
 /// Uses specialized operation classes for different concerns.
 class PodFavoritesService extends BasePodService {
-  final SharedPreferences _prefs;
-  final FavoritesService _fallbackService;
   final Set<int> _moviesWithFiles = {};
   final Map<int, Movie> _movieCache = {};
 
@@ -41,8 +34,6 @@ class PodFavoritesService extends BasePodService {
   late final PodFavoritesFileManager _fileManager;
   late final MovieListService _movieListService;
   late final UserProfileService _userProfileService;
-  late final PodListManagementService _listManagementService;
-  late final PodSharingService _sharingService;
 
   // Decomposed operation classes
   late final PodFavoritesMovieOperations _movieOperations;
@@ -52,18 +43,13 @@ class PodFavoritesService extends BasePodService {
 
   PodFavoritesService(
     super.context,
-    super.child,
-    this._prefs,
-    this._fallbackService, {
+    super.child, {
     VoidCallback? onInitialLoadComplete,
   }) : _onInitialLoadComplete = onInitialLoadComplete {
     _streamManager = PodFavoritesStreamManager();
     _fileManager = PodFavoritesFileManager(context, child);
     _userProfileService = UserProfileService(context, child);
     _movieListService = MovieListService(context, child, _userProfileService);
-    _listManagementService =
-        PodListManagementService(context, child, _movieListService);
-    _sharingService = PodSharingService();
 
     // Initialize decomposed operation classes
     _movieOperations = PodFavoritesMovieOperations(

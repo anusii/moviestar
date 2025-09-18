@@ -6,15 +6,16 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:moviestar/mixins/screen_state_mixin.dart';
-import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
+import 'package:moviestar/mixins/screen_state_mixin.dart';
+import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/shared/widgets/shared_movie_list_detail/shared_list_data_loader.dart';
 
 /// Handles navigation operations for shared movie list detail screen.
@@ -43,8 +44,10 @@ class SharedListNavigationHandler {
       final movieId =
           int.tryParse(movieData['movieId']?.toString() ?? '0') ?? 0;
 
-      debugPrint('🎬 [SharedListNavigationHandler] Navigating to movie details for ID: $movieId');
-      debugPrint('🎬 [SharedListNavigationHandler] Using provided favoritesService: ${favoritesService != null}');
+      debugPrint(
+          '🎬 [SharedListNavigationHandler] Navigating to movie details for ID: $movieId',);
+      debugPrint(
+          '🎬 [SharedListNavigationHandler] Using provided favoritesService: ${favoritesService != null}',);
 
       if (movieId == 0) {
         throw Exception('Invalid movie ID');
@@ -66,14 +69,23 @@ class SharedListNavigationHandler {
 
       // Create Movie object directly from available data (like working Shared tab logic)
       // This avoids TMDB API calls and associated API key/network issues
-      final movieTitle = enhancedMovieData['title'] ?? enhancedMovieData['fileName'] ?? 'Unknown Movie';
+      final movieTitle = enhancedMovieData['title'] ??
+          enhancedMovieData['fileName'] ??
+          'Unknown Movie';
       final posterUrl = enhancedMovieData['posterUrl'] ?? '';
       final backdropUrl = enhancedMovieData['backdropUrl'] ?? posterUrl ?? '';
       final overview = enhancedMovieData['overview'] ?? 'Shared movie';
-      final releaseDate = DateTime.tryParse(enhancedMovieData['releaseDate'] ?? '') ?? DateTime.now();
-      final voteAverage = (enhancedMovieData['voteAverage'] as num?)?.toDouble() ??
-                         (enhancedMovieData['rating'] as num?)?.toDouble() ?? 0.0;
-      final genreIds = (enhancedMovieData['genreIds'] as List?)?.map((e) => e as int).toList() ?? <int>[];
+      final releaseDate =
+          DateTime.tryParse(enhancedMovieData['releaseDate'] ?? '') ??
+              DateTime.now();
+      final voteAverage =
+          (enhancedMovieData['voteAverage'] as num?)?.toDouble() ??
+              (enhancedMovieData['rating'] as num?)?.toDouble() ??
+              0.0;
+      final genreIds = (enhancedMovieData['genreIds'] as List?)
+              ?.map((e) => e as int)
+              .toList() ??
+          <int>[];
 
       debugPrint('🎬 [SharedListNavigationHandler] Movie data debug:');
       debugPrint('   - Title: $movieTitle');
@@ -93,7 +105,8 @@ class SharedListNavigationHandler {
         genreIds: genreIds,
       );
 
-      debugPrint('🎬 [SharedListNavigationHandler] Created Movie object directly: ${movie.title}');
+      debugPrint(
+          '🎬 [SharedListNavigationHandler] Created Movie object directly: ${movie.title}',);
 
       // Dismiss loading indicator
       if (context.mounted) {
@@ -103,11 +116,13 @@ class SharedListNavigationHandler {
       // Use provided favorites service or create a minimal one for shared context.
       FavoritesService finalFavoritesService;
       if (favoritesService != null) {
-        debugPrint('🎬 [SharedListNavigationHandler] Using provided favorites service');
+        debugPrint(
+            '🎬 [SharedListNavigationHandler] Using provided favorites service',);
         finalFavoritesService = favoritesService!;
       } else {
         // Create a minimal favorites service for shared viewing context
-        debugPrint('🎬 [SharedListNavigationHandler] Creating fallback favorites service for shared context');
+        debugPrint(
+            '🎬 [SharedListNavigationHandler] Creating fallback favorites service for shared context',);
         final prefs = await SharedPreferences.getInstance();
         if (!context.mounted) return;
 
@@ -116,7 +131,8 @@ class SharedListNavigationHandler {
           context,
           widget,
         );
-        finalFavoritesService = FavoritesServiceAdapter(favoritesServiceManager);
+        finalFavoritesService =
+            FavoritesServiceAdapter(favoritesServiceManager);
       }
 
       // Navigate to MovieDetailsScreen with enhanced shared movie data.

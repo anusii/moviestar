@@ -11,10 +11,10 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:moviestar/constants/timing_constants.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 
 /// Dialog for adding a movie to custom lists.
 class AddToCustomListsDialog extends StatefulWidget {
@@ -210,10 +210,8 @@ class _AddToCustomListsDialogState extends State<AddToCustomListsDialog> {
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.close),
             style: IconButton.styleFrom(
-              backgroundColor: Theme.of(context)
-                  .colorScheme
-                  .surface
-                  .withValues(alpha: 0.8),
+              backgroundColor:
+                  Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -237,17 +235,15 @@ class _AddToCustomListsDialogState extends State<AddToCustomListsDialog> {
     );
   }
 
-  Widget _buildListItem(BuildContext context, CustomList list, bool isSelected) {
+  Widget _buildListItem(
+      BuildContext context, CustomList list, bool isSelected,) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         border: Border.all(
           color: isSelected
               ? Theme.of(context).colorScheme.primary
-              : Theme.of(context)
-                  .colorScheme
-                  .outline
-                  .withValues(alpha: 0.2),
+              : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
           width: isSelected ? 2 : 1,
         ),
         borderRadius: BorderRadius.circular(12),

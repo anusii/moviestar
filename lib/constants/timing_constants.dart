@@ -73,6 +73,12 @@ class TimingConstants {
 
   static const Duration snackbarStandardDuration = Duration(seconds: 3);
 
+  /// API key cache valid duration (24 hours).
+  ///
+  /// Duration for which cached API keys remain valid.
+
+  static const int cacheValidHours = 24;
+
   /// Long SnackBar display duration (4 seconds).
 
   static const Duration snackbarLongDuration = Duration(seconds: 4);

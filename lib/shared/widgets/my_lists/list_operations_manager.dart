@@ -9,18 +9,19 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solidpod/solidpod.dart'
     show SolidFunctionCallStatus, readPod, writePod;
 
 import 'package:moviestar/constants/timing_constants.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
+import 'package:moviestar/core/services/favorites/movie_list_service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
-import 'package:moviestar/core/services/favorites/movie_list_service.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
@@ -36,7 +37,7 @@ class ListOperationsManager {
   }) async {
     final hasMovies = list.movieIds.isNotEmpty;
     final isPodEnabled = favoritesService is FavoritesServiceAdapter &&
-        (favoritesService as FavoritesServiceAdapter).isPodStorageEnabled;
+        (favoritesService).isPodStorageEnabled;
 
     await showModalBottomSheet(
       context: context,
@@ -226,7 +227,7 @@ class ListOperationsManager {
 
       // First try to load from POD if using POD storage (same as custom list detail screen)
       if (favoritesService is FavoritesServiceAdapter &&
-          (favoritesService as FavoritesServiceAdapter).isPodStorageEnabled) {
+          (favoritesService).isPodStorageEnabled) {
         final movieListService = MovieListService(
           context,
           context as ConsumerStatefulWidget,
@@ -250,8 +251,8 @@ class ListOperationsManager {
 
       // If we didn't get movies from POD, load from API with content type correction
       if (moviesToShare.isEmpty && context.mounted) {
-        final movieService = ProviderScope.containerOf(context)
-            .read(cachedMovieServiceProvider);
+        final movieService =
+            ProviderScope.containerOf(context).read(cachedMovieServiceProvider);
 
         for (int index = 0; index < list.movieIds.length; index++) {
           final movieId = list.movieIds[index];

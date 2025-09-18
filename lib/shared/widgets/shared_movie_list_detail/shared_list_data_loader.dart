@@ -8,6 +8,7 @@ library;
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solidpod/solidpod.dart';
 
@@ -327,7 +328,8 @@ class SharedListDataLoader {
         urlsToTry.add('${ownerBaseUrl}moviestar/data/movies/$providedFilePath');
       }
       if (sharerBaseUrl != null && sharerBaseUrl != ownerBaseUrl) {
-        urlsToTry.add('${sharerBaseUrl}moviestar/data/movies/$providedFilePath');
+        urlsToTry
+            .add('${sharerBaseUrl}moviestar/data/movies/$providedFilePath');
       }
 
       for (final resourceUrl in urlsToTry) {
@@ -498,7 +500,8 @@ class SharedListDataLoader {
         movieMetadata = jsonDecode(movieJsonData) as Map<String, dynamic>;
         title = movieMetadata['title'] as String?;
         debugPrint('   - JSON title: "$title"');
-        debugPrint('   - JSON metadata available: ${movieMetadata.keys.toList()}');
+        debugPrint(
+            '   - JSON metadata available: ${movieMetadata.keys.toList()}',);
       } else {
         debugPrint('   - No JSON_MOVIE_DATA found, will try TTL parsing');
       }
@@ -555,31 +558,51 @@ class SharedListDataLoader {
 
       if (title != null) result['title'] = title;
       if (rating != null) result['rating'] = rating;
-      if (comments != null && comments.isNotEmpty) result['comments'] = comments;
+      if (comments != null && comments.isNotEmpty) {
+        result['comments'] = comments;
+      }
 
       // Include TMDB metadata from JSON backup if available
       if (movieMetadata != null) {
         // Add poster and backdrop URLs
         if (movieMetadata['poster_path'] != null) {
-          result['posterUrl'] = 'https://image.tmdb.org/t/p/w500${movieMetadata['poster_path']}';
+          result['posterUrl'] =
+              'https://image.tmdb.org/t/p/w500${movieMetadata['poster_path']}';
         }
         if (movieMetadata['backdrop_path'] != null) {
-          result['backdropUrl'] = 'https://image.tmdb.org/t/p/w1280${movieMetadata['backdrop_path']}';
+          result['backdropUrl'] =
+              'https://image.tmdb.org/t/p/w1280${movieMetadata['backdrop_path']}';
         }
 
         // Add other TMDB fields
-        if (movieMetadata['overview'] != null) result['overview'] = movieMetadata['overview'];
-        if (movieMetadata['release_date'] != null) result['releaseDate'] = movieMetadata['release_date'];
-        if (movieMetadata['first_air_date'] != null) result['releaseDate'] = movieMetadata['first_air_date']; // For TV shows
-        if (movieMetadata['vote_average'] != null) result['voteAverage'] = movieMetadata['vote_average'];
-        if (movieMetadata['genre_ids'] != null) result['genreIds'] = movieMetadata['genre_ids'];
+        if (movieMetadata['overview'] != null) {
+          result['overview'] = movieMetadata['overview'];
+        }
+        if (movieMetadata['release_date'] != null) {
+          result['releaseDate'] = movieMetadata['release_date'];
+        }
+        if (movieMetadata['first_air_date'] != null) {
+          result['releaseDate'] =
+              movieMetadata['first_air_date']; // For TV shows
+        }
+        if (movieMetadata['vote_average'] != null) {
+          result['voteAverage'] = movieMetadata['vote_average'];
+        }
+        if (movieMetadata['genre_ids'] != null) {
+          result['genreIds'] = movieMetadata['genre_ids'];
+        }
 
-        debugPrint('   - Added TMDB metadata: posterUrl=${result['posterUrl'] != null}, backdropUrl=${result['backdropUrl'] != null}, voteAverage=${result['voteAverage']}');
+        debugPrint(
+            '   - Added TMDB metadata: posterUrl=${result['posterUrl'] != null}, backdropUrl=${result['backdropUrl'] != null}, voteAverage=${result['voteAverage']}',);
       }
 
       if (result.isNotEmpty) {
         debugPrint(
-          '   - Parse results: title="$title", rating=$rating, hasComments=${comments != null && comments.isNotEmpty}, tmdbFields=${result.keys.where((k) => !['title', 'rating', 'comments'].contains(k)).toList()}',
+          '   - Parse results: title="$title", rating=$rating, hasComments=${comments != null && comments.isNotEmpty}, tmdbFields=${result.keys.where((k) => ![
+                'title',
+                'rating',
+                'comments',
+              ].contains(k),).toList()}',
         );
         return result;
       }

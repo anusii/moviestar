@@ -9,27 +9,28 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/widgets/error_display_widget.dart';
-import 'package:moviestar/widgets/sort_controls.dart';
-
 // Import extracted kanban components
 import 'package:moviestar/shared/widgets/kanban/kanban_board_controller.dart';
-import 'package:moviestar/shared/widgets/kanban/kanban_column_widget.dart';
 import 'package:moviestar/shared/widgets/kanban/kanban_card_widget.dart';
+import 'package:moviestar/shared/widgets/kanban/kanban_column_widget.dart';
 import 'package:moviestar/shared/widgets/kanban/kanban_drag_handler.dart';
-import 'package:moviestar/shared/widgets/kanban/kanban_list_operations.dart' hide KanbanColumnType;
+import 'package:moviestar/shared/widgets/kanban/kanban_list_operations.dart'
+    hide KanbanColumnType;
 import 'package:moviestar/shared/widgets/kanban/kanban_search_filter.dart';
 import 'package:moviestar/shared/widgets/kanban/kanban_settings_panel.dart';
+import 'package:moviestar/widgets/error_display_widget.dart';
+import 'package:moviestar/widgets/sort_controls.dart';
 
 /// Custom Kanban board widget for displaying movies in columns.
 /// Now serves as an orchestrator for the extracted kanban components.
@@ -218,7 +219,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
             color: Theme.of(context).colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+              color:
+                  Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
             ),
           ),
           child: Row(
@@ -238,8 +240,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
               Text(
                 '${queue.length}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+                      fontWeight: FontWeight.w500,
+                    ),
               ),
             ],
           ),
@@ -255,7 +257,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       controller: _horizontalScrollController,
       child: Consumer(
         builder: (context, ref, child) {
-          final popularMoviesAsync = ref.watch(popularMoviesWithCacheInfoProvider);
+          final popularMoviesAsync =
+              ref.watch(popularMoviesWithCacheInfoProvider);
           return popularMoviesAsync.when(
             data: (popularCacheResult) {
               return StreamBuilder<List<Movie>>(
@@ -284,7 +287,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
             error: (error, stackTrace) {
               return ErrorDisplayWidget(
                 message: 'Error loading movies: $error',
-                onRetry: () => ref.invalidate(popularMoviesWithCacheInfoProvider),
+                onRetry: () =>
+                    ref.invalidate(popularMoviesWithCacheInfoProvider),
               );
             },
           );
@@ -326,7 +330,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           categoryId: 'popular',
           columnType: KanbanColumnType.popular,
           fromCache: popularCacheResult.fromCache ?? false,
-          isLoading: popularMovies.isEmpty && !(popularCacheResult.fromCache ?? false),
+          isLoading:
+              popularMovies.isEmpty && !(popularCacheResult.fromCache ?? false),
         ),
 
         // To Watch column
@@ -350,7 +355,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         ),
 
         // Custom list columns
-        ...customLists.map((customList) => _buildUnifiedCustomListColumn(customList)),
+        ...customLists
+            .map((customList) => _buildUnifiedCustomListColumn(customList)),
       ],
     );
   }

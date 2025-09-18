@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
@@ -16,7 +17,7 @@ import 'package:moviestar/models/movie.dart';
 /// Search and filter controller for kanban board
 class KanbanSearchController extends ChangeNotifier {
   String _searchQuery = '';
-  Set<String> _selectedGenres = {};
+  final Set<String> _selectedGenres = {};
   double? _minRating;
   double? _maxRating;
   int? _startYear;
@@ -140,19 +141,18 @@ class KanbanSearchController extends ChangeNotifier {
 
       // Year filter
       if (_startYear != null || _endYear != null) {
-        final movieYear = movie.releaseDate?.year;
-        if (movieYear != null) {
-          if (_startYear != null && movieYear < _startYear!) {
-            return false;
-          }
-          if (_endYear != null && movieYear > _endYear!) {
-            return false;
-          }
+        final movieYear = movie.releaseDate.year;
+        if (_startYear != null && movieYear < _startYear!) {
+          return false;
+        }
+        if (_endYear != null && movieYear > _endYear!) {
+          return false;
         }
       }
 
       // Content type filter
-      if (_contentTypeFilter != null && movie.contentType != _contentTypeFilter) {
+      if (_contentTypeFilter != null &&
+          movie.contentType != _contentTypeFilter) {
         return false;
       }
 
@@ -184,7 +184,8 @@ class _KanbanSearchBarState extends State<KanbanSearchBar> {
   @override
   void initState() {
     super.initState();
-    _textController = TextEditingController(text: widget.controller.searchQuery);
+    _textController =
+        TextEditingController(text: widget.controller.searchQuery);
   }
 
   @override
@@ -479,9 +480,9 @@ class KanbanSearchUtils {
   /// Get search suggestions based on current query and movie list
   static List<String> getSearchSuggestions(
     String query,
-    List<Movie> movies,
-    {int maxSuggestions = 5}
-  ) {
+    List<Movie> movies, {
+    int maxSuggestions = 5,
+  }) {
     if (query.isEmpty) return [];
 
     final suggestions = <String>{};
@@ -521,17 +522,21 @@ class KanbanSearchUtils {
     while (index != -1) {
       // Add text before the match
       if (index > start) {
-        spans.add(TextSpan(
-          text: text.substring(start, index),
-          style: normalStyle,
-        ));
+        spans.add(
+          TextSpan(
+            text: text.substring(start, index),
+            style: normalStyle,
+          ),
+        );
       }
 
       // Add the highlighted match
-      spans.add(TextSpan(
-        text: text.substring(index, index + searchTerm.length),
-        style: highlightStyle,
-      ));
+      spans.add(
+        TextSpan(
+          text: text.substring(index, index + searchTerm.length),
+          style: highlightStyle,
+        ),
+      );
 
       start = index + searchTerm.length;
       index = lowerText.indexOf(lowerSearchTerm, start);
@@ -539,10 +544,12 @@ class KanbanSearchUtils {
 
     // Add any remaining text
     if (start < text.length) {
-      spans.add(TextSpan(
-        text: text.substring(start),
-        style: normalStyle,
-      ));
+      spans.add(
+        TextSpan(
+          text: text.substring(start),
+          style: normalStyle,
+        ),
+      );
     }
 
     return TextSpan(children: spans);

@@ -11,8 +11,6 @@
 
 library;
 
-import 'package:rdflib/rdflib.dart';
-
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/shared/utils/turtle/api_key_turtle_serializer.dart';
 import 'package:moviestar/shared/utils/turtle/movie_list_turtle_serializer.dart';
@@ -231,5 +229,4 @@ class TurtleSerializer {
   static String generateId() {
     return TurtleBaseSerializer.generateId();
   }
-
 }

@@ -41,7 +41,8 @@ class ContentSearchService {
   /// Searches for content (movies and TV shows) matching the given query.
 
   Future<List<ContentItem>> searchContent(String query) async {
-    print('🔍 [ContentSearchService] searchContent called with query: "$query"');
+    print(
+        '🔍 [ContentSearchService] searchContent called with query: "$query"',);
     final allContent = <ContentItem>[];
 
     try {
@@ -50,7 +51,8 @@ class ContentSearchService {
       final movieResults = await _client.getJsonList(
         'search/movie?query=${Uri.encodeComponent(query)}',
       );
-      print('🔍 [ContentSearchService] Movie search returned ${movieResults.length} results');
+      print(
+          '🔍 [ContentSearchService] Movie search returned ${movieResults.length} results',);
       allContent.addAll(
         movieResults.map((movie) => ContentItem.fromMovieJson(movie)),
       );
@@ -60,13 +62,15 @@ class ContentSearchService {
       final tvResults = await _client.getJsonList(
         'search/tv?query=${Uri.encodeComponent(query)}',
       );
-      print('🔍 [ContentSearchService] TV search returned ${tvResults.length} results');
+      print(
+          '🔍 [ContentSearchService] TV search returned ${tvResults.length} results',);
       allContent.addAll(tvResults.map((tv) => ContentItem.fromTVJson(tv)));
 
       // Sort by vote average for better results.
       allContent.sort((a, b) => b.voteAverage.compareTo(a.voteAverage));
 
-      print('🔍 [ContentSearchService] searchContent completed with ${allContent.length} total results');
+      print(
+          '🔍 [ContentSearchService] searchContent completed with ${allContent.length} total results',);
       return allContent;
     } catch (e) {
       print('🔍 [ContentSearchService] searchContent failed: $e');
@@ -315,14 +319,16 @@ class ContentSearchService {
   Future<Map<String, List<ContentItem>>> searchContentComprehensive(
     String query,
   ) async {
-    print('🔍 [ContentSearchService] searchContentComprehensive called with query: "$query"');
+    print(
+        '🔍 [ContentSearchService] searchContentComprehensive called with query: "$query"',);
     final results = <String, List<ContentItem>>{};
 
     try {
       print('🔍 [ContentSearchService] Searching by title...');
       // Search by title.
       results['title'] = await searchContent(query);
-      print('🔍 [ContentSearchService] Title search completed: ${results['title']!.length} results');
+      print(
+          '🔍 [ContentSearchService] Title search completed: ${results['title']!.length} results',);
     } catch (e) {
       print('🔍 [ContentSearchService] Title search failed: $e');
       results['title'] = [];
@@ -332,7 +338,8 @@ class ContentSearchService {
       print('🔍 [ContentSearchService] Searching by actor...');
       // Search by actor.
       results['actor'] = await searchContentByActor(query);
-      print('🔍 [ContentSearchService] Actor search completed: ${results['actor']!.length} results');
+      print(
+          '🔍 [ContentSearchService] Actor search completed: ${results['actor']!.length} results',);
     } catch (e) {
       print('🔍 [ContentSearchService] Actor search failed: $e');
       results['actor'] = [];
@@ -342,13 +349,15 @@ class ContentSearchService {
       print('🔍 [ContentSearchService] Searching by genre...');
       // Search by genre.
       results['genre'] = await searchContentByGenre(query);
-      print('🔍 [ContentSearchService] Genre search completed: ${results['genre']!.length} results');
+      print(
+          '🔍 [ContentSearchService] Genre search completed: ${results['genre']!.length} results',);
     } catch (e) {
       print('🔍 [ContentSearchService] Genre search failed: $e');
       results['genre'] = [];
     }
 
-    print('🔍 [ContentSearchService] Comprehensive search completed with ${results.values.fold(0, (sum, list) => sum + list.length)} total results');
+    print(
+        '🔍 [ContentSearchService] Comprehensive search completed with ${results.values.fold(0, (sum, list) => sum + list.length)} total results',);
     return results;
   }
 

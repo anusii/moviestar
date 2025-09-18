@@ -9,10 +9,10 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
-import 'package:moviestar/core/services/cache/cached_movie_service.dart';
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
@@ -40,7 +40,8 @@ class HomeCacheIndicatorSystem extends StatefulWidget {
   });
 
   @override
-  State<HomeCacheIndicatorSystem> createState() => _HomeCacheIndicatorSystemState();
+  State<HomeCacheIndicatorSystem> createState() =>
+      _HomeCacheIndicatorSystemState();
 }
 
 class _HomeCacheIndicatorSystemState extends State<HomeCacheIndicatorSystem> {
@@ -120,7 +121,8 @@ class _HomeCacheIndicatorSystemState extends State<HomeCacheIndicatorSystem> {
 
     // Force refresh through the cached service
     try {
-      final cachedService = widget.ref.read(configuredCachedMovieServiceProvider);
+      final cachedService =
+          widget.ref.read(configuredCachedMovieServiceProvider);
       await cachedService.forceRefreshAll();
     } catch (e) {
       // Handle error gracefully without causing setState after dispose

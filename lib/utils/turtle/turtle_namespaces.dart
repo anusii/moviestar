@@ -13,8 +13,10 @@ import 'package:rdflib/rdflib.dart';
 /// Central registry for all RDF namespaces and properties used in MovieStar Turtle serialization
 class TurtleNamespaces {
   // Primary namespaces
-  static final moviestarOntoNS = Namespace(ns: 'http://dacs.anu.edu.au/ontologies/moviestar#');
-  static final moviestarDataNS = Namespace(ns: 'http://dacs.anu.edu.au/data/moviestar#');
+  static final moviestarOntoNS =
+      Namespace(ns: 'http://dacs.anu.edu.au/ontologies/moviestar#');
+  static final moviestarDataNS =
+      Namespace(ns: 'http://dacs.anu.edu.au/data/moviestar#');
   static final movieNS = Namespace(ns: 'http://schema.org/');
   static final xsdNS = Namespace(ns: 'http://www.w3.org/2001/XMLSchema#');
   static final rdfsNS = Namespace(ns: 'http://www.w3.org/2000/01/rdf-schema#');

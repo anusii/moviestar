@@ -29,25 +29,17 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:solidpod/solidpod.dart';
-import 'package:solidui/solidui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:moviestar/constants/timing_constants.dart';
-import 'package:moviestar/mixins/screen_state_mixin.dart';
-import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/core/services/api/api_key_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
-import 'package:moviestar/utils/create_solid_login.dart';
-import 'package:moviestar/utils/is_logged_in.dart';
-import 'package:moviestar/widgets/base_screen.dart';
+import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/shared/widgets/settings/api_settings_panel.dart';
 import 'package:moviestar/shared/widgets/settings/cache_management_panel.dart';
-import 'package:moviestar/shared/widgets/settings/data_management_panel.dart';
 import 'package:moviestar/shared/widgets/settings/pod_settings_panel.dart';
 import 'package:moviestar/shared/widgets/settings/preferences_panel.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 
 /// A screen that displays and manages user settings.
 
@@ -80,11 +72,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen>
     with ScreenStateMixin {
-
-
-
-
-
   /// Launch a URL in the browser.
 
   Future<void> _launchUrl(Uri url) async {
@@ -92,9 +79,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       throw Exception('Could not launch $url');
     }
   }
-
-
-
 
   @override
   void initState() {
@@ -104,8 +88,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
 
     widget.apiKeyService.updateContext(context, widget);
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +164,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     );
   }
 
-
   /// Builds a section of settings with a title and children widgets.
 
   Widget _buildSection(String title, List<Widget> children) {
@@ -227,7 +208,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       onChanged: onChanged,
     );
   }
-
 
   /// Builds a list tile for navigation items.
 

@@ -9,9 +9,9 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
 
 /// Enum for different column types in the kanban board.
@@ -92,8 +92,10 @@ class KanbanBoardController extends ChangeNotifier {
   };
 
   // Getters
-  List<OperationQueueItem> get operationQueue => List.unmodifiable(_operationQueue);
-  Map<String, MovieSortCriteria> get columnSortCriteria => Map.unmodifiable(_columnSortCriteria);
+  List<OperationQueueItem> get operationQueue =>
+      List.unmodifiable(_operationQueue);
+  Map<String, MovieSortCriteria> get columnSortCriteria =>
+      Map.unmodifiable(_columnSortCriteria);
 
   /// Get the key for tracking operations.
   String _getOperationKey(KanbanColumnType type, String id) {
@@ -129,7 +131,8 @@ class KanbanBoardController extends ChangeNotifier {
       notifyListeners();
 
       // Auto-remove completed/failed operations after delay
-      if (status == OperationStatus.completed || status == OperationStatus.failed) {
+      if (status == OperationStatus.completed ||
+          status == OperationStatus.failed) {
         Future.delayed(TimingConstants.autoRemoveDelay, () {
           _operationQueue.removeWhere((op) => op.id == operationId);
           notifyListeners();
@@ -245,7 +248,8 @@ class KanbanBoardController extends ChangeNotifier {
   bool isPendingOperation(KanbanColumnType type, String id, int movieId) {
     final key = _getOperationKey(type, id);
     final pendingOps = _pendingOperations[key];
-    return pendingOps?.contains(movieId) == true || pendingOps?.contains(-movieId) == true;
+    return pendingOps?.contains(movieId) == true ||
+        pendingOps?.contains(-movieId) == true;
   }
 
   /// Clear all state (for cleanup).

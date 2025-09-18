@@ -32,15 +32,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart' show logoutPopup, getWebId;
 import 'package:solidui/solidui.dart';
 
+import 'package:moviestar/core/services/api/api_key_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
+import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/enhanced_search_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
-import 'package:moviestar/core/services/api/api_key_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/utils/show_api_key_dialog.dart';
@@ -311,7 +311,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     if (mounted) {
       try {
         // Get the content service with proper API key
-        final contentService = await ref.read(directContentServiceProvider.future);
+        final contentService =
+            await ref.read(directContentServiceProvider.future);
         if (mounted) {
           Navigator.push(
             context,
@@ -328,7 +329,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         // Show error or fallback
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Search is not available at the moment')),
+            const SnackBar(
+                content: Text('Search is not available at the moment'),),
           );
         }
       }

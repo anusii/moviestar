@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
@@ -18,7 +19,8 @@ import 'package:moviestar/utils/is_logged_in.dart';
 
 class PodSettingsPanel extends ConsumerStatefulWidget {
   final Function(String title, List<Widget> children) buildSection;
-  final Function(String title, String subtitle, bool value, ValueChanged<bool> onChanged) buildSwitchTile;
+  final Function(String title, String subtitle, bool value,
+      ValueChanged<bool> onChanged,) buildSwitchTile;
   final FavoritesServiceManager favoritesServiceManager;
   final Function(String message) showSuccessSnackBar;
   final Function(String message) showErrorSnackBar;
@@ -39,7 +41,6 @@ class PodSettingsPanel extends ConsumerStatefulWidget {
 }
 
 class _PodSettingsPanelState extends ConsumerState<PodSettingsPanel> {
-
   @override
   void initState() {
     super.initState();
@@ -139,7 +140,8 @@ class _PodSettingsPanelState extends ConsumerState<PodSettingsPanel> {
   @override
   Widget build(BuildContext context) {
     // Use the actual service state instead of local state
-    final podStorageEnabled = widget.favoritesServiceManager.isPodStorageEnabled;
+    final podStorageEnabled =
+        widget.favoritesServiceManager.isPodStorageEnabled;
 
     return widget.buildSection('Data Storage', [
       widget.buildSwitchTile(

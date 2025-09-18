@@ -202,7 +202,7 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
       movieIds: [],
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-    ));
+    ),);
     // Return mock movies for the IDs in the list
     return list.movieIds.map((id) => Movie(
       id: id,
@@ -213,7 +213,7 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
       voteAverage: 7.5,
       releaseDate: DateTime.parse('2023-01-01'),
       genreIds: [],
-    )).toList();
+    ),).toList();
   }
 
   @override
@@ -224,7 +224,7 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
       movieIds: [],
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-    ));
+    ),);
     return list.movieIds;
   }
 
@@ -241,7 +241,7 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
       movieIds: [],
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-    ));
+    ),);
     return list.movieIds.contains(movieId);
   }
 

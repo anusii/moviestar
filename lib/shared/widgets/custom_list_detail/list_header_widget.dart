@@ -9,11 +9,11 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 
 import 'package:moviestar/models/custom_list.dart';
-import 'package:moviestar/utils/date_format_util.dart';
 
 class ListHeaderWidget extends ConsumerWidget {
   final CustomList customList;
@@ -73,16 +73,21 @@ class ListHeaderWidget extends ConsumerWidget {
                         message: customList.description!,
                         child: Text(
                           '${customList.description!.substring(0, 97)}...',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       )
                     : Text(
                         customList.description!,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,

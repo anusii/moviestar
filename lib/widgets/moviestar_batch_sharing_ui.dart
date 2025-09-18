@@ -30,10 +30,10 @@ import 'package:solidpod/solidpod.dart' show SolidFunctionCallStatus;
 // ignore: implementation_imports
 import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
 
+import 'package:moviestar/core/services/pod/pod_sharing_service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/models/sharing_models.dart';
-import 'package:moviestar/core/services/pod/pod_sharing_service.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
 import 'package:moviestar/widgets/common_sharing_ui.dart';
 

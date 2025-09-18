@@ -11,7 +11,6 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
@@ -213,7 +212,7 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
       voteAverage: 7.5,
       releaseDate: DateTime.parse('2023-01-01'),
       genreIds: [],
-    )).toList();
+    ),).toList();
   }
 
   @override
@@ -224,7 +223,7 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
       movieIds: [],
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-    ));
+    ),);
     return list.movieIds;
   }
 

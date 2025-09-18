@@ -63,8 +63,10 @@ class UserProfileTurtleSerializer extends TurtleBaseSerializer {
     // Add movie lists if provided.
     if (movieListIds != null && movieListIds.isNotEmpty) {
       final movieListRefs = movieListIds
-          .map((id) =>
-              TurtleNamespaceManager.moviestarDataNS.withAttr('MovieList-$id'))
+          .map(
+            (id) => TurtleNamespaceManager.moviestarDataNS
+                .withAttr('MovieList-$id'),
+          )
           .toList();
       triples[userResource]![TurtleNamespaceManager.hasMovieList] =
           movieListRefs;

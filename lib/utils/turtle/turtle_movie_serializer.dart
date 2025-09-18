@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter/foundation.dart';
+
 import 'package:rdflib/rdflib.dart';
 
 import 'package:moviestar/models/content_item.dart';
@@ -57,13 +58,17 @@ class TurtleMovieSerializer {
     }
 
     // Fallback: create manual TTL with movies
-    debugPrint('🐛 [TurtleMovieSerializer] Using fallback manual TTL generation for $listName with ${movies.length} movies');
+    debugPrint(
+        '🐛 [TurtleMovieSerializer] Using fallback manual TTL generation for $listName with ${movies.length} movies',);
     final buffer = StringBuffer();
 
     // Add namespaces
-    buffer.writeln('@prefix ms: <http://dacs.anu.edu.au/ontologies/moviestar#> .');
-    buffer.writeln('@prefix moviestar-data: <http://dacs.anu.edu.au/data/moviestar#> .');
-    buffer.writeln('@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .');
+    buffer.writeln(
+        '@prefix ms: <http://dacs.anu.edu.au/ontologies/moviestar#> .',);
+    buffer.writeln(
+        '@prefix moviestar-data: <http://dacs.anu.edu.au/data/moviestar#> .',);
+    buffer.writeln(
+        '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .',);
     buffer.writeln('@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .');
     buffer.writeln();
 
@@ -75,16 +80,24 @@ class TurtleMovieSerializer {
 
     // Add each movie
     for (final movie in movies) {
-      final movieUri = 'moviestar-data:${movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie'}-${movie.id}';
-      buffer.writeln('$movieUri rdf:type ms:${movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie'} ;');
-      buffer.writeln('    ms:name "${TurtleUtils.escapeString(movie.title)}" ;');
-      buffer.writeln('    ms:description "${TurtleUtils.escapeString(movie.overview)}" ;');
+      final movieUri =
+          'moviestar-data:${movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie'}-${movie.id}';
+      buffer.writeln(
+          '$movieUri rdf:type ms:${movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie'} ;',);
+      buffer
+          .writeln('    ms:name "${TurtleUtils.escapeString(movie.title)}" ;');
+      buffer.writeln(
+          '    ms:description "${TurtleUtils.escapeString(movie.overview)}" ;',);
       buffer.writeln('    ms:movieId "${movie.id}" ;');
-      buffer.writeln('    ms:posterUrl "${TurtleUtils.escapeString(movie.posterUrl)}" ;');
-      buffer.writeln('    ms:backdropUrl "${TurtleUtils.escapeString(movie.backdropUrl)}" ;');
-      buffer.writeln('    ms:releaseDate "${movie.releaseDate.toIso8601String()}" ;');
+      buffer.writeln(
+          '    ms:posterUrl "${TurtleUtils.escapeString(movie.posterUrl)}" ;',);
+      buffer.writeln(
+          '    ms:backdropUrl "${TurtleUtils.escapeString(movie.backdropUrl)}" ;',);
+      buffer.writeln(
+          '    ms:releaseDate "${movie.releaseDate.toIso8601String()}" ;',);
       buffer.writeln('    ms:voteAverage "${movie.voteAverage}" ;');
-      buffer.writeln('    ms:contentType "${movie.contentType == ContentType.tvShow ? 'tvShow' : 'movie'}" .');
+      buffer.writeln(
+          '    ms:contentType "${movie.contentType == ContentType.tvShow ? 'tvShow' : 'movie'}" .',);
       buffer.writeln();
 
       // Link movie to list
@@ -93,7 +106,8 @@ class TurtleMovieSerializer {
     }
 
     final fallbackTtl = buffer.toString();
-    debugPrint('🐛 [TurtleMovieSerializer] Generated fallback TTL (${fallbackTtl.length} chars)');
+    debugPrint(
+        '🐛 [TurtleMovieSerializer] Generated fallback TTL (${fallbackTtl.length} chars)',);
     return fallbackTtl;
   }
 
@@ -149,17 +163,22 @@ class TurtleMovieSerializer {
         return graph.serializedString;
       }
     } catch (e) {
-      debugPrint('🐛 [TurtleMovieSerializer] movieWithUserDataToTurtle graph serialize error: $e');
+      debugPrint(
+          '🐛 [TurtleMovieSerializer] movieWithUserDataToTurtle graph serialize error: $e',);
     }
 
     // Fallback: create manual TTL with movies and user data
-    debugPrint('🐛 [TurtleMovieSerializer] Using fallback manual TTL for movieWithUserDataToTurtle: $listName with ${movies.length} movies');
+    debugPrint(
+        '🐛 [TurtleMovieSerializer] Using fallback manual TTL for movieWithUserDataToTurtle: $listName with ${movies.length} movies',);
     final buffer = StringBuffer();
 
     // Add namespaces
-    buffer.writeln('@prefix ms: <http://dacs.anu.edu.au/ontologies/moviestar#> .');
-    buffer.writeln('@prefix moviestar-data: <http://dacs.anu.edu.au/data/moviestar#> .');
-    buffer.writeln('@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .');
+    buffer.writeln(
+        '@prefix ms: <http://dacs.anu.edu.au/ontologies/moviestar#> .',);
+    buffer.writeln(
+        '@prefix moviestar-data: <http://dacs.anu.edu.au/data/moviestar#> .',);
+    buffer.writeln(
+        '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .',);
     buffer.writeln('@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .');
     buffer.writeln();
 
@@ -171,16 +190,24 @@ class TurtleMovieSerializer {
 
     // Add each movie with user data
     for (final movie in movies) {
-      final movieUri = 'moviestar-data:${movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie'}-${movie.id}';
-      buffer.writeln('$movieUri rdf:type ms:${movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie'} ;');
-      buffer.writeln('    ms:name "${TurtleUtils.escapeString(movie.title)}" ;');
-      buffer.writeln('    ms:description "${TurtleUtils.escapeString(movie.overview)}" ;');
+      final movieUri =
+          'moviestar-data:${movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie'}-${movie.id}';
+      buffer.writeln(
+          '$movieUri rdf:type ms:${movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie'} ;',);
+      buffer
+          .writeln('    ms:name "${TurtleUtils.escapeString(movie.title)}" ;');
+      buffer.writeln(
+          '    ms:description "${TurtleUtils.escapeString(movie.overview)}" ;',);
       buffer.writeln('    ms:movieId "${movie.id}" ;');
-      buffer.writeln('    ms:posterUrl "${TurtleUtils.escapeString(movie.posterUrl)}" ;');
-      buffer.writeln('    ms:backdropUrl "${TurtleUtils.escapeString(movie.backdropUrl)}" ;');
-      buffer.writeln('    ms:releaseDate "${movie.releaseDate.toIso8601String()}" ;');
+      buffer.writeln(
+          '    ms:posterUrl "${TurtleUtils.escapeString(movie.posterUrl)}" ;',);
+      buffer.writeln(
+          '    ms:backdropUrl "${TurtleUtils.escapeString(movie.backdropUrl)}" ;',);
+      buffer.writeln(
+          '    ms:releaseDate "${movie.releaseDate.toIso8601String()}" ;',);
       buffer.writeln('    ms:voteAverage "${movie.voteAverage}" ;');
-      buffer.writeln('    ms:contentType "${movie.contentType == ContentType.tvShow ? 'tvShow' : 'movie'}" .');
+      buffer.writeln(
+          '    ms:contentType "${movie.contentType == ContentType.tvShow ? 'tvShow' : 'movie'}" .',);
 
       // Add user data if available
       final rating = ratings[movie.id.toString()];
@@ -190,7 +217,8 @@ class TurtleMovieSerializer {
 
       final comment = comments[movie.id.toString()];
       if (comment != null) {
-        buffer.writeln('$movieUri ms:userComment "${TurtleUtils.escapeString(comment)}" .');
+        buffer.writeln(
+            '$movieUri ms:userComment "${TurtleUtils.escapeString(comment)}" .',);
       }
 
       buffer.writeln();
@@ -201,7 +229,8 @@ class TurtleMovieSerializer {
     }
 
     final fallbackTtl = buffer.toString();
-    debugPrint('🐛 [TurtleMovieSerializer] Generated fallback user data TTL (${fallbackTtl.length} chars)');
+    debugPrint(
+        '🐛 [TurtleMovieSerializer] Generated fallback user data TTL (${fallbackTtl.length} chars)',);
     return fallbackTtl;
   }
 
@@ -233,32 +262,37 @@ class TurtleMovieSerializer {
 
   /// Adds a movie to the RDF graph and returns the movie URI
   static URIRef _addMovieToGraph(Graph graph, Movie movie, URIRef listUri) {
-    final movieUri = TurtleNamespaces.moviestarDataNS.withAttr('movie_${movie.id}');
+    final movieUri =
+        TurtleNamespaces.moviestarDataNS.withAttr('movie_${movie.id}');
 
     // Link movie to list
     graph.addTripleToGroups(listUri, TurtleNamespaces.hasMovie, movieUri);
 
     // Add movie type
-    graph.addTripleToGroups(movieUri, TurtleNamespaces.rdfType, TurtleNamespaces.movieType);
+    graph.addTripleToGroups(
+        movieUri, TurtleNamespaces.rdfType, TurtleNamespaces.movieType,);
 
     // Add movie properties
     graph.addTripleToGroups(
       movieUri,
       TurtleNamespaces.identifier,
-      Literal(movie.id.toString(), datatype: TurtleNamespaces.xsdNS.withAttr('integer')),
+      Literal(movie.id.toString(),
+          datatype: TurtleNamespaces.xsdNS.withAttr('integer'),),
     );
 
     graph.addTripleToGroups(
       movieUri,
       TurtleNamespaces.name,
-      Literal(TurtleUtils.escapeString(movie.title), datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+      Literal(TurtleUtils.escapeString(movie.title),
+          datatype: TurtleNamespaces.xsdNS.withAttr('string'),),
     );
 
     if (movie.overview.isNotEmpty) {
       graph.addTripleToGroups(
         movieUri,
         TurtleNamespaces.description,
-        Literal(TurtleUtils.escapeString(movie.overview), datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+        Literal(TurtleUtils.escapeString(movie.overview),
+            datatype: TurtleNamespaces.xsdNS.withAttr('string'),),
       );
     }
 
@@ -279,14 +313,16 @@ class TurtleMovieSerializer {
       graph.addTripleToGroups(
         movieUri,
         TurtleNamespaces.aggregateRating,
-        Literal(movie.voteAverage.toString(), datatype: TurtleNamespaces.xsdNS.withAttr('decimal')),
+        Literal(movie.voteAverage.toString(),
+            datatype: TurtleNamespaces.xsdNS.withAttr('decimal'),),
       );
     }
 
     graph.addTripleToGroups(
       movieUri,
       TurtleNamespaces.datePublished,
-      Literal(movie.releaseDate.toIso8601String(), datatype: TurtleNamespaces.xsdNS.withAttr('date')),
+      Literal(movie.releaseDate.toIso8601String(),
+          datatype: TurtleNamespaces.xsdNS.withAttr('date'),),
     );
 
     return movieUri;
@@ -295,24 +331,29 @@ class TurtleMovieSerializer {
   /// Adds a rating to the graph for a movie
   static void _addRatingToGraph(Graph graph, URIRef movieUri, double rating) {
     final ratingUri = URIRef('${movieUri.value}_rating');
-    graph.addTripleToGroups(ratingUri, TurtleNamespaces.rdfType, TurtleNamespaces.ratingType);
-    graph.addTripleToGroups(movieUri, TurtleNamespaces.aggregateRating, ratingUri);
+    graph.addTripleToGroups(
+        ratingUri, TurtleNamespaces.rdfType, TurtleNamespaces.ratingType,);
+    graph.addTripleToGroups(
+        movieUri, TurtleNamespaces.aggregateRating, ratingUri,);
     graph.addTripleToGroups(
       ratingUri,
       TurtleNamespaces.value,
-      Literal(rating.toString(), datatype: TurtleNamespaces.xsdNS.withAttr('decimal')),
+      Literal(rating.toString(),
+          datatype: TurtleNamespaces.xsdNS.withAttr('decimal'),),
     );
   }
 
   /// Adds a comment to the graph for a movie
   static void _addCommentToGraph(Graph graph, URIRef movieUri, String comment) {
     final commentUri = URIRef('${movieUri.value}_comment');
-    graph.addTripleToGroups(commentUri, TurtleNamespaces.rdfType, TurtleNamespaces.commentType);
+    graph.addTripleToGroups(
+        commentUri, TurtleNamespaces.rdfType, TurtleNamespaces.commentType,);
     graph.addTripleToGroups(movieUri, TurtleNamespaces.comment, commentUri);
     graph.addTripleToGroups(
       commentUri,
       TurtleNamespaces.text,
-      Literal(TurtleUtils.escapeString(comment), datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+      Literal(TurtleUtils.escapeString(comment),
+          datatype: TurtleNamespaces.xsdNS.withAttr('string'),),
     );
   }
 
@@ -320,32 +361,37 @@ class TurtleMovieSerializer {
   static Movie? _extractMovieFromObjects(Graph graph, URIRef movieUri) {
     try {
       // Get movie ID
-      final idObjects = graph.objects(sub: movieUri, pre: TurtleNamespaces.identifier);
+      final idObjects =
+          graph.objects(sub: movieUri, pre: TurtleNamespaces.identifier);
       if (idObjects.isEmpty) return null;
       final id = int.tryParse(idObjects.first.toString()) ?? 0;
 
       // Get movie title
-      final nameObjects = graph.objects(sub: movieUri, pre: TurtleNamespaces.name);
+      final nameObjects =
+          graph.objects(sub: movieUri, pre: TurtleNamespaces.name);
       if (nameObjects.isEmpty) return null;
       final title = nameObjects.first.toString().replaceAll('"', '');
 
       // Get optional fields
-      final overviewObjects = graph.objects(sub: movieUri, pre: TurtleNamespaces.description);
+      final overviewObjects =
+          graph.objects(sub: movieUri, pre: TurtleNamespaces.description);
       final overview = overviewObjects.isNotEmpty
           ? overviewObjects.first.toString().replaceAll('"', '')
           : '';
 
-      final posterObjects = graph.objects(sub: movieUri, pre: TurtleNamespaces.image);
-      final posterUrl = posterObjects.isNotEmpty
-          ? posterObjects.first.toString()
-          : '';
+      final posterObjects =
+          graph.objects(sub: movieUri, pre: TurtleNamespaces.image);
+      final posterUrl =
+          posterObjects.isNotEmpty ? posterObjects.first.toString() : '';
 
-      final ratingObjects = graph.objects(sub: movieUri, pre: TurtleNamespaces.aggregateRating);
+      final ratingObjects =
+          graph.objects(sub: movieUri, pre: TurtleNamespaces.aggregateRating);
       final voteAverage = ratingObjects.isNotEmpty
           ? double.tryParse(ratingObjects.first.toString()) ?? 0.0
           : 0.0;
 
-      final dateObjects = graph.objects(sub: movieUri, pre: TurtleNamespaces.datePublished);
+      final dateObjects =
+          graph.objects(sub: movieUri, pre: TurtleNamespaces.datePublished);
       final dateStr = dateObjects.isNotEmpty
           ? dateObjects.first.toString().replaceAll('"', '')
           : '';

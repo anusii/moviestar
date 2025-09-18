@@ -30,27 +30,36 @@ class MovieSerializers {
     final listResource = TurtleSerializer.localNS.withAttr(listName);
     triples[listResource] = {
       TurtleSerializer.rdfType: TurtleSerializer.movieListType,
-      TurtleSerializer.nameProperty: Literal(TurtleSerializer.escapeString(listName)),
+      TurtleSerializer.nameProperty:
+          Literal(TurtleSerializer.escapeString(listName)),
     };
 
     // Add movie references to the list only if there are movies.
     if (movies.isNotEmpty) {
-      final movieList =
-          movies.map((m) => TurtleSerializer.localNS.withAttr('movie${m.id}')).toList();
+      final movieList = movies
+          .map((m) => TurtleSerializer.localNS.withAttr('movie${m.id}'))
+          .toList();
       triples[listResource]![TurtleSerializer.moviesProperty] = movieList;
 
       // Add individual movie definitions.
       for (final movie in movies) {
-        final movieResource = TurtleSerializer.localNS.withAttr('movie${movie.id}');
-        final contentType =
-            movie.contentType == ContentType.tvShow ? TurtleSerializer.tvShowType : TurtleSerializer.movieType;
+        final movieResource =
+            TurtleSerializer.localNS.withAttr('movie${movie.id}');
+        final contentType = movie.contentType == ContentType.tvShow
+            ? TurtleSerializer.tvShowType
+            : TurtleSerializer.movieType;
         triples[movieResource] = {
           TurtleSerializer.rdfType: contentType,
-          TurtleSerializer.identifier: Literal('${movie.id}', datatype: XSD.int),
-          TurtleSerializer.name: Literal(TurtleSerializer.escapeString(movie.title)),
-          TurtleSerializer.description: Literal(TurtleSerializer.escapeString(movie.overview)),
-          TurtleSerializer.image: Literal(TurtleSerializer.escapeString(movie.posterUrl)),
-          TurtleSerializer.thumbnailUrl: Literal(TurtleSerializer.escapeString(movie.backdropUrl)),
+          TurtleSerializer.identifier:
+              Literal('${movie.id}', datatype: XSD.int),
+          TurtleSerializer.name:
+              Literal(TurtleSerializer.escapeString(movie.title)),
+          TurtleSerializer.description:
+              Literal(TurtleSerializer.escapeString(movie.overview)),
+          TurtleSerializer.image:
+              Literal(TurtleSerializer.escapeString(movie.posterUrl)),
+          TurtleSerializer.thumbnailUrl:
+              Literal(TurtleSerializer.escapeString(movie.backdropUrl)),
           TurtleSerializer.aggregateRating: Literal(
             '${movie.voteAverage}',
             datatype: XSD.double,
@@ -65,7 +74,10 @@ class MovieSerializers {
     }
 
     // Define namespace bindings - only bind our custom namespaces.
-    final bindNamespaces = {'': TurtleSerializer.localNS, 'schema': TurtleSerializer.movieNS};
+    final bindNamespaces = {
+      '': TurtleSerializer.localNS,
+      'schema': TurtleSerializer.movieNS,
+    };
 
     return tripleMapToTurtle(triples, bindNamespaces: bindNamespaces);
   }
@@ -260,11 +272,16 @@ class MovieSerializers {
       'MovieList-$movieListId',
     );
     triples[movieListResource] = {
-      TurtleSerializer.rdfType: [TurtleSerializer.owlNS.withAttr('NamedIndividual'), TurtleSerializer.movieListType],
+      TurtleSerializer.rdfType: [
+        TurtleSerializer.owlNS.withAttr('NamedIndividual'),
+        TurtleSerializer.movieListType,
+      ],
       TurtleSerializer.identifier: Literal(movieListId),
-      TurtleSerializer.name: Literal(TurtleSerializer.escapeAndSanitizeString(listName)),
+      TurtleSerializer.name:
+          Literal(TurtleSerializer.escapeAndSanitizeString(listName)),
       TurtleSerializer.description: Literal(
-        TurtleSerializer.escapeAndSanitizeString(description ?? 'List of movies: $listName'),
+        TurtleSerializer.escapeAndSanitizeString(
+            description ?? 'List of movies: $listName',),
       ),
       TurtleSerializer.rdfsLabel: Literal(
         '|filePath=moviestar/data/MovieList-$movieListId.ttl|',
@@ -276,8 +293,8 @@ class MovieSerializers {
       // Add shared_with as a list of WebIds.
       final sharedWithWebIds =
           sharedWith.keys.map((webId) => Literal(webId)).toList();
-      triples[movieListResource]![TurtleSerializer.moviestarOntoNS.withAttr('sharedWith')] =
-          sharedWithWebIds;
+      triples[movieListResource]![TurtleSerializer.moviestarOntoNS
+          .withAttr('sharedWith')] = sharedWithWebIds;
 
       // Add permissions as JSON string for flexibility.
       final permissionsJson = jsonEncode(sharedWith);
@@ -299,23 +316,29 @@ class MovieSerializers {
     // Add movie references (not full movie data) if provided.
     if (movies.isNotEmpty) {
       final movieRefs = movies
-          .map((movie) => TurtleSerializer.moviestarDataNS.withAttr('movie-${movie.id}'))
+          .map((movie) =>
+              TurtleSerializer.moviestarDataNS.withAttr('movie-${movie.id}'),)
           .toList();
       triples[movieListResource]![TurtleSerializer.hasMovie] = movieRefs;
 
       // Add individual movie reference definitions (not full data).
       // According to ontology, MovieList only contains references with filePath.
       for (final movie in movies) {
-        final movieResource = TurtleSerializer.moviestarDataNS.withAttr('movie-${movie.id}');
+        final movieResource =
+            TurtleSerializer.moviestarDataNS.withAttr('movie-${movie.id}');
         // Use content-type aware file naming
         final contentPrefix =
             movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie';
         final filePathStr =
             'moviestar/data/movies/$contentPrefix-${movie.id}.ttl';
-        final contentType =
-            movie.contentType == ContentType.tvShow ? TurtleSerializer.tvShowType : TurtleSerializer.movieType;
+        final contentType = movie.contentType == ContentType.tvShow
+            ? TurtleSerializer.tvShowType
+            : TurtleSerializer.movieType;
         triples[movieResource] = {
-          TurtleSerializer.rdfType: [TurtleSerializer.owlNS.withAttr('NamedIndividual'), contentType],
+          TurtleSerializer.rdfType: [
+            TurtleSerializer.owlNS.withAttr('NamedIndividual'),
+            contentType,
+          ],
           TurtleSerializer.filePath: Literal(filePathStr),
           TurtleSerializer.rdfsLabel: Literal(
             '|filePath=$filePathStr|',
@@ -325,7 +348,8 @@ class MovieSerializers {
     }
 
     // Use ontology-compliant namespace bindings.
-    return tripleMapToTurtle(triples, bindNamespaces: TurtleSerializer.getOntologyNamespaces());
+    return tripleMapToTurtle(triples,
+        bindNamespaces: TurtleSerializer.getOntologyNamespaces(),);
   }
 
   /// Parses movie list from TTL content.
@@ -416,7 +440,8 @@ class MovieSerializers {
         }
         // Check for individual movie resources and their content types
         else {
-          final movieIdMatch = RegExp(r'movie-(\d+)').firstMatch(subject.toString());
+          final movieIdMatch =
+              RegExp(r'movie-(\d+)').firstMatch(subject.toString());
           if (movieIdMatch != null) {
             final movieId = movieIdMatch.group(1)!;
             // Determine content type from RDF type
@@ -425,7 +450,8 @@ class MovieSerializers {
                   type.toString().contains('TVShow') ||
                   type == 'http://schema.org/TVShow',
             );
-            movieContentTypes[movieId] = isTvShow ? ContentType.tvShow : ContentType.movie;
+            movieContentTypes[movieId] =
+                isTvShow ? ContentType.tvShow : ContentType.movie;
           }
         }
       }
@@ -449,5 +475,4 @@ class MovieSerializers {
       return null;
     }
   }
-
 }

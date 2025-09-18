@@ -29,15 +29,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:moviestar/core/services/api/content_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/api/content_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/widgets/base_screen.dart';
-import 'package:moviestar/shared/widgets/search/search_results_display.dart';
-import 'package:moviestar/shared/widgets/search/search_empty_state.dart';
 import 'package:moviestar/shared/widgets/search/add_to_custom_lists_dialog.dart';
+import 'package:moviestar/shared/widgets/search/search_empty_state.dart';
+import 'package:moviestar/shared/widgets/search/search_results_display.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 
 /// Enhanced search screen that supports both movies and TV shows.
 
@@ -122,7 +122,8 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
     try {
       print('🔍 [EnhancedSearchScreen] Searching for: "$query"');
 
-      final results = await widget.contentService.searchContentComprehensive(query);
+      final results =
+          await widget.contentService.searchContentComprehensive(query);
 
       print(
         '🔍 [EnhancedSearchScreen] Results found: ${results.entries.map((e) => '${e.key}: ${e.value.length}').join(', ')}',
@@ -220,7 +221,8 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
         _searchContent(value);
       },
       isLoading: isLoading,
-      body: _searchResults.isEmpty || SearchResultsDisplay.hasNoResults(_searchResults)
+      body: _searchResults.isEmpty ||
+              SearchResultsDisplay.hasNoResults(_searchResults)
           ? SearchEmptyState(searchController: _searchController)
           : SearchResultsDisplay(
               searchResults: _searchResults,
@@ -230,5 +232,4 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
             ),
     );
   }
-
 }

@@ -11,6 +11,7 @@ library;
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+
 import 'package:rdflib/rdflib.dart';
 import 'package:solidpod/solidpod.dart' show tripleMapToTurtle;
 
@@ -45,7 +46,8 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
       TurtleNamespaceManager.name:
           Literal(TurtleBaseSerializer.escapeAndSanitizeString(listName)),
       TurtleNamespaceManager.description: Literal(
-        TurtleBaseSerializer.escapeAndSanitizeString(description ?? 'List of movies: $listName'),
+        TurtleBaseSerializer.escapeAndSanitizeString(
+            description ?? 'List of movies: $listName',),
       ),
       TurtleNamespaceManager.rdfsLabel: Literal(
         '|filePath=moviestar/data/MovieList-$movieListId.ttl|',
@@ -57,9 +59,8 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
       // Add shared_with as a list of WebIds.
       final sharedWithWebIds =
           sharedWith.keys.map((webId) => Literal(webId)).toList();
-      triples[movieListResource]![
-              TurtleNamespaceManager.moviestarOntoNS.withAttr('sharedWith')] =
-          sharedWithWebIds;
+      triples[movieListResource]![TurtleNamespaceManager.moviestarOntoNS
+          .withAttr('sharedWith')] = sharedWithWebIds;
 
       // Add permissions as JSON string for flexibility.
       final permissionsJson = jsonEncode(sharedWith);
@@ -79,8 +80,10 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
     // Add movie references (not full movie data) if provided.
     if (movies.isNotEmpty) {
       final movieRefs = movies
-          .map((movie) => TurtleNamespaceManager.moviestarDataNS
-              .withAttr('movie-${movie.id}'))
+          .map(
+            (movie) => TurtleNamespaceManager.moviestarDataNS
+                .withAttr('movie-${movie.id}'),
+          )
           .toList();
       triples[movieListResource]![TurtleNamespaceManager.hasMovie] = movieRefs;
 

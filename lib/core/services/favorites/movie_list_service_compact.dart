@@ -171,10 +171,8 @@ class MovieListService extends BasePodService {
           displayName,
         );
 
-        if (existingId != null) {
-          debugPrint('✅ Found existing $listType MovieList: $existingId');
-          return existingId;
-        }
+        debugPrint('✅ Found existing $listType MovieList: $existingId');
+        return existingId;
 
         final description = _getListDescription(listType);
         return await createMovieList(

@@ -31,10 +31,10 @@ import 'package:flutter/material.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:moviestar/models/custom_list.dart';
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/core/services/pod/pod_favorites_service.dart';
+import 'package:moviestar/models/custom_list.dart';
+import 'package:moviestar/models/movie.dart';
 
 /// Manager that switches between local and POD storage based on user preferences.
 
@@ -171,16 +171,19 @@ class FavoritesServiceManager extends ChangeNotifier {
 
     // If POD storage is enabled, delegate directly to POD service to avoid duplication
     if (_isPodStorageEnabled && _podService != null) {
-      debugPrint('🎬 [FavoritesServiceManager] Delegating to POD service custom lists stream');
+      debugPrint(
+          '🎬 [FavoritesServiceManager] Delegating to POD service custom lists stream',);
       return _podService!.customLists;
     }
 
-    debugPrint('🎬 [FavoritesServiceManager] _lastCustomLists: ${_lastCustomLists?.length ?? "null"}');
+    debugPrint(
+        '🎬 [FavoritesServiceManager] _lastCustomLists: ${_lastCustomLists?.length ?? "null"}',);
 
     // If we have cached data, create a stream that emits it first.
 
     if (_lastCustomLists != null) {
-      debugPrint('🎬 [FavoritesServiceManager] Returning stream with initial value: ${_lastCustomLists!.length} lists');
+      debugPrint(
+          '🎬 [FavoritesServiceManager] Returning stream with initial value: ${_lastCustomLists!.length} lists',);
       return _createStreamWithInitialValue(_lastCustomLists!);
     }
     debugPrint('🎬 [FavoritesServiceManager] Returning raw controller stream');
@@ -200,14 +203,18 @@ class FavoritesServiceManager extends ChangeNotifier {
 
   Future<void> _updateCustomListsStream() async {
     try {
-      debugPrint('🎬 [FavoritesServiceManager] _updateCustomListsStream called');
+      debugPrint(
+          '🎬 [FavoritesServiceManager] _updateCustomListsStream called',);
       final lists = await getCustomLists();
-      debugPrint('🎬 [FavoritesServiceManager] _updateCustomListsStream got ${lists.length} lists');
+      debugPrint(
+          '🎬 [FavoritesServiceManager] _updateCustomListsStream got ${lists.length} lists',);
 
       if (!_customListsController.isClosed) {
         _lastCustomLists = lists; // Store last value for late listeners.
-        debugPrint('🎬 [FavoritesServiceManager] Adding ${lists.length} lists to stream controller');
-        debugPrint('🎬 [FavoritesServiceManager] Controller has ${_customListsController.hasListener ? "listeners" : "no listeners"}');
+        debugPrint(
+            '🎬 [FavoritesServiceManager] Adding ${lists.length} lists to stream controller',);
+        debugPrint(
+            '🎬 [FavoritesServiceManager] Controller has ${_customListsController.hasListener ? "listeners" : "no listeners"}',);
         _customListsController.add(lists);
         debugPrint('🎬 [FavoritesServiceManager] Stream updated successfully');
       } else {
@@ -395,11 +402,13 @@ class FavoritesServiceManager extends ChangeNotifier {
   Future<List<CustomList>> getCustomLists() async {
     if (_isPodStorageEnabled && _podService != null) {
       final result = await _podService!.getCustomLists();
-      debugPrint('🎬 [FavoritesServiceManager] getCustomLists from POD: ${result.length} lists');
+      debugPrint(
+          '🎬 [FavoritesServiceManager] getCustomLists from POD: ${result.length} lists',);
       return result;
     }
     final result = await _localService.getCustomLists();
-    debugPrint('🎬 [FavoritesServiceManager] getCustomLists from local: ${result.length} lists');
+    debugPrint(
+        '🎬 [FavoritesServiceManager] getCustomLists from local: ${result.length} lists',);
     return result;
   }
 

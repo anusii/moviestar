@@ -9,19 +9,21 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:solidui/solidui.dart';
 import 'package:solidpod/solidpod.dart' show logoutPopup;
+import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/utils/create_solid_login.dart';
 
 class PreferencesPanel extends ConsumerStatefulWidget {
   final Function(String title, List<Widget> children) buildSection;
-  final Function(String title, String subtitle, bool value, ValueChanged<bool> onChanged) buildSwitchTile;
-  final Function(String title, IconData icon, VoidCallback onTap, {bool isDestructive}) buildListTile;
+  final Function(String title, String subtitle, bool value,
+      ValueChanged<bool> onChanged,) buildSwitchTile;
+  final Function(String title, IconData icon, VoidCallback onTap,
+      {bool isDestructive,}) buildListTile;
 
   const PreferencesPanel({
     super.key,

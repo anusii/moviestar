@@ -29,7 +29,8 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
     final listResource = TurtleNamespaceManager.localNS.withAttr(listName);
     triples[listResource] = {
       TurtleNamespaceManager.rdfType: TurtleNamespaceManager.movieListType,
-      TurtleNamespaceManager.nameProperty: Literal(TurtleBaseSerializer.escapeString(listName)),
+      TurtleNamespaceManager.nameProperty:
+          Literal(TurtleBaseSerializer.escapeString(listName)),
     };
 
     // Add movie references to the list only if there are movies.
@@ -50,10 +51,12 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
           TurtleNamespaceManager.rdfType: contentType,
           TurtleNamespaceManager.identifier:
               Literal('${movie.id}', datatype: XSD.int),
-          TurtleNamespaceManager.name: Literal(TurtleBaseSerializer.escapeString(movie.title)),
+          TurtleNamespaceManager.name:
+              Literal(TurtleBaseSerializer.escapeString(movie.title)),
           TurtleNamespaceManager.description:
               Literal(TurtleBaseSerializer.escapeString(movie.overview)),
-          TurtleNamespaceManager.image: Literal(TurtleBaseSerializer.escapeString(movie.posterUrl)),
+          TurtleNamespaceManager.image:
+              Literal(TurtleBaseSerializer.escapeString(movie.posterUrl)),
           TurtleNamespaceManager.thumbnailUrl:
               Literal(TurtleBaseSerializer.escapeString(movie.backdropUrl)),
           TurtleNamespaceManager.aggregateRating: Literal(
@@ -90,10 +93,12 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
       TurtleNamespaceManager.rdfType: TurtleNamespaceManager.movieType,
       TurtleNamespaceManager.identifier:
           Literal('${movie.id}', datatype: XSD.int),
-      TurtleNamespaceManager.name: Literal(TurtleBaseSerializer.escapeString(movie.title)),
+      TurtleNamespaceManager.name:
+          Literal(TurtleBaseSerializer.escapeString(movie.title)),
       TurtleNamespaceManager.description:
           Literal(TurtleBaseSerializer.escapeString(movie.overview)),
-      TurtleNamespaceManager.image: Literal(TurtleBaseSerializer.escapeString(movie.posterUrl)),
+      TurtleNamespaceManager.image:
+          Literal(TurtleBaseSerializer.escapeString(movie.posterUrl)),
       TurtleNamespaceManager.thumbnailUrl:
           Literal(TurtleBaseSerializer.escapeString(movie.backdropUrl)),
       TurtleNamespaceManager.aggregateRating:
@@ -117,9 +122,8 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
       };
 
       // Link the movie to the user rating.
-      triples[movieResource]![
-              TurtleNamespaceManager.localNS.withAttr('hasUserRating')] =
-          userRatingResource;
+      triples[movieResource]![TurtleNamespaceManager.localNS
+          .withAttr('hasUserRating')] = userRatingResource;
     }
 
     // Add user's personal comment if it exists.
@@ -130,13 +134,13 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
         TurtleNamespaceManager.rdfType: TurtleNamespaceManager.commentType,
         TurtleNamespaceManager.movieId:
             Literal('${movie.id}', datatype: XSD.int),
-        TurtleNamespaceManager.text: Literal(TurtleBaseSerializer.escapeString(comment)),
+        TurtleNamespaceManager.text:
+            Literal(TurtleBaseSerializer.escapeString(comment)),
       };
 
       // Link the movie to the user comment.
-      triples[movieResource]![
-              TurtleNamespaceManager.localNS.withAttr('hasUserComment')] =
-          userCommentResource;
+      triples[movieResource]![TurtleNamespaceManager.localNS
+          .withAttr('hasUserComment')] = userCommentResource;
     }
 
     // Add JSON backup for compatibility.
@@ -196,8 +200,8 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
         datatype: TurtleNamespaceManager.xsdNS.withAttr('date'),
       ),
       TurtleNamespaceManager.genre: Literal(movie.genreIds.join(',')),
-      TurtleNamespaceManager.rdfsLabel:
-          Literal('|name=${TurtleBaseSerializer.escapeAndSanitizeString(movie.title)}|'),
+      TurtleNamespaceManager.rdfsLabel: Literal(
+          '|name=${TurtleBaseSerializer.escapeAndSanitizeString(movie.title)}|',),
     };
 
     // Add user's personal rating if it exists.
@@ -293,7 +297,8 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
   static Map<String, dynamic>? movieWithUserDataFromTurtle(String ttlContent) {
     try {
       // First try to parse from JSON backup for compatibility.
-      final userData = TurtleParsingUtils.tryParseUserDataJsonBackup(ttlContent);
+      final userData =
+          TurtleParsingUtils.tryParseUserDataJsonBackup(ttlContent);
       if (userData != null) {
         return userData;
       }
@@ -324,14 +329,12 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
           movie = TurtleParsingUtils.extractMovieFromTriples(predicates);
 
           // Also check for rating and comment in the same movie resource (new ontology format).
-          if (rating == null) {
-            rating = double.tryParse(
-              TurtleParsingUtils.extractFirstValue(
-                predicates,
-                ['contentRating', 'http://schema.org/contentRating'],
-              ),
-            );
-          }
+          rating ??= double.tryParse(
+            TurtleParsingUtils.extractFirstValue(
+              predicates,
+              ['contentRating', 'http://schema.org/contentRating'],
+            ),
+          );
 
           if (comment == null) {
             final commentValue = TurtleParsingUtils.extractFirstValue(

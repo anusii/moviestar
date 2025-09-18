@@ -5,6 +5,7 @@
 /// Licensed under the GNU General Public License, Version 3 (the "License").
 ///
 /// License: https://www.gnu.org/licenses/gpl-3.0.en.html.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,7 +13,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:moviestar/screens/shared_movie_list_detail_screen.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 
 void main() {
   group('SharedMovieListDetailScreen Tests', () {

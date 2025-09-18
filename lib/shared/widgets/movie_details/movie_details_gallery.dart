@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:gap/gap.dart';
 
@@ -31,7 +32,8 @@ class MovieDetailsGallery extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (isValidImageUrl(movie.posterUrl) || isValidImageUrl(movie.backdropUrl))
+        if (isValidImageUrl(movie.posterUrl) ||
+            isValidImageUrl(movie.backdropUrl))
           _buildGallerySection(context),
       ],
     );
@@ -44,7 +46,8 @@ class MovieDetailsGallery extends StatelessWidget {
       validImages.add(movie.posterUrl);
     }
 
-    if (isValidImageUrl(movie.backdropUrl) && movie.backdropUrl != movie.posterUrl) {
+    if (isValidImageUrl(movie.backdropUrl) &&
+        movie.backdropUrl != movie.posterUrl) {
       validImages.add(movie.backdropUrl);
     }
 
@@ -236,7 +239,8 @@ class MoviePosterWidget extends StatelessWidget {
                       child: CircularProgressIndicator(),
                     ),
                   ),
-                  errorWidget: (context, url, error) => _buildPlaceholderPoster(context),
+                  errorWidget: (context, url, error) =>
+                      _buildPlaceholderPoster(context),
                 )
               : _buildPlaceholderPoster(context),
         ),

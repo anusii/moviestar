@@ -9,11 +9,11 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 
-import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
+import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 
 /// A card that displays a custom list item with actions.

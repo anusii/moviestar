@@ -9,11 +9,12 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/constants/ui_constants.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
 import 'kanban_board_controller.dart';
@@ -28,7 +29,8 @@ class KanbanCardWidget extends StatelessWidget {
   final String columnName;
   final FavoritesService favoritesService;
   final KanbanBoardController controller;
-  final Function(Offset, Movie, KanbanColumnType, String, String) onShowContextMenu;
+  final Function(Offset, Movie, KanbanColumnType, String, String)
+      onShowContextMenu;
 
   const KanbanCardWidget({
     super.key,
@@ -46,7 +48,8 @@ class KanbanCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Check if this movie has pending operations
-    final hasPendingOp = controller.isPendingOperation(columnType, columnId, movie.id);
+    final hasPendingOp =
+        controller.isPendingOperation(columnType, columnId, movie.id);
     final hasError = controller.hasSyncError(columnType, columnId, movie.id);
 
     final movieCard = Container(

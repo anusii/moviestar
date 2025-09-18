@@ -9,11 +9,12 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
+import 'package:moviestar/models/custom_list.dart';
 
 class ListOperationsPanel extends ConsumerWidget {
   final CustomList customList;
@@ -33,7 +34,8 @@ class ListOperationsPanel extends ConsumerWidget {
 
   Future<void> _showEditListDialog(BuildContext context) async {
     final nameController = TextEditingController(text: customList.name);
-    final descriptionController = TextEditingController(text: customList.description ?? '');
+    final descriptionController =
+        TextEditingController(text: customList.description ?? '');
 
     await showDialog(
       context: context,
@@ -172,9 +174,7 @@ class ListOperationsPanel extends ConsumerWidget {
             subtitle: (hasMovies && isPodEnabled)
                 ? null
                 : Text(
-                    hasMovies
-                        ? 'POD storage required'
-                        : 'Add movies to share',
+                    hasMovies ? 'POD storage required' : 'Add movies to share',
                     style: TextStyle(
                       color: Theme.of(context)
                           .colorScheme

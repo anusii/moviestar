@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SharedListHeaderWidget extends ConsumerWidget {
@@ -164,11 +165,13 @@ class SharedListHeaderWidget extends ConsumerWidget {
               Row(
                 children: [
                   Icon(
-                    permissions.contains('write') ? Icons.edit : Icons.visibility,
+                    permissions.contains('write')
+                        ? Icons.edit
+                        : Icons.visibility,
                     size: 18,
                     color: permissions.contains('write')
-                      ? colorScheme.tertiary
-                      : colorScheme.onSurfaceVariant,
+                        ? colorScheme.tertiary
+                        : colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -179,19 +182,22 @@ class SharedListHeaderWidget extends ConsumerWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: permissions.contains('write')
-                        ? colorScheme.tertiaryContainer
-                        : colorScheme.secondaryContainer,
+                          ? colorScheme.tertiaryContainer
+                          : colorScheme.secondaryContainer,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      permissions.contains('write') ? 'Read & Write' : 'Read Only',
+                      permissions.contains('write')
+                          ? 'Read & Write'
+                          : 'Read Only',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: permissions.contains('write')
-                          ? colorScheme.onTertiaryContainer
-                          : colorScheme.onSecondaryContainer,
+                            ? colorScheme.onTertiaryContainer
+                            : colorScheme.onSecondaryContainer,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

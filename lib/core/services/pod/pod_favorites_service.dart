@@ -11,20 +11,20 @@ import 'package:flutter/foundation.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:moviestar/models/custom_list.dart';
-import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/pod/base_pod_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/core/services/favorites/movie_list_service.dart';
+import 'package:moviestar/core/services/pod/base_pod_service.dart';
+import 'package:moviestar/core/services/pod/favorites/pod_favorites_cache_manager.dart';
+import 'package:moviestar/core/services/pod/favorites/pod_favorites_file_handler.dart';
+import 'package:moviestar/core/services/pod/favorites/pod_favorites_list_operations.dart';
+import 'package:moviestar/core/services/pod/favorites/pod_favorites_movie_operations.dart';
 import 'package:moviestar/core/services/pod/pod_favorites_file_manager.dart';
 import 'package:moviestar/core/services/pod/pod_favorites_stream_manager.dart';
 import 'package:moviestar/core/services/pod/pod_list_management_service.dart';
 import 'package:moviestar/core/services/pod/pod_sharing_service.dart';
+import 'package:moviestar/models/custom_list.dart';
+import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/user_profile_service.dart';
-import 'package:moviestar/core/services/pod/favorites/pod_favorites_movie_operations.dart';
-import 'package:moviestar/core/services/pod/favorites/pod_favorites_list_operations.dart';
-import 'package:moviestar/core/services/pod/favorites/pod_favorites_cache_manager.dart';
-import 'package:moviestar/core/services/pod/favorites/pod_favorites_file_handler.dart';
 
 /// POD-based service for managing favorite movies using decomposed operations.
 /// Uses specialized operation classes for different concerns.
@@ -98,8 +98,9 @@ class PodFavoritesService extends BasePodService {
       );
       // Notify manager that initial loading is complete
       if (_onInitialLoadComplete != null) {
-        debugPrint('🎬 [PodFavoritesService] Calling onInitialLoadComplete callback');
-        _onInitialLoadComplete!();
+        debugPrint(
+            '🎬 [PodFavoritesService] Calling onInitialLoadComplete callback',);
+        _onInitialLoadComplete();
       }
     }).catchError((error) {
       debugPrint(
@@ -107,8 +108,9 @@ class PodFavoritesService extends BasePodService {
       );
       // Even on error, notify that loading attempt is complete
       if (_onInitialLoadComplete != null) {
-        debugPrint('🎬 [PodFavoritesService] Calling onInitialLoadComplete callback (after error)');
-        _onInitialLoadComplete!();
+        debugPrint(
+            '🎬 [PodFavoritesService] Calling onInitialLoadComplete callback (after error)',);
+        _onInitialLoadComplete();
       }
     });
   }
@@ -195,10 +197,6 @@ class PodFavoritesService extends BasePodService {
   void clearCache() {
     _cacheManager.clearCache();
   }
-
-
-
-
 
   /// Reloads data from POD after initialization.
   Future<void> reloadFromPod() async {
@@ -314,7 +312,8 @@ class PodFavoritesService extends BasePodService {
     Movie movie, {
     String contentType = 'movie',
   }) async {
-    return _listOperations.addMovieToCustomList(listId, movie, contentType: contentType);
+    return _listOperations.addMovieToCustomList(listId, movie,
+        contentType: contentType,);
   }
 
   /// Removes a movie from a custom list.
@@ -363,7 +362,6 @@ class PodFavoritesService extends BasePodService {
   Future<void> syncWithPod() async {
     await loadFavorites();
   }
-
 
   @override
   void dispose() {

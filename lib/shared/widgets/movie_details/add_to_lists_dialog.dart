@@ -10,10 +10,10 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 
 /// Dialog for adding a movie to custom lists.
 class AddToListsDialog extends StatefulWidget {

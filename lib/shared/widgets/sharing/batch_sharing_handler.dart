@@ -9,12 +9,13 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:solidpod/solidpod.dart' show SolidFunctionCallStatus;
 // ignore: implementation_imports
 import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
 
-import 'package:moviestar/models/sharing_models.dart';
 import 'package:moviestar/core/services/pod/pod_sharing_service.dart';
+import 'package:moviestar/models/sharing_models.dart';
 
 /// Handler for batch sharing operations.
 class BatchSharingHandler {

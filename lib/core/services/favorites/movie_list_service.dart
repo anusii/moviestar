@@ -7,12 +7,12 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:moviestar/models/content_item.dart';
-import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/pod/base_pod_service.dart';
 import 'package:moviestar/core/services/favorites/movie_list_file_helper.dart';
 import 'package:moviestar/core/services/favorites/movie_list_operations_helper.dart';
+import 'package:moviestar/core/services/pod/base_pod_service.dart';
 import 'package:moviestar/core/services/pod/pod_operations_mixin.dart';
+import 'package:moviestar/models/content_item.dart';
+import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 
@@ -45,14 +45,16 @@ class MovieListService extends BasePodService with PodOperationsMixin {
     return await executePodOperation(
       operation: () async {
         // Check if a custom list with this name already exists
-        debugPrint('🎬 [MovieListService] Checking for existing list with name: $listName');
+        debugPrint(
+            '🎬 [MovieListService] Checking for existing list with name: $listName',);
         final existingListId = await _fileHelper.findExistingMovieList(
           'custom', // Use 'custom' as list type for user-created lists
           listName,
         );
 
         if (existingListId != null) {
-          debugPrint('⚠️ [MovieListService] List "$listName" already exists with ID: $existingListId - returning existing');
+          debugPrint(
+              '⚠️ [MovieListService] List "$listName" already exists with ID: $existingListId - returning existing',);
           return existingListId;
         }
 
@@ -97,20 +99,24 @@ class MovieListService extends BasePodService with PodOperationsMixin {
     String movieListId, {
     bool forceRefresh = false,
   }) async {
-    debugPrint('🎬 [MovieListService] getMovieList called for: $movieListId (forceRefresh: $forceRefresh)');
+    debugPrint(
+        '🎬 [MovieListService] getMovieList called for: $movieListId (forceRefresh: $forceRefresh)',);
 
     if (!forceRefresh && _cache.containsKey(movieListId)) {
       final cached = _cache[movieListId];
       final movies = cached?['movies'] as List<Movie>? ?? [];
 
       // Check if cached data contains placeholder movies
-      final hasPlaceholders = movies.any((movie) => movie.title == 'Loading...');
+      final hasPlaceholders =
+          movies.any((movie) => movie.title == 'Loading...');
       if (hasPlaceholders) {
-        debugPrint('🎬 [MovieListService] Cache contains placeholder movies - forcing refresh');
+        debugPrint(
+            '🎬 [MovieListService] Cache contains placeholder movies - forcing refresh',);
         _cache.remove(movieListId);
       } else {
         debugPrint('🎬 [MovieListService] Returning cached data');
-        debugPrint('🎬 [MovieListService] Cached movies count: ${movies.length}');
+        debugPrint(
+            '🎬 [MovieListService] Cached movies count: ${movies.length}',);
         return cached;
       }
     }
@@ -119,39 +125,47 @@ class MovieListService extends BasePodService with PodOperationsMixin {
     return await executePodOperation(
       operation: () async {
         final fileName = _fileHelper.getMovieListFilePath(movieListId);
-        debugPrint('🎬 [MovieListService] Reading file: moviestar/data/$fileName');
+        debugPrint(
+            '🎬 [MovieListService] Reading file: moviestar/data/$fileName',);
         final content = await safeReadFile('moviestar/data/$fileName');
 
         if (content != null && content.isNotEmpty) {
-          debugPrint('🎬 [MovieListService] File content loaded (${content.length} chars)');
+          debugPrint(
+              '🎬 [MovieListService] File content loaded (${content.length} chars)',);
           final movieListData = TurtleSerializer.movieListFromTurtle(content);
 
           if (movieListData != null) {
-            debugPrint('🎬 [MovieListService] Successfully parsed movie list data');
+            debugPrint(
+                '🎬 [MovieListService] Successfully parsed movie list data',);
             movieListData['id'] = movieListId;
 
             // Load full movie data
             final placeholderMovies =
                 movieListData['movies'] as List<Movie>? ?? [];
-            debugPrint('🎬 [MovieListService] Found ${placeholderMovies.length} placeholder movies');
+            debugPrint(
+                '🎬 [MovieListService] Found ${placeholderMovies.length} placeholder movies',);
             final fullMovies = <Movie>[];
 
             for (final placeholderMovie in placeholderMovies) {
-              final contentType = placeholderMovie.contentType == ContentType.tvShow
-                  ? 'tv'
-                  : 'movie';
-              debugPrint('🎬 [MovieListService] Loading movie ${placeholderMovie.id} with contentType: $contentType');
+              final contentType =
+                  placeholderMovie.contentType == ContentType.tvShow
+                      ? 'tv'
+                      : 'movie';
+              debugPrint(
+                  '🎬 [MovieListService] Loading movie ${placeholderMovie.id} with contentType: $contentType',);
               final fullMovieData = await _fileHelper.loadFullMovieData(
                 placeholderMovie.id,
                 contentType: contentType,
               );
-              debugPrint('🎬 [MovieListService] Loaded movie ${placeholderMovie.id}: ${fullMovieData?.title ?? 'NULL'}');
+              debugPrint(
+                  '🎬 [MovieListService] Loaded movie ${placeholderMovie.id}: ${fullMovieData?.title ?? 'NULL'}',);
               fullMovies.add(fullMovieData ?? placeholderMovie);
             }
 
             movieListData['movies'] = fullMovies;
             _cache[movieListId] = movieListData;
-            debugPrint('🎬 [MovieListService] Final result: ${fullMovies.length} movies with full details');
+            debugPrint(
+                '🎬 [MovieListService] Final result: ${fullMovies.length} movies with full details',);
             return movieListData;
           } else {
             debugPrint('🎬 [MovieListService] Failed to parse movie list data');
@@ -191,7 +205,8 @@ class MovieListService extends BasePodService with PodOperationsMixin {
 
   /// Removes a movie from a MovieList.
   Future<bool> removeMovieFromList(String movieListId, int movieId) async {
-    final success = await _operationsHelper.removeMovieFromList(movieListId, movieId);
+    final success =
+        await _operationsHelper.removeMovieFromList(movieListId, movieId);
 
     if (success) {
       _cache.remove(movieListId);
@@ -242,7 +257,8 @@ class MovieListService extends BasePodService with PodOperationsMixin {
 
   /// Updates the name of a MovieList.
   Future<bool> updateMovieListName(String movieListId, String newName) async {
-    final success = await _operationsHelper.updateMovieListName(movieListId, newName);
+    final success =
+        await _operationsHelper.updateMovieListName(movieListId, newName);
 
     if (success) {
       _cache.remove(movieListId);
@@ -261,7 +277,8 @@ class MovieListService extends BasePodService with PodOperationsMixin {
     String movieListId,
     List<Movie> movies,
   ) async {
-    final success = await _operationsHelper.batchAddMoviesToList(movieListId, movies);
+    final success =
+        await _operationsHelper.batchAddMoviesToList(movieListId, movies);
 
     if (success) {
       _cache.remove(movieListId);

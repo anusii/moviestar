@@ -32,12 +32,12 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 
@@ -144,7 +144,8 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     safeSetState(() => _error = null);
 
     try {
-      final contentService = await ref.read(directContentServiceProvider.future);
+      final contentService =
+          await ref.read(directContentServiceProvider.future);
       final popularMixedContent = await contentService.getPopularMixedContent();
 
       // Remove content already in the list.
@@ -196,7 +197,8 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     });
 
     try {
-      final contentService = await ref.read(directContentServiceProvider.future);
+      final contentService =
+          await ref.read(directContentServiceProvider.future);
       final results = await contentService.searchContentComprehensive(query);
 
       // Filter out content already in the list.

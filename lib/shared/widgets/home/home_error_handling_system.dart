@@ -9,17 +9,17 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/core/services/api/api_key_validation_service.dart';
+import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
+import 'package:moviestar/core/services/network/network_connectivity_service.dart';
 import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/core/services/api/api_key_validation_service.dart';
-import 'package:moviestar/core/services/cache/cached_movie_service.dart';
-import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
-import 'package:moviestar/core/services/network/network_connectivity_service.dart';
 import 'package:moviestar/services/error_mapper_service.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 
@@ -37,7 +37,8 @@ class HomeErrorHandlingSystem extends StatefulWidget {
   });
 
   @override
-  State<HomeErrorHandlingSystem> createState() => _HomeErrorHandlingSystemState();
+  State<HomeErrorHandlingSystem> createState() =>
+      _HomeErrorHandlingSystemState();
 }
 
 class _HomeErrorHandlingSystemState extends State<HomeErrorHandlingSystem> {
@@ -206,7 +207,8 @@ class _HomeErrorHandlingSystemState extends State<HomeErrorHandlingSystem> {
         // Fallback
         return ErrorDisplayWidget(
           message: 'Error loading movies: $error',
-          onRetry: () => widget.ref.invalidate(popularMoviesWithCacheInfoProvider),
+          onRetry: () =>
+              widget.ref.invalidate(popularMoviesWithCacheInfoProvider),
         );
       },
     );

@@ -9,8 +9,7 @@
 library;
 
 import 'package:rdflib/rdflib.dart';
-import 'package:solidpod/solidpod.dart'
-    show tripleMapToTurtle;
+import 'package:solidpod/solidpod.dart' show tripleMapToTurtle;
 
 import 'package:moviestar/utils/turtle_serializer.dart';
 
@@ -29,14 +28,19 @@ class UserProfileSerializers {
     // Create the user resource.
     final userResource = URIRef(userWebId);
     triples[userResource] = {
-      TurtleSerializer.rdfType: [TurtleSerializer.owlNS.withAttr('NamedIndividual'), TurtleSerializer.userType],
-      TurtleSerializer.webId: Literal(userWebId, datatype: TurtleSerializer.xsdNS.withAttr('anyURI')),
+      TurtleSerializer.rdfType: [
+        TurtleSerializer.owlNS.withAttr('NamedIndividual'),
+        TurtleSerializer.userType,
+      ],
+      TurtleSerializer.webId: Literal(userWebId,
+          datatype: TurtleSerializer.xsdNS.withAttr('anyURI'),),
       TurtleSerializer.rdfsLabel: Literal('|webID=$userWebId|'),
     };
 
     // Add API key if provided.
     if (apiKey != null && apiKey.isNotEmpty) {
-      triples[userResource]![TurtleSerializer.hasApiKey] = TurtleSerializer.moviestarDataNS.withAttr(
+      triples[userResource]![TurtleSerializer.hasApiKey] =
+          TurtleSerializer.moviestarDataNS.withAttr(
         'ApiKey-$apiKey',
       );
     }
@@ -57,13 +61,15 @@ class UserProfileSerializers {
     // Add movie lists if provided.
     if (movieListIds != null && movieListIds.isNotEmpty) {
       final movieListRefs = movieListIds
-          .map((id) => TurtleSerializer.moviestarDataNS.withAttr('MovieList-$id'))
+          .map((id) =>
+              TurtleSerializer.moviestarDataNS.withAttr('MovieList-$id'),)
           .toList();
       triples[userResource]![TurtleSerializer.hasMovieList] = movieListRefs;
     }
 
     // Use ontology-compliant namespace bindings.
-    return tripleMapToTurtle(triples, bindNamespaces: TurtleSerializer.getOntologyNamespaces());
+    return tripleMapToTurtle(triples,
+        bindNamespaces: TurtleSerializer.getOntologyNamespaces(),);
   }
 
   /// Creates an API key file in TTL format following the ontology structure.
@@ -75,17 +81,23 @@ class UserProfileSerializers {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
     // Create the API key resource.
-    final apiKeyResource = TurtleSerializer.moviestarDataNS.withAttr('ApiKey-$apiKeyId');
+    final apiKeyResource =
+        TurtleSerializer.moviestarDataNS.withAttr('ApiKey-$apiKeyId');
     triples[apiKeyResource] = {
-      TurtleSerializer.rdfType: [TurtleSerializer.owlNS.withAttr('NamedIndividual'), TurtleSerializer.apiKeyType],
+      TurtleSerializer.rdfType: [
+        TurtleSerializer.owlNS.withAttr('NamedIndividual'),
+        TurtleSerializer.apiKeyType,
+      ],
       TurtleSerializer.identifier: Literal(apiKeyId),
       TurtleSerializer.keyValue: Literal(apiKeyValue),
       TurtleSerializer.source: Literal(source),
-      TurtleSerializer.rdfsLabel: Literal('|filePath=moviestar/data/keys/ApiKey-$apiKeyId.ttl|'),
+      TurtleSerializer.rdfsLabel:
+          Literal('|filePath=moviestar/data/keys/ApiKey-$apiKeyId.ttl|'),
     };
 
     // Use ontology-compliant namespace bindings.
-    return tripleMapToTurtle(triples, bindNamespaces: TurtleSerializer.getOntologyNamespaces());
+    return tripleMapToTurtle(triples,
+        bindNamespaces: TurtleSerializer.getOntologyNamespaces(),);
   }
 
   /// Generates a unique ID for resources.

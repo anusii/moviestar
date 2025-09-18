@@ -9,18 +9,21 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/constants/timing_constants.dart';
-import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
+import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 
 class DataManagementPanel extends ConsumerWidget {
   final Function(String title, List<Widget> children) buildSection;
-  final Function(String title, String subtitle, bool value, ValueChanged<bool> onChanged) buildSwitchTile;
-  final Function(String title, IconData icon, VoidCallback onTap, {bool isDestructive}) buildListTile;
+  final Function(String title, String subtitle, bool value,
+      ValueChanged<bool> onChanged,) buildSwitchTile;
+  final Function(String title, IconData icon, VoidCallback onTap,
+      {bool isDestructive,}) buildListTile;
   final Function(String message) showSuccessSnackBar;
   final Function(String message) showErrorSnackBar;
 
@@ -266,7 +269,8 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
     }
   }
 
-  Widget _buildOfflineModeTile(bool cachingEnabled, bool cacheOnlyMode, WidgetRef ref, BuildContext context) {
+  Widget _buildOfflineModeTile(bool cachingEnabled, bool cacheOnlyMode,
+      WidgetRef ref, BuildContext context,) {
     return SwitchListTile(
       title: Text(
         'Offline Mode',
@@ -301,7 +305,8 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
               }
             }
           : null,
-      thumbColor: WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
+      thumbColor:
+          WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
     );
   }
 
@@ -364,9 +369,13 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
             'Cache movie data to improve performance',
             cachingEnabled,
             (value) {
-              ref.read(cachingEnabledProvider.notifier).setCachingEnabled(value);
+              ref
+                  .read(cachingEnabledProvider.notifier)
+                  .setCachingEnabled(value);
               if (!value && cacheOnlyMode) {
-                ref.read(cacheOnlyModeProvider.notifier).setCacheOnlyMode(false);
+                ref
+                    .read(cacheOnlyModeProvider.notifier)
+                    .setCacheOnlyMode(false);
               }
             },
           ),
@@ -401,24 +410,35 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
                           ...stats.entries.map((entry) {
                             final category = entry.key;
                             final stat = entry.value;
-                            final categoryName = _getCategoryDisplayName(category);
+                            final categoryName =
+                                _getCategoryDisplayName(category);
 
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 8),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         categoryName,
-                                        style: Theme.of(context).textTheme.bodyMedium,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium,
                                       ),
                                       Text(
                                         'Updated ${_getTimeAgo(stat['age'] as Duration)} ago',
-                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                              color: Theme.of(context).textTheme.bodyMedium?.color,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.color,
                                             ),
                                       ),
                                     ],
@@ -439,7 +459,9 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
                                         (stat['isValid'] as bool)
                                             ? '${stat['movieCount']} movies'
                                             : 'Expired',
-                                        style: Theme.of(context).textTheme.bodySmall,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall,
                                       ),
                                     ],
                                   ),
@@ -457,13 +479,15 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
 
           // Cache Actions
           buildListTile('Force Refresh All', Icons.refresh, () async {
-            await _showForceRefreshDialog(ref, context, cachingEnabled, cacheOnlyMode);
+            await _showForceRefreshDialog(
+                ref, context, cachingEnabled, cacheOnlyMode,);
           }),
           buildListTile(
             'Clear All Cache',
             Icons.delete_sweep,
             () async {
-              await _showClearCacheDialog(ref, context, cachingEnabled, cacheOnlyMode);
+              await _showClearCacheDialog(
+                  ref, context, cachingEnabled, cacheOnlyMode,);
             },
             isDestructive: true,
           ),

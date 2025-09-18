@@ -26,18 +26,19 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/screens/add_movies_to_list_screen.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/shared/widgets/lists/list_dialogs.dart';
-import 'package:moviestar/shared/widgets/lists/lists_empty_state.dart';
 import 'package:moviestar/shared/widgets/lists/list_item_card.dart';
 import 'package:moviestar/shared/widgets/lists/list_sharing_handler.dart';
+import 'package:moviestar/shared/widgets/lists/lists_empty_state.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 
 /// A screen that displays all custom movie lists.
 
@@ -78,7 +79,8 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen>
     _loadCustomLists();
 
     widget.favoritesService.customLists.listen((lists) {
-      print('🎬 [MyListsScreen] Received custom lists update: ${lists.length} lists');
+      print(
+          '🎬 [MyListsScreen] Received custom lists update: ${lists.length} lists',);
       for (final list in lists) {
         print('🎬 [MyListsScreen] List: ${list.name} (ID: ${list.id})');
       }
@@ -94,7 +96,8 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen>
     final lists = await widget.favoritesService.getCustomLists();
     print('🎬 [MyListsScreen] getCustomLists returned ${lists.length} lists');
     for (final list in lists) {
-      print('🎬 [MyListsScreen] Direct load - List: ${list.name} (ID: ${list.id})');
+      print(
+          '🎬 [MyListsScreen] Direct load - List: ${list.name} (ID: ${list.id})',);
     }
 
     safeSetState(() {
@@ -185,5 +188,4 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen>
       ),
     );
   }
-
 }

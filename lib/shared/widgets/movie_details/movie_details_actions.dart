@@ -9,12 +9,11 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 
 class AddToCustomListsDialog extends StatefulWidget {
   final Movie movie;
@@ -190,10 +189,8 @@ class _AddToCustomListsDialogState extends State<AddToCustomListsDialog> {
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.close),
             style: IconButton.styleFrom(
-              backgroundColor: Theme.of(context)
-                  .colorScheme
-                  .surface
-                  .withValues(alpha: 0.8),
+              backgroundColor:
+                  Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -294,7 +291,8 @@ class _AddToCustomListsDialogState extends State<AddToCustomListsDialog> {
                     activeColor: Theme.of(context).colorScheme.primary,
                     onChanged: _isLoading
                         ? null
-                        : (value) => _toggleMovieInList(list.id, value ?? false),
+                        : (value) =>
+                            _toggleMovieInList(list.id, value ?? false),
                   ),
                 );
               },

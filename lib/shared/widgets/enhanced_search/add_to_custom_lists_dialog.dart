@@ -9,13 +9,14 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 
 /// Dialog for adding a movie to custom lists
 class AddToCustomListsDialog extends StatefulWidget {
@@ -152,9 +153,10 @@ class _AddToCustomListsDialogState extends State<AddToCustomListsDialog> {
       );
 
       // Add the movie to the new list immediately
-      final contentType = widget.originalContentItem.contentType == ContentType.tvShow
-          ? 'tv'
-          : 'movie';
+      final contentType =
+          widget.originalContentItem.contentType == ContentType.tvShow
+              ? 'tv'
+              : 'movie';
       await widget.favoritesService.addMovieToCustomList(
         newList.id,
         widget.movie,
@@ -226,7 +228,8 @@ class _AddToCustomListsDialogState extends State<AddToCustomListsDialog> {
                         Text(
                           widget.movie.title,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
+                            color: colorScheme.onPrimaryContainer
+                                .withValues(alpha: 0.8),
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -266,7 +269,8 @@ class _AddToCustomListsDialogState extends State<AddToCustomListsDialog> {
                           controller: _newListController,
                           decoration: InputDecoration(
                             hintText: 'Enter a unique list name...',
-                            helperText: 'Tip: Use unique names to avoid duplicates',
+                            helperText:
+                                'Tip: Use unique names to avoid duplicates',
                             helperMaxLines: 2,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -321,7 +325,8 @@ class _AddToCustomListsDialogState extends State<AddToCustomListsDialog> {
                           subtitle: Text(
                             '${list.movieCount} movies',
                             style: TextStyle(
-                              color: colorScheme.onSurface.withValues(alpha: 0.6),
+                              color:
+                                  colorScheme.onSurface.withValues(alpha: 0.6),
                               fontSize: 12,
                             ),
                           ),

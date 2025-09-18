@@ -32,14 +32,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solidpod/solidpod.dart' show getWebId;
 
-import 'package:moviestar/models/content_item.dart';
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/core/services/api/api_key_service.dart';
+import 'package:moviestar/core/services/api/content_service.dart';
+import 'package:moviestar/core/services/api/movie_service.dart';
 import 'package:moviestar/core/services/cache/cache_settings_service.dart';
 import 'package:moviestar/core/services/cache/cached_movie_service.dart';
-import 'package:moviestar/core/services/api/content_service.dart';
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
-import 'package:moviestar/core/services/api/movie_service.dart';
+import 'package:moviestar/models/content_item.dart';
+import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/network_client.dart';
 
 /// A simple API key service that returns the provided API key directly.
@@ -251,7 +251,8 @@ class DirectMovieService extends MovieService {
 
   @override
   Future<Movie> getMovieDetails(int movieId) async {
-    debugPrint('🔑 [DirectMovieService] getMovieDetails called for ID: $movieId');
+    debugPrint(
+        '🔑 [DirectMovieService] getMovieDetails called for ID: $movieId',);
     await _ensureDirectClientInitialized();
 
     // Use direct client instead of going through ContentService
@@ -261,7 +262,8 @@ class DirectMovieService extends MovieService {
       return Movie.fromContentItem(contentItem);
     } catch (e) {
       // Try TV endpoint if movie fails (for TV shows)
-      debugPrint('🔑 [DirectMovieService] Movie endpoint failed, trying TV endpoint: $e');
+      debugPrint(
+          '🔑 [DirectMovieService] Movie endpoint failed, trying TV endpoint: $e',);
       final data = await _directClient!.getJson('tv/$movieId');
       final contentItem = ContentItem.fromTVJson(data);
       return Movie.fromContentItem(contentItem);
@@ -488,10 +490,12 @@ final contentServiceProvider = Provider<ContentService>((ref) {
 
 /// Direct provider for the content service that uses the direct API key.
 
-final directContentServiceProvider = FutureProvider<ContentService>((ref) async {
+final directContentServiceProvider =
+    FutureProvider<ContentService>((ref) async {
   final apiKey = await ref.watch(directApiKeyProvider.future);
 
-  print('🔍 [DirectContentServiceProvider] Creating ContentService with API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}');
+  print(
+      '🔍 [DirectContentServiceProvider] Creating ContentService with API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',);
 
   // Use the new constructor that accepts API key directly
   final contentService = ContentService.withApiKey(apiKey);

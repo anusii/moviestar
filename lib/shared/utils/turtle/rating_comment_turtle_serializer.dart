@@ -24,8 +24,7 @@ class RatingCommentTurtleSerializer extends TurtleBaseSerializer {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
     // Create the ratings list resource.
-    final ratingsResource =
-        TurtleNamespaceManager.localNS.withAttr('ratings');
+    final ratingsResource = TurtleNamespaceManager.localNS.withAttr('ratings');
     triples[ratingsResource] = {
       TurtleNamespaceManager.rdfType: TurtleNamespaceManager.movieListType,
       TurtleNamespaceManager.nameProperty: Literal('User Ratings'),
@@ -68,7 +67,8 @@ class RatingCommentTurtleSerializer extends TurtleBaseSerializer {
       triples[commentResource] = {
         TurtleNamespaceManager.rdfType: TurtleNamespaceManager.commentType,
         TurtleNamespaceManager.movieId: Literal(entry.key, datatype: XSD.int),
-        TurtleNamespaceManager.text: Literal(TurtleBaseSerializer.escapeString(entry.value)),
+        TurtleNamespaceManager.text:
+            Literal(TurtleBaseSerializer.escapeString(entry.value)),
       };
     }
 

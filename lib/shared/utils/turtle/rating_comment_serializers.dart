@@ -34,7 +34,8 @@ class RatingCommentSerializers {
 
     // Add individual rating definitions.
     for (final entry in ratings.entries) {
-      final ratingResource = TurtleSerializer.localNS.withAttr('rating${entry.key}');
+      final ratingResource =
+          TurtleSerializer.localNS.withAttr('rating${entry.key}');
       triples[ratingResource] = {
         TurtleSerializer.rdfType: TurtleSerializer.ratingType,
         TurtleSerializer.movieId: Literal(entry.key, datatype: XSD.int),
@@ -61,11 +62,13 @@ class RatingCommentSerializers {
 
     // Add individual comment definitions.
     for (final entry in comments.entries) {
-      final commentResource = TurtleSerializer.localNS.withAttr('comment${entry.key}');
+      final commentResource =
+          TurtleSerializer.localNS.withAttr('comment${entry.key}');
       triples[commentResource] = {
         TurtleSerializer.rdfType: TurtleSerializer.commentType,
         TurtleSerializer.movieId: Literal(entry.key, datatype: XSD.int),
-        TurtleSerializer.text: Literal(TurtleSerializer.escapeString(entry.value)),
+        TurtleSerializer.text:
+            Literal(TurtleSerializer.escapeString(entry.value)),
       };
     }
 
@@ -107,7 +110,8 @@ class RatingCommentSerializers {
 
           if (movieIdValues.isNotEmpty && valueValues.isNotEmpty) {
             final movieId = movieIdValues.first.toString();
-            final ratingValue = double.tryParse(valueValues.first.toString()) ?? 0.0;
+            final ratingValue =
+                double.tryParse(valueValues.first.toString()) ?? 0.0;
             ratings[movieId] = ratingValue;
           }
         }
@@ -206,11 +210,16 @@ class RatingCommentSerializers {
     triples[movieResource] = {
       TurtleSerializer.rdfType: TurtleSerializer.movieType,
       TurtleSerializer.identifier: Literal('${movie.id}', datatype: XSD.int),
-      TurtleSerializer.name: Literal(TurtleSerializer.escapeString(movie.title)),
-      TurtleSerializer.description: Literal(TurtleSerializer.escapeString(movie.overview)),
-      TurtleSerializer.image: Literal(TurtleSerializer.escapeString(movie.posterUrl)),
-      TurtleSerializer.thumbnailUrl: Literal(TurtleSerializer.escapeString(movie.backdropUrl)),
-      TurtleSerializer.aggregateRating: Literal('${movie.voteAverage}', datatype: XSD.double),
+      TurtleSerializer.name:
+          Literal(TurtleSerializer.escapeString(movie.title)),
+      TurtleSerializer.description:
+          Literal(TurtleSerializer.escapeString(movie.overview)),
+      TurtleSerializer.image:
+          Literal(TurtleSerializer.escapeString(movie.posterUrl)),
+      TurtleSerializer.thumbnailUrl:
+          Literal(TurtleSerializer.escapeString(movie.backdropUrl)),
+      TurtleSerializer.aggregateRating:
+          Literal('${movie.voteAverage}', datatype: XSD.double),
       TurtleSerializer.datePublished: Literal(
         movie.releaseDate.toIso8601String(),
         datatype: XSD.dateTime,
@@ -220,7 +229,8 @@ class RatingCommentSerializers {
 
     // Add user rating if provided
     if (rating != null) {
-      final userRatingResource = TurtleSerializer.localNS.withAttr('userRating${movie.id}');
+      final userRatingResource =
+          TurtleSerializer.localNS.withAttr('userRating${movie.id}');
       triples[userRatingResource] = {
         TurtleSerializer.rdfType: TurtleSerializer.ratingType,
         TurtleSerializer.movieId: Literal('${movie.id}', datatype: XSD.int),
@@ -233,7 +243,8 @@ class RatingCommentSerializers {
 
     // Add user comment if provided
     if (comment != null && comment.isNotEmpty) {
-      final userCommentResource = TurtleSerializer.localNS.withAttr('userComment${movie.id}');
+      final userCommentResource =
+          TurtleSerializer.localNS.withAttr('userComment${movie.id}');
       triples[userCommentResource] = {
         TurtleSerializer.rdfType: TurtleSerializer.commentType,
         TurtleSerializer.movieId: Literal('${movie.id}', datatype: XSD.int),
@@ -245,7 +256,10 @@ class RatingCommentSerializers {
     }
 
     // Use a minimal namespace binding for user data files
-    final bindNamespaces = {'': TurtleSerializer.localNS, 'schema': TurtleSerializer.movieNS};
+    final bindNamespaces = {
+      '': TurtleSerializer.localNS,
+      'schema': TurtleSerializer.movieNS,
+    };
 
     return tripleMapToTurtle(triples, bindNamespaces: bindNamespaces);
   }
@@ -293,7 +307,9 @@ class RatingCommentSerializers {
 
         final isMovie = typeValues.any(
           (type) =>
-              type.toString().contains('Movie') || type == 'http://schema.org/Movie' || type == '#Movie',
+              type.toString().contains('Movie') ||
+              type == 'http://schema.org/Movie' ||
+              type == '#Movie',
         );
         final isRating = typeValues.any(
           (type) => type.toString().contains('Rating') || type == '#Rating',

@@ -37,10 +37,7 @@ class MoviePosterSection extends StatelessWidget {
       leading: Container(
         margin: const EdgeInsets.all(Dimensions.m),
         decoration: BoxDecoration(
-          color: Theme.of(context)
-              .colorScheme
-              .surface
-              .withValues(alpha: 0.8),
+          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
@@ -66,8 +63,7 @@ class MoviePosterSection extends StatelessWidget {
                 fit: BoxFit.cover,
                 placeholder: (context, url) =>
                     const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) =>
-                    const Icon(Icons.error),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
               )
             : Container(
                 color: Theme.of(context).colorScheme.surfaceContainer,

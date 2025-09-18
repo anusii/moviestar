@@ -9,15 +9,16 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:gap/gap.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
-import 'package:moviestar/models/content_item.dart';
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
+import 'package:moviestar/models/content_item.dart';
+import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
 
@@ -79,10 +80,7 @@ class MovieDetailsHeader extends StatelessWidget {
       leading: Container(
         margin: const EdgeInsets.all(Dimensions.m),
         decoration: BoxDecoration(
-          color: Theme.of(context)
-              .colorScheme
-              .surface
-              .withValues(alpha: 0.8),
+          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
@@ -108,8 +106,7 @@ class MovieDetailsHeader extends StatelessWidget {
                 fit: BoxFit.cover,
                 placeholder: (context, url) =>
                     const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) =>
-                    const Icon(Icons.error),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
               )
             : Container(
                 color: Theme.of(context).colorScheme.surfaceContainer,
@@ -197,17 +194,14 @@ class MovieDetailsHeaderContent extends StatelessWidget {
               children: [
                 IconButton(
                   icon: Icon(
-                    isInToWatch
-                        ? Icons.bookmark
-                        : Icons.bookmark_border,
+                    isInToWatch ? Icons.bookmark : Icons.bookmark_border,
                     color: isInToWatch
                         ? Theme.of(context).colorScheme.primary
                         : Theme.of(context).colorScheme.onSurface,
                   ),
                   onPressed: onToggleToWatch,
-                  tooltip: isInToWatch
-                      ? 'Remove from To Watch'
-                      : 'Add to To Watch',
+                  tooltip:
+                      isInToWatch ? 'Remove from To Watch' : 'Add to To Watch',
                 ),
                 IconButton(
                   icon: Icon(
@@ -219,9 +213,8 @@ class MovieDetailsHeaderContent extends StatelessWidget {
                         : Theme.of(context).colorScheme.onSurface,
                   ),
                   onPressed: onToggleWatched,
-                  tooltip: isInWatched
-                      ? 'Remove from Watched'
-                      : 'Add to Watched',
+                  tooltip:
+                      isInWatched ? 'Remove from Watched' : 'Add to Watched',
                 ),
                 if (!isSharedMovie)
                   MarkdownTooltip(
@@ -348,7 +341,8 @@ Your shared movies will appear in their "Shared with Me" tab.
             padding: const EdgeInsets.all(12),
             margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+              color:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: Theme.of(context).colorScheme.primary,

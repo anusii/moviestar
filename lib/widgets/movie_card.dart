@@ -34,9 +34,9 @@ import 'package:gap/gap.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/constants/timing_constants.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
 import 'package:moviestar/widgets/quick_actions_dialog.dart';
 

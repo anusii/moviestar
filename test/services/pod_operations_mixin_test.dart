@@ -1,6 +1,7 @@
 /// Unit tests for PodOperationsMixin.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

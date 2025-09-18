@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter/foundation.dart';
+
 import 'package:rdflib/rdflib.dart';
 
 import 'package:moviestar/utils/turtle/turtle_namespaces.dart';
@@ -30,9 +31,11 @@ class TurtleUserDataSerializer {
     for (final entry in ratings.entries) {
       final movieId = entry.key;
       final rating = entry.value;
-      final ratingUri = TurtleNamespaces.moviestarDataNS.withAttr('rating_$movieId');
+      final ratingUri =
+          TurtleNamespaces.moviestarDataNS.withAttr('rating_$movieId');
 
-      graph.addTripleToGroups(ratingUri, TurtleNamespaces.rdfType, TurtleNamespaces.ratingType);
+      graph.addTripleToGroups(
+          ratingUri, TurtleNamespaces.rdfType, TurtleNamespaces.ratingType,);
       graph.addTripleToGroups(
         ratingUri,
         TurtleNamespaces.movieId,
@@ -41,7 +44,8 @@ class TurtleUserDataSerializer {
       graph.addTripleToGroups(
         ratingUri,
         TurtleNamespaces.value,
-        Literal(rating.toString(), datatype: TurtleNamespaces.xsdNS.withAttr('decimal')),
+        Literal(rating.toString(),
+            datatype: TurtleNamespaces.xsdNS.withAttr('decimal'),),
       );
     }
 
@@ -63,9 +67,11 @@ class TurtleUserDataSerializer {
     for (final entry in comments.entries) {
       final movieId = entry.key;
       final comment = entry.value;
-      final commentUri = TurtleNamespaces.moviestarDataNS.withAttr('comment_$movieId');
+      final commentUri =
+          TurtleNamespaces.moviestarDataNS.withAttr('comment_$movieId');
 
-      graph.addTripleToGroups(commentUri, TurtleNamespaces.rdfType, TurtleNamespaces.commentType);
+      graph.addTripleToGroups(
+          commentUri, TurtleNamespaces.rdfType, TurtleNamespaces.commentType,);
       graph.addTripleToGroups(
         commentUri,
         TurtleNamespaces.movieId,
@@ -74,7 +80,8 @@ class TurtleUserDataSerializer {
       graph.addTripleToGroups(
         commentUri,
         TurtleNamespaces.text,
-        Literal(TurtleUtils.escapeString(comment), datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+        Literal(TurtleUtils.escapeString(comment),
+            datatype: TurtleNamespaces.xsdNS.withAttr('string'),),
       );
     }
 
@@ -177,7 +184,8 @@ class TurtleUserDataSerializer {
     graph.addTripleToGroups(
       ratingsUri,
       TurtleNamespaces.keyValue,
-      Literal(ratingsJson.toString(), datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+      Literal(ratingsJson.toString(),
+          datatype: TurtleNamespaces.xsdNS.withAttr('string'),),
     );
 
     graph.serialize(format: 'turtle');
@@ -200,7 +208,8 @@ class TurtleUserDataSerializer {
     graph.addTripleToGroups(
       commentsUri,
       TurtleNamespaces.keyValue,
-      Literal(comments.toString(), datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+      Literal(comments.toString(),
+          datatype: TurtleNamespaces.xsdNS.withAttr('string'),),
     );
 
     graph.serialize(format: 'turtle');

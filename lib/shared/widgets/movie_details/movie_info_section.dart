@@ -16,9 +16,9 @@ import 'package:gap/gap.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/constants/timing_constants.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 
 /// A widget that displays the main info section of a movie details screen.
@@ -302,7 +302,8 @@ class _MovieInfoSectionState extends State<MovieInfoSection> {
             padding: const EdgeInsets.all(12),
             margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+              color:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: Theme.of(context).colorScheme.primary,
@@ -428,9 +429,7 @@ class _MovieInfoSectionState extends State<MovieInfoSection> {
               ),
         Text(
           _personalRating == null
-              ? (widget.isSharedMovie
-                  ? 'No rating shared'
-                  : 'No rating yet')
+              ? (widget.isSharedMovie ? 'No rating shared' : 'No rating yet')
               : (widget.isSharedMovie
                   ? 'Shared rating: ${_personalRating!.toStringAsFixed(1)}/10'
                   : 'Your rating: ${_personalRating!.toStringAsFixed(1)}/10'),

@@ -6,10 +6,10 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/core/services/favorites/movie_list_file_helper.dart';
 import 'package:moviestar/core/services/pod/pod_file_operations_service.dart';
 import 'package:moviestar/core/services/pod/pod_operations_mixin.dart';
+import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 
@@ -84,16 +84,19 @@ class MovieListOperationsHelper with PodOperationsMixin {
 
   /// Deletes a MovieList.
   Future<bool> deleteMovieList(String movieListId) async {
-    debugPrint('🎬 [MovieListOperationsHelper] deleteMovieList called for: $movieListId');
+    debugPrint(
+        '🎬 [MovieListOperationsHelper] deleteMovieList called for: $movieListId',);
 
     if (!await validateContextAndLogin(_context)) {
-      debugPrint('🎬 [MovieListOperationsHelper] Context/login validation failed');
+      debugPrint(
+          '🎬 [MovieListOperationsHelper] Context/login validation failed',);
       return false;
     }
 
     try {
       final filePath = 'moviestar/data/${getMovieListFilePath(movieListId)}';
-      debugPrint('🎬 [MovieListOperationsHelper] Attempting to delete file: $filePath');
+      debugPrint(
+          '🎬 [MovieListOperationsHelper] Attempting to delete file: $filePath',);
 
       final result = await PodFileOperationsService.deleteFile(
         filePath,
@@ -101,24 +104,31 @@ class MovieListOperationsHelper with PodOperationsMixin {
         _child,
       );
 
-      debugPrint('🎬 [MovieListOperationsHelper] Delete file result: success=${result.success}, error=${result.error}');
+      debugPrint(
+          '🎬 [MovieListOperationsHelper] Delete file result: success=${result.success}, error=${result.error}',);
 
       if (result.success) {
         _cache.remove(movieListId);
-        debugPrint('🎬 [MovieListOperationsHelper] Removing movie list from user profile...');
+        debugPrint(
+            '🎬 [MovieListOperationsHelper] Removing movie list from user profile...',);
 
-        final profileUpdateSuccess = await _userProfileService.removeMovieListFromProfile(movieListId);
-        debugPrint('🎬 [MovieListOperationsHelper] Profile update result: $profileUpdateSuccess');
+        final profileUpdateSuccess =
+            await _userProfileService.removeMovieListFromProfile(movieListId);
+        debugPrint(
+            '🎬 [MovieListOperationsHelper] Profile update result: $profileUpdateSuccess',);
 
         if (profileUpdateSuccess) {
-          debugPrint('✅ [MovieListOperationsHelper] Successfully deleted MovieList $movieListId');
+          debugPrint(
+              '✅ [MovieListOperationsHelper] Successfully deleted MovieList $movieListId',);
           return true;
         } else {
-          debugPrint('❌ [MovieListOperationsHelper] Failed to update user profile after file deletion');
+          debugPrint(
+              '❌ [MovieListOperationsHelper] Failed to update user profile after file deletion',);
           return false;
         }
       } else {
-        debugPrint('❌ [MovieListOperationsHelper] POD file deletion failed: ${result.error}');
+        debugPrint(
+            '❌ [MovieListOperationsHelper] POD file deletion failed: ${result.error}',);
       }
     } catch (e) {
       debugPrint('❌ [MovieListOperationsHelper] Exception during delete: $e');

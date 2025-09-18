@@ -9,20 +9,17 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
-import 'package:moviestar/core/services/cache/cached_movie_service.dart';
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
-import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/widgets/movie_card.dart';
-import 'package:moviestar/shared/widgets/home/home_cache_indicator_system.dart';
-import 'package:moviestar/screens/movie_details_screen.dart';
+import 'package:moviestar/models/custom_list.dart';
+import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
+import 'package:moviestar/screens/movie_details_screen.dart';
+import 'package:moviestar/widgets/movie_card.dart';
 
 /// Service class that handles custom list management, POD integration, and movie rendering
 class HomeCustomListManager {
@@ -30,9 +27,18 @@ class HomeCustomListManager {
   final Map<String, ScrollController> scrollControllers;
   final bool Function() isMounted;
   final void Function(Route<dynamic>) safeNavigateTo;
-  final Widget Function(WidgetRef, Object, StackTrace, String, VoidCallback) buildSmartErrorWidgetCompact;
-  final Widget Function(WidgetRef, Object, StackTrace, String, VoidCallback) buildSmartErrorWidgetCompactWithRetry;
-  final Widget Function(BuildContext, WidgetRef, String, AsyncValue<CacheResult<List<Movie>>>, String, CacheCategory, bool) buildMovieRow;
+  final Widget Function(WidgetRef, Object, StackTrace, String, VoidCallback)
+      buildSmartErrorWidgetCompact;
+  final Widget Function(WidgetRef, Object, StackTrace, String, VoidCallback)
+      buildSmartErrorWidgetCompactWithRetry;
+  final Widget Function(
+      BuildContext,
+      WidgetRef,
+      String,
+      AsyncValue<CacheResult<List<Movie>>>,
+      String,
+      CacheCategory,
+      bool,) buildMovieRow;
   final StatefulWidget parentWidget;
 
   const HomeCustomListManager({
@@ -47,7 +53,8 @@ class HomeCustomListManager {
   });
 
   /// Builds custom list rows based on user's custom lists
-  Widget buildCustomListRows(BuildContext context, Widget Function(CustomList) onCustomListTapped) {
+  Widget buildCustomListRows(
+      BuildContext context, Widget Function(CustomList) onCustomListTapped,) {
     return StreamBuilder<List<CustomList>>(
       stream: favoritesService.customLists,
       builder: (context, snapshot) {
@@ -221,10 +228,12 @@ class HomeCustomListManager {
         if (movies.isEmpty) {
           return const SizedBox.shrink();
         }
-        return _buildListSection(context, title, _buildMovieListItems(context, movies));
+        return _buildListSection(
+            context, title, _buildMovieListItems(context, movies),);
       },
       loading: () => _buildLoadingSection(context, title),
-      error: (error, stackTrace) => _buildErrorSection(context, ref, title, error, stackTrace),
+      error: (error, stackTrace) =>
+          _buildErrorSection(context, ref, title, error, stackTrace),
     );
   }
 
@@ -234,7 +243,8 @@ class HomeCustomListManager {
       stream: favoritesService.customLists,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return _buildErrorSection(context, ref, 'Custom Lists', snapshot.error!, StackTrace.current);
+          return _buildErrorSection(context, ref, 'Custom Lists',
+              snapshot.error!, StackTrace.current,);
         }
 
         if (!snapshot.hasData) {
@@ -252,7 +262,8 @@ class HomeCustomListManager {
               future: _loadMoviesForCustomList(customList),
               builder: (context, movieSnapshot) {
                 if (movieSnapshot.hasError) {
-                  return _buildErrorSection(context, ref, customList.name, movieSnapshot.error!, StackTrace.current);
+                  return _buildErrorSection(context, ref, customList.name,
+                      movieSnapshot.error!, StackTrace.current,);
                 }
 
                 if (!movieSnapshot.hasData) {
@@ -264,7 +275,8 @@ class HomeCustomListManager {
                   return const SizedBox.shrink();
                 }
 
-                return _buildListSection(context, customList.name, _buildMovieListItems(context, movies));
+                return _buildListSection(context, customList.name,
+                    _buildMovieListItems(context, movies),);
               },
             );
           }).toList(),
@@ -287,7 +299,8 @@ class HomeCustomListManager {
           return const SizedBox.shrink();
         }
 
-        return _buildListSection(context, 'To Watch', _buildMovieListItems(context, movies));
+        return _buildListSection(
+            context, 'To Watch', _buildMovieListItems(context, movies),);
       },
     );
   }
@@ -306,7 +319,8 @@ class HomeCustomListManager {
           return const SizedBox.shrink();
         }
 
-        return _buildListSection(context, 'Watched', _buildMovieListItems(context, movies));
+        return _buildListSection(
+            context, 'Watched', _buildMovieListItems(context, movies),);
       },
     );
   }
@@ -498,7 +512,7 @@ class HomeCustomListManager {
                 ),
           title: Text(movie.title),
           subtitle: movie.releaseDate != null
-              ? Text(movie.releaseDate!.year.toString())
+              ? Text(movie.releaseDate.year.toString())
               : null,
           onTap: () => _navigateToMovieDetails(movie),
         );

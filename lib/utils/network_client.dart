@@ -88,7 +88,8 @@ class NetworkClient {
       final url = '$baseUrl/$endpoint${separator}api_key=$apiKey';
 
       print('🔍 [NetworkClient] Making GET request to: $baseUrl/$endpoint');
-      print('🔍 [NetworkClient] API key present: ${apiKey.isNotEmpty ? 'Yes (${apiKey.length} chars)' : 'No'}');
+      print(
+          '🔍 [NetworkClient] API key present: ${apiKey.isNotEmpty ? 'Yes (${apiKey.length} chars)' : 'No'}',);
 
       final response = await _client.get(Uri.parse(url)).timeout(_timeout);
 
@@ -99,7 +100,8 @@ class NetworkClient {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body) as Map<String, dynamic>;
-        print('🔍 [NetworkClient] Response contains results: ${jsonData.containsKey('results')}');
+        print(
+            '🔍 [NetworkClient] Response contains results: ${jsonData.containsKey('results')}',);
         if (jsonData.containsKey('results')) {
           final resultsList = jsonData['results'] as List<dynamic>;
           print('🔍 [NetworkClient] Results count: ${resultsList.length}');

@@ -9,13 +9,15 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:gap/gap.dart';
+
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/constants/timing_constants.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 
 import 'kanban_board_controller.dart';
 
@@ -105,8 +107,8 @@ class KanbanDragHandler {
           debugPrint(
             '🎬 [KanbanDrag] Adding to ToWatch with contentType string: $contentTypeString',
           );
-          await favoritesService
-              .addToWatch(dragData.movie, contentType: contentTypeString);
+          await favoritesService.addToWatch(dragData.movie,
+              contentType: contentTypeString,);
           break;
         case KanbanColumnType.watched:
           final contentTypeString =
@@ -114,8 +116,8 @@ class KanbanDragHandler {
           debugPrint(
             '🎬 [KanbanDrag] Adding to Watched with contentType string: $contentTypeString',
           );
-          await favoritesService
-              .addToWatched(dragData.movie, contentType: contentTypeString);
+          await favoritesService.addToWatched(dragData.movie,
+              contentType: contentTypeString,);
           break;
         case KanbanColumnType.customList:
           final contentTypeString =
@@ -498,7 +500,8 @@ class KanbanDragHandler {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to ${action.replaceAll('_', ' ')} "${movie.title}"'),
+            content: Text(
+                'Failed to ${action.replaceAll('_', ' ')} "${movie.title}"',),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

@@ -97,12 +97,10 @@ class SharedListMovieProcessor {
                       children: [
                         Text(
                           movieTitle,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         if (rating != null) ...[
                           const SizedBox(height: 4),
@@ -229,7 +227,8 @@ class SharedListMovieProcessor {
                     Text(
                       '$movieCount movies',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                   ],

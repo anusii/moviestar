@@ -11,17 +11,18 @@ library;
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart';
 
-import 'package:moviestar/mixins/screen_state_mixin.dart';
-import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
-import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/content_item.dart';
+import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/providers/cached_movie_service_provider.dart';
+import 'package:moviestar/screens/movie_details_screen.dart';
 
 class SharedListMovieDisplay extends ConsumerStatefulWidget {
   final List<Map<String, dynamic>> movies;
@@ -42,15 +43,17 @@ class SharedListMovieDisplay extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<SharedListMovieDisplay> createState() => _SharedListMovieDisplayState();
+  ConsumerState<SharedListMovieDisplay> createState() =>
+      _SharedListMovieDisplayState();
 }
 
-class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay> with ScreenStateMixin {
-
+class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
+    with ScreenStateMixin {
   Widget _buildRatingDisplay(dynamic rating) {
     if (rating == null) return const SizedBox.shrink();
 
-    final ratingValue = rating is double ? rating : double.tryParse(rating.toString()) ?? 0.0;
+    final ratingValue =
+        rating is double ? rating : double.tryParse(rating.toString()) ?? 0.0;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -67,7 +70,8 @@ class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
 
   Future<void> _navigateToMovieDetails(Map<String, dynamic> movieData) async {
     try {
-      final movieId = int.tryParse(movieData['movieId']?.toString() ?? '0') ?? 0;
+      final movieId =
+          int.tryParse(movieData['movieId']?.toString() ?? '0') ?? 0;
       if (movieId <= 0) return;
 
       // Get enhanced data with proper content type detection
@@ -133,12 +137,14 @@ class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
 
     try {
       if (webIdOrUsername.startsWith('http')) {
-        final match = RegExp(r'(https?://[^/]+/[^/]+/)').firstMatch(webIdOrUsername);
+        final match =
+            RegExp(r'(https?://[^/]+/[^/]+/)').firstMatch(webIdOrUsername);
         if (match != null) {
           return match.group(1);
         }
       } else {
-        final constructedUrl = 'https://pods.dev.solidcommunity.au/$webIdOrUsername/';
+        final constructedUrl =
+            'https://pods.dev.solidcommunity.au/$webIdOrUsername/';
         return constructedUrl;
       }
 
@@ -149,7 +155,8 @@ class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
     }
   }
 
-  Future<Map<String, dynamic>> _fetchIndividualMovieData(Map<String, dynamic> movieData) async {
+  Future<Map<String, dynamic>> _fetchIndividualMovieData(
+      Map<String, dynamic> movieData,) async {
     try {
       final movieId = movieData['movieId']?.toString() ?? '0';
 
@@ -179,16 +186,19 @@ class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
         final urlsToTry = <String>[];
 
         if (ownerBaseUrl != null) {
-          urlsToTry.add('${ownerBaseUrl}moviestar/data/movies/$providedFilePath');
+          urlsToTry
+              .add('${ownerBaseUrl}moviestar/data/movies/$providedFilePath');
         }
         if (sharerBaseUrl != null && sharerBaseUrl != ownerBaseUrl) {
-          urlsToTry.add('${sharerBaseUrl}moviestar/data/movies/$providedFilePath');
+          urlsToTry
+              .add('${sharerBaseUrl}moviestar/data/movies/$providedFilePath');
         }
 
         for (final resourceUrl in urlsToTry) {
           if (!mounted) return movieData;
 
-          movieFileContent = await readExternalPod(resourceUrl, context, widget.parentWidget);
+          movieFileContent =
+              await readExternalPod(resourceUrl, context, widget.parentWidget);
 
           if (movieFileContent != null &&
               movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
@@ -210,7 +220,8 @@ class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
 
           // Try Movie file first
           final movieResourceUrl = '${baseUrl}moviestar/data/$movieFileName';
-          movieFileContent = await readExternalPod(movieResourceUrl, context, widget.parentWidget);
+          movieFileContent = await readExternalPod(
+              movieResourceUrl, context, widget.parentWidget,);
 
           if (movieFileContent != null &&
               movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
@@ -220,10 +231,12 @@ class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
             break;
           } else {
             // Try TVShow file
-            final tvShowResourceUrl = '${baseUrl}moviestar/data/$tvShowFileName';
+            final tvShowResourceUrl =
+                '${baseUrl}moviestar/data/$tvShowFileName';
             if (!mounted) return movieData;
 
-            movieFileContent = await readExternalPod(tvShowResourceUrl, context, widget.parentWidget);
+            movieFileContent = await readExternalPod(
+                tvShowResourceUrl, context, widget.parentWidget,);
 
             if (movieFileContent != null &&
                 movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
@@ -271,13 +284,15 @@ class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
     }
   }
 
-  Future<Map<String, dynamic>?> _parseIndividualMovieData(String ttlContent) async {
+  Future<Map<String, dynamic>?> _parseIndividualMovieData(
+      String ttlContent,) async {
     try {
       double? rating;
       String? comments;
       String? title;
 
-      final movieJsonMatch = RegExp(r'# JSON_MOVIE_DATA: (.+)').firstMatch(ttlContent);
+      final movieJsonMatch =
+          RegExp(r'# JSON_MOVIE_DATA: (.+)').firstMatch(ttlContent);
 
       if (movieJsonMatch != null) {
         final movieJsonData = movieJsonMatch.group(1)!;
@@ -285,7 +300,8 @@ class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
         title = movieData['title'] as String?;
       }
 
-      final userJsonMatch = RegExp(r'# JSON_USER_DATA: (.+)').firstMatch(ttlContent);
+      final userJsonMatch =
+          RegExp(r'# JSON_USER_DATA: (.+)').firstMatch(ttlContent);
 
       if (userJsonMatch != null) {
         final userJsonData = userJsonMatch.group(1)!;
@@ -386,7 +402,9 @@ class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
         final movieId = movieData['movieId']?.toString() ?? '0';
         final movieTitle = widget.loadingTitles
             ? 'Loading...'
-            : (widget.movieTitles[movieId] ?? movieData['fileName'] ?? 'Unknown Movie');
+            : (widget.movieTitles[movieId] ??
+                movieData['fileName'] ??
+                'Unknown Movie');
         final rating = movieData['rating'];
         final comments = movieData['comments'] ?? '';
 
@@ -452,7 +470,8 @@ class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                        color: colorScheme.surfaceContainerHighest
+                            .withOpacity(0.3),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(

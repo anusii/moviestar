@@ -9,12 +9,13 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 
@@ -35,7 +36,8 @@ class ListSharingControls extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ListSharingControls> createState() => _ListSharingControlsState();
+  ConsumerState<ListSharingControls> createState() =>
+      _ListSharingControlsState();
 }
 
 class _ListSharingControlsState extends ConsumerState<ListSharingControls> {
@@ -169,8 +171,10 @@ class _ListSharingControlsState extends ConsumerState<ListSharingControls> {
       }
 
       // Get current rating and comments from favorites service
-      final currentRating = await widget.favoritesService.getPersonalRating(movie);
-      final currentComments = await widget.favoritesService.getMovieComments(movie);
+      final currentRating =
+          await widget.favoritesService.getPersonalRating(movie);
+      final currentComments =
+          await widget.favoritesService.getMovieComments(movie);
 
       // Create the movie TTL content with any existing user data
       final ttlContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
@@ -200,25 +204,25 @@ class _ListSharingControlsState extends ConsumerState<ListSharingControls> {
   @override
   Widget build(BuildContext context) {
     final canShare = widget.customList.movieIds.isNotEmpty &&
-                    widget.favoritesService.isPodStorageEnabled;
+        widget.favoritesService.isPodStorageEnabled;
 
     return IconButton(
       icon: _isSharing
-        ? SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          )
-        : const Icon(Icons.share),
+          ? SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            )
+          : const Icon(Icons.share),
       onPressed: canShare && !_isSharing ? _shareCustomList : null,
       tooltip: canShare
-        ? 'Share list via POD'
-        : widget.customList.movieIds.isEmpty
-          ? 'Add movies to share'
-          : 'POD storage required',
+          ? 'Share list via POD'
+          : widget.customList.movieIds.isEmpty
+              ? 'Add movies to share'
+              : 'POD storage required',
     );
   }
 }

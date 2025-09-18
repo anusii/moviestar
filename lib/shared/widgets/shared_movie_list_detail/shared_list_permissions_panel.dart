@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SharedListPermissionsPanel extends ConsumerWidget {
@@ -87,8 +88,8 @@ class SharedListPermissionsPanel extends ConsumerWidget {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: permissions.contains('write')
-                ? colorScheme.tertiaryContainer
-                : colorScheme.primaryContainer,
+                  ? colorScheme.tertiaryContainer
+                  : colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -96,17 +97,19 @@ class SharedListPermissionsPanel extends ConsumerWidget {
                 Icon(
                   permissions.contains('write') ? Icons.edit : Icons.visibility,
                   color: permissions.contains('write')
-                    ? colorScheme.onTertiaryContainer
-                    : colorScheme.onPrimaryContainer,
+                      ? colorScheme.onTertiaryContainer
+                      : colorScheme.onPrimaryContainer,
                   size: 16,
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  permissions.contains('write') ? 'Read & Write Access' : 'Read Only Access',
+                  permissions.contains('write')
+                      ? 'Read & Write Access'
+                      : 'Read Only Access',
                   style: theme.textTheme.labelLarge?.copyWith(
                     color: permissions.contains('write')
-                      ? colorScheme.onTertiaryContainer
-                      : colorScheme.onPrimaryContainer,
+                        ? colorScheme.onTertiaryContainer
+                        : colorScheme.onPrimaryContainer,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -119,8 +122,8 @@ class SharedListPermissionsPanel extends ConsumerWidget {
           // Permission details
           Text(
             permissions.contains('write')
-              ? 'You can view and edit this shared list'
-              : 'You can view this shared list but cannot make changes',
+                ? 'You can view and edit this shared list'
+                : 'You can view this shared list but cannot make changes',
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -140,7 +143,6 @@ class SharedListPermissionsPanel extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 8),
-
               _buildUserInfo(
                 context,
                 'Owner',
@@ -148,7 +150,6 @@ class SharedListPermissionsPanel extends ConsumerWidget {
                 Icons.person,
                 colorScheme.primary,
               ),
-
               if (ownerWebId != sharedByWebId) ...[
                 const SizedBox(height: 6),
                 _buildUserInfo(

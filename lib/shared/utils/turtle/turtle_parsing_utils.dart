@@ -11,7 +11,7 @@ library;
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:rdflib/rdflib.dart';
+
 import 'package:solidpod/solidpod.dart' show turtleToTripleMap;
 
 import 'package:moviestar/models/content_item.dart';
@@ -196,8 +196,7 @@ class TurtleParsingUtils {
         predicates['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] ?? [];
     return typeValues.any(
       (type) => typeMatches.any(
-        (match) =>
-            type.toString().contains(match) || type.toString() == match,
+        (match) => type.toString().contains(match) || type.toString() == match,
       ),
     );
   }

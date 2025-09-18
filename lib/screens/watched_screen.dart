@@ -29,12 +29,12 @@ import 'package:flutter/material.dart';
 
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 
-import 'package:moviestar/mixins/screen_state_mixin.dart';
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
 import 'package:moviestar/core/services/favorites/movie_list_service.dart';
 import 'package:moviestar/core/services/pod/pod_file_operations_service.dart';
+import 'package:moviestar/mixins/screen_state_mixin.dart';
+import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/utils/navigation_utils.dart';

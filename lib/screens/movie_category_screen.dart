@@ -28,10 +28,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 

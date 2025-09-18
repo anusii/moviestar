@@ -14,17 +14,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/constants/timing_constants.dart';
-import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
+import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 
 /// A widget that displays cache management settings and statistics.
 class CacheManagementPanel extends ConsumerWidget {
   /// Function to build a switch tile widget.
-  final Widget Function(String title, String subtitle, bool value, ValueChanged<bool> onChanged) buildSwitchTile;
+  final Widget Function(String title, String subtitle, bool value,
+      ValueChanged<bool> onChanged,) buildSwitchTile;
 
   /// Function to build a list tile widget.
-  final Widget Function(String title, IconData icon, VoidCallback onTap, {bool isDestructive}) buildListTile;
+  final Widget Function(String title, IconData icon, VoidCallback onTap,
+      {bool isDestructive,}) buildListTile;
 
   /// Function to show success snackbar.
   final void Function(String message) showSuccessSnackBar;
@@ -104,7 +106,8 @@ class CacheManagementPanel extends ConsumerWidget {
                         ...stats.entries.map((entry) {
                           final category = entry.key;
                           final stat = entry.value;
-                          final categoryName = _getCategoryDisplayName(category);
+                          final categoryName =
+                              _getCategoryDisplayName(category);
 
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8),
@@ -116,12 +119,20 @@ class CacheManagementPanel extends ConsumerWidget {
                                   children: [
                                     Text(
                                       categoryName,
-                                      style: Theme.of(context).textTheme.bodyMedium,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium,
                                     ),
                                     Text(
                                       'Updated ${_getTimeAgo(stat['age'] as Duration)} ago',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            color: Theme.of(context).textTheme.bodyMedium?.color,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.color,
                                           ),
                                     ),
                                   ],
@@ -142,7 +153,8 @@ class CacheManagementPanel extends ConsumerWidget {
                                       (stat['isValid'] as bool)
                                           ? '${stat['movieCount']} movies'
                                           : 'Expired',
-                                      style: Theme.of(context).textTheme.bodySmall,
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
                                     ),
                                   ],
                                 ),
@@ -160,13 +172,15 @@ class CacheManagementPanel extends ConsumerWidget {
 
         // Cache Actions.
         buildListTile('Force Refresh All', Icons.refresh, () async {
-          await _showForceRefreshDialog(context, ref, cachingEnabled, cacheOnlyMode);
+          await _showForceRefreshDialog(
+              context, ref, cachingEnabled, cacheOnlyMode,);
         }),
         buildListTile(
           'Clear All Cache',
           Icons.delete_sweep,
           () async {
-            await _showClearCacheDialog(context, ref, cachingEnabled, cacheOnlyMode);
+            await _showClearCacheDialog(
+                context, ref, cachingEnabled, cacheOnlyMode,);
           },
           isDestructive: true,
         ),
@@ -207,7 +221,8 @@ class CacheManagementPanel extends ConsumerWidget {
   }
 
   /// Builds the offline mode tile with proper enabled/disabled state.
-  Widget _buildOfflineModeTile(BuildContext context, WidgetRef ref, bool cachingEnabled, bool cacheOnlyMode) {
+  Widget _buildOfflineModeTile(BuildContext context, WidgetRef ref,
+      bool cachingEnabled, bool cacheOnlyMode,) {
     return SwitchListTile(
       title: Text(
         'Offline Mode',
@@ -241,7 +256,8 @@ class CacheManagementPanel extends ConsumerWidget {
               );
             }
           : null,
-      thumbColor: WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
+      thumbColor:
+          WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
     );
   }
 

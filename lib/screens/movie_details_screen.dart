@@ -29,17 +29,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
-import 'package:moviestar/widgets/movie_sharing_ui.dart';
 import 'package:moviestar/shared/widgets/movie_details/add_to_lists_dialog.dart';
 import 'package:moviestar/shared/widgets/movie_details/movie_action_buttons.dart';
 import 'package:moviestar/shared/widgets/movie_details/movie_info_section.dart';
 import 'package:moviestar/shared/widgets/movie_details/movie_poster_section.dart';
+import 'package:moviestar/widgets/movie_sharing_ui.dart';
 
 /// A screen that displays detailed information about a selected movie.
 
@@ -87,7 +87,6 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
 
   bool _isInWatched = false;
 
-
   /// Indicates whether the movie has a shareable file (rating or comment).
 
   bool _hasMovieFile = false;
@@ -99,7 +98,6 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
   // Indicates whether this is a shared movie (read-only view).
 
   bool get _isSharedMovie => widget.sharedMovieData != null;
-
 
   @override
   void initState() {
@@ -202,7 +200,6 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
       });
     }
   }
-
 
   /// Checks if the current movie has a file (user has rated or commented).
 
@@ -390,4 +387,3 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
     );
   }
 }
-

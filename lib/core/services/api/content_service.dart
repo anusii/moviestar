@@ -27,10 +27,10 @@ library;
 
 import 'dart:io';
 
-import 'package:moviestar/models/content_item.dart';
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/core/services/api/api_key_service.dart';
 import 'package:moviestar/core/services/network/content_search_service.dart';
+import 'package:moviestar/models/content_item.dart';
+import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/network_client.dart';
 
 //
@@ -75,7 +75,8 @@ class ContentService {
       return;
     }
     final apiKey = await _apiKeyService.getApiKey();
-    print('🔍 [ContentService] Got API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}');
+    print(
+        '🔍 [ContentService] Got API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',);
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
     _searchService = ContentSearchService(_client!);
     print('🔍 [ContentService] Client initialized with API key');
@@ -90,7 +91,8 @@ class ContentService {
   // Initializes the network client with a direct API key.
 
   Future<void> _initializeClientWithApiKey(String? apiKey) async {
-    print('🔍 [ContentService] _initializeClientWithApiKey called with API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}');
+    print(
+        '🔍 [ContentService] _initializeClientWithApiKey called with API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',);
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
     _searchService = ContentSearchService(_client!);
     print('🔍 [ContentService] Client initialized with direct API key');
@@ -347,16 +349,20 @@ class ContentService {
   Future<Map<String, List<ContentItem>>> searchContentComprehensive(
     String query,
   ) async {
-    print('🔍 [ContentService] searchContentComprehensive called with query: "$query"');
+    print(
+        '🔍 [ContentService] searchContentComprehensive called with query: "$query"',);
     await _ensureClientInitialized();
-    print('🔍 [ContentService] Client initialized, _searchService is null: ${_searchService == null}');
+    print(
+        '🔍 [ContentService] Client initialized, _searchService is null: ${_searchService == null}',);
     if (_searchService == null) {
       print('🔍 [ContentService] _searchService is null, reinitializing...');
       // Fallback: reinitialize if still null
       await _initializeClient();
-      print('🔍 [ContentService] After reinit, _searchService is null: ${_searchService == null}');
+      print(
+          '🔍 [ContentService] After reinit, _searchService is null: ${_searchService == null}',);
     }
-    print('🔍 [ContentService] Calling _searchService.searchContentComprehensive');
+    print(
+        '🔍 [ContentService] Calling _searchService.searchContentComprehensive',);
     return await _searchService!.searchContentComprehensive(query);
   }
 

@@ -12,7 +12,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:solidpod/solidpod.dart' as solidpod show SolidFunctionCallStatus, writePod, readPod, deleteFile;
+import 'package:solidpod/solidpod.dart' as solidpod
+    show SolidFunctionCallStatus, writePod, readPod, deleteFile;
 
 import 'package:moviestar/utils/is_logged_in.dart';
 

@@ -10,11 +10,10 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:gap/gap.dart';
+import 'package:markdown_tooltip/markdown_tooltip.dart';
 
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
-import 'package:markdown_tooltip/markdown_tooltip.dart';
 
 /// A widget that displays the action buttons for a movie details screen.
 /// This component shows bookmark, watched, add to list, and share buttons.

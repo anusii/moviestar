@@ -9,23 +9,23 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
-import 'package:moviestar/widgets/movie_kanban_board.dart';
+import 'package:moviestar/shared/widgets/home/home_cache_badges.dart';
 import 'package:moviestar/shared/widgets/home/home_custom_list_builder.dart';
+import 'package:moviestar/shared/widgets/home/home_error_handler.dart';
+import 'package:moviestar/shared/widgets/home/home_movie_list_items.dart';
+import 'package:moviestar/shared/widgets/home/home_movie_sections.dart';
 import 'package:moviestar/shared/widgets/home/home_to_watch_section.dart';
 import 'package:moviestar/shared/widgets/home/home_watched_section.dart';
-import 'package:moviestar/shared/widgets/home/home_movie_list_items.dart';
-import 'package:moviestar/shared/widgets/home/home_cache_badges.dart';
-import 'package:moviestar/shared/widgets/home/home_movie_sections.dart';
-import 'package:moviestar/shared/widgets/home/home_error_handler.dart';
+import 'package:moviestar/widgets/movie_kanban_board.dart';
 
 /// Widget that builds different view modes for the home screen.
 class HomeViewModes extends ConsumerWidget {
@@ -175,7 +175,8 @@ class HomeViewModes extends ConsumerWidget {
             scrollControllers: scrollControllers,
             showAsListSections: true,
           ),
-          _buildAsyncListSection(context, ref, 'Popular on Movie Star', popularMovies),
+          _buildAsyncListSection(
+              context, ref, 'Popular on Movie Star', popularMovies,),
           _buildAsyncListSection(context, ref, 'Now Playing', nowPlayingMovies),
           _buildAsyncListSection(context, ref, 'Top Rated', topRatedMovies),
           _buildAsyncListSection(context, ref, 'Upcoming', upcomingMovies),

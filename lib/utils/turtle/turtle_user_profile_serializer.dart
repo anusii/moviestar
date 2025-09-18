@@ -33,16 +33,22 @@ class TurtleUserProfileSerializer {
     // Create user resource
     final userUri = URIRef(webId);
     print(
-        '🐛 [TurtleUserProfileSerializer] Adding user triple: $userUri rdf:type ${TurtleNamespaces.userType}');
+      '🐛 [TurtleUserProfileSerializer] Adding user triple: $userUri rdf:type ${TurtleNamespaces.userType}',
+    );
     graph.addTripleToGroups(
-        userUri, TurtleNamespaces.rdfType, TurtleNamespaces.userType);
+      userUri,
+      TurtleNamespaces.rdfType,
+      TurtleNamespaces.userType,
+    );
 
     // Add user properties
     graph.addTripleToGroups(
       userUri,
       TurtleNamespaces.name,
-      Literal(TurtleUtils.escapeString(name),
-          datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+      Literal(
+        TurtleUtils.escapeString(name),
+        datatype: TurtleNamespaces.xsdNS.withAttr('string'),
+      ),
     );
 
     if (dob.isNotEmpty) {
@@ -57,16 +63,20 @@ class TurtleUserProfileSerializer {
       graph.addTripleToGroups(
         userUri,
         TurtleNamespaces.gender,
-        Literal(TurtleUtils.escapeString(gender),
-            datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+        Literal(
+          TurtleUtils.escapeString(gender),
+          datatype: TurtleNamespaces.xsdNS.withAttr('string'),
+        ),
       );
     }
 
     graph.addTripleToGroups(
       userUri,
       TurtleNamespaces.webId,
-      Literal(TurtleUtils.escapeString(webId),
-          datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+      Literal(
+        TurtleUtils.escapeString(webId),
+        datatype: TurtleNamespaces.xsdNS.withAttr('string'),
+      ),
     );
 
     print('🐛 [TurtleUserProfileSerializer] About to serialize graph');
@@ -75,9 +85,11 @@ class TurtleUserProfileSerializer {
     try {
       graph.serialize(format: 'turtle');
       print(
-          '🐛 [TurtleUserProfileSerializer] Graph serialize called, serializedString length: ${graph.serializedString.length}');
+        '🐛 [TurtleUserProfileSerializer] Graph serialize called, serializedString length: ${graph.serializedString.length}',
+      );
       print(
-          '🐛 [TurtleUserProfileSerializer] Graph serializedString content: "${graph.serializedString}"');
+        '🐛 [TurtleUserProfileSerializer] Graph serializedString content: "${graph.serializedString}"',
+      );
 
       if (graph.serializedString.isNotEmpty) {
         return graph.serializedString;
@@ -88,16 +100,20 @@ class TurtleUserProfileSerializer {
 
     // Fallback: create manual TTL for user profile
     print(
-        '🐛 [TurtleUserProfileSerializer] Using fallback manual TTL generation');
+      '🐛 [TurtleUserProfileSerializer] Using fallback manual TTL generation',
+    );
     final buffer = StringBuffer();
 
     // Add namespaces
     buffer.writeln(
-        '@prefix ms: <http://dacs.anu.edu.au/ontologies/moviestar#> .');
+      '@prefix ms: <http://dacs.anu.edu.au/ontologies/moviestar#> .',
+    );
     buffer.writeln(
-        '@prefix moviestar-data: <http://dacs.anu.edu.au/data/moviestar#> .');
+      '@prefix moviestar-data: <http://dacs.anu.edu.au/data/moviestar#> .',
+    );
     buffer.writeln(
-        '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .');
+      '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .',
+    );
     buffer.writeln('@prefix foaf: <http://xmlns.com/foaf/0.1/> .');
     buffer.writeln('@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .');
     buffer.writeln();
@@ -110,7 +126,8 @@ class TurtleUserProfileSerializer {
 
     final fallbackTtl = buffer.toString();
     print(
-        '🐛 [TurtleUserProfileSerializer] Generated fallback TTL (${fallbackTtl.length} chars)');
+      '🐛 [TurtleUserProfileSerializer] Generated fallback TTL (${fallbackTtl.length} chars)',
+    );
     return fallbackTtl;
   }
 
@@ -135,19 +152,26 @@ class TurtleUserProfileSerializer {
 
     // Create movie list
     graph.addTripleToGroups(
-        listUri, TurtleNamespaces.rdfType, TurtleNamespaces.movieListType);
+      listUri,
+      TurtleNamespaces.rdfType,
+      TurtleNamespaces.movieListType,
+    );
     graph.addTripleToGroups(
       listUri,
       TurtleNamespaces.name,
-      Literal(TurtleUtils.escapeString(listName),
-          datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+      Literal(
+        TurtleUtils.escapeString(listName),
+        datatype: TurtleNamespaces.xsdNS.withAttr('string'),
+      ),
     );
     if (description.isNotEmpty) {
       graph.addTripleToGroups(
         listUri,
         TurtleNamespaces.description,
-        Literal(TurtleUtils.escapeString(description),
-            datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+        Literal(
+          TurtleUtils.escapeString(description),
+          datatype: TurtleNamespaces.xsdNS.withAttr('string'),
+        ),
       );
     }
 
@@ -155,28 +179,34 @@ class TurtleUserProfileSerializer {
     try {
       graph.serialize(format: 'turtle');
       print(
-          '🐛 [TurtleUserProfileSerializer] Movie list graph serialize called, serializedString length: ${graph.serializedString.length}');
+        '🐛 [TurtleUserProfileSerializer] Movie list graph serialize called, serializedString length: ${graph.serializedString.length}',
+      );
 
       if (graph.serializedString.isNotEmpty) {
         return graph.serializedString;
       }
     } catch (e) {
       print(
-          '🐛 [TurtleUserProfileSerializer] Movie list graph serialize error: $e');
+        '🐛 [TurtleUserProfileSerializer] Movie list graph serialize error: $e',
+      );
     }
 
     // Fallback: create manual TTL for movie list
     print(
-        '🐛 [TurtleUserProfileSerializer] Using fallback manual TTL for movie list $listId');
+      '🐛 [TurtleUserProfileSerializer] Using fallback manual TTL for movie list $listId',
+    );
     final buffer = StringBuffer();
 
     // Add namespaces
     buffer.writeln(
-        '@prefix ms: <http://dacs.anu.edu.au/ontologies/moviestar#> .');
+      '@prefix ms: <http://dacs.anu.edu.au/ontologies/moviestar#> .',
+    );
     buffer.writeln(
-        '@prefix moviestar-data: <http://dacs.anu.edu.au/data/moviestar#> .');
+      '@prefix moviestar-data: <http://dacs.anu.edu.au/data/moviestar#> .',
+    );
     buffer.writeln(
-        '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .');
+      '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .',
+    );
     buffer.writeln();
 
     // Add movie list reference
@@ -190,7 +220,8 @@ class TurtleUserProfileSerializer {
 
     final fallbackTtl = buffer.toString();
     print(
-        '🐛 [TurtleUserProfileSerializer] Generated fallback movie list TTL (${fallbackTtl.length} chars)');
+      '🐛 [TurtleUserProfileSerializer] Generated fallback movie list TTL (${fallbackTtl.length} chars)',
+    );
     return fallbackTtl;
   }
 
@@ -215,18 +246,25 @@ class TurtleUserProfileSerializer {
 
     // Create API key
     graph.addTripleToGroups(
-        apiKeyUri, TurtleNamespaces.rdfType, TurtleNamespaces.apiKeyType);
+      apiKeyUri,
+      TurtleNamespaces.rdfType,
+      TurtleNamespaces.apiKeyType,
+    );
     graph.addTripleToGroups(
       apiKeyUri,
       TurtleNamespaces.keyValue,
-      Literal(TurtleUtils.escapeString(apiKeyValue),
-          datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+      Literal(
+        TurtleUtils.escapeString(apiKeyValue),
+        datatype: TurtleNamespaces.xsdNS.withAttr('string'),
+      ),
     );
     graph.addTripleToGroups(
       apiKeyUri,
       TurtleNamespaces.source,
-      Literal(TurtleUtils.escapeString(source),
-          datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+      Literal(
+        TurtleUtils.escapeString(source),
+        datatype: TurtleNamespaces.xsdNS.withAttr('string'),
+      ),
     );
 
     // Try to serialize using the graph
@@ -237,7 +275,8 @@ class TurtleUserProfileSerializer {
       }
     } catch (e) {
       print(
-          '🐛 [TurtleUserProfileSerializer] API key graph serialize error: $e');
+        '🐛 [TurtleUserProfileSerializer] API key graph serialize error: $e',
+      );
     }
 
     // Fallback: create manual TTL for API key
@@ -245,11 +284,14 @@ class TurtleUserProfileSerializer {
 
     // Add namespaces
     buffer.writeln(
-        '@prefix ms: <http://dacs.anu.edu.au/ontologies/moviestar#> .');
+      '@prefix ms: <http://dacs.anu.edu.au/ontologies/moviestar#> .',
+    );
     buffer.writeln(
-        '@prefix moviestar-data: <http://dacs.anu.edu.au/data/moviestar#> .');
+      '@prefix moviestar-data: <http://dacs.anu.edu.au/data/moviestar#> .',
+    );
     buffer.writeln(
-        '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .');
+      '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .',
+    );
     buffer.writeln();
 
     // Add API key
@@ -279,12 +321,17 @@ class TurtleUserProfileSerializer {
     // Create movie list
     final listUri = TurtleNamespaces.moviestarDataNS.withAttr(listName);
     graph.addTripleToGroups(
-        listUri, TurtleNamespaces.rdfType, TurtleNamespaces.movieListType);
+      listUri,
+      TurtleNamespaces.rdfType,
+      TurtleNamespaces.movieListType,
+    );
     graph.addTripleToGroups(
       listUri,
       TurtleNamespaces.rdfsLabel,
-      Literal(TurtleUtils.escapeString(listName),
-          datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+      Literal(
+        TurtleUtils.escapeString(listName),
+        datatype: TurtleNamespaces.xsdNS.withAttr('string'),
+      ),
     );
 
     // Add movies from map data
@@ -300,7 +347,10 @@ class TurtleUserProfileSerializer {
 
       // Add movie type
       graph.addTripleToGroups(
-          movieUri, TurtleNamespaces.rdfType, TurtleNamespaces.movieType);
+        movieUri,
+        TurtleNamespaces.rdfType,
+        TurtleNamespaces.movieType,
+      );
 
       // Add movie properties from map
       if (movieData['title'] != null) {
@@ -331,14 +381,22 @@ class TurtleUserProfileSerializer {
         final ratingUri =
             TurtleNamespaces.moviestarDataNS.withAttr('rating_$movieId');
         graph.addTripleToGroups(
-            ratingUri, TurtleNamespaces.rdfType, TurtleNamespaces.ratingType);
+          ratingUri,
+          TurtleNamespaces.rdfType,
+          TurtleNamespaces.ratingType,
+        );
         graph.addTripleToGroups(
-            movieUri, TurtleNamespaces.aggregateRating, ratingUri);
+          movieUri,
+          TurtleNamespaces.aggregateRating,
+          ratingUri,
+        );
         graph.addTripleToGroups(
           ratingUri,
           TurtleNamespaces.value,
-          Literal(rating.toString(),
-              datatype: TurtleNamespaces.xsdNS.withAttr('decimal')),
+          Literal(
+            rating.toString(),
+            datatype: TurtleNamespaces.xsdNS.withAttr('decimal'),
+          ),
         );
       }
 
@@ -347,13 +405,18 @@ class TurtleUserProfileSerializer {
         final commentUri =
             TurtleNamespaces.moviestarDataNS.withAttr('comment_$movieId');
         graph.addTripleToGroups(
-            commentUri, TurtleNamespaces.rdfType, TurtleNamespaces.commentType);
+          commentUri,
+          TurtleNamespaces.rdfType,
+          TurtleNamespaces.commentType,
+        );
         graph.addTripleToGroups(movieUri, TurtleNamespaces.comment, commentUri);
         graph.addTripleToGroups(
           commentUri,
           TurtleNamespaces.text,
-          Literal(TurtleUtils.escapeString(comment),
-              datatype: TurtleNamespaces.xsdNS.withAttr('string')),
+          Literal(
+            TurtleUtils.escapeString(comment),
+            datatype: TurtleNamespaces.xsdNS.withAttr('string'),
+          ),
         );
       }
     }
@@ -368,7 +431,8 @@ class TurtleUserProfileSerializer {
       final graph = Graph();
       graph.parseTurtle(ttlContent);
       print(
-          '🐛 [movieListFromTurtle] Graph parsed, looking for movie lists...');
+        '🐛 [movieListFromTurtle] Graph parsed, looking for movie lists...',
+      );
 
       // Try to find movie lists with current namespace
       var listUris = graph.subjects(
@@ -376,7 +440,8 @@ class TurtleUserProfileSerializer {
         obj: TurtleNamespaces.movieListType,
       );
       print(
-          '🐛 [movieListFromTurtle] Found ${listUris.length} lists with movieListType');
+        '🐛 [movieListFromTurtle] Found ${listUris.length} lists with movieListType',
+      );
 
       // Fallback: try with rdfs:label instead of custom movieListType for backward compatibility
       if (listUris.isEmpty) {
@@ -384,7 +449,8 @@ class TurtleUserProfileSerializer {
         final labelProp = TurtleNamespaces.rdfsNS.withAttr('label');
         listUris = graph.subjects(pre: labelProp);
         print(
-            '🐛 [movieListFromTurtle] Fallback: found ${listUris.length} subjects with rdfs:label');
+          '🐛 [movieListFromTurtle] Fallback: found ${listUris.length} subjects with rdfs:label',
+        );
       }
 
       if (listUris.isEmpty) {
@@ -425,13 +491,15 @@ class TurtleUserProfileSerializer {
         pre: TurtleNamespaces.hasMovie,
       );
       print(
-          '🐛 [movieListFromTurtle] Found ${movieTriples.length} movies with hasMovie property');
+        '🐛 [movieListFromTurtle] Found ${movieTriples.length} movies with hasMovie property',
+      );
 
       if (movieTriples.isNotEmpty) {
         // Convert objects to URIRef list
         movieUris = movieTriples.whereType<URIRef>().toList();
         print(
-            '🐛 [movieListFromTurtle] Using hasMovie results: ${movieUris.length} movies');
+          '🐛 [movieListFromTurtle] Using hasMovie results: ${movieUris.length} movies',
+        );
       } else {
         // Fallback: find all objects that are movies based on their type
         final movieUriSet = graph.subjects(
@@ -440,11 +508,13 @@ class TurtleUserProfileSerializer {
         );
         movieUris = movieUriSet.toList();
         print(
-            '🐛 [movieListFromTurtle] Fallback: found ${movieUris.length} movies by type');
+          '🐛 [movieListFromTurtle] Fallback: found ${movieUris.length} movies by type',
+        );
       }
 
       print(
-          '🐛 [movieListFromTurtle] Total movies to process: ${movieUris.length}');
+        '🐛 [movieListFromTurtle] Total movies to process: ${movieUris.length}',
+      );
 
       final movies = <Map<String, dynamic>>[];
       final ratings = <String, double>{};
@@ -452,7 +522,8 @@ class TurtleUserProfileSerializer {
 
       for (final movieUri in movieUris) {
         print(
-            '🐛 [movieListFromTurtle] Processing movie URI: ${movieUri.value}');
+          '🐛 [movieListFromTurtle] Processing movie URI: ${movieUri.value}',
+        );
 
         // Extract movie data
         final movieData = _extractMovieDataFromGraph(graph, movieUri);
@@ -460,8 +531,10 @@ class TurtleUserProfileSerializer {
 
         if (movieData != null) {
           // Check if this is a placeholder that needs file loading
-          if (movieData['isPlaceholder'] == true && movieData['filePath'] != null) {
-            print('🐛 [movieListFromTurtle] Movie ${movieData['id']} is a placeholder, needs file loading from: ${movieData['filePath']}');
+          if (movieData['isPlaceholder'] == true &&
+              movieData['filePath'] != null) {
+            print(
+                '🐛 [movieListFromTurtle] Movie ${movieData['id']} is a placeholder, needs file loading from: ${movieData['filePath']}',);
             // Mark the movie as needing file resolution but add it to the list
             // The calling code will need to resolve filePath references
             movieData['needsFileResolution'] = true;
@@ -469,7 +542,8 @@ class TurtleUserProfileSerializer {
 
           movies.add(movieData);
           print(
-              '🐛 [movieListFromTurtle] Added movie: ${movieData['title']} (ID: ${movieData['id']})');
+            '🐛 [movieListFromTurtle] Added movie: ${movieData['title']} (ID: ${movieData['id']})',
+          );
 
           final movieId = movieData['id']?.toString() ?? '';
 
@@ -486,7 +560,8 @@ class TurtleUserProfileSerializer {
           }
         } else {
           print(
-              '🐛 [movieListFromTurtle] Failed to extract data for movie URI: ${movieUri.value}');
+            '🐛 [movieListFromTurtle] Failed to extract data for movie URI: ${movieUri.value}',
+          );
         }
       }
 
@@ -504,22 +579,28 @@ class TurtleUserProfileSerializer {
 
   /// Extracts movie data from graph
   static Map<String, dynamic>? _extractMovieDataFromGraph(
-      Graph graph, URIRef movieUri) {
+    Graph graph,
+    URIRef movieUri,
+  ) {
     try {
       print(
-          '🐛 [_extractMovieDataFromGraph] Extracting data for URI: ${movieUri.value}');
+        '🐛 [_extractMovieDataFromGraph] Extracting data for URI: ${movieUri.value}',
+      );
       final movieData = <String, dynamic>{};
 
       // Extract ID from URI - handle both Movie and TVShow formats with underscore and hyphen
       final uriString = movieUri.value;
-      var idMatch = RegExp(r'(Movie|TVShow)[_-](\d+)', caseSensitive: false).firstMatch(uriString);
+      var idMatch = RegExp(r'(Movie|TVShow)[_-](\d+)', caseSensitive: false)
+          .firstMatch(uriString);
       if (idMatch != null) {
         movieData['id'] = int.tryParse(idMatch.group(2)!) ?? 0;
         print(
-            '🐛 [_extractMovieDataFromGraph] Extracted ID: ${movieData['id']} from ${idMatch.group(1)} format');
+          '🐛 [_extractMovieDataFromGraph] Extracted ID: ${movieData['id']} from ${idMatch.group(1)} format',
+        );
       } else {
         print(
-            '🐛 [_extractMovieDataFromGraph] Failed to extract ID from URI: $uriString');
+          '🐛 [_extractMovieDataFromGraph] Failed to extract ID from URI: $uriString',
+        );
       }
 
       // Extract title - try both schema.org name and moviestar ontology name
@@ -528,10 +609,13 @@ class TurtleUserProfileSerializer {
 
       // If not found with schema.org name, try moviestar ontology name
       if (nameTriples.isEmpty) {
-        nameTriples = graph.objects(sub: movieUri, pre: TurtleNamespaces.moviestarOntoNS.withAttr('name'));
+        nameTriples = graph.objects(
+            sub: movieUri,
+            pre: TurtleNamespaces.moviestarOntoNS.withAttr('name'),);
       }
       print(
-          '🐛 [_extractMovieDataFromGraph] Name triples found: ${nameTriples.length}');
+        '🐛 [_extractMovieDataFromGraph] Name triples found: ${nameTriples.length}',
+      );
       if (nameTriples.isNotEmpty) {
         var titleValue = nameTriples.first.toString().replaceAll('"', '');
 
@@ -545,31 +629,35 @@ class TurtleUserProfileSerializer {
           if (fileNameMatch != null) {
             final fileName = fileNameMatch.group(1)!;
             // Extract movie ID from filename (e.g., "Movie-803796" -> "803796", "TVShow-223911" -> "223911")
-            final fileIdMatch = RegExp(r'(Movie|TVShow)[_-](\d+)', caseSensitive: false).firstMatch(fileName);
+            final fileIdMatch =
+                RegExp(r'(Movie|TVShow)[_-](\d+)', caseSensitive: false)
+                    .firstMatch(fileName);
             if (fileIdMatch != null) {
               final contentType = fileIdMatch.group(1)!;
               final movieId = fileIdMatch.group(2)!;
-              movieData['title'] =
-                  '$contentType $movieId'; // Placeholder title
+              movieData['title'] = '$contentType $movieId'; // Placeholder title
               movieData['isPlaceholder'] =
                   true; // Mark as placeholder for later loading
               movieData['filePath'] =
                   filePath; // Store file path for later loading
               print(
-                  '🐛 [_extractMovieDataFromGraph] Detected file path reference: $filePath, using placeholder title: ${movieData['title']}');
+                '🐛 [_extractMovieDataFromGraph] Detected file path reference: $filePath, using placeholder title: ${movieData['title']}',
+              );
             }
           }
         } else {
           movieData['title'] = titleValue;
           print(
-              '🐛 [_extractMovieDataFromGraph] Extracted title: ${movieData['title']}');
+            '🐛 [_extractMovieDataFromGraph] Extracted title: ${movieData['title']}',
+          );
         }
       } else {
         // Fallback: try rdfs:label for title
         final labelProp = TurtleNamespaces.rdfsNS.withAttr('label');
         final labelTriples = graph.objects(sub: movieUri, pre: labelProp);
         print(
-            '🐛 [_extractMovieDataFromGraph] Label triples found: ${labelTriples.length}');
+          '🐛 [_extractMovieDataFromGraph] Label triples found: ${labelTriples.length}',
+        );
         if (labelTriples.isNotEmpty) {
           var titleValue = labelTriples.first.toString().replaceAll('"', '');
 
@@ -584,7 +672,8 @@ class TurtleUserProfileSerializer {
               final fileName = fileNameMatch.group(1)!;
               // Extract movie ID from filename
               final fileIdMatch =
-                  RegExp(r'(Movie|TVShow)[_-](\d+)', caseSensitive: false).firstMatch(fileName);
+                  RegExp(r'(Movie|TVShow)[_-](\d+)', caseSensitive: false)
+                      .firstMatch(fileName);
               if (fileIdMatch != null) {
                 final contentType = fileIdMatch.group(1)!;
                 final movieId = fileIdMatch.group(2)!;
@@ -595,13 +684,15 @@ class TurtleUserProfileSerializer {
                 movieData['filePath'] =
                     filePath; // Store file path for later loading
                 print(
-                    '🐛 [_extractMovieDataFromGraph] Detected file path reference in label: $filePath, using placeholder title: ${movieData['title']}');
+                  '🐛 [_extractMovieDataFromGraph] Detected file path reference in label: $filePath, using placeholder title: ${movieData['title']}',
+                );
               }
             }
           } else {
             movieData['title'] = titleValue;
             print(
-                '🐛 [_extractMovieDataFromGraph] Extracted title from label: ${movieData['title']}');
+              '🐛 [_extractMovieDataFromGraph] Extracted title from label: ${movieData['title']}',
+            );
           }
         }
       }
@@ -610,23 +701,27 @@ class TurtleUserProfileSerializer {
       final descTriples =
           graph.objects(sub: movieUri, pre: TurtleNamespaces.description);
       print(
-          '🐛 [_extractMovieDataFromGraph] Description triples found: ${descTriples.length}');
+        '🐛 [_extractMovieDataFromGraph] Description triples found: ${descTriples.length}',
+      );
       if (descTriples.isNotEmpty) {
         movieData['overview'] =
             descTriples.first.toString().replaceAll('"', '');
         print(
-            '🐛 [_extractMovieDataFromGraph] Extracted overview: ${movieData['overview']}');
+          '🐛 [_extractMovieDataFromGraph] Extracted overview: ${movieData['overview']}',
+        );
       } else {
         // Fallback: try rdfs:comment for overview
         final commentProp = TurtleNamespaces.rdfsNS.withAttr('comment');
         final commentTriples = graph.objects(sub: movieUri, pre: commentProp);
         print(
-            '🐛 [_extractMovieDataFromGraph] Comment triples found: ${commentTriples.length}');
+          '🐛 [_extractMovieDataFromGraph] Comment triples found: ${commentTriples.length}',
+        );
         if (commentTriples.isNotEmpty) {
           movieData['overview'] =
               commentTriples.first.toString().replaceAll('"', '');
           print(
-              '🐛 [_extractMovieDataFromGraph] Extracted overview from comment: ${movieData['overview']}');
+            '🐛 [_extractMovieDataFromGraph] Extracted overview from comment: ${movieData['overview']}',
+          );
         }
       }
 
@@ -651,7 +746,8 @@ class TurtleUserProfileSerializer {
 
       if (valueTriples.isNotEmpty) {
         return double.tryParse(
-            valueTriples.first.toString().replaceAll('"', ''));
+          valueTriples.first.toString().replaceAll('"', ''),
+        );
       }
 
       return null;

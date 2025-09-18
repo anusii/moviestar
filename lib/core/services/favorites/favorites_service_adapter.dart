@@ -27,10 +27,10 @@
 library;
 
 import 'package:moviestar/constants/timing_constants.dart';
-import 'package:moviestar/models/custom_list.dart';
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_manager.dart';
+import 'package:moviestar/models/custom_list.dart';
+import 'package:moviestar/models/movie.dart';
 
 /// Adapter that makes FavoritesServiceManager look like FavoritesService.
 /// This allows us to integrate POD storage without changing all existing screens.

@@ -9,14 +9,13 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gap/gap.dart';
 
-import 'package:moviestar/core/services/cache/cached_movie_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/widgets/movie_kanban_board.dart';
 
 /// Component that handles view mode switching and content routing for HomeScreen
@@ -29,9 +28,12 @@ class HomeScreenViewModeHandler extends StatelessWidget {
   final Widget Function() buildToWatchMovieRow;
   final Widget Function() buildWatchedMovieRow;
   final Widget Function() buildCustomListRows;
-  final Widget Function(String, AsyncValue<CacheResult<List<Movie>>>, String, CacheCategory) buildMovieRow;
+  final Widget Function(
+          String, AsyncValue<CacheResult<List<Movie>>>, String, CacheCategory,)
+      buildMovieRow;
   final Widget Function() buildCustomListListSections;
-  final Widget Function(String, AsyncValue<CacheResult<List<Movie>>>) buildAsyncListSection;
+  final Widget Function(String, AsyncValue<CacheResult<List<Movie>>>)
+      buildAsyncListSection;
   final Widget Function(String, Widget) buildListSection;
   final Widget Function() buildToWatchListItems;
   final Widget Function() buildWatchedListItems;

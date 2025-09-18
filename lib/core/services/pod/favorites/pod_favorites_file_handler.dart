@@ -9,8 +9,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/core/services/pod/pod_favorites_file_manager.dart';
+import 'package:moviestar/models/movie.dart';
 
 /// Handles file operations for POD favorites service.
 class PodFavoritesFileHandler {
@@ -75,7 +75,8 @@ class PodFavoritesFileHandler {
       );
       return fullMovies;
     } else {
-      debugPrint('🎬 [PodFavoritesFileHandler] Failed to parse movies from TTL');
+      debugPrint(
+          '🎬 [PodFavoritesFileHandler] Failed to parse movies from TTL',);
     }
 
     return movieListData ?? [];

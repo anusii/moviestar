@@ -29,9 +29,9 @@ import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
 
-import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/core/services/api/api_key_validation_service.dart';
 import 'package:moviestar/core/services/network/network_connectivity_service.dart';
+import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/utils/network_client.dart';
 
 /// Context for error mapping operations.

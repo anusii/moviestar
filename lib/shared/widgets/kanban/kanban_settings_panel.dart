@@ -9,8 +9,8 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:moviestar/constants/dimensions.dart';
-import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
 
 /// Configuration settings for the kanban board
@@ -60,9 +60,11 @@ class KanbanSettings {
       showMoviePosters: showMoviePosters ?? this.showMoviePosters,
       enableDragAndDrop: enableDragAndDrop ?? this.enableDragAndDrop,
       showSyncIndicators: showSyncIndicators ?? this.showSyncIndicators,
-      enableOptimisticUpdates: enableOptimisticUpdates ?? this.enableOptimisticUpdates,
+      enableOptimisticUpdates:
+          enableOptimisticUpdates ?? this.enableOptimisticUpdates,
       autoRefresh: autoRefresh ?? this.autoRefresh,
-      refreshIntervalMinutes: refreshIntervalMinutes ?? this.refreshIntervalMinutes,
+      refreshIntervalMinutes:
+          refreshIntervalMinutes ?? this.refreshIntervalMinutes,
       cardWidth: cardWidth ?? this.cardWidth,
       cardHeight: cardHeight ?? this.cardHeight,
       defaultSortCriteria: defaultSortCriteria ?? this.defaultSortCriteria,
@@ -446,7 +448,8 @@ class KanbanSettingsPanel extends StatelessWidget {
           context,
           'Popular movies',
           'popular',
-          controller.settings.defaultSortCriteria['popular'] ?? MovieSortCriteria.ratingDesc,
+          controller.settings.defaultSortCriteria['popular'] ??
+              MovieSortCriteria.ratingDesc,
         ),
 
         // To Watch sort
@@ -454,7 +457,8 @@ class KanbanSettingsPanel extends StatelessWidget {
           context,
           'To Watch',
           'towatch',
-          controller.settings.defaultSortCriteria['towatch'] ?? MovieSortCriteria.nameAsc,
+          controller.settings.defaultSortCriteria['towatch'] ??
+              MovieSortCriteria.nameAsc,
         ),
 
         // Watched sort
@@ -462,7 +466,8 @@ class KanbanSettingsPanel extends StatelessWidget {
           context,
           'Watched',
           'watched',
-          controller.settings.defaultSortCriteria['watched'] ?? MovieSortCriteria.dateDesc,
+          controller.settings.defaultSortCriteria['watched'] ??
+              MovieSortCriteria.dateDesc,
         ),
       ],
     );
@@ -587,7 +592,8 @@ class KanbanQuickSettings extends StatelessWidget {
           // Drag and drop toggle
           IconButton(
             onPressed: () {
-              controller.updateEnableDragAndDrop(!controller.settings.enableDragAndDrop);
+              controller.updateEnableDragAndDrop(
+                  !controller.settings.enableDragAndDrop,);
             },
             icon: Icon(
               controller.settings.enableDragAndDrop

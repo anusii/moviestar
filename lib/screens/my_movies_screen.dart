@@ -31,12 +31,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart';
 
-import 'package:moviestar/mixins/screen_state_mixin.dart';
-import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
 import 'package:moviestar/core/services/favorites/movie_list_service.dart';
+import 'package:moviestar/mixins/screen_state_mixin.dart';
+import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';

@@ -9,18 +9,17 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:gap/gap.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/constants/timing_constants.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/screens/custom_list_detail_screen.dart';
-import 'package:moviestar/screens/movie_category_screen.dart';
-import 'package:moviestar/widgets/sort_controls.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/utils/movie_sort_util.dart';
+import 'package:moviestar/widgets/sort_controls.dart';
 
 import 'kanban_board_controller.dart';
 
@@ -54,7 +53,9 @@ class KanbanColumnWidget extends StatelessWidget {
   final Function(MovieDragData, KanbanColumnType, String, String) onDrop;
   final Function(String, List<Movie>, bool) onNavigateToCategory;
   final Function(CustomList) onNavigateToCustomList;
-  final Widget Function(Movie, String, {
+  final Widget Function(
+    Movie,
+    String, {
     required bool fromCache,
     required KanbanColumnType columnType,
     required String columnId,
@@ -130,7 +131,8 @@ class KanbanColumnWidget extends StatelessWidget {
 
     return DragTarget<MovieDragData>(
       onAcceptWithDetails: (details) {
-        onDrop(details.data, columnData.columnType, columnData.categoryId, columnData.title);
+        onDrop(details.data, columnData.columnType, columnData.categoryId,
+            columnData.title,);
       },
       builder: (context, candidateData, rejectedData) {
         final isHovering = candidateData.isNotEmpty;
@@ -275,17 +277,25 @@ class KanbanColumnWidget extends StatelessWidget {
           size: 18,
           color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
-        onSelected: (criteria) => controller.onSortChanged(columnData.categoryId, criteria),
+        onSelected: (criteria) =>
+            controller.onSortChanged(columnData.categoryId, criteria),
         itemBuilder: (context) {
-          final currentSort = controller.columnSortCriteria[columnData.categoryId] ??
-              MovieSortCriteria.nameAsc;
+          final currentSort =
+              controller.columnSortCriteria[columnData.categoryId] ??
+                  MovieSortCriteria.nameAsc;
           return [
-            _buildSortMenuItem(context, currentSort, MovieSortCriteria.nameAsc, 'Name (A-Z)'),
-            _buildSortMenuItem(context, currentSort, MovieSortCriteria.nameDesc, 'Name (Z-A)'),
-            _buildSortMenuItem(context, currentSort, MovieSortCriteria.ratingDesc, 'Rating (High to Low)'),
-            _buildSortMenuItem(context, currentSort, MovieSortCriteria.ratingAsc, 'Rating (Low to High)'),
-            _buildSortMenuItem(context, currentSort, MovieSortCriteria.dateDesc, 'Date (Newest First)'),
-            _buildSortMenuItem(context, currentSort, MovieSortCriteria.dateAsc, 'Date (Oldest First)'),
+            _buildSortMenuItem(
+                context, currentSort, MovieSortCriteria.nameAsc, 'Name (A-Z)',),
+            _buildSortMenuItem(
+                context, currentSort, MovieSortCriteria.nameDesc, 'Name (Z-A)',),
+            _buildSortMenuItem(context, currentSort,
+                MovieSortCriteria.ratingDesc, 'Rating (High to Low)',),
+            _buildSortMenuItem(context, currentSort,
+                MovieSortCriteria.ratingAsc, 'Rating (Low to High)',),
+            _buildSortMenuItem(context, currentSort, MovieSortCriteria.dateDesc,
+                'Date (Newest First)',),
+            _buildSortMenuItem(context, currentSort, MovieSortCriteria.dateAsc,
+                'Date (Oldest First)',),
           ];
         },
       ),

@@ -9,13 +9,14 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
-import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/core/services/api/api_key_validation_service.dart';
 import 'package:moviestar/core/services/network/network_connectivity_service.dart';
+import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/services/error_mapper_service.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';

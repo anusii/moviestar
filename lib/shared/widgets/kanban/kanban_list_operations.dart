@@ -9,15 +9,15 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/api/content_service.dart';
-import 'package:moviestar/core/services/cache/cached_movie_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
@@ -64,10 +64,15 @@ class _CustomListMoviesWidgetState
   void didUpdateWidget(CustomListMoviesWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Check if we need to load new movies (only load missing ones, don't reload all)
-    final newMovieIds = widget.movieIds.where((id) =>
-        !oldWidget.movieIds.contains(id) &&
-        !_moviesMap.containsKey(id) &&
-        !widget.optimisticMovies.containsKey('${id}_customList_${widget.customList.id}')).toList();
+    final newMovieIds = widget.movieIds
+        .where(
+          (id) =>
+              !oldWidget.movieIds.contains(id) &&
+              !_moviesMap.containsKey(id) &&
+              !widget.optimisticMovies
+                  .containsKey('${id}_customList_${widget.customList.id}'),
+        )
+        .toList();
 
     // If sort criteria changed, reload all
     if (oldWidget.sortCriteria != widget.sortCriteria) {
@@ -79,7 +84,7 @@ class _CustomListMoviesWidgetState
     }
     // If movies were removed or optimistic movies changed, just update the UI
     else if (oldWidget.movieIds.length != widget.movieIds.length ||
-             oldWidget.optimisticMovies != widget.optimisticMovies) {
+        oldWidget.optimisticMovies != widget.optimisticMovies) {
       setState(() {}); // Trigger rebuild with current data
     }
   }
@@ -103,7 +108,8 @@ class _CustomListMoviesWidgetState
   /// Load only specific new movies (for optimistic updates)
   Future<void> _loadNewMovies(List<int> movieIds) async {
     for (final movieId in movieIds) {
-      if (_moviesMap.containsKey(movieId) || _loadingMovieIds.contains(movieId)) {
+      if (_moviesMap.containsKey(movieId) ||
+          _loadingMovieIds.contains(movieId)) {
         continue;
       }
 
@@ -303,7 +309,9 @@ class KanbanListOperations {
     List<Movie> excludeMovies,
   ) {
     final excludeIds = excludeMovies.map((m) => m.id).toSet();
-    return sourceMovies.where((movie) => !excludeIds.contains(movie.id)).toList();
+    return sourceMovies
+        .where((movie) => !excludeIds.contains(movie.id))
+        .toList();
   }
 
   /// Merge two movie lists removing duplicates
@@ -342,9 +350,8 @@ class KanbanListOperations {
     final contentService = ref.read(contentServiceProvider);
     final movies = <Movie>[];
 
-    final idsToLoad = maxCount != null
-        ? movieIds.take(maxCount).toList()
-        : movieIds;
+    final idsToLoad =
+        maxCount != null ? movieIds.take(maxCount).toList() : movieIds;
 
     for (int i = 0; i < idsToLoad.length; i++) {
       final movieId = idsToLoad[i];

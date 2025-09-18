@@ -9,11 +9,11 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/models/content_item.dart';
-import 'package:moviestar/core/services/pod/pod_favorites_stream_manager.dart';
-import 'package:moviestar/core/services/pod/pod_favorites_file_manager.dart';
 import 'package:moviestar/core/services/favorites/movie_list_service.dart';
+import 'package:moviestar/core/services/pod/pod_favorites_file_manager.dart';
+import 'package:moviestar/core/services/pod/pod_favorites_stream_manager.dart';
+import 'package:moviestar/models/content_item.dart';
+import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 
 /// Handles movie-specific operations for POD favorites service.
@@ -215,58 +215,62 @@ class PodFavoritesMovieOperations {
     debugPrint(
       '🎬 [PodFavoritesMovieOperations] _addToList called: ${movie.title} to $listType',
     );
-    await executePodOperation(operation: () async {
-      final listId =
-          await _movieListService.initializeMovieList(listType, displayName);
-      debugPrint(
-        '🎬 [PodFavoritesMovieOperations] Got listId: $listId for $listType',
-      );
-      if (listId != null) {
-        await _movieListService.addMovieToList(
-          listId,
-          movie,
-          contentType:
-              movie.contentType == ContentType.tvShow ? 'tvShow' : 'movie',
-        );
+    await executePodOperation(
+      operation: () async {
+        final listId =
+            await _movieListService.initializeMovieList(listType, displayName);
         debugPrint(
-          '🎬 [PodFavoritesMovieOperations] Added movie to MovieList service',
+          '🎬 [PodFavoritesMovieOperations] Got listId: $listId for $listType',
         );
-
-        await _fileManager.createOrUpdateMovieFile(movie);
-        debugPrint('🎬 [PodFavoritesMovieOperations] Created/updated movie file');
-
-        _movieCache[movie.id] = movie;
-        _moviesWithFiles.add(movie.id);
-
-        final currentList = List<Movie>.from(
-          listType == 'to_watch'
-              ? _streamManager.toWatch
-              : _streamManager.watched,
-        );
-        if (!currentList.any((m) => m.id == movie.id)) {
-          currentList.add(movie);
-          updateStream(currentList);
-          debugPrint(
-            '🎬 [PodFavoritesMovieOperations] Updated stream with ${currentList.length} movies',
+        if (listId != null) {
+          await _movieListService.addMovieToList(
+            listId,
+            movie,
+            contentType:
+                movie.contentType == ContentType.tvShow ? 'tvShow' : 'movie',
           );
+          debugPrint(
+            '🎬 [PodFavoritesMovieOperations] Added movie to MovieList service',
+          );
+
+          await _fileManager.createOrUpdateMovieFile(movie);
+          debugPrint(
+              '🎬 [PodFavoritesMovieOperations] Created/updated movie file',);
+
+          _movieCache[movie.id] = movie;
+          _moviesWithFiles.add(movie.id);
+
+          final currentList = List<Movie>.from(
+            listType == 'to_watch'
+                ? _streamManager.toWatch
+                : _streamManager.watched,
+          );
+          if (!currentList.any((m) => m.id == movie.id)) {
+            currentList.add(movie);
+            updateStream(currentList);
+            debugPrint(
+              '🎬 [PodFavoritesMovieOperations] Updated stream with ${currentList.length} movies',
+            );
+          } else {
+            debugPrint(
+              '🎬 [PodFavoritesMovieOperations] Movie already in list, not adding',
+            );
+          }
+
+          // Update the TTL file to persist the change
+          debugPrint(
+            '🎬 [PodFavoritesMovieOperations] About to write TTL file for $listType with ${currentList.length} movies',
+          );
+          await _writeTtlFile(listType, currentList);
         } else {
           debugPrint(
-            '🎬 [PodFavoritesMovieOperations] Movie already in list, not adding',
+            '🎬 [PodFavoritesMovieOperations] Failed to get listId for $listType',
           );
         }
-
-        // Update the TTL file to persist the change
-        debugPrint(
-          '🎬 [PodFavoritesMovieOperations] About to write TTL file for $listType with ${currentList.length} movies',
-        );
-        await _writeTtlFile(listType, currentList);
-      } else {
-        debugPrint(
-          '🎬 [PodFavoritesMovieOperations] Failed to get listId for $listType',
-        );
-      }
-      return null;
-    }, operationName: 'addToList($listType)');
+        return null;
+      },
+      operationName: 'addToList($listType)',
+    );
   }
 
   /// Helper method for removing movies from lists.
@@ -276,28 +280,31 @@ class PodFavoritesMovieOperations {
     String displayName,
     Function(List<Movie>) updateStream,
   ) async {
-    await executePodOperation(operation: () async {
-      final listId =
-          await _movieListService.initializeMovieList(listType, displayName);
-      if (listId != null) {
-        await _movieListService.removeMovieFromList(listId, movieId);
+    await executePodOperation(
+      operation: () async {
+        final listId =
+            await _movieListService.initializeMovieList(listType, displayName);
+        if (listId != null) {
+          await _movieListService.removeMovieFromList(listId, movieId);
 
-        final currentList = List<Movie>.from(
-          listType == 'to_watch'
-              ? _streamManager.toWatch
-              : _streamManager.watched,
-        );
-        currentList.removeWhere((m) => m.id == movieId);
-        updateStream(currentList);
+          final currentList = List<Movie>.from(
+            listType == 'to_watch'
+                ? _streamManager.toWatch
+                : _streamManager.watched,
+          );
+          currentList.removeWhere((m) => m.id == movieId);
+          updateStream(currentList);
 
-        _movieCache.remove(movieId);
-        _moviesWithFiles.remove(movieId);
+          _movieCache.remove(movieId);
+          _moviesWithFiles.remove(movieId);
 
-        // Update the TTL file to persist the change
-        await _writeTtlFile(listType, currentList);
-      }
-      return null;
-    }, operationName: 'removeFromList($listType)');
+          // Update the TTL file to persist the change
+          await _writeTtlFile(listType, currentList);
+        }
+        return null;
+      },
+      operationName: 'removeFromList($listType)',
+    );
   }
 
   /// Writes a movie list to the appropriate TTL file.
@@ -325,9 +332,11 @@ class PodFavoritesMovieOperations {
       // Write to POD
       final success = await safeWriteFile(fileName, ttlContent);
       if (success) {
-        debugPrint('🎬 [PodFavoritesMovieOperations] Successfully wrote $fileName');
+        debugPrint(
+            '🎬 [PodFavoritesMovieOperations] Successfully wrote $fileName',);
       } else {
-        debugPrint('🎬 [PodFavoritesMovieOperations] Failed to write $fileName');
+        debugPrint(
+            '🎬 [PodFavoritesMovieOperations] Failed to write $fileName',);
       }
     } catch (e) {
       debugPrint('🎬 [PodFavoritesMovieOperations] Error writing TTL file: $e');

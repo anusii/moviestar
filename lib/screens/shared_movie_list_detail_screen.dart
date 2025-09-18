@@ -6,13 +6,14 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moviestar/mixins/screen_state_mixin.dart';
-import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/shared/widgets/shared_movie_list_detail/shared_list_data_loader.dart';
 import 'package:moviestar/shared/widgets/shared_movie_list_detail/shared_list_movie_processor.dart';
 import 'package:moviestar/shared/widgets/shared_movie_list_detail/shared_list_navigation_handler.dart';
+import 'package:moviestar/widgets/base_screen.dart';
 
 /// Screen to display movies within a shared movie list using decomposed components.
 /// Facade screen delegating to specialized operation classes.
@@ -100,8 +101,6 @@ class _SharedMovieListDetailScreenState
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return BaseScreen(
@@ -141,7 +140,8 @@ class _SharedMovieListDetailScreenState
                         context: context,
                         movieData: movieData,
                         movieTitle: movieTitle,
-                        onTap: () => _navigationHandler.navigateToMovieDetails(movieData),
+                        onTap: () => _navigationHandler
+                            .navigateToMovieDetails(movieData),
                       );
                     },
                   ),

@@ -9,17 +9,15 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
-import 'package:moviestar/constants/dimensions.dart';
-import 'package:moviestar/mixins/screen_state_mixin.dart';
-import 'package:moviestar/models/content_item.dart';
-import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
-import 'package:moviestar/core/services/cache/cached_movie_service.dart';
-import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
+import 'package:moviestar/models/content_item.dart';
+import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
@@ -112,12 +110,16 @@ class HomeWatchedSection extends ConsumerWidget {
                         Text(
                           'Watched',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.headlineMedium?.color,
+                            color: Theme.of(context)
+                                .textTheme
+                                .headlineMedium
+                                ?.color,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        if (snapshot.connectionState == ConnectionState.waiting) ...[
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) ...[
                           const Gap(8),
                           SizedBox(
                             width: 12,
@@ -125,7 +127,9 @@ class HomeWatchedSection extends ConsumerWidget {
                             child: CircularProgressIndicator(
                               strokeWidth: 1.5,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                Theme.of(context).primaryColor.withValues(alpha: 0.6),
+                                Theme.of(context)
+                                    .primaryColor
+                                    .withValues(alpha: 0.6),
                               ),
                             ),
                           ),
@@ -134,7 +138,8 @@ class HomeWatchedSection extends ConsumerWidget {
                     ),
                   ),
                   // Show cache indicator for user data if cached.
-                  if (fromCache && cacheAge != null) buildCacheAgeBadge(cacheAge),
+                  if (fromCache && cacheAge != null)
+                    buildCacheAgeBadge(cacheAge),
                 ],
               ),
             ),
@@ -172,7 +177,8 @@ class HomeWatchedSection extends ConsumerWidget {
     }
 
     // Enhanced loading indicator for initial load and connection state.
-    if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
+    if (snapshot.connectionState == ConnectionState.waiting ||
+        !snapshot.hasData) {
       return Container(
         width: double.infinity,
         height: 200,
@@ -197,7 +203,11 @@ class HomeWatchedSection extends ConsumerWidget {
             Text(
               'Loading Watched movies...',
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                color: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.color
+                    ?.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
             ),
@@ -290,7 +300,11 @@ class HomeWatchedSection extends ConsumerWidget {
                 Text(
                   'Loading Watched movies...',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.color
+                        ?.withValues(alpha: 0.7),
                     fontSize: 14,
                   ),
                 ),

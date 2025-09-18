@@ -9,17 +9,18 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/widgets/movie_card.dart';
-import 'package:moviestar/shared/widgets/home/home_cache_indicator_system.dart';
-import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/models/content_item.dart';
+import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/screens/movie_category_screen.dart';
+import 'package:moviestar/screens/movie_details_screen.dart';
+import 'package:moviestar/shared/widgets/home/home_cache_indicator_system.dart';
+import 'package:moviestar/widgets/movie_card.dart';
 
 /// Component that handles movie row building, list sections, and navigation logic
 class HomeMovieRowBuilder extends StatelessWidget {
@@ -27,8 +28,10 @@ class HomeMovieRowBuilder extends StatelessWidget {
   final Map<String, ScrollController> scrollControllers;
   final bool Function() isMounted;
   final void Function(Route<dynamic>) safeNavigateTo;
-  final Widget Function(WidgetRef, Object, StackTrace, String, VoidCallback) buildSmartErrorWidgetCompact;
-  final Widget Function(WidgetRef, Object, StackTrace, String, VoidCallback) buildSmartErrorWidgetCompactWithRetry;
+  final Widget Function(WidgetRef, Object, StackTrace, String, VoidCallback)
+      buildSmartErrorWidgetCompact;
+  final Widget Function(WidgetRef, Object, StackTrace, String, VoidCallback)
+      buildSmartErrorWidgetCompactWithRetry;
   final Widget Function(WidgetRef, Object, StackTrace) buildSmartErrorWidget;
   final VoidCallback onInvalidateProviders;
   final StatefulWidget parentWidget;
@@ -289,9 +292,6 @@ class HomeMovieRowBuilder extends StatelessWidget {
     return const SizedBox.shrink();
   }
 
-
-
-
   /// Build list items for a list of movies
   Widget buildMovieListItems(
     BuildContext context,
@@ -330,7 +330,6 @@ class HomeMovieRowBuilder extends StatelessWidget {
     );
   }
 
-
   /// Build cache indicator for section headers using the helper
   Widget _buildSectionCacheIndicator(
     AsyncValue<CacheResult<List<Movie>>> moviesAsync,
@@ -360,9 +359,6 @@ class HomeMovieRowBuilder extends StatelessWidget {
       ),
     );
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {

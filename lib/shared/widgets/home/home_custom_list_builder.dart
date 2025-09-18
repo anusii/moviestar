@@ -9,20 +9,20 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
-import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/core/services/api/content_service.dart';
+import 'package:moviestar/core/services/cache/cached_movie_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/favorites/favorites_service.dart';
-import 'package:moviestar/core/services/favorites/favorites_service_adapter.dart';
-import 'package:moviestar/core/services/cache/cached_movie_service.dart';
-import 'package:moviestar/core/services/api/content_service.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
+import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
 /// A widget that builds custom list sections for the home screen.
@@ -211,7 +211,8 @@ class HomeCustomListBuilder extends ConsumerWidget {
                 customList,
               );
             } else {
-              return _buildMovieCardsFromIds(context, ref, movieIds, customList);
+              return _buildMovieCardsFromIds(
+                  context, ref, movieIds, customList,);
             }
           },
         );

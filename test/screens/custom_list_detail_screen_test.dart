@@ -5,6 +5,7 @@
 /// Licensed under the GNU General Public License, Version 3 (the "License").
 ///
 /// License: https://www.gnu.org/licenses/gpl-3.0.en.html.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

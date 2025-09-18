@@ -11,12 +11,12 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
 import 'package:gap/gap.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
-import 'package:moviestar/constants/timing_constants.dart';
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/models/movie.dart';
 
 class MovieDetailsContent extends StatefulWidget {
   final Movie movie;
@@ -166,7 +166,8 @@ class _MovieDetailsContentState extends State<MovieDetailsContent> {
                         min: 0,
                         max: 10,
                         divisions: 100,
-                        label: widget.personalRating?.toStringAsFixed(1) ?? '0.0',
+                        label:
+                            widget.personalRating?.toStringAsFixed(1) ?? '0.0',
                         onChanged: widget.isSharedMovie
                             ? null
                             : (value) => widget.onUpdateRating(value),
@@ -188,9 +189,7 @@ class _MovieDetailsContentState extends State<MovieDetailsContent> {
               ),
         Text(
           widget.personalRating == null
-              ? (widget.isSharedMovie
-                  ? 'No rating shared'
-                  : 'No rating yet')
+              ? (widget.isSharedMovie ? 'No rating shared' : 'No rating yet')
               : (widget.isSharedMovie
                   ? 'Shared rating: ${widget.personalRating!.toStringAsFixed(1)}/10'
                   : 'Your rating: ${widget.personalRating!.toStringAsFixed(1)}/10'),

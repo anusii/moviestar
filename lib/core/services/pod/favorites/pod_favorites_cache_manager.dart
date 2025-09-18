@@ -7,9 +7,9 @@ library;
 
 import 'package:flutter/foundation.dart';
 
-import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/pod/pod_favorites_stream_manager.dart';
 import 'package:moviestar/core/services/pod/pod_favorites_file_manager.dart';
+import 'package:moviestar/core/services/pod/pod_favorites_stream_manager.dart';
+import 'package:moviestar/models/movie.dart';
 
 /// Handles caching operations for POD favorites service.
 class PodFavoritesCacheManager {

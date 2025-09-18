@@ -11,8 +11,8 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:moviestar/constants/timing_constants.dart';
-import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/models/custom_list.dart';
 
 /// Utility class for showing list management dialogs.
 class ListDialogs {

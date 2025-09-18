@@ -13,8 +13,10 @@ import 'package:moviestar/core/services/pod/pod_operations_mixin.dart';
 class TestMixinClass with PodOperationsMixin {
   int operationCallCount = 0;
 
-  Future<String?> testRetryOperation(
-      {bool shouldFail = false, int maxRetries = 3}) {
+  Future<String?> testRetryOperation({
+    bool shouldFail = false,
+    int maxRetries = 3,
+  }) {
     return retryOperation(
       operation: () async {
         operationCallCount++;
@@ -109,30 +111,41 @@ void main() {
     testWidgets('isFileNotFoundError detects file not found errors',
         (WidgetTester tester) async {
       expect(
-          testClass.testIsFileNotFoundError(Exception('File does not exist')),
-          isTrue);
+        testClass.testIsFileNotFoundError(Exception('File does not exist')),
+        isTrue,
+      );
       expect(
-          testClass
-              .testIsFileNotFoundError(Exception('resource does not exist')),
-          isTrue);
+        testClass.testIsFileNotFoundError(Exception('resource does not exist')),
+        isTrue,
+      );
       expect(testClass.testIsFileNotFoundError(Exception('404')), isTrue);
       expect(testClass.testIsFileNotFoundError(Exception('not found')), isTrue);
       expect(
-          testClass.testIsFileNotFoundError(Exception('Other error')), isFalse);
+        testClass.testIsFileNotFoundError(Exception('Other error')),
+        isFalse,
+      );
     });
 
     testWidgets('isPermissionError detects permission errors',
         (WidgetTester tester) async {
-      expect(testClass.testIsPermissionError(Exception('Permission denied')),
-          isTrue);
       expect(
-          testClass.testIsPermissionError(Exception('Access denied')), isTrue);
+        testClass.testIsPermissionError(Exception('Permission denied')),
+        isTrue,
+      );
       expect(
-          testClass.testIsPermissionError(Exception('Unauthorized')), isTrue);
+        testClass.testIsPermissionError(Exception('Access denied')),
+        isTrue,
+      );
+      expect(
+        testClass.testIsPermissionError(Exception('Unauthorized')),
+        isTrue,
+      );
       expect(testClass.testIsPermissionError(Exception('403')), isTrue);
       expect(testClass.testIsPermissionError(Exception('401')), isTrue);
       expect(
-          testClass.testIsPermissionError(Exception('Other error')), isFalse);
+        testClass.testIsPermissionError(Exception('Other error')),
+        isFalse,
+      );
     });
 
     test('exponential backoff delays increase correctly', () async {

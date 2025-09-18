@@ -103,9 +103,12 @@ class MovieListOperationsHelper with PodOperationsMixin {
 
       final result = await PodFileOperationsService.deleteFile(
         filePath,
-        _context,
+        _context, // ignore: use_build_context_synchronously
         _child,
       );
+
+      if (!validateContext(_context))
+        return false; // ignore: use_build_context_synchronously
 
       debugPrint(
         '🎬 [MovieListOperationsHelper] Delete file result: success=${result.success}, error=${result.error}',

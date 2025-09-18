@@ -98,8 +98,10 @@ class UserProfileService {
 
       String? actualApiKey = apiKey;
       if (actualApiKey == null) {
+        if (!_context.mounted) return false;
         final apiKeyService = ApiKeyService(_context, _child);
         actualApiKey = await apiKeyService.getApiKey();
+        if (!_context.mounted) return false;
       }
 
       // Use existing API key ID if available, otherwise create new one.

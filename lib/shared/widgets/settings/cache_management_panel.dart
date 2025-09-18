@@ -458,24 +458,32 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
         ),
       );
 
+      if (!context.mounted) return;
+
       if (confirmed == true) {
         // Disable offline mode temporarily
         ref.read(cacheOnlyModeProvider.notifier).setCacheOnlyMode(false);
 
         // Show feedback
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Offline Mode disabled. Refreshing all data...'),
-            backgroundColor: Colors.blue,
-          ),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Offline Mode disabled. Refreshing all data...'),
+              backgroundColor: Colors.blue,
+            ),
+          );
+        }
 
         // Now do the refresh.
-        await _forceRefreshAll(context, ref);
+        if (context.mounted) {
+          await _forceRefreshAll(context, ref);
+        }
       }
     } else {
       // Normal case - just refresh.
-      await _forceRefreshAll(context, ref);
+      if (context.mounted) {
+        await _forceRefreshAll(context, ref);
+      }
     }
   }
 
@@ -505,21 +513,25 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
       final cachedService = ref.read(configuredCachedMovieServiceProvider);
       await cachedService.forceRefreshAll();
 
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('All movie data refreshed successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('All movie data refreshed successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to refresh data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to refresh data: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 }

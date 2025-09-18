@@ -109,12 +109,18 @@ void main() {
         favoritesServiceManager: mockFavoritesServiceManager2,
       );
 
-      expect(settingsScreen1.favoritesService,
-          isNot(equals(settingsScreen2.favoritesService)));
-      expect(settingsScreen1.apiKeyService,
-          isNot(equals(settingsScreen2.apiKeyService)));
-      expect(settingsScreen1.favoritesServiceManager,
-          isNot(equals(settingsScreen2.favoritesServiceManager)));
+      expect(
+        settingsScreen1.favoritesService,
+        isNot(equals(settingsScreen2.favoritesService)),
+      );
+      expect(
+        settingsScreen1.apiKeyService,
+        isNot(equals(settingsScreen2.apiKeyService)),
+      );
+      expect(
+        settingsScreen1.favoritesServiceManager,
+        isNot(equals(settingsScreen2.favoritesServiceManager)),
+      );
     });
 
     testWidgets('SettingsScreen key parameter works',

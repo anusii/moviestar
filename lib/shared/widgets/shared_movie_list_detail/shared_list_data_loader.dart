@@ -217,11 +217,15 @@ class SharedListDataLoader {
           '   - Found individual file in shared resources: $actualSharedUrl',
         );
 
+        if (!context.mounted) return {};
+
         final movieFileContent = await readExternalPod(
           actualSharedUrl,
           context,
           widget,
         );
+
+        if (!context.mounted) return {};
 
         if (movieFileContent != null &&
             movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
@@ -376,6 +380,8 @@ class SharedListDataLoader {
           widget,
         );
 
+        if (!context.mounted) return {};
+
         if (movieFileContent != null &&
             movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
             movieFileContent is String &&
@@ -394,6 +400,8 @@ class SharedListDataLoader {
             context,
             widget,
           );
+
+          if (!context.mounted) return {};
 
           if (movieFileContent != null &&
               movieFileContent != SolidFunctionCallStatus.notLoggedIn &&

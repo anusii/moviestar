@@ -5,8 +5,7 @@
 
 library;
 
-import 'package:flutter/material.dart';
-
+import 'package:flutter/material.dart'; // ignore: unused_import
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solidpod/solidpod.dart' show getWebId;
 
@@ -30,7 +29,7 @@ class ApiKeyService extends BasePodService {
   String? _cachedApiKey;
   DateTime? _lastCacheTime;
 
-  ApiKeyService(BuildContext context, Widget child) : super(context, child);
+  ApiKeyService(super.context, super.child);
 
   /// Gets the API key from cache, POD, or secure storage.
   Future<String?> getApiKey() async {

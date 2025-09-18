@@ -103,6 +103,8 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
       // Give providers time to refresh before showing success message
       await Future.delayed(const Duration(milliseconds: 100));
 
+      if (!mounted) return;
+
       // Show success message.
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

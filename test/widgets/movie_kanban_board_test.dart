@@ -117,8 +117,11 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
   }
 
   @override
-  Future<void> addMovieToCustomList(String listId, Movie movie,
-      {String contentType = 'movie'}) async {
+  Future<void> addMovieToCustomList(
+    String listId,
+    Movie movie, {
+    String contentType = 'movie',
+  }) async {
     // Find the list and add movie
     final list = _customLists.firstWhere((l) => l.id == listId);
     if (!list.movieIds.contains(movie.id)) {
@@ -169,8 +172,10 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
   }
 
   @override
-  Future<CustomList> createCustomList(String name,
-      {String? description}) async {
+  Future<CustomList> createCustomList(
+    String name, {
+    String? description,
+  }) async {
     final newList = CustomList(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: name,

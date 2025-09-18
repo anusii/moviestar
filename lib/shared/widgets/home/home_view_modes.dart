@@ -176,7 +176,11 @@ class HomeViewModes extends ConsumerWidget {
             showAsListSections: true,
           ),
           _buildAsyncListSection(
-              context, ref, 'Popular on Movie Star', popularMovies,),
+            context,
+            ref,
+            'Popular on Movie Star',
+            popularMovies,
+          ),
           _buildAsyncListSection(context, ref, 'Now Playing', nowPlayingMovies),
           _buildAsyncListSection(context, ref, 'Top Rated', topRatedMovies),
           _buildAsyncListSection(context, ref, 'Upcoming', upcomingMovies),

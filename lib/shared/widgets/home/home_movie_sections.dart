@@ -144,7 +144,9 @@ class HomeMovieSections extends ConsumerWidget {
               ),
               const Gap(8),
               HomeCacheBadges.buildSectionCacheIndicator(
-                  moviesAsync, cacheOnlyMode,),
+                moviesAsync,
+                cacheOnlyMode,
+              ),
             ],
           ),
         ),

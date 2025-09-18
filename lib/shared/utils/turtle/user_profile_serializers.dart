@@ -32,8 +32,10 @@ class UserProfileSerializers {
         TurtleSerializer.owlNS.withAttr('NamedIndividual'),
         TurtleSerializer.userType,
       ],
-      TurtleSerializer.webId: Literal(userWebId,
-          datatype: TurtleSerializer.xsdNS.withAttr('anyURI'),),
+      TurtleSerializer.webId: Literal(
+        userWebId,
+        datatype: TurtleSerializer.xsdNS.withAttr('anyURI'),
+      ),
       TurtleSerializer.rdfsLabel: Literal('|webID=$userWebId|'),
     };
 
@@ -61,15 +63,18 @@ class UserProfileSerializers {
     // Add movie lists if provided.
     if (movieListIds != null && movieListIds.isNotEmpty) {
       final movieListRefs = movieListIds
-          .map((id) =>
-              TurtleSerializer.moviestarDataNS.withAttr('MovieList-$id'),)
+          .map(
+            (id) => TurtleSerializer.moviestarDataNS.withAttr('MovieList-$id'),
+          )
           .toList();
       triples[userResource]![TurtleSerializer.hasMovieList] = movieListRefs;
     }
 
     // Use ontology-compliant namespace bindings.
-    return tripleMapToTurtle(triples,
-        bindNamespaces: TurtleSerializer.getOntologyNamespaces(),);
+    return tripleMapToTurtle(
+      triples,
+      bindNamespaces: TurtleSerializer.getOntologyNamespaces(),
+    );
   }
 
   /// Creates an API key file in TTL format following the ontology structure.
@@ -96,8 +101,10 @@ class UserProfileSerializers {
     };
 
     // Use ontology-compliant namespace bindings.
-    return tripleMapToTurtle(triples,
-        bindNamespaces: TurtleSerializer.getOntologyNamespaces(),);
+    return tripleMapToTurtle(
+      triples,
+      bindNamespaces: TurtleSerializer.getOntologyNamespaces(),
+    );
   }
 
   /// Generates a unique ID for resources.

@@ -32,7 +32,8 @@ void main() {
       favoritesService = FavoritesService(prefs);
     });
 
-    testWidgets('should create widget with required parameters', (WidgetTester tester) async {
+    testWidgets('should create widget with required parameters',
+        (WidgetTester tester) async {
       // Act & Assert
       await tester.pumpWidget(
         ProviderScope(
@@ -48,7 +49,8 @@ void main() {
       expect(find.byType(EnhancedSearchScreen), findsOneWidget);
     });
 
-    testWidgets('should accept FavoritesService parameter', (WidgetTester tester) async {
+    testWidgets('should accept FavoritesService parameter',
+        (WidgetTester tester) async {
       const testKey = Key('enhanced-search-screen');
 
       // Act
@@ -65,11 +67,13 @@ void main() {
       );
 
       // Assert
-      final searchScreen = tester.widget<EnhancedSearchScreen>(find.byKey(testKey));
+      final searchScreen =
+          tester.widget<EnhancedSearchScreen>(find.byKey(testKey));
       expect(searchScreen.favoritesService, isA<FavoritesService>());
     });
 
-    testWidgets('should accept ContentService parameter', (WidgetTester tester) async {
+    testWidgets('should accept ContentService parameter',
+        (WidgetTester tester) async {
       const testKey = Key('enhanced-search-screen');
 
       // Act
@@ -86,7 +90,8 @@ void main() {
       );
 
       // Assert
-      final searchScreen = tester.widget<EnhancedSearchScreen>(find.byKey(testKey));
+      final searchScreen =
+          tester.widget<EnhancedSearchScreen>(find.byKey(testKey));
       expect(searchScreen.contentService, isA<ContentService>());
     });
 
@@ -112,7 +117,8 @@ void main() {
       expect(widget, isA<StatefulWidget>());
     });
 
-    testWidgets('should render without throwing exceptions', (WidgetTester tester) async {
+    testWidgets('should render without throwing exceptions',
+        (WidgetTester tester) async {
       // This test verifies the widget can be instantiated and rendered
       // without any runtime exceptions during build
 

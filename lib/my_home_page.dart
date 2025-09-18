@@ -330,7 +330,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content: Text('Search is not available at the moment'),),
+              content: Text('Search is not available at the moment'),
+            ),
           );
         }
       }

@@ -20,10 +20,18 @@ import 'package:moviestar/utils/create_solid_login.dart';
 
 class PreferencesPanel extends ConsumerStatefulWidget {
   final Function(String title, List<Widget> children) buildSection;
-  final Function(String title, String subtitle, bool value,
-      ValueChanged<bool> onChanged,) buildSwitchTile;
-  final Function(String title, IconData icon, VoidCallback onTap,
-      {bool isDestructive,}) buildListTile;
+  final Function(
+    String title,
+    String subtitle,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) buildSwitchTile;
+  final Function(
+    String title,
+    IconData icon,
+    VoidCallback onTap, {
+    bool isDestructive,
+  }) buildListTile;
 
   const PreferencesPanel({
     super.key,

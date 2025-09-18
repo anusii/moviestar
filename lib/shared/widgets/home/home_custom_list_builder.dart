@@ -212,7 +212,11 @@ class HomeCustomListBuilder extends ConsumerWidget {
               );
             } else {
               return _buildMovieCardsFromIds(
-                  context, ref, movieIds, customList,);
+                context,
+                ref,
+                movieIds,
+                customList,
+              );
             }
           },
         );

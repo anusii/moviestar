@@ -80,7 +80,8 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen>
 
     widget.favoritesService.customLists.listen((lists) {
       print(
-          '🎬 [MyListsScreen] Received custom lists update: ${lists.length} lists',);
+        '🎬 [MyListsScreen] Received custom lists update: ${lists.length} lists',
+      );
       for (final list in lists) {
         print('🎬 [MyListsScreen] List: ${list.name} (ID: ${list.id})');
       }
@@ -97,7 +98,8 @@ class _MyListsScreenState extends ConsumerState<MyListsScreen>
     print('🎬 [MyListsScreen] getCustomLists returned ${lists.length} lists');
     for (final list in lists) {
       print(
-          '🎬 [MyListsScreen] Direct load - List: ${list.name} (ID: ${list.id})',);
+        '🎬 [MyListsScreen] Direct load - List: ${list.name} (ID: ${list.id})',
+      );
     }
 
     safeSetState(() {

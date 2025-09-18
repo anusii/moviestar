@@ -201,7 +201,8 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
       ),
       TurtleNamespaceManager.genre: Literal(movie.genreIds.join(',')),
       TurtleNamespaceManager.rdfsLabel: Literal(
-          '|name=${TurtleBaseSerializer.escapeAndSanitizeString(movie.title)}|',),
+        '|name=${TurtleBaseSerializer.escapeAndSanitizeString(movie.title)}|',
+      ),
     };
 
     // Add user's personal rating if it exists.

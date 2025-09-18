@@ -29,7 +29,8 @@ void main() {
       favoritesService = FavoritesService(prefs);
     });
 
-    testWidgets('should create widget with required parameters', (WidgetTester tester) async {
+    testWidgets('should create widget with required parameters',
+        (WidgetTester tester) async {
       // Act & Assert
       await tester.pumpWidget(
         ProviderScope(
@@ -44,7 +45,8 @@ void main() {
       expect(find.byType(MyListsScreen), findsOneWidget);
     });
 
-    testWidgets('should accept FavoritesService parameter', (WidgetTester tester) async {
+    testWidgets('should accept FavoritesService parameter',
+        (WidgetTester tester) async {
       const testKey = Key('my-lists-screen');
 
       // Act
@@ -64,7 +66,8 @@ void main() {
       expect(myListsScreen.favoritesService, isA<FavoritesService>());
     });
 
-    testWidgets('should be a ConsumerStatefulWidget', (WidgetTester tester) async {
+    testWidgets('should be a ConsumerStatefulWidget',
+        (WidgetTester tester) async {
       const testKey = Key('my-lists-screen');
 
       // Act
@@ -85,7 +88,8 @@ void main() {
       expect(widget, isA<ConsumerStatefulWidget>());
     });
 
-    testWidgets('should render without throwing exceptions', (WidgetTester tester) async {
+    testWidgets('should render without throwing exceptions',
+        (WidgetTester tester) async {
       // This test verifies the widget can be instantiated and rendered
       // without any runtime exceptions during build
 

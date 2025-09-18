@@ -593,7 +593,8 @@ class KanbanQuickSettings extends StatelessWidget {
           IconButton(
             onPressed: () {
               controller.updateEnableDragAndDrop(
-                  !controller.settings.enableDragAndDrop,);
+                !controller.settings.enableDragAndDrop,
+              );
             },
             icon: Icon(
               controller.settings.enableDragAndDrop

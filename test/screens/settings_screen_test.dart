@@ -18,7 +18,8 @@ import 'package:moviestar/core/services/favorites/favorites_service_manager.dart
 // Simple test that verifies the SettingsScreen class can be instantiated
 void main() {
   group('SettingsScreen Basic Tests', () {
-    testWidgets('SettingsScreen class can be instantiated', (WidgetTester tester) async {
+    testWidgets('SettingsScreen class can be instantiated',
+        (WidgetTester tester) async {
       // Create simple mock services
       final mockFavoritesService = MockFavoritesService();
       final mockApiKeyService = MockApiKeyService();
@@ -35,10 +36,12 @@ void main() {
       expect(settingsScreen, isA<SettingsScreen>());
       expect(settingsScreen.favoritesService, equals(mockFavoritesService));
       expect(settingsScreen.apiKeyService, equals(mockApiKeyService));
-      expect(settingsScreen.favoritesServiceManager, equals(mockFavoritesServiceManager));
+      expect(settingsScreen.favoritesServiceManager,
+          equals(mockFavoritesServiceManager));
     });
 
-    testWidgets('SettingsScreen handles constructor parameters', (WidgetTester tester) async {
+    testWidgets('SettingsScreen handles constructor parameters',
+        (WidgetTester tester) async {
       final mockFavoritesService = MockFavoritesService();
       final mockApiKeyService = MockApiKeyService();
       final mockFavoritesServiceManager = MockFavoritesServiceManager();
@@ -63,7 +66,8 @@ void main() {
       expect(settingsScreenDefault.fromApiKeyPrompt, isFalse);
     });
 
-    testWidgets('SettingsScreen creates state correctly', (WidgetTester tester) async {
+    testWidgets('SettingsScreen creates state correctly',
+        (WidgetTester tester) async {
       final mockFavoritesService = MockFavoritesService();
       final mockApiKeyService = MockApiKeyService();
       final mockFavoritesServiceManager = MockFavoritesServiceManager();
@@ -80,7 +84,8 @@ void main() {
       expect(state.runtimeType.toString(), contains('SettingsScreenState'));
     });
 
-    testWidgets('SettingsScreen handles different service combinations', (WidgetTester tester) async {
+    testWidgets('SettingsScreen handles different service combinations',
+        (WidgetTester tester) async {
       final mockFavoritesService1 = MockFavoritesService();
       final mockApiKeyService1 = MockApiKeyService();
       final mockFavoritesServiceManager1 = MockFavoritesServiceManager();
@@ -102,12 +107,16 @@ void main() {
         favoritesServiceManager: mockFavoritesServiceManager2,
       );
 
-      expect(settingsScreen1.favoritesService, isNot(equals(settingsScreen2.favoritesService)));
-      expect(settingsScreen1.apiKeyService, isNot(equals(settingsScreen2.apiKeyService)));
-      expect(settingsScreen1.favoritesServiceManager, isNot(equals(settingsScreen2.favoritesServiceManager)));
+      expect(settingsScreen1.favoritesService,
+          isNot(equals(settingsScreen2.favoritesService)));
+      expect(settingsScreen1.apiKeyService,
+          isNot(equals(settingsScreen2.apiKeyService)));
+      expect(settingsScreen1.favoritesServiceManager,
+          isNot(equals(settingsScreen2.favoritesServiceManager)));
     });
 
-    testWidgets('SettingsScreen key parameter works', (WidgetTester tester) async {
+    testWidgets('SettingsScreen key parameter works',
+        (WidgetTester tester) async {
       final mockFavoritesService = MockFavoritesService();
       final mockApiKeyService = MockApiKeyService();
       final mockFavoritesServiceManager = MockFavoritesServiceManager();
@@ -126,7 +135,8 @@ void main() {
   });
 
   group('SettingsScreen Widget Properties', () {
-    testWidgets('SettingsScreen has correct widget type', (WidgetTester tester) async {
+    testWidgets('SettingsScreen has correct widget type',
+        (WidgetTester tester) async {
       final mockFavoritesService = MockFavoritesService();
       final mockApiKeyService = MockApiKeyService();
       final mockFavoritesServiceManager = MockFavoritesServiceManager();
@@ -141,7 +151,8 @@ void main() {
       expect(settingsScreen, isA<StatefulWidget>());
     });
 
-    testWidgets('SettingsScreen maintains service references', (WidgetTester tester) async {
+    testWidgets('SettingsScreen maintains service references',
+        (WidgetTester tester) async {
       final mockFavoritesService = MockFavoritesService();
       final mockApiKeyService = MockApiKeyService();
       final mockFavoritesServiceManager = MockFavoritesServiceManager();

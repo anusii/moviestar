@@ -172,18 +172,21 @@ class FavoritesServiceManager extends ChangeNotifier {
     // If POD storage is enabled, delegate directly to POD service to avoid duplication
     if (_isPodStorageEnabled && _podService != null) {
       debugPrint(
-          '🎬 [FavoritesServiceManager] Delegating to POD service custom lists stream',);
+        '🎬 [FavoritesServiceManager] Delegating to POD service custom lists stream',
+      );
       return _podService!.customLists;
     }
 
     debugPrint(
-        '🎬 [FavoritesServiceManager] _lastCustomLists: ${_lastCustomLists?.length ?? "null"}',);
+      '🎬 [FavoritesServiceManager] _lastCustomLists: ${_lastCustomLists?.length ?? "null"}',
+    );
 
     // If we have cached data, create a stream that emits it first.
 
     if (_lastCustomLists != null) {
       debugPrint(
-          '🎬 [FavoritesServiceManager] Returning stream with initial value: ${_lastCustomLists!.length} lists',);
+        '🎬 [FavoritesServiceManager] Returning stream with initial value: ${_lastCustomLists!.length} lists',
+      );
       return _createStreamWithInitialValue(_lastCustomLists!);
     }
     debugPrint('🎬 [FavoritesServiceManager] Returning raw controller stream');
@@ -204,17 +207,21 @@ class FavoritesServiceManager extends ChangeNotifier {
   Future<void> _updateCustomListsStream() async {
     try {
       debugPrint(
-          '🎬 [FavoritesServiceManager] _updateCustomListsStream called',);
+        '🎬 [FavoritesServiceManager] _updateCustomListsStream called',
+      );
       final lists = await getCustomLists();
       debugPrint(
-          '🎬 [FavoritesServiceManager] _updateCustomListsStream got ${lists.length} lists',);
+        '🎬 [FavoritesServiceManager] _updateCustomListsStream got ${lists.length} lists',
+      );
 
       if (!_customListsController.isClosed) {
         _lastCustomLists = lists; // Store last value for late listeners.
         debugPrint(
-            '🎬 [FavoritesServiceManager] Adding ${lists.length} lists to stream controller',);
+          '🎬 [FavoritesServiceManager] Adding ${lists.length} lists to stream controller',
+        );
         debugPrint(
-            '🎬 [FavoritesServiceManager] Controller has ${_customListsController.hasListener ? "listeners" : "no listeners"}',);
+          '🎬 [FavoritesServiceManager] Controller has ${_customListsController.hasListener ? "listeners" : "no listeners"}',
+        );
         _customListsController.add(lists);
         debugPrint('🎬 [FavoritesServiceManager] Stream updated successfully');
       } else {
@@ -403,12 +410,14 @@ class FavoritesServiceManager extends ChangeNotifier {
     if (_isPodStorageEnabled && _podService != null) {
       final result = await _podService!.getCustomLists();
       debugPrint(
-          '🎬 [FavoritesServiceManager] getCustomLists from POD: ${result.length} lists',);
+        '🎬 [FavoritesServiceManager] getCustomLists from POD: ${result.length} lists',
+      );
       return result;
     }
     final result = await _localService.getCustomLists();
     debugPrint(
-        '🎬 [FavoritesServiceManager] getCustomLists from local: ${result.length} lists',);
+      '🎬 [FavoritesServiceManager] getCustomLists from local: ${result.length} lists',
+    );
     return result;
   }
 

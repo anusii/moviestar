@@ -76,7 +76,8 @@ class PodFavoritesFileHandler {
       return fullMovies;
     } else {
       debugPrint(
-          '🎬 [PodFavoritesFileHandler] Failed to parse movies from TTL',);
+        '🎬 [PodFavoritesFileHandler] Failed to parse movies from TTL',
+      );
     }
 
     return movieListData ?? [];

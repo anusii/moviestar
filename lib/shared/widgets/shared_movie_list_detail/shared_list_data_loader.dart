@@ -501,7 +501,8 @@ class SharedListDataLoader {
         title = movieMetadata['title'] as String?;
         debugPrint('   - JSON title: "$title"');
         debugPrint(
-            '   - JSON metadata available: ${movieMetadata.keys.toList()}',);
+          '   - JSON metadata available: ${movieMetadata.keys.toList()}',
+        );
       } else {
         debugPrint('   - No JSON_MOVIE_DATA found, will try TTL parsing');
       }
@@ -593,16 +594,19 @@ class SharedListDataLoader {
         }
 
         debugPrint(
-            '   - Added TMDB metadata: posterUrl=${result['posterUrl'] != null}, backdropUrl=${result['backdropUrl'] != null}, voteAverage=${result['voteAverage']}',);
+          '   - Added TMDB metadata: posterUrl=${result['posterUrl'] != null}, backdropUrl=${result['backdropUrl'] != null}, voteAverage=${result['voteAverage']}',
+        );
       }
 
       if (result.isNotEmpty) {
         debugPrint(
-          '   - Parse results: title="$title", rating=$rating, hasComments=${comments != null && comments.isNotEmpty}, tmdbFields=${result.keys.where((k) => ![
-                'title',
-                'rating',
-                'comments',
-              ].contains(k),).toList()}',
+          '   - Parse results: title="$title", rating=$rating, hasComments=${comments != null && comments.isNotEmpty}, tmdbFields=${result.keys.where(
+                (k) => ![
+                  'title',
+                  'rating',
+                  'comments',
+                ].contains(k),
+              ).toList()}',
         );
         return result;
       }

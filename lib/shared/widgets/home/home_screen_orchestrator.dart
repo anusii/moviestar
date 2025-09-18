@@ -167,7 +167,9 @@ class HomeScreenOrchestrator {
       customListManager.buildWatchedMovieRow(context, ref);
 
   Widget _buildCustomListRows() => customListManager.buildCustomListRows(
-      context, (customList) => const SizedBox.shrink(),);
+        context,
+        (customList) => const SizedBox.shrink(),
+      );
 
   Widget _buildMovieRow(
     String title,
@@ -214,7 +216,11 @@ class HomeScreenOrchestrator {
   ) {
     return FutureBuilder(
       future: ErrorHandlingHelper.createUserFriendlyError(
-          ref, error, stackTrace, invalidateProviders,),
+        ref,
+        error,
+        stackTrace,
+        invalidateProviders,
+      ),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -222,7 +228,8 @@ class HomeScreenOrchestrator {
         final userFriendlyError = snapshot.data;
         if (userFriendlyError != null) {
           return ErrorDisplayWidget.fromUserFriendlyError(
-              error: userFriendlyError,);
+            error: userFriendlyError,
+          );
         }
         return ErrorDisplayWidget(
           message: 'Error loading movies: $error',
@@ -241,16 +248,22 @@ class HomeScreenOrchestrator {
   ) {
     return FutureBuilder(
       future: ErrorHandlingHelper.createUserFriendlyError(
-          ref, error, stackTrace, onRetry,),
+        ref,
+        error,
+        stackTrace,
+        onRetry,
+      ),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const ErrorDisplayWidget.compact(
-              message: 'Loading error details...',);
+            message: 'Loading error details...',
+          );
         }
         final userFriendlyError = snapshot.data;
         if (userFriendlyError != null) {
           return ErrorDisplayWidget.compactFromUserFriendlyError(
-              error: userFriendlyError,);
+            error: userFriendlyError,
+          );
         }
         return ErrorDisplayWidget.compact(
           message: 'Failed to load $title',
@@ -268,7 +281,12 @@ class HomeScreenOrchestrator {
     VoidCallback onRetry,
   ) {
     return _buildSmartErrorWidgetCompact(
-        ref, error, stackTrace, title, onRetry,);
+      ref,
+      error,
+      stackTrace,
+      title,
+      onRetry,
+    );
   }
 
   /// Disposes of scroll controllers when orchestrator is no longer needed

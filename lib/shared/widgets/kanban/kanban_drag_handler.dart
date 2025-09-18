@@ -107,8 +107,10 @@ class KanbanDragHandler {
           debugPrint(
             '🎬 [KanbanDrag] Adding to ToWatch with contentType string: $contentTypeString',
           );
-          await favoritesService.addToWatch(dragData.movie,
-              contentType: contentTypeString,);
+          await favoritesService.addToWatch(
+            dragData.movie,
+            contentType: contentTypeString,
+          );
           break;
         case KanbanColumnType.watched:
           final contentTypeString =
@@ -116,8 +118,10 @@ class KanbanDragHandler {
           debugPrint(
             '🎬 [KanbanDrag] Adding to Watched with contentType string: $contentTypeString',
           );
-          await favoritesService.addToWatched(dragData.movie,
-              contentType: contentTypeString,);
+          await favoritesService.addToWatched(
+            dragData.movie,
+            contentType: contentTypeString,
+          );
           break;
         case KanbanColumnType.customList:
           final contentTypeString =
@@ -501,7 +505,8 @@ class KanbanDragHandler {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Failed to ${action.replaceAll('_', ' ')} "${movie.title}"',),
+              'Failed to ${action.replaceAll('_', ' ')} "${movie.title}"',
+            ),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

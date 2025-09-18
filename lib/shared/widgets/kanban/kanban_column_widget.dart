@@ -131,8 +131,12 @@ class KanbanColumnWidget extends StatelessWidget {
 
     return DragTarget<MovieDragData>(
       onAcceptWithDetails: (details) {
-        onDrop(details.data, columnData.columnType, columnData.categoryId,
-            columnData.title,);
+        onDrop(
+          details.data,
+          columnData.columnType,
+          columnData.categoryId,
+          columnData.title,
+        );
       },
       builder: (context, candidateData, rejectedData) {
         final isHovering = candidateData.isNotEmpty;
@@ -285,17 +289,41 @@ class KanbanColumnWidget extends StatelessWidget {
                   MovieSortCriteria.nameAsc;
           return [
             _buildSortMenuItem(
-                context, currentSort, MovieSortCriteria.nameAsc, 'Name (A-Z)',),
+              context,
+              currentSort,
+              MovieSortCriteria.nameAsc,
+              'Name (A-Z)',
+            ),
             _buildSortMenuItem(
-                context, currentSort, MovieSortCriteria.nameDesc, 'Name (Z-A)',),
-            _buildSortMenuItem(context, currentSort,
-                MovieSortCriteria.ratingDesc, 'Rating (High to Low)',),
-            _buildSortMenuItem(context, currentSort,
-                MovieSortCriteria.ratingAsc, 'Rating (Low to High)',),
-            _buildSortMenuItem(context, currentSort, MovieSortCriteria.dateDesc,
-                'Date (Newest First)',),
-            _buildSortMenuItem(context, currentSort, MovieSortCriteria.dateAsc,
-                'Date (Oldest First)',),
+              context,
+              currentSort,
+              MovieSortCriteria.nameDesc,
+              'Name (Z-A)',
+            ),
+            _buildSortMenuItem(
+              context,
+              currentSort,
+              MovieSortCriteria.ratingDesc,
+              'Rating (High to Low)',
+            ),
+            _buildSortMenuItem(
+              context,
+              currentSort,
+              MovieSortCriteria.ratingAsc,
+              'Rating (Low to High)',
+            ),
+            _buildSortMenuItem(
+              context,
+              currentSort,
+              MovieSortCriteria.dateDesc,
+              'Date (Newest First)',
+            ),
+            _buildSortMenuItem(
+              context,
+              currentSort,
+              MovieSortCriteria.dateAsc,
+              'Date (Oldest First)',
+            ),
           ];
         },
       ),

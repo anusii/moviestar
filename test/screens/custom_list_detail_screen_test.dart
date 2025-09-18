@@ -61,7 +61,8 @@ void main() {
       expect(widget, isA<ConsumerStatefulWidget>());
     });
 
-    testWidgets('should accept CustomList and FavoritesService parameters', (tester) async {
+    testWidgets('should accept CustomList and FavoritesService parameters',
+        (tester) async {
       final widget = CustomListDetailScreen(
         customList: testCustomList,
         favoritesService: mockFavoritesService,

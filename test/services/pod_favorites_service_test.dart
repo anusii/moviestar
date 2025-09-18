@@ -22,13 +22,15 @@ void main() {
       prefs = await SharedPreferences.getInstance();
     });
 
-    testWidgets('Service exposes all required public APIs', (WidgetTester tester) async {
+    testWidgets('Service exposes all required public APIs',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
             builder: (context) {
               fallbackService = FavoritesService(prefs);
-              service = PodFavoritesService(context, Container(), prefs, fallbackService);
+              service = PodFavoritesService(
+                  context, Container(), prefs, fallbackService);
               return Container();
             },
           ),

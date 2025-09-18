@@ -65,12 +65,10 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
       _watchedMovies.any((m) => m.id == movie.id);
 
   @override
-  Future<double?> getPersonalRating(Movie movie) async =>
-      _ratings[movie.id];
+  Future<double?> getPersonalRating(Movie movie) async => _ratings[movie.id];
 
   @override
-  Future<bool> hasMovieFile(Movie movie) async =>
-      _hasFiles[movie.id] ?? false;
+  Future<bool> hasMovieFile(Movie movie) async => _hasFiles[movie.id] ?? false;
 
   @override
   Future<void> addToWatch(Movie movie, {String contentType = 'movie'}) async {
@@ -101,7 +99,8 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
   }
 
   @override
-  Future<void> addMovieToCustomList(String listId, Movie movie, {String contentType = 'movie'}) async {
+  Future<void> addMovieToCustomList(String listId, Movie movie,
+      {String contentType = 'movie'}) async {
     // Find the list and add movie
     final listIndex = _customLists.indexWhere((l) => l.id == listId);
     if (listIndex != -1) {
@@ -165,7 +164,8 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
   }
 
   @override
-  Future<CustomList> createCustomList(String name, {String? description}) async {
+  Future<CustomList> createCustomList(String name,
+      {String? description}) async {
     final newList = CustomList(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: name,
@@ -196,52 +196,67 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
 
   @override
   Future<List<Movie>> getMoviesInCustomList(String listId) async {
-    final list = _customLists.firstWhere((l) => l.id == listId, orElse: () => CustomList(
-      id: '',
-      name: '',
-      movieIds: [],
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),);
+    final list = _customLists.firstWhere(
+      (l) => l.id == listId,
+      orElse: () => CustomList(
+        id: '',
+        name: '',
+        movieIds: [],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
     // Return mock movies for the IDs in the list
-    return list.movieIds.map((id) => Movie(
-      id: id,
-      title: 'Movie $id',
-      overview: 'Test movie $id',
-      posterUrl: '/test.jpg',
-      backdropUrl: '/test_backdrop.jpg',
-      voteAverage: 7.5,
-      releaseDate: DateTime.parse('2023-01-01'),
-      genreIds: [],
-    ),).toList();
+    return list.movieIds
+        .map(
+          (id) => Movie(
+            id: id,
+            title: 'Movie $id',
+            overview: 'Test movie $id',
+            posterUrl: '/test.jpg',
+            backdropUrl: '/test_backdrop.jpg',
+            voteAverage: 7.5,
+            releaseDate: DateTime.parse('2023-01-01'),
+            genreIds: [],
+          ),
+        )
+        .toList();
   }
 
   @override
   Future<List<int>> getMovieIdsInCustomList(String listId) async {
-    final list = _customLists.firstWhere((l) => l.id == listId, orElse: () => CustomList(
-      id: '',
-      name: '',
-      movieIds: [],
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),);
+    final list = _customLists.firstWhere(
+      (l) => l.id == listId,
+      orElse: () => CustomList(
+        id: '',
+        name: '',
+        movieIds: [],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
     return list.movieIds;
   }
 
   @override
   Future<List<CustomList>> getCustomListsContainingMovie(int movieId) async {
-    return _customLists.where((list) => list.movieIds.contains(movieId)).toList();
+    return _customLists
+        .where((list) => list.movieIds.contains(movieId))
+        .toList();
   }
 
   @override
   Future<bool> isMovieInCustomList(String listId, int movieId) async {
-    final list = _customLists.firstWhere((l) => l.id == listId, orElse: () => CustomList(
-      id: '',
-      name: '',
-      movieIds: [],
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),);
+    final list = _customLists.firstWhere(
+      (l) => l.id == listId,
+      orElse: () => CustomList(
+        id: '',
+        name: '',
+        movieIds: [],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
     return list.movieIds.contains(movieId);
   }
 
@@ -277,7 +292,8 @@ void main() {
       mockService = MockFavoritesService();
     });
 
-    testWidgets('creates MovieDetailsScreen widget', (WidgetTester tester) async {
+    testWidgets('creates MovieDetailsScreen widget',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: MovieDetailsScreen(
@@ -323,7 +339,8 @@ void main() {
       expect(find.byType(MovieDetailsScreen), findsOneWidget);
     });
 
-    testWidgets('handles shared movie data parameter', (WidgetTester tester) async {
+    testWidgets('handles shared movie data parameter',
+        (WidgetTester tester) async {
       final sharedData = {
         'rating': 4.5,
         'comments': 'Great movie!',
@@ -407,7 +424,8 @@ void main() {
       expect(find.byType(MovieDetailsScreen), findsOneWidget);
     });
 
-    testWidgets('handles user interactions without crashing', (WidgetTester tester) async {
+    testWidgets('handles user interactions without crashing',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: MovieDetailsScreen(
@@ -463,11 +481,14 @@ void main() {
       expect(find.byType(MovieDetailsScreen), findsOneWidget);
     });
 
-    testWidgets('handles movie with maximum values', (WidgetTester tester) async {
+    testWidgets('handles movie with maximum values',
+        (WidgetTester tester) async {
       final maxMovie = Movie(
         id: 888,
-        title: 'Maximum Movie with Very Long Title That Should Be Handled Gracefully',
-        overview: 'Very long overview that contains detailed information about the movie plot and characters and should not cause any overflow issues in the user interface layout when displayed in the movie details screen',
+        title:
+            'Maximum Movie with Very Long Title That Should Be Handled Gracefully',
+        overview:
+            'Very long overview that contains detailed information about the movie plot and characters and should not cause any overflow issues in the user interface layout when displayed in the movie details screen',
         releaseDate: DateTime.parse('2030-12-31'),
         posterUrl: 'https://image.tmdb.org/t/p/w500/test.jpg',
         backdropUrl: 'https://image.tmdb.org/t/p/w1280/test.jpg',
@@ -488,7 +509,8 @@ void main() {
       expect(find.byType(MovieDetailsScreen), findsOneWidget);
     });
 
-    testWidgets('handles null and empty shared data', (WidgetTester tester) async {
+    testWidgets('handles null and empty shared data',
+        (WidgetTester tester) async {
       final testMovie = Movie(
         id: 777,
         title: 'Shared Test Movie',

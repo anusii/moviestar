@@ -41,14 +41,16 @@ class PodFavoritesListOperations {
       final id = listData['id'] as String? ?? '';
 
       debugPrint(
-          '🎬 [PodFavoritesListOperations] Processing list: $name (ID: $id)',);
+        '🎬 [PodFavoritesListOperations] Processing list: $name (ID: $id)',
+      );
 
       // Skip standard lists
       if (!['Movies to Watch', 'Movies Watched', 'Favorites'].contains(name)) {
         duplicateTracker.putIfAbsent(name, () => []).add(listData);
       } else {
         debugPrint(
-            '🎬 [PodFavoritesListOperations] Skipping standard list: $name',);
+          '🎬 [PodFavoritesListOperations] Skipping standard list: $name',
+        );
       }
     }
 
@@ -63,7 +65,8 @@ class PodFavoritesListOperations {
         );
         for (final listData in listsWithSameName) {
           debugPrint(
-              '🎬 [PodFavoritesListOperations] Duplicate: ID ${listData['id']}',);
+            '🎬 [PodFavoritesListOperations] Duplicate: ID ${listData['id']}',
+          );
         }
       }
 
@@ -90,7 +93,8 @@ class PodFavoritesListOperations {
 
       if (listsWithSameName.length > 1) {
         debugPrint(
-            '🎬 [PodFavoritesListOperations] Selected most recent list: $name (ID: $id)',);
+          '🎬 [PodFavoritesListOperations] Selected most recent list: $name (ID: $id)',
+        );
       } else {
         debugPrint('🎬 [PodFavoritesListOperations] Added custom list: $name');
       }
@@ -101,13 +105,15 @@ class PodFavoritesListOperations {
     );
     _streamManager.updateCustomLists(customLists);
     debugPrint(
-        '🎬 [PodFavoritesListOperations] Updated stream with custom lists',);
+      '🎬 [PodFavoritesListOperations] Updated stream with custom lists',
+    );
   }
 
   /// Deletes a custom list using MovieListService.
   Future<void> deleteCustomList(String listId) async {
     debugPrint(
-        '🎬 [PodFavoritesListOperations] deleteCustomList called for listId: $listId',);
+      '🎬 [PodFavoritesListOperations] deleteCustomList called for listId: $listId',
+    );
 
     // Clear any cache related to this list
     _movieListService.clearCache();
@@ -116,7 +122,8 @@ class PodFavoritesListOperations {
     try {
       final success = await _movieListService.deleteMovieList(listId);
       debugPrint(
-          '🎬 [PodFavoritesListOperations] Delete operation result: $success',);
+        '🎬 [PodFavoritesListOperations] Delete operation result: $success',
+      );
 
       if (success) {
         // Clear cache again after deletion
@@ -125,13 +132,15 @@ class PodFavoritesListOperations {
         // Refresh custom lists after POD operation completes
         await loadCustomLists();
         debugPrint(
-            '🎬 [PodFavoritesListOperations] Custom lists reloaded after deletion',);
+          '🎬 [PodFavoritesListOperations] Custom lists reloaded after deletion',
+        );
       } else {
         debugPrint('🎬 [PodFavoritesListOperations] Delete operation failed');
       }
     } catch (error) {
       debugPrint(
-          '🎬 [PodFavoritesListOperations] Error deleting custom list: $error',);
+        '🎬 [PodFavoritesListOperations] Error deleting custom list: $error',
+      );
     }
   }
 
@@ -146,14 +155,16 @@ class PodFavoritesListOperations {
     String? description,
   }) async {
     debugPrint(
-        '🎬 [PodFavoritesListOperations] createCustomList called: $name',);
+      '🎬 [PodFavoritesListOperations] createCustomList called: $name',
+    );
 
     final listId = await _movieListService.createMovieList(
       name,
       description: description ?? '',
     );
     debugPrint(
-        '🎬 [PodFavoritesListOperations] createMovieList returned: $listId',);
+      '🎬 [PodFavoritesListOperations] createMovieList returned: $listId',
+    );
 
     if (listId != null) {
       debugPrint(
@@ -162,7 +173,8 @@ class PodFavoritesListOperations {
       await loadCustomLists();
 
       debugPrint(
-          '🎬 [PodFavoritesListOperations] Custom list creation completed',);
+        '🎬 [PodFavoritesListOperations] Custom list creation completed',
+      );
       return CustomList(
         id: listId,
         name: name,
@@ -178,7 +190,8 @@ class PodFavoritesListOperations {
   /// Updates a custom list.
   Future<void> updateCustomList(CustomList updatedList) async {
     debugPrint(
-        '🎬 [PodFavoritesListOperations] updateCustomList called for listId: ${updatedList.id}',);
+      '🎬 [PodFavoritesListOperations] updateCustomList called for listId: ${updatedList.id}',
+    );
 
     // Fire-and-forget POD operation for immediate UI responsiveness
     _movieListService
@@ -188,12 +201,14 @@ class PodFavoritesListOperations {
     )
         .then((_) async {
       debugPrint(
-          '🎬 [PodFavoritesListOperations] Update operation completed successfully',);
+        '🎬 [PodFavoritesListOperations] Update operation completed successfully',
+      );
       // Refresh custom lists in background after POD operation completes
       await loadCustomLists();
     }).catchError((error) {
       debugPrint(
-          '🎬 [PodFavoritesListOperations] Error updating custom list: $error',);
+        '🎬 [PodFavoritesListOperations] Error updating custom list: $error',
+      );
     });
 
     // Return immediately for optimistic UI
@@ -217,7 +232,8 @@ class PodFavoritesListOperations {
       await loadCustomLists();
     }).catchError((error) {
       debugPrint(
-          '🎬 [PodFavoritesListOperations] Error adding movie to custom list: $error',);
+        '🎬 [PodFavoritesListOperations] Error adding movie to custom list: $error',
+      );
       // TODO: Handle error state - could emit error to stream
     });
 
@@ -232,7 +248,8 @@ class PodFavoritesListOperations {
       await loadCustomLists();
     }).catchError((error) {
       debugPrint(
-          '🎬 [PodFavoritesListOperations] Error removing movie from custom list: $error',);
+        '🎬 [PodFavoritesListOperations] Error removing movie from custom list: $error',
+      );
       // TODO: Handle error state - could emit error to stream
     });
 
@@ -253,18 +270,22 @@ class PodFavoritesListOperations {
   /// Gets movies in a custom list.
   Future<List<Movie>> getMoviesInCustomList(String listId) async {
     debugPrint(
-        '🎬 [PodFavoritesListOperations] getMoviesInCustomList called for listId: $listId',);
+      '🎬 [PodFavoritesListOperations] getMoviesInCustomList called for listId: $listId',
+    );
     final movieList = await _movieListService.getMovieList(listId);
     debugPrint(
-        '🎬 [PodFavoritesListOperations] getMovieList returned: ${movieList != null ? "DATA" : "NULL"}',);
+      '🎬 [PodFavoritesListOperations] getMovieList returned: ${movieList != null ? "DATA" : "NULL"}',
+    );
     if (movieList != null) {
       final movies = movieList['movies'] as List<Movie>? ?? [];
       debugPrint(
-          '🎬 [PodFavoritesListOperations] Movies count: ${movies.length}',);
+        '🎬 [PodFavoritesListOperations] Movies count: ${movies.length}',
+      );
       for (int i = 0; i < movies.length; i++) {
         final movie = movies[i];
         debugPrint(
-            '🎬 [PodFavoritesListOperations] Movie $i: ${movie.title} (ID: ${movie.id}, ContentType: ${movie.contentType})',);
+          '🎬 [PodFavoritesListOperations] Movie $i: ${movie.title} (ID: ${movie.id}, ContentType: ${movie.contentType})',
+        );
       }
       return movies;
     }

@@ -281,7 +281,8 @@ class MovieSerializers {
           Literal(TurtleSerializer.escapeAndSanitizeString(listName)),
       TurtleSerializer.description: Literal(
         TurtleSerializer.escapeAndSanitizeString(
-            description ?? 'List of movies: $listName',),
+          description ?? 'List of movies: $listName',
+        ),
       ),
       TurtleSerializer.rdfsLabel: Literal(
         '|filePath=moviestar/data/MovieList-$movieListId.ttl|',
@@ -316,8 +317,10 @@ class MovieSerializers {
     // Add movie references (not full movie data) if provided.
     if (movies.isNotEmpty) {
       final movieRefs = movies
-          .map((movie) =>
-              TurtleSerializer.moviestarDataNS.withAttr('movie-${movie.id}'),)
+          .map(
+            (movie) =>
+                TurtleSerializer.moviestarDataNS.withAttr('movie-${movie.id}'),
+          )
           .toList();
       triples[movieListResource]![TurtleSerializer.hasMovie] = movieRefs;
 
@@ -348,8 +351,10 @@ class MovieSerializers {
     }
 
     // Use ontology-compliant namespace bindings.
-    return tripleMapToTurtle(triples,
-        bindNamespaces: TurtleSerializer.getOntologyNamespaces(),);
+    return tripleMapToTurtle(
+      triples,
+      bindNamespaces: TurtleSerializer.getOntologyNamespaces(),
+    );
   }
 
   /// Parses movie list from TTL content.

@@ -21,12 +21,20 @@ import 'package:moviestar/widgets/cache_feedback_widget.dart';
 /// A widget that displays cache management settings and statistics.
 class CacheManagementPanel extends ConsumerWidget {
   /// Function to build a switch tile widget.
-  final Widget Function(String title, String subtitle, bool value,
-      ValueChanged<bool> onChanged,) buildSwitchTile;
+  final Widget Function(
+    String title,
+    String subtitle,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) buildSwitchTile;
 
   /// Function to build a list tile widget.
-  final Widget Function(String title, IconData icon, VoidCallback onTap,
-      {bool isDestructive,}) buildListTile;
+  final Widget Function(
+    String title,
+    IconData icon,
+    VoidCallback onTap, {
+    bool isDestructive,
+  }) buildListTile;
 
   /// Function to show success snackbar.
   final void Function(String message) showSuccessSnackBar;
@@ -173,14 +181,22 @@ class CacheManagementPanel extends ConsumerWidget {
         // Cache Actions.
         buildListTile('Force Refresh All', Icons.refresh, () async {
           await _showForceRefreshDialog(
-              context, ref, cachingEnabled, cacheOnlyMode,);
+            context,
+            ref,
+            cachingEnabled,
+            cacheOnlyMode,
+          );
         }),
         buildListTile(
           'Clear All Cache',
           Icons.delete_sweep,
           () async {
             await _showClearCacheDialog(
-                context, ref, cachingEnabled, cacheOnlyMode,);
+              context,
+              ref,
+              cachingEnabled,
+              cacheOnlyMode,
+            );
           },
           isDestructive: true,
         ),
@@ -221,8 +237,12 @@ class CacheManagementPanel extends ConsumerWidget {
   }
 
   /// Builds the offline mode tile with proper enabled/disabled state.
-  Widget _buildOfflineModeTile(BuildContext context, WidgetRef ref,
-      bool cachingEnabled, bool cacheOnlyMode,) {
+  Widget _buildOfflineModeTile(
+    BuildContext context,
+    WidgetRef ref,
+    bool cachingEnabled,
+    bool cacheOnlyMode,
+  ) {
     return SwitchListTile(
       title: Text(
         'Offline Mode',

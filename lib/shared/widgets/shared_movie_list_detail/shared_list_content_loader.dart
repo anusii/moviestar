@@ -63,7 +63,8 @@ class _SharedListContentLoaderState
           debugPrint('🔍 [LoadTitles] Loading title for movie ID: $movieId');
           debugPrint('   - Initial data: ${movieData['fileName']}');
           debugPrint(
-              '   - FilePath: ${movieData['filePath'] ?? "not provided"}',);
+            '   - FilePath: ${movieData['filePath'] ?? "not provided"}',
+          );
 
           try {
             final enhancedData = await _fetchIndividualMovieData(movieData);
@@ -121,7 +122,9 @@ class _SharedListContentLoaderState
   }
 
   Future<String?> _findIndividualFileInSharedResources(
-      String movieId, String? providedFilePath,) async {
+    String movieId,
+    String? providedFilePath,
+  ) async {
     try {
       final sharedResourcesResult =
           await sharedResources(context, widget.parentWidget);
@@ -143,21 +146,24 @@ class _SharedListContentLoaderState
           if (resourceUrl.contains('Movie-$movieId.ttl') ||
               resourceUrl.contains('TVShow-$movieId.ttl')) {
             debugPrint(
-                '   🔍 Found matching individual file by ID: $resourceUrl',);
+              '   🔍 Found matching individual file by ID: $resourceUrl',
+            );
             return resourceUrl;
           }
 
           if (providedFilePath != null &&
               resourceUrl.endsWith(providedFilePath)) {
             debugPrint(
-                '   🔍 Found matching individual file by filePath: $resourceUrl',);
+              '   🔍 Found matching individual file by filePath: $resourceUrl',
+            );
             return resourceUrl;
           }
         }
       }
 
       debugPrint(
-          '   ❌ No individual file found in shared resources for movie $movieId',);
+        '   ❌ No individual file found in shared resources for movie $movieId',
+      );
       return null;
     } catch (e) {
       debugPrint('   ❌ Error searching shared resources: $e');
@@ -189,7 +195,8 @@ class _SharedListContentLoaderState
   }
 
   Future<Map<String, dynamic>> _fetchIndividualMovieData(
-      Map<String, dynamic> movieData,) async {
+    Map<String, dynamic> movieData,
+  ) async {
     try {
       final movieId = movieData['movieId']?.toString() ?? '0';
 
@@ -206,7 +213,8 @@ class _SharedListContentLoaderState
 
       if (actualSharedUrl != null) {
         debugPrint(
-            '   - Found individual file in shared resources: $actualSharedUrl',);
+          '   - Found individual file in shared resources: $actualSharedUrl',
+        );
 
         if (!mounted) return movieData;
 
@@ -224,7 +232,8 @@ class _SharedListContentLoaderState
               (providedFilePath?.startsWith('TVShow-') ?? false);
 
           debugPrint(
-              '   ✅ Successfully read shared individual file (${movieFileContent.length} chars)',);
+            '   ✅ Successfully read shared individual file (${movieFileContent.length} chars)',
+          );
           debugPrint('   - Detected as: ${isTvShow ? "TV Show" : "Movie"}');
 
           final parsedData = await _parseIndividualMovieData(movieFileContent);
@@ -296,7 +305,8 @@ class _SharedListContentLoaderState
               movieFileContent.isNotEmpty) {
             isTvShow = providedFilePath.startsWith('TVShow-');
             debugPrint(
-                '   ✅ Successfully read file from $resourceUrl (${movieFileContent.length} chars)',);
+              '   ✅ Successfully read file from $resourceUrl (${movieFileContent.length} chars)',
+            );
             debugPrint('   - Detected as: ${isTvShow ? "TV Show" : "Movie"}');
             break;
           } else {
@@ -305,7 +315,8 @@ class _SharedListContentLoaderState
         }
       } else {
         debugPrint(
-            '   - Falling back to trying both Movie and TVShow patterns',);
+          '   - Falling back to trying both Movie and TVShow patterns',
+        );
 
         final baseUrlsToTry = <String>[];
         if (ownerBaseUrl != null) baseUrlsToTry.add(ownerBaseUrl);
@@ -320,7 +331,10 @@ class _SharedListContentLoaderState
           debugPrint('   - Trying Movie pattern: $movieResourceUrl');
 
           movieFileContent = await readExternalPod(
-              movieResourceUrl, context, widget.parentWidget,);
+            movieResourceUrl,
+            context,
+            widget.parentWidget,
+          );
 
           if (movieFileContent != null &&
               movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
@@ -338,7 +352,10 @@ class _SharedListContentLoaderState
             if (!mounted) return movieData;
 
             movieFileContent = await readExternalPod(
-                tvShowResourceUrl, context, widget.parentWidget,);
+              tvShowResourceUrl,
+              context,
+              widget.parentWidget,
+            );
 
             if (movieFileContent != null &&
                 movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
@@ -400,7 +417,8 @@ class _SharedListContentLoaderState
   }
 
   Future<Map<String, dynamic>?> _parseIndividualMovieData(
-      String ttlContent,) async {
+    String ttlContent,
+  ) async {
     try {
       debugPrint('   🔬 [ParseTTL] Starting TTL content parsing...');
 
@@ -466,7 +484,8 @@ class _SharedListContentLoaderState
             if (match != null) {
               comments = match.group(1);
               debugPrint(
-                  '   - Found comments in TTL: "${comments?.substring(0, comments.length > 50 ? 50 : comments.length)}${comments != null && comments.length > 50 ? '...' : ''}"',);
+                '   - Found comments in TTL: "${comments?.substring(0, comments.length > 50 ? 50 : comments.length)}${comments != null && comments.length > 50 ? '...' : ''}"',
+              );
             }
           }
         }
@@ -474,7 +493,8 @@ class _SharedListContentLoaderState
 
       if (title != null || rating != null || comments != null) {
         debugPrint(
-            '   ✅ [ParseTTL] Successfully parsed: title=${title != null ? '"$title"' : 'null'}, rating=$rating, comments=${comments != null ? 'present' : 'null'}',);
+          '   ✅ [ParseTTL] Successfully parsed: title=${title != null ? '"$title"' : 'null'}, rating=$rating, comments=${comments != null ? 'present' : 'null'}',
+        );
         return {
           'title': title,
           'rating': rating,
@@ -491,7 +511,8 @@ class _SharedListContentLoaderState
   }
 
   Future<String?> _extractTitleFromEnhancedData(
-      Map<String, dynamic> enhancedData,) async {
+    Map<String, dynamic> enhancedData,
+  ) async {
     final title = enhancedData['title'] as String?;
     if (title != null && title.isNotEmpty) {
       return title;

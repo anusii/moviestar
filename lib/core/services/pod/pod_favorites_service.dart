@@ -99,7 +99,8 @@ class PodFavoritesService extends BasePodService {
       // Notify manager that initial loading is complete
       if (_onInitialLoadComplete != null) {
         debugPrint(
-            '🎬 [PodFavoritesService] Calling onInitialLoadComplete callback',);
+          '🎬 [PodFavoritesService] Calling onInitialLoadComplete callback',
+        );
         _onInitialLoadComplete();
       }
     }).catchError((error) {
@@ -109,7 +110,8 @@ class PodFavoritesService extends BasePodService {
       // Even on error, notify that loading attempt is complete
       if (_onInitialLoadComplete != null) {
         debugPrint(
-            '🎬 [PodFavoritesService] Calling onInitialLoadComplete callback (after error)',);
+          '🎬 [PodFavoritesService] Calling onInitialLoadComplete callback (after error)',
+        );
         _onInitialLoadComplete();
       }
     });
@@ -312,8 +314,11 @@ class PodFavoritesService extends BasePodService {
     Movie movie, {
     String contentType = 'movie',
   }) async {
-    return _listOperations.addMovieToCustomList(listId, movie,
-        contentType: contentType,);
+    return _listOperations.addMovieToCustomList(
+      listId,
+      movie,
+      contentType: contentType,
+    );
   }
 
   /// Removes a movie from a custom list.

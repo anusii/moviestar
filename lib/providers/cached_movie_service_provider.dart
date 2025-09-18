@@ -252,7 +252,8 @@ class DirectMovieService extends MovieService {
   @override
   Future<Movie> getMovieDetails(int movieId) async {
     debugPrint(
-        '🔑 [DirectMovieService] getMovieDetails called for ID: $movieId',);
+      '🔑 [DirectMovieService] getMovieDetails called for ID: $movieId',
+    );
     await _ensureDirectClientInitialized();
 
     // Use direct client instead of going through ContentService
@@ -263,7 +264,8 @@ class DirectMovieService extends MovieService {
     } catch (e) {
       // Try TV endpoint if movie fails (for TV shows)
       debugPrint(
-          '🔑 [DirectMovieService] Movie endpoint failed, trying TV endpoint: $e',);
+        '🔑 [DirectMovieService] Movie endpoint failed, trying TV endpoint: $e',
+      );
       final data = await _directClient!.getJson('tv/$movieId');
       final contentItem = ContentItem.fromTVJson(data);
       return Movie.fromContentItem(contentItem);
@@ -495,7 +497,8 @@ final directContentServiceProvider =
   final apiKey = await ref.watch(directApiKeyProvider.future);
 
   print(
-      '🔍 [DirectContentServiceProvider] Creating ContentService with API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',);
+    '🔍 [DirectContentServiceProvider] Creating ContentService with API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',
+  );
 
   // Use the new constructor that accepts API key directly
   final contentService = ContentService.withApiKey(apiKey);

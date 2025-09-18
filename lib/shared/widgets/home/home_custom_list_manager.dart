@@ -32,13 +32,14 @@ class HomeCustomListManager {
   final Widget Function(WidgetRef, Object, StackTrace, String, VoidCallback)
       buildSmartErrorWidgetCompactWithRetry;
   final Widget Function(
-      BuildContext,
-      WidgetRef,
-      String,
-      AsyncValue<CacheResult<List<Movie>>>,
-      String,
-      CacheCategory,
-      bool,) buildMovieRow;
+    BuildContext,
+    WidgetRef,
+    String,
+    AsyncValue<CacheResult<List<Movie>>>,
+    String,
+    CacheCategory,
+    bool,
+  ) buildMovieRow;
   final StatefulWidget parentWidget;
 
   const HomeCustomListManager({
@@ -54,7 +55,9 @@ class HomeCustomListManager {
 
   /// Builds custom list rows based on user's custom lists
   Widget buildCustomListRows(
-      BuildContext context, Widget Function(CustomList) onCustomListTapped,) {
+    BuildContext context,
+    Widget Function(CustomList) onCustomListTapped,
+  ) {
     return StreamBuilder<List<CustomList>>(
       stream: favoritesService.customLists,
       builder: (context, snapshot) {
@@ -229,7 +232,10 @@ class HomeCustomListManager {
           return const SizedBox.shrink();
         }
         return _buildListSection(
-            context, title, _buildMovieListItems(context, movies),);
+          context,
+          title,
+          _buildMovieListItems(context, movies),
+        );
       },
       loading: () => _buildLoadingSection(context, title),
       error: (error, stackTrace) =>
@@ -243,8 +249,13 @@ class HomeCustomListManager {
       stream: favoritesService.customLists,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return _buildErrorSection(context, ref, 'Custom Lists',
-              snapshot.error!, StackTrace.current,);
+          return _buildErrorSection(
+            context,
+            ref,
+            'Custom Lists',
+            snapshot.error!,
+            StackTrace.current,
+          );
         }
 
         if (!snapshot.hasData) {
@@ -262,8 +273,13 @@ class HomeCustomListManager {
               future: _loadMoviesForCustomList(customList),
               builder: (context, movieSnapshot) {
                 if (movieSnapshot.hasError) {
-                  return _buildErrorSection(context, ref, customList.name,
-                      movieSnapshot.error!, StackTrace.current,);
+                  return _buildErrorSection(
+                    context,
+                    ref,
+                    customList.name,
+                    movieSnapshot.error!,
+                    StackTrace.current,
+                  );
                 }
 
                 if (!movieSnapshot.hasData) {
@@ -275,8 +291,11 @@ class HomeCustomListManager {
                   return const SizedBox.shrink();
                 }
 
-                return _buildListSection(context, customList.name,
-                    _buildMovieListItems(context, movies),);
+                return _buildListSection(
+                  context,
+                  customList.name,
+                  _buildMovieListItems(context, movies),
+                );
               },
             );
           }).toList(),
@@ -300,7 +319,10 @@ class HomeCustomListManager {
         }
 
         return _buildListSection(
-            context, 'To Watch', _buildMovieListItems(context, movies),);
+          context,
+          'To Watch',
+          _buildMovieListItems(context, movies),
+        );
       },
     );
   }
@@ -320,7 +342,10 @@ class HomeCustomListManager {
         }
 
         return _buildListSection(
-            context, 'Watched', _buildMovieListItems(context, movies),);
+          context,
+          'Watched',
+          _buildMovieListItems(context, movies),
+        );
       },
     );
   }

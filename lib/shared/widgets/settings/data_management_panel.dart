@@ -20,10 +20,18 @@ import 'package:moviestar/widgets/cache_feedback_widget.dart';
 
 class DataManagementPanel extends ConsumerWidget {
   final Function(String title, List<Widget> children) buildSection;
-  final Function(String title, String subtitle, bool value,
-      ValueChanged<bool> onChanged,) buildSwitchTile;
-  final Function(String title, IconData icon, VoidCallback onTap,
-      {bool isDestructive,}) buildListTile;
+  final Function(
+    String title,
+    String subtitle,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) buildSwitchTile;
+  final Function(
+    String title,
+    IconData icon,
+    VoidCallback onTap, {
+    bool isDestructive,
+  }) buildListTile;
   final Function(String message) showSuccessSnackBar;
   final Function(String message) showErrorSnackBar;
 
@@ -269,8 +277,12 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
     }
   }
 
-  Widget _buildOfflineModeTile(bool cachingEnabled, bool cacheOnlyMode,
-      WidgetRef ref, BuildContext context,) {
+  Widget _buildOfflineModeTile(
+    bool cachingEnabled,
+    bool cacheOnlyMode,
+    WidgetRef ref,
+    BuildContext context,
+  ) {
     return SwitchListTile(
       title: Text(
         'Offline Mode',
@@ -480,14 +492,22 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
           // Cache Actions
           buildListTile('Force Refresh All', Icons.refresh, () async {
             await _showForceRefreshDialog(
-                ref, context, cachingEnabled, cacheOnlyMode,);
+              ref,
+              context,
+              cachingEnabled,
+              cacheOnlyMode,
+            );
           }),
           buildListTile(
             'Clear All Cache',
             Icons.delete_sweep,
             () async {
               await _showClearCacheDialog(
-                  ref, context, cachingEnabled, cacheOnlyMode,);
+                ref,
+                context,
+                cachingEnabled,
+                cacheOnlyMode,
+              );
             },
             isDestructive: true,
           ),

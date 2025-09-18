@@ -235,7 +235,8 @@ class PodFavoritesMovieOperations {
 
           await _fileManager.createOrUpdateMovieFile(movie);
           debugPrint(
-              '🎬 [PodFavoritesMovieOperations] Created/updated movie file',);
+            '🎬 [PodFavoritesMovieOperations] Created/updated movie file',
+          );
 
           _movieCache[movie.id] = movie;
           _moviesWithFiles.add(movie.id);
@@ -333,10 +334,12 @@ class PodFavoritesMovieOperations {
       final success = await safeWriteFile(fileName, ttlContent);
       if (success) {
         debugPrint(
-            '🎬 [PodFavoritesMovieOperations] Successfully wrote $fileName',);
+          '🎬 [PodFavoritesMovieOperations] Successfully wrote $fileName',
+        );
       } else {
         debugPrint(
-            '🎬 [PodFavoritesMovieOperations] Failed to write $fileName',);
+          '🎬 [PodFavoritesMovieOperations] Failed to write $fileName',
+        );
       }
     } catch (e) {
       debugPrint('🎬 [PodFavoritesMovieOperations] Error writing TTL file: $e');

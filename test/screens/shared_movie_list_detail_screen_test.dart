@@ -23,7 +23,8 @@ void main() {
       mockPrefs = await SharedPreferences.getInstance();
     });
 
-    testWidgets('should create widget with required parameters', (tester) async {
+    testWidgets('should create widget with required parameters',
+        (tester) async {
       final screen = SharedMovieListDetailScreen(
         listName: 'Test List',
         listDescription: 'Test Description',

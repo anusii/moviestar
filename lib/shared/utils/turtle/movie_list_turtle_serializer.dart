@@ -47,7 +47,8 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
           Literal(TurtleBaseSerializer.escapeAndSanitizeString(listName)),
       TurtleNamespaceManager.description: Literal(
         TurtleBaseSerializer.escapeAndSanitizeString(
-            description ?? 'List of movies: $listName',),
+          description ?? 'List of movies: $listName',
+        ),
       ),
       TurtleNamespaceManager.rdfsLabel: Literal(
         '|filePath=moviestar/data/MovieList-$movieListId.ttl|',

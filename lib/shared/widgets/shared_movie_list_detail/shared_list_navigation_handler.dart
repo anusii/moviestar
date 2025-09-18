@@ -45,9 +45,11 @@ class SharedListNavigationHandler {
           int.tryParse(movieData['movieId']?.toString() ?? '0') ?? 0;
 
       debugPrint(
-          '🎬 [SharedListNavigationHandler] Navigating to movie details for ID: $movieId',);
+        '🎬 [SharedListNavigationHandler] Navigating to movie details for ID: $movieId',
+      );
       debugPrint(
-          '🎬 [SharedListNavigationHandler] Using provided favoritesService: ${favoritesService != null}',);
+        '🎬 [SharedListNavigationHandler] Using provided favoritesService: ${favoritesService != null}',
+      );
 
       if (movieId == 0) {
         throw Exception('Invalid movie ID');
@@ -106,7 +108,8 @@ class SharedListNavigationHandler {
       );
 
       debugPrint(
-          '🎬 [SharedListNavigationHandler] Created Movie object directly: ${movie.title}',);
+        '🎬 [SharedListNavigationHandler] Created Movie object directly: ${movie.title}',
+      );
 
       // Dismiss loading indicator
       if (context.mounted) {
@@ -117,12 +120,14 @@ class SharedListNavigationHandler {
       FavoritesService finalFavoritesService;
       if (favoritesService != null) {
         debugPrint(
-            '🎬 [SharedListNavigationHandler] Using provided favorites service',);
+          '🎬 [SharedListNavigationHandler] Using provided favorites service',
+        );
         finalFavoritesService = favoritesService!;
       } else {
         // Create a minimal favorites service for shared viewing context
         debugPrint(
-            '🎬 [SharedListNavigationHandler] Creating fallback favorites service for shared context',);
+          '🎬 [SharedListNavigationHandler] Creating fallback favorites service for shared context',
+        );
         final prefs = await SharedPreferences.getInstance();
         if (!context.mounted) return;
 

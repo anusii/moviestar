@@ -534,7 +534,8 @@ class TurtleUserProfileSerializer {
           if (movieData['isPlaceholder'] == true &&
               movieData['filePath'] != null) {
             print(
-                '🐛 [movieListFromTurtle] Movie ${movieData['id']} is a placeholder, needs file loading from: ${movieData['filePath']}',);
+              '🐛 [movieListFromTurtle] Movie ${movieData['id']} is a placeholder, needs file loading from: ${movieData['filePath']}',
+            );
             // Mark the movie as needing file resolution but add it to the list
             // The calling code will need to resolve filePath references
             movieData['needsFileResolution'] = true;
@@ -610,8 +611,9 @@ class TurtleUserProfileSerializer {
       // If not found with schema.org name, try moviestar ontology name
       if (nameTriples.isEmpty) {
         nameTriples = graph.objects(
-            sub: movieUri,
-            pre: TurtleNamespaces.moviestarOntoNS.withAttr('name'),);
+          sub: movieUri,
+          pre: TurtleNamespaces.moviestarOntoNS.withAttr('name'),
+        );
       }
       print(
         '🐛 [_extractMovieDataFromGraph] Name triples found: ${nameTriples.length}',

@@ -9,6 +9,8 @@ import 'dart:async';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:moviestar/core/services/favorites/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/movie_list_service.dart';
 import 'package:moviestar/core/services/pod/base_pod_service.dart';
 import 'package:moviestar/core/services/pod/pod_favorites_file_manager.dart';
 import 'package:moviestar/core/services/pod/pod_favorites_stream_manager.dart';
@@ -17,8 +19,6 @@ import 'package:moviestar/core/services/pod/pod_sharing_service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/services/movie_list_service.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 
 /// Compact POD-based service for managing favorite movies using composition.

@@ -19,8 +19,12 @@ import 'package:moviestar/utils/is_logged_in.dart';
 
 class PodSettingsPanel extends ConsumerStatefulWidget {
   final Function(String title, List<Widget> children) buildSection;
-  final Function(String title, String subtitle, bool value,
-      ValueChanged<bool> onChanged,) buildSwitchTile;
+  final Function(
+    String title,
+    String subtitle,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) buildSwitchTile;
   final FavoritesServiceManager favoritesServiceManager;
   final Function(String message) showSuccessSnackBar;
   final Function(String message) showErrorSnackBar;

@@ -253,4 +253,14 @@ class ApiKeyService extends BasePodService {
     );
     logDebug('========================');
   }
+
+  /// Creates API key file name based on WebID.
+  String createApiKeyFileName(String webId) {
+    final uri = Uri.parse(webId);
+    String safeName = uri.host.replaceAll('.', '-');
+    if (uri.pathSegments.isNotEmpty) {
+      safeName += '-${uri.pathSegments.first}';
+    }
+    return 'apikey-$safeName.ttl';
+  }
 }

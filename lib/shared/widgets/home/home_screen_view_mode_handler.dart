@@ -29,8 +29,11 @@ class HomeScreenViewModeHandler extends StatelessWidget {
   final Widget Function() buildWatchedMovieRow;
   final Widget Function() buildCustomListRows;
   final Widget Function(
-          String, AsyncValue<CacheResult<List<Movie>>>, String, CacheCategory,)
-      buildMovieRow;
+    String,
+    AsyncValue<CacheResult<List<Movie>>>,
+    String,
+    CacheCategory,
+  ) buildMovieRow;
   final Widget Function() buildCustomListListSections;
   final Widget Function(String, AsyncValue<CacheResult<List<Movie>>>)
       buildAsyncListSection;

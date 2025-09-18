@@ -29,7 +29,8 @@ void main() {
       favoritesService = FavoritesService(prefs);
     });
 
-    testWidgets('should create widget with required parameters', (WidgetTester tester) async {
+    testWidgets('should create widget with required parameters',
+        (WidgetTester tester) async {
       // Act & Assert
       await tester.pumpWidget(
         ProviderScope(
@@ -44,7 +45,8 @@ void main() {
       expect(find.byType(HomeScreen), findsOneWidget);
     });
 
-    testWidgets('should accept FavoritesService parameter', (WidgetTester tester) async {
+    testWidgets('should accept FavoritesService parameter',
+        (WidgetTester tester) async {
       const testKey = Key('home-screen');
 
       // Act
@@ -64,7 +66,8 @@ void main() {
       expect(homeScreen.favoritesService, isA<FavoritesService>());
     });
 
-    testWidgets('should be a ConsumerStatefulWidget', (WidgetTester tester) async {
+    testWidgets('should be a ConsumerStatefulWidget',
+        (WidgetTester tester) async {
       const testKey = Key('home-screen');
 
       // Act
@@ -85,7 +88,8 @@ void main() {
       expect(widget, isA<ConsumerStatefulWidget>());
     });
 
-    testWidgets('should render without throwing exceptions', (WidgetTester tester) async {
+    testWidgets('should render without throwing exceptions',
+        (WidgetTester tester) async {
       // This test verifies the widget can be instantiated and rendered
       // without any runtime exceptions during initial build
 
@@ -128,7 +132,8 @@ void main() {
       expect(find.byType(RefreshIndicator), findsOneWidget);
     });
 
-    testWidgets('should handle view mode switching', (WidgetTester tester) async {
+    testWidgets('should handle view mode switching',
+        (WidgetTester tester) async {
       // This is a basic test that the home screen can handle different view modes
       // without throwing exceptions
 

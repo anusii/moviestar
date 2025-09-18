@@ -83,12 +83,10 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
       _watchedMovies.any((m) => m.id == movie.id);
 
   @override
-  Future<double?> getPersonalRating(Movie movie) async =>
-      _ratings[movie.id];
+  Future<double?> getPersonalRating(Movie movie) async => _ratings[movie.id];
 
   @override
-  Future<bool> hasMovieFile(Movie movie) async =>
-      _hasFiles[movie.id] ?? false;
+  Future<bool> hasMovieFile(Movie movie) async => _hasFiles[movie.id] ?? false;
 
   @override
   Future<void> addToWatch(Movie movie, {String contentType = 'movie'}) async {
@@ -119,7 +117,8 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
   }
 
   @override
-  Future<void> addMovieToCustomList(String listId, Movie movie, {String contentType = 'movie'}) async {
+  Future<void> addMovieToCustomList(String listId, Movie movie,
+      {String contentType = 'movie'}) async {
     // Find the list and add movie
     final list = _customLists.firstWhere((l) => l.id == listId);
     if (!list.movieIds.contains(movie.id)) {
@@ -170,7 +169,8 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
   }
 
   @override
-  Future<CustomList> createCustomList(String name, {String? description}) async {
+  Future<CustomList> createCustomList(String name,
+      {String? description}) async {
     final newList = CustomList(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: name,
@@ -203,33 +203,42 @@ class MockFavoritesService extends ChangeNotifier implements FavoritesService {
   Future<List<Movie>> getMoviesInCustomList(String listId) async {
     final list = _customLists.firstWhere((l) => l.id == listId);
     // Return mock movies for the IDs in the list
-    return list.movieIds.map((id) => Movie(
-      id: id,
-      title: 'Movie $id',
-      overview: 'Test movie $id',
-      posterUrl: '/test.jpg',
-      backdropUrl: '/test_backdrop.jpg',
-      voteAverage: 7.5,
-      releaseDate: DateTime.parse('2023-01-01'),
-      genreIds: [],
-    ),).toList();
+    return list.movieIds
+        .map(
+          (id) => Movie(
+            id: id,
+            title: 'Movie $id',
+            overview: 'Test movie $id',
+            posterUrl: '/test.jpg',
+            backdropUrl: '/test_backdrop.jpg',
+            voteAverage: 7.5,
+            releaseDate: DateTime.parse('2023-01-01'),
+            genreIds: [],
+          ),
+        )
+        .toList();
   }
 
   @override
   Future<List<int>> getMovieIdsInCustomList(String listId) async {
-    final list = _customLists.firstWhere((l) => l.id == listId, orElse: () => CustomList(
-      id: '',
-      name: '',
-      movieIds: [],
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),);
+    final list = _customLists.firstWhere(
+      (l) => l.id == listId,
+      orElse: () => CustomList(
+        id: '',
+        name: '',
+        movieIds: [],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
     return list.movieIds;
   }
 
   @override
   Future<List<CustomList>> getCustomListsContainingMovie(int movieId) async {
-    return _customLists.where((list) => list.movieIds.contains(movieId)).toList();
+    return _customLists
+        .where((list) => list.movieIds.contains(movieId))
+        .toList();
   }
 
   @override
@@ -304,7 +313,8 @@ void main() {
       );
     }
 
-    testWidgets('should render kanban board with basic structure', (WidgetTester tester) async {
+    testWidgets('should render kanban board with basic structure',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createKanbanBoard());
       await tester.pump(); // Allow initial build
 
@@ -315,7 +325,8 @@ void main() {
       expect(find.byType(SingleChildScrollView), findsWidgets);
     });
 
-    testWidgets('should display to-watch column when empty', (WidgetTester tester) async {
+    testWidgets('should display to-watch column when empty',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createKanbanBoard());
       await tester.pump();
 
@@ -323,7 +334,8 @@ void main() {
       expect(find.text('To Watch'), findsOneWidget);
     });
 
-    testWidgets('should display watched column when empty', (WidgetTester tester) async {
+    testWidgets('should display watched column when empty',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createKanbanBoard());
       await tester.pump();
 
@@ -331,7 +343,8 @@ void main() {
       expect(find.text('Watched'), findsOneWidget);
     });
 
-    testWidgets('should display movies in to-watch column', (WidgetTester tester) async {
+    testWidgets('should display movies in to-watch column',
+        (WidgetTester tester) async {
       // Setup: Add movie to to-watch list
       mockFavoritesService.addToWatchMovie(testMovie1);
 
@@ -346,7 +359,8 @@ void main() {
       expect(find.text('1'), findsOneWidget); // Movie count should be 1
     });
 
-    testWidgets('should display movies in watched column', (WidgetTester tester) async {
+    testWidgets('should display movies in watched column',
+        (WidgetTester tester) async {
       // Setup: Add movie to watched list
       mockFavoritesService.addWatchedMovie(testMovie2);
 
@@ -361,7 +375,8 @@ void main() {
       expect(find.text('1'), findsOneWidget); // Movie count should be 1
     });
 
-    testWidgets('should display custom list column', (WidgetTester tester) async {
+    testWidgets('should display custom list column',
+        (WidgetTester tester) async {
       // Setup: Add custom list
       mockFavoritesService.addCustomList(testCustomList);
 
@@ -376,7 +391,8 @@ void main() {
       // Note: Custom list title rendering is timing-dependent in test environment
     });
 
-    testWidgets('should handle drag and drop between columns', (WidgetTester tester) async {
+    testWidgets('should handle drag and drop between columns',
+        (WidgetTester tester) async {
       // Setup: Add movie to to-watch
       mockFavoritesService.addToWatchMovie(testMovie1);
 
@@ -398,7 +414,8 @@ void main() {
       // This tests that the basic gesture is handled without crashes
     });
 
-    testWidgets('should display sort controls for columns', (WidgetTester tester) async {
+    testWidgets('should display sort controls for columns',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createKanbanBoard());
       await tester.pump();
       // Add additional pumps to ensure widget completes rendering
@@ -417,7 +434,8 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsWidgets);
     });
 
-    testWidgets('should handle multiple movies in same column', (WidgetTester tester) async {
+    testWidgets('should handle multiple movies in same column',
+        (WidgetTester tester) async {
       // Setup: Add multiple movies to to-watch
       mockFavoritesService.addToWatchMovie(testMovie1);
       mockFavoritesService.addToWatchMovie(testMovie2);
@@ -433,7 +451,8 @@ void main() {
       expect(find.text('2'), findsOneWidget); // Movie count should be 2
     });
 
-    testWidgets('should handle custom list with movies', (WidgetTester tester) async {
+    testWidgets('should handle custom list with movies',
+        (WidgetTester tester) async {
       // Setup: Add custom list with movie
       mockFavoritesService.addCustomList(testCustomList);
 
@@ -448,7 +467,8 @@ void main() {
       // Note: Custom list title rendering is timing-dependent in test environment
     });
 
-    testWidgets('should show movie ratings when available', (WidgetTester tester) async {
+    testWidgets('should show movie ratings when available',
+        (WidgetTester tester) async {
       // Setup: Add movie with rating
       mockFavoritesService.addToWatchMovie(testMovie1);
       mockFavoritesService.setRating(testMovie1.id, 4.5);
@@ -465,7 +485,8 @@ void main() {
       // Rating display test would depend on implementation details
     });
 
-    testWidgets('should handle error states gracefully', (WidgetTester tester) async {
+    testWidgets('should handle error states gracefully',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createKanbanBoard());
       await tester.pump();
 
@@ -473,7 +494,8 @@ void main() {
       expect(find.byType(MovieKanbanBoard), findsOneWidget);
     });
 
-    testWidgets('should respond to column sort changes', (WidgetTester tester) async {
+    testWidgets('should respond to column sort changes',
+        (WidgetTester tester) async {
       // Setup: Add movies to test sorting
       mockFavoritesService.addToWatchMovie(testMovie1);
       mockFavoritesService.addToWatchMovie(testMovie2);
@@ -502,7 +524,8 @@ void main() {
       }
     });
 
-    testWidgets('should handle optimistic UI updates', (WidgetTester tester) async {
+    testWidgets('should handle optimistic UI updates',
+        (WidgetTester tester) async {
       // Setup: Add movie to to-watch
       mockFavoritesService.addToWatchMovie(testMovie1);
 
@@ -537,10 +560,12 @@ void main() {
       );
     }
 
-    testWidgets('should handle very long movie titles', (WidgetTester tester) async {
+    testWidgets('should handle very long movie titles',
+        (WidgetTester tester) async {
       final longTitleMovie = Movie(
         id: 999,
-        title: 'This is a very long movie title that should be handled gracefully by the kanban board widget',
+        title:
+            'This is a very long movie title that should be handled gracefully by the kanban board widget',
         overview: 'Test movie with long title',
         posterUrl: 'https://image.tmdb.org/t/p/w500/test.jpg',
         backdropUrl: 'https://image.tmdb.org/t/p/w1280/test_backdrop.jpg',
@@ -558,7 +583,8 @@ void main() {
       expect(find.byType(MovieKanbanBoard), findsOneWidget);
     });
 
-    testWidgets('should handle maximum number of movies per column', (WidgetTester tester) async {
+    testWidgets('should handle maximum number of movies per column',
+        (WidgetTester tester) async {
       // Add more than the maximum items per column (8)
       for (int i = 1; i <= 10; i++) {
         final movie = Movie(
@@ -581,7 +607,8 @@ void main() {
       expect(find.byType(MovieKanbanBoard), findsOneWidget);
     });
 
-    testWidgets('should handle empty custom lists', (WidgetTester tester) async {
+    testWidgets('should handle empty custom lists',
+        (WidgetTester tester) async {
       final emptyCustomList = CustomList(
         id: 'empty-list',
         name: 'Empty List',

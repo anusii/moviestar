@@ -236,7 +236,10 @@ class _AddToCustomListsDialogState extends State<AddToCustomListsDialog> {
   }
 
   Widget _buildListItem(
-      BuildContext context, CustomList list, bool isSelected,) {
+    BuildContext context,
+    CustomList list,
+    bool isSelected,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(

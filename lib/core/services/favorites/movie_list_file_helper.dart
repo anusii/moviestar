@@ -65,9 +65,11 @@ class MovieListFileHelper with PodOperationsMixin {
       final tvShowFileName = 'moviestar/data/movies/TVShow-$movieId.ttl';
 
       print(
-          '🎬 [MovieListFileHelper] loadFullMovieData for $movieId, contentType: $contentType',);
+        '🎬 [MovieListFileHelper] loadFullMovieData for $movieId, contentType: $contentType',
+      );
       print(
-          '🎬 [MovieListFileHelper] Will try: ${contentType == 'tv' || contentType == 'tvShow' ? tvShowFileName : movieFileName}',);
+        '🎬 [MovieListFileHelper] Will try: ${contentType == 'tv' || contentType == 'tvShow' ? tvShowFileName : movieFileName}',
+      );
 
       if (!_context.mounted) return null;
 
@@ -84,7 +86,8 @@ class MovieListFileHelper with PodOperationsMixin {
           );
           result = readResult.success ? (readResult.data ?? '') : '';
           print(
-              '🎬 [MovieListFileHelper] TVShow file read result: success=${readResult.success}, dataLength=${result.length}',);
+            '🎬 [MovieListFileHelper] TVShow file read result: success=${readResult.success}, dataLength=${result.length}',
+          );
         } catch (e) {
           print('🎬 [MovieListFileHelper] TVShow file read failed: $e');
           // Fall back to Movie file for backward compatibility
@@ -100,7 +103,8 @@ class MovieListFileHelper with PodOperationsMixin {
           );
           result = readResult.success ? (readResult.data ?? '') : '';
           print(
-              '🎬 [MovieListFileHelper] Movie file read result: success=${readResult.success}, dataLength=${result.length}',);
+            '🎬 [MovieListFileHelper] Movie file read result: success=${readResult.success}, dataLength=${result.length}',
+          );
         }
       } else {
         // For movies, just try Movie file
@@ -112,23 +116,28 @@ class MovieListFileHelper with PodOperationsMixin {
         );
         result = readResult.success ? (readResult.data ?? '') : '';
         print(
-            '🎬 [MovieListFileHelper] Movie file read result: success=${readResult.success}, dataLength=${result.length}',);
+          '🎬 [MovieListFileHelper] Movie file read result: success=${readResult.success}, dataLength=${result.length}',
+        );
       }
 
       if (result.isNotEmpty) {
         print(
-            '🎬 [MovieListFileHelper] Parsing TTL data (${result.length} chars)',);
+          '🎬 [MovieListFileHelper] Parsing TTL data (${result.length} chars)',
+        );
         final movieData = TurtleSerializer.movieWithUserDataFromTurtle(result);
         print(
-            '🎬 [MovieListFileHelper] Parse result: ${movieData != null ? "SUCCESS" : "FAILED"}',);
+          '🎬 [MovieListFileHelper] Parse result: ${movieData != null ? "SUCCESS" : "FAILED"}',
+        );
         if (movieData != null && movieData['movie'] is Movie) {
           final movie = movieData['movie'] as Movie;
           print(
-              '🎬 [MovieListFileHelper] Returning movie: ${movie.title} (ID: ${movie.id})',);
+            '🎬 [MovieListFileHelper] Returning movie: ${movie.title} (ID: ${movie.id})',
+          );
           return movie;
         } else {
           print(
-              '🎬 [MovieListFileHelper] movieData is null or invalid: $movieData',);
+            '🎬 [MovieListFileHelper] movieData is null or invalid: $movieData',
+          );
         }
       } else {
         print('🎬 [MovieListFileHelper] No data read from file');

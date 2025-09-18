@@ -156,7 +156,8 @@ class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
   }
 
   Future<Map<String, dynamic>> _fetchIndividualMovieData(
-      Map<String, dynamic> movieData,) async {
+    Map<String, dynamic> movieData,
+  ) async {
     try {
       final movieId = movieData['movieId']?.toString() ?? '0';
 
@@ -221,7 +222,10 @@ class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
           // Try Movie file first
           final movieResourceUrl = '${baseUrl}moviestar/data/$movieFileName';
           movieFileContent = await readExternalPod(
-              movieResourceUrl, context, widget.parentWidget,);
+            movieResourceUrl,
+            context,
+            widget.parentWidget,
+          );
 
           if (movieFileContent != null &&
               movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
@@ -236,7 +240,10 @@ class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
             if (!mounted) return movieData;
 
             movieFileContent = await readExternalPod(
-                tvShowResourceUrl, context, widget.parentWidget,);
+              tvShowResourceUrl,
+              context,
+              widget.parentWidget,
+            );
 
             if (movieFileContent != null &&
                 movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
@@ -285,7 +292,8 @@ class _SharedListMovieDisplayState extends ConsumerState<SharedListMovieDisplay>
   }
 
   Future<Map<String, dynamic>?> _parseIndividualMovieData(
-      String ttlContent,) async {
+    String ttlContent,
+  ) async {
     try {
       double? rating;
       String? comments;

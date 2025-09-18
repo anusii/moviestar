@@ -76,7 +76,8 @@ class ContentService {
     }
     final apiKey = await _apiKeyService.getApiKey();
     print(
-        '🔍 [ContentService] Got API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',);
+      '🔍 [ContentService] Got API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',
+    );
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
     _searchService = ContentSearchService(_client!);
     print('🔍 [ContentService] Client initialized with API key');
@@ -92,7 +93,8 @@ class ContentService {
 
   Future<void> _initializeClientWithApiKey(String? apiKey) async {
     print(
-        '🔍 [ContentService] _initializeClientWithApiKey called with API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',);
+      '🔍 [ContentService] _initializeClientWithApiKey called with API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',
+    );
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
     _searchService = ContentSearchService(_client!);
     print('🔍 [ContentService] Client initialized with direct API key');
@@ -350,19 +352,23 @@ class ContentService {
     String query,
   ) async {
     print(
-        '🔍 [ContentService] searchContentComprehensive called with query: "$query"',);
+      '🔍 [ContentService] searchContentComprehensive called with query: "$query"',
+    );
     await _ensureClientInitialized();
     print(
-        '🔍 [ContentService] Client initialized, _searchService is null: ${_searchService == null}',);
+      '🔍 [ContentService] Client initialized, _searchService is null: ${_searchService == null}',
+    );
     if (_searchService == null) {
       print('🔍 [ContentService] _searchService is null, reinitializing...');
       // Fallback: reinitialize if still null
       await _initializeClient();
       print(
-          '🔍 [ContentService] After reinit, _searchService is null: ${_searchService == null}',);
+        '🔍 [ContentService] After reinit, _searchService is null: ${_searchService == null}',
+      );
     }
     print(
-        '🔍 [ContentService] Calling _searchService.searchContentComprehensive',);
+      '🔍 [ContentService] Calling _searchService.searchContentComprehensive',
+    );
     return await _searchService!.searchContentComprehensive(query);
   }
 

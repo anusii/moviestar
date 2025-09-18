@@ -73,11 +73,25 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
 
   /// Triggers app reinitialization after API key is set.
   void _triggerAppReinitialization() {
-    widget.onTriggerAppReinitialization?.call();
+    // The provider invalidations handle the reinitialization
+    // No additional action needed since providers are already invalidated
   }
 
   void _navigateToHomeScreen() {
-    widget.onNavigateToHome?.call();
+    // Navigate back to the main home screen
+    Navigator.of(context).popUntil((route) => route.isFirst);
+
+    // Show message to user
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Movie data will now load with your new API key'),
+            backgroundColor: Colors.blue,
+          ),
+        );
+      }
+    });
   }
 
   Future<void> _saveApiKey() async {

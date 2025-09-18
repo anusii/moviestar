@@ -124,8 +124,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             buildSection: _buildSection,
             apiKeyService: widget.apiKeyService,
             fromApiKeyPrompt: widget.fromApiKeyPrompt,
-            onNavigateToHome: _navigateToHomeScreen,
-            onTriggerAppReinitialization: _triggerAppReinitialization,
           ),
           PodSettingsPanel(
             buildSection: _buildSection,

@@ -1,4 +1,4 @@
-/// HomeScreen Movie Row Builder Component - Movie rendering and navigation logic
+/// HomeScreen Movie Row Builder Component - Movie rendering and navigation logic.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -22,7 +22,7 @@ import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/shared/widgets/home/home_cache_indicator_system.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
-/// Component that handles movie row building, list sections, and navigation logic
+/// Component that handles movie row building, list sections, and navigation logic.
 class HomeMovieRowBuilder extends StatelessWidget {
   final FavoritesService favoritesService;
   final Map<String, ScrollController> scrollControllers;
@@ -49,7 +49,7 @@ class HomeMovieRowBuilder extends StatelessWidget {
     required this.parentWidget,
   });
 
-  /// Build a movie row with horizontal scrolling
+  /// Build a movie row with horizontal scrolling.
   Widget buildMovieRow(
     BuildContext context,
     WidgetRef ref,
@@ -204,7 +204,7 @@ class HomeMovieRowBuilder extends StatelessWidget {
     );
   }
 
-  /// Build a list section with title and items
+  /// Build a list section with title and items.
   Widget buildListSection(
     BuildContext context,
     String title,
@@ -236,7 +236,7 @@ class HomeMovieRowBuilder extends StatelessWidget {
     );
   }
 
-  /// Build View More button for user lists (To Watch/Watched)
+  /// Build View More button for user lists (To Watch/Watched).
   Widget buildViewMoreForUserList(BuildContext context, String title) {
     if (title == 'To Watch') {
       return StreamBuilder<List<Movie>>(
@@ -292,7 +292,7 @@ class HomeMovieRowBuilder extends StatelessWidget {
     return const SizedBox.shrink();
   }
 
-  /// Build list items for a list of movies
+  /// Build list items for a list of movies.
   Widget buildMovieListItems(
     BuildContext context,
     List<Movie> movies,
@@ -330,7 +330,7 @@ class HomeMovieRowBuilder extends StatelessWidget {
     );
   }
 
-  /// Build cache indicator for section headers using the helper
+  /// Build cache indicator for section headers using the helper.
   Widget _buildSectionCacheIndicator(
     AsyncValue<CacheResult<List<Movie>>> moviesAsync,
     bool cacheOnlyMode,
@@ -341,7 +341,7 @@ class HomeMovieRowBuilder extends StatelessWidget {
     );
   }
 
-  /// Navigate to movie category screen
+  /// Navigate to movie category screen.
   void _navigateToMovieCategory(
     BuildContext context,
     String categoryName,

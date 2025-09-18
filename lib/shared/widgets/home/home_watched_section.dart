@@ -1,4 +1,4 @@
-/// Watched Section for Home Screen
+/// Watched Section for Home Screen.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

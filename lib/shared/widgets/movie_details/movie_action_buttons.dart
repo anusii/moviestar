@@ -1,4 +1,4 @@
-/// Movie Action Buttons for Movie Details Screen
+/// Movie Action Buttons for Movie Details Screen.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

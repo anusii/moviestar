@@ -1,4 +1,4 @@
-/// Custom List Builder for Home Screen
+/// Custom List Builder for Home Screen.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

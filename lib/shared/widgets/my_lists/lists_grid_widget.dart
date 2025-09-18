@@ -1,4 +1,4 @@
-/// Lists Grid Widget Component - Scrollable grid display of custom list cards
+/// Lists Grid Widget Component - Scrollable grid display of custom list cards.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -15,7 +15,7 @@ import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 
-/// Widget that displays a scrollable grid of custom list cards
+/// Widget that displays a scrollable grid of custom list cards.
 class ListsGridWidget extends StatelessWidget {
   final List<CustomList> customLists;
   final VoidCallback onRefresh;

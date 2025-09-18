@@ -1,4 +1,4 @@
-/// User data (ratings, comments) Turtle serialization functionality
+/// User data (ratings, comments) Turtle serialization functionality.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -15,9 +15,9 @@ import 'package:rdflib/rdflib.dart';
 import 'package:moviestar/utils/turtle/turtle_namespaces.dart';
 import 'package:moviestar/utils/turtle/turtle_utils.dart';
 
-/// Handles conversion of user ratings and comments to/from Turtle format
+/// Handles conversion of user ratings and comments to/from Turtle format.
 class TurtleUserDataSerializer {
-  /// Converts movie ratings to Turtle format
+  /// Converts movie ratings to Turtle format.
   static String ratingsToTurtle(Map<String, double> ratings) {
     final graph = Graph();
     final namespaces = TurtleNamespaces.getOntologyNamespaces();
@@ -58,7 +58,7 @@ class TurtleUserDataSerializer {
     return graph.serializedString;
   }
 
-  /// Converts movie comments to Turtle format
+  /// Converts movie comments to Turtle format.
   static String commentsToTurtle(Map<String, String> comments) {
     final graph = Graph();
     final namespaces = TurtleNamespaces.getOntologyNamespaces();
@@ -99,7 +99,7 @@ class TurtleUserDataSerializer {
     return graph.serializedString;
   }
 
-  /// Extracts ratings from Turtle content
+  /// Extracts ratings from Turtle content.
   static Map<String, double> ratingsFromTurtle(String ttlContent) {
     try {
       final graph = Graph();
@@ -140,7 +140,7 @@ class TurtleUserDataSerializer {
     }
   }
 
-  /// Extracts comments from Turtle content
+  /// Extracts comments from Turtle content.
   static Map<String, String> commentsFromTurtle(String ttlContent) {
     try {
       final graph = Graph();
@@ -177,7 +177,7 @@ class TurtleUserDataSerializer {
     }
   }
 
-  /// Converts ratings to Turtle with JSON embedding
+  /// Converts ratings to Turtle with JSON embedding.
   static String ratingsToTurtleWithJson(Map<String, double> ratings) {
     final graph = Graph();
     final namespaces = TurtleNamespaces.getOntologyNamespaces();
@@ -204,7 +204,7 @@ class TurtleUserDataSerializer {
     return graph.serializedString;
   }
 
-  /// Converts comments to Turtle with JSON embedding
+  /// Converts comments to Turtle with JSON embedding.
   static String commentsToTurtleWithJson(Map<String, String> comments) {
     final graph = Graph();
     final namespaces = TurtleNamespaces.getOntologyNamespaces();

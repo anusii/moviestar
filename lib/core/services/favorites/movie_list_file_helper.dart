@@ -64,12 +64,6 @@ class MovieListFileHelper with PodOperationsMixin {
       final movieFileName = 'moviestar/data/movies/Movie-$movieId.ttl';
       final tvShowFileName = 'moviestar/data/movies/TVShow-$movieId.ttl';
 
-      print(
-        '🎬 [MovieListFileHelper] loadFullMovieData for $movieId, contentType: $contentType',
-      );
-      print(
-        '🎬 [MovieListFileHelper] Will try: ${contentType == 'tv' || contentType == 'tvShow' ? tvShowFileName : movieFileName}',
-      );
 
       if (!_context.mounted) return null;
 
@@ -78,69 +72,43 @@ class MovieListFileHelper with PodOperationsMixin {
       // For TV shows, try TVShow file first, then fall back to Movie file
       if (contentType == 'tv' || contentType == 'tvShow') {
         try {
-          print('🎬 [MovieListFileHelper] Trying to read: $tvShowFileName');
           final readResult = await PodFileOperationsService.readFile(
             tvShowFileName,
             _context,
             _child,
           );
           result = readResult.success ? (readResult.data ?? '') : '';
-          print(
-            '🎬 [MovieListFileHelper] TVShow file read result: success=${readResult.success}, dataLength=${result.length}',
-          );
         } catch (e) {
-          print('🎬 [MovieListFileHelper] TVShow file read failed: $e');
           // Fall back to Movie file for backward compatibility
           if (!isFileNotFoundError(e)) {
             rethrow;
           }
           if (!_context.mounted) return null;
-          print('🎬 [MovieListFileHelper] Falling back to: $movieFileName');
           final readResult = await PodFileOperationsService.readFile(
             movieFileName,
             _context,
             _child,
           );
           result = readResult.success ? (readResult.data ?? '') : '';
-          print(
-            '🎬 [MovieListFileHelper] Movie file read result: success=${readResult.success}, dataLength=${result.length}',
-          );
         }
       } else {
         // For movies, just try Movie file
-        print('🎬 [MovieListFileHelper] Trying to read: $movieFileName');
         final readResult = await PodFileOperationsService.readFile(
           movieFileName,
           _context,
           _child,
         );
         result = readResult.success ? (readResult.data ?? '') : '';
-        print(
-          '🎬 [MovieListFileHelper] Movie file read result: success=${readResult.success}, dataLength=${result.length}',
-        );
       }
 
       if (result.isNotEmpty) {
-        print(
-          '🎬 [MovieListFileHelper] Parsing TTL data (${result.length} chars)',
-        );
         final movieData = TurtleSerializer.movieWithUserDataFromTurtle(result);
-        print(
-          '🎬 [MovieListFileHelper] Parse result: ${movieData != null ? "SUCCESS" : "FAILED"}',
-        );
         if (movieData != null && movieData['movie'] is Movie) {
           final movie = movieData['movie'] as Movie;
-          print(
-            '🎬 [MovieListFileHelper] Returning movie: ${movie.title} (ID: ${movie.id})',
-          );
           return movie;
         } else {
-          print(
-            '🎬 [MovieListFileHelper] movieData is null or invalid: $movieData',
-          );
         }
       } else {
-        print('🎬 [MovieListFileHelper] No data read from file');
       }
     } catch (e) {
       if (!isFileNotFoundError(e)) {

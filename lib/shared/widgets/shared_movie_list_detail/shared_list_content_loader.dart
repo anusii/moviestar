@@ -1,4 +1,4 @@
-/// Shared List Content Loader Component - Movie Title Loading, API Integration, and Caching Logic
+/// Shared List Content Loader Component - Movie Title Loading, API Integration, and Caching Logic.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

@@ -1,4 +1,4 @@
-/// Moviestar - Manage and share ratings through private PODs
+/// Moviestar - Manage and share ratings through private PODs.
 ///
 // Time-stamp: <Wednesday 2025-07-23 16:55:28 +1000 Graham Williams>
 ///
@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang, Graham Williams, Ashley Tang
+/// Authors: Kevin Wang, Graham Williams, Ashley Tang.
 
 library;
 

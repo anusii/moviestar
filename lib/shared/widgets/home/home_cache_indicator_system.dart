@@ -1,4 +1,4 @@
-/// HomeScreen Cache Indicator System Component - Cache status display and performance feedback system
+/// HomeScreen Cache Indicator System Component - Cache status display and performance feedback system.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -18,7 +18,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 
-/// Component that handles cache indicator display and performance feedback
+/// Component that handles cache indicator display and performance feedback.
 class HomeCacheIndicatorSystem extends StatefulWidget {
   final WidgetRef ref;
   final bool mounted;
@@ -60,7 +60,7 @@ class _HomeCacheIndicatorSystemState extends State<HomeCacheIndicatorSystem> {
     });
   }
 
-  /// Shows cache performance feedback after initial load
+  /// Shows cache performance feedback after initial load.
   void _showCachePerformanceFeedback() {
     if (_hasShownInitialFeedback) return;
 
@@ -112,7 +112,7 @@ class _HomeCacheIndicatorSystemState extends State<HomeCacheIndicatorSystem> {
     }
   }
 
-  /// Forces refresh of all movie data
+  /// Forces refresh of all movie data.
   Future<void> forceRefresh() async {
     // Check if widget is still mounted before starting refresh
     if (!widget.mounted) return;
@@ -130,7 +130,7 @@ class _HomeCacheIndicatorSystemState extends State<HomeCacheIndicatorSystem> {
     }
   }
 
-  /// Builds cache indicator for section headers
+  /// Builds cache indicator for section headers.
   Widget buildSectionCacheIndicator(
     AsyncValue<CacheResult<List<Movie>>> moviesAsync,
     bool cacheOnlyMode,
@@ -156,7 +156,7 @@ class _HomeCacheIndicatorSystemState extends State<HomeCacheIndicatorSystem> {
     );
   }
 
-  /// Builds offline mode badge
+  /// Builds offline mode badge.
   Widget buildOfflineModeBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -182,7 +182,7 @@ class _HomeCacheIndicatorSystemState extends State<HomeCacheIndicatorSystem> {
     );
   }
 
-  /// Builds cache age badge
+  /// Builds cache age badge.
   Widget buildCacheAgeBadge(Duration cacheAge) {
     final ageText = _formatCacheAge(cacheAge);
     return Container(
@@ -209,7 +209,7 @@ class _HomeCacheIndicatorSystemState extends State<HomeCacheIndicatorSystem> {
     );
   }
 
-  /// Builds cache badge for fresh cache data
+  /// Builds cache badge for fresh cache data.
   Widget buildCacheBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -235,7 +235,7 @@ class _HomeCacheIndicatorSystemState extends State<HomeCacheIndicatorSystem> {
     );
   }
 
-  /// Builds network badge for fresh data
+  /// Builds network badge for fresh data.
   Widget buildNetworkBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -261,7 +261,7 @@ class _HomeCacheIndicatorSystemState extends State<HomeCacheIndicatorSystem> {
     );
   }
 
-  /// Formats cache age into human-readable string
+  /// Formats cache age into human-readable string.
   String _formatCacheAge(Duration age) {
     if (age.inDays > 0) {
       return '${age.inDays}d old';
@@ -282,9 +282,9 @@ class _HomeCacheIndicatorSystemState extends State<HomeCacheIndicatorSystem> {
   }
 }
 
-/// Static helper class for cache indicator creation outside of component context
+/// Static helper class for cache indicator creation outside of component context.
 class CacheIndicatorHelper {
-  /// Builds cache indicator for section headers
+  /// Builds cache indicator for section headers.
   static Widget buildSectionCacheIndicator(
     AsyncValue<CacheResult<List<Movie>>> moviesAsync,
     bool cacheOnlyMode,

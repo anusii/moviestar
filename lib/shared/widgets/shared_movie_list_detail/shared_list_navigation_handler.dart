@@ -37,7 +37,7 @@ class SharedListNavigationHandler {
   });
 
   /// Navigate to movie details screen with enhanced data.
-  /// Uses direct Movie creation approach (similar to working Shared tab logic)
+  /// Uses direct Movie creation approach (similar to working Shared tab logic).
   /// instead of TMDB API calls to avoid API key and network issues.
   Future<void> navigateToMovieDetails(Map<String, dynamic> movieData) async {
     try {

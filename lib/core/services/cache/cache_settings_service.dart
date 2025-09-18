@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -79,7 +79,7 @@ class CacheSettingsService {
     );
   }
 
-  /// Gets whether offline mode is enabled (defaults to false)
+  /// Gets whether offline mode is enabled (defaults to false).
 
   bool get cacheOnlyMode {
     return _prefs?.getBool(_cacheOnlyModeKey) ?? false;

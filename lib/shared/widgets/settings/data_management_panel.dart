@@ -1,4 +1,4 @@
-/// Data Management Panel Component - Cache Management and Data Operations
+/// Data Management Panel Component - Cache Management and Data Operations.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

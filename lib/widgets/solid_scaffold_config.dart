@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Tony Chen
+/// Authors: Tony Chen.
 
 library;
 
@@ -45,15 +45,15 @@ import 'package:moviestar/screens/watched_screen.dart';
 
 /// MovieStar-specific SolidScaffold configuration.
 ///
-/// Provides centralised configuration for all SolidScaffold components
+/// Provides centralised configuration for all SolidScaffold components.
 /// including navigation menu, app bar actions, and overflow items.
 /// This ensures consistent UI patterns throughout the application.
 
 class SolidScaffoldConfig {
   /// Creates the MovieStar app navigation menu items.
   ///
-  /// Returns a list of menu items configured specifically for the
-  /// MovieStar application with proper titles, icons, tooltips, and child
+  /// Returns a list of menu items configured specifically for the.
+  /// MovieStar application with proper titles, icons, tooltips, and child.
   /// widgets.
   ///
   /// [favoritesService] The service for managing favourite movies.
@@ -155,7 +155,7 @@ your movie data files.
   /// Creates the MovieStar app bar actions.
   ///
   /// Returns a list of action buttons configured for the MovieStar application.
-  /// Requires a WidgetRef to access view mode state and callback functions for
+  /// Requires a WidgetRef to access view mode state and callback functions for.
   /// handling actions.
 
   static List<SolidAppBarAction> createAppBarActions({
@@ -188,7 +188,7 @@ your movie data files.
 
   /// Creates the MovieStar app bar overflow items.
   ///
-  /// Returns a list of overflow menu items configured for the MovieStar
+  /// Returns a list of overflow menu items configured for the MovieStar.
   /// application.
 
   static List<SolidOverflowMenuItem> createOverflowItems({

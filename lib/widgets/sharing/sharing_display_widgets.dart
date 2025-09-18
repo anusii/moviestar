@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Software Innovation Institute
+/// Authors: Software Innovation Institute.
 
 library;
 
@@ -31,7 +31,7 @@ import 'package:solidpod/solidpod.dart' show GrantPermissionUi;
 import 'package:moviestar/widgets/sharing/sharing_components.dart';
 import 'package:moviestar/widgets/sharing/sharing_form_widgets.dart';
 
-/// Sharing status indicator
+/// Sharing status indicator.
 class SharingStatusIndicator extends StatelessWidget {
   final ShareStatus status;
   final String? message;
@@ -111,7 +111,7 @@ class SharingStatusIndicator extends StatelessWidget {
   }
 }
 
-/// Batch sharing item tile
+/// Batch sharing item tile.
 class ShareableItemTile extends StatelessWidget {
   final ShareableFile file;
   final ValueChanged<List<String>> onPermissionsChanged;
@@ -250,7 +250,7 @@ class ShareableItemTile extends StatelessWidget {
   }
 }
 
-/// Navigate to GrantPermissionUi with consistent theming
+/// Navigate to GrantPermissionUi with consistent theming.
 Future<bool?> navigateToGrantPermissionUi({
   required BuildContext context,
   required String fileName,

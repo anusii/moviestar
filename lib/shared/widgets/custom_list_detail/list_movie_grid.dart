@@ -1,4 +1,4 @@
-/// List Movie Grid Widget Component - Display Movies in List with Loading and Error States
+/// List Movie Grid Widget Component - Display Movies in List with Loading and Error States.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

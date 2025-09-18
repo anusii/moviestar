@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -34,7 +34,7 @@ class NetworkConstants {
 
   /// Base delay for exponential backoff (500 milliseconds).
   ///
-  /// Used in retry logic: delay = baseDelay * attempt
+  /// Used in retry logic: delay = baseDelay * attempt.
 
   static const int backoffBaseDelayMs = 500;
 }

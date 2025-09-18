@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -402,7 +402,7 @@ class FavoritesServiceManager extends ChangeNotifier {
     return null;
   }
 
-  /// Custom Lists Methods
+  /// Custom Lists Methods.
 
   /// Retrieves all custom lists.
 

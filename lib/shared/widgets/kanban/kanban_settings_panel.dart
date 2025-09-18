@@ -1,4 +1,4 @@
-/// Kanban Settings Panel - Configuration UI
+/// Kanban Settings Panel - Configuration UI.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
 
-/// Configuration settings for the kanban board
+/// Configuration settings for the kanban board.
 class KanbanSettings {
   final int maxItemsPerColumn;
   final bool showMoviePosters;
@@ -72,7 +72,7 @@ class KanbanSettings {
   }
 }
 
-/// Controller for managing kanban settings
+/// Controller for managing kanban settings.
 class KanbanSettingsController extends ChangeNotifier {
   KanbanSettings _settings = const KanbanSettings();
 
@@ -134,7 +134,7 @@ class KanbanSettingsController extends ChangeNotifier {
   }
 }
 
-/// Settings panel widget for kanban board configuration
+/// Settings panel widget for kanban board configuration.
 class KanbanSettingsPanel extends StatelessWidget {
   final KanbanSettingsController controller;
   final VoidCallback? onClose;
@@ -533,7 +533,7 @@ class KanbanSettingsPanel extends StatelessWidget {
   }
 }
 
-/// Quick settings toolbar for common kanban adjustments
+/// Quick settings toolbar for common kanban adjustments.
 class KanbanQuickSettings extends StatelessWidget {
   final KanbanSettingsController controller;
   final VoidCallback? onOpenFullSettings;

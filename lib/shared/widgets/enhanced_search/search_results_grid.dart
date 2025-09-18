@@ -1,4 +1,4 @@
-/// Search Results Grid Component - Movie/TV grid display with categorized results
+/// Search Results Grid Component - Movie/TV grid display with categorized results.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -21,7 +21,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
 
-/// Widget that displays search results in categorized sections
+/// Widget that displays search results in categorized sections.
 class SearchResultsGrid extends StatefulWidget {
   final Map<String, List<ContentItem>> searchResults;
   final FavoritesService favoritesService;
@@ -42,7 +42,7 @@ class SearchResultsGrid extends StatefulWidget {
 
 class _SearchResultsGridState extends State<SearchResultsGrid>
     with ScreenStateMixin {
-  /// Builds the search results display organized by categories
+  /// Builds the search results display organized by categories.
   @override
   Widget build(BuildContext context) {
     // Check if we have any results
@@ -62,7 +62,7 @@ class _SearchResultsGridState extends State<SearchResultsGrid>
     );
   }
 
-  /// Builds a section of search results for a specific category
+  /// Builds a section of search results for a specific category.
   Widget _buildResultsSection(String category, List<ContentItem> content) {
     if (content.isEmpty) return const SizedBox.shrink();
 
@@ -240,7 +240,7 @@ class _SearchResultsGridState extends State<SearchResultsGrid>
     );
   }
 
-  /// Navigate to movie/TV details screen
+  /// Navigate to movie/TV details screen.
   void _navigateToDetails(ContentItem contentItem) {
     final movie = Movie.fromContentItem(contentItem);
     safeNavigateTo(
@@ -254,12 +254,12 @@ class _SearchResultsGridState extends State<SearchResultsGrid>
     );
   }
 
-  /// Handle list action selection from popup menu
+  /// Handle list action selection from popup menu.
   void _handleListAction(String action, ContentItem contentItem) {
     widget.onListAction(action, contentItem);
   }
 
-  /// Check if all search result categories are empty
+  /// Check if all search result categories are empty.
   bool _hasNoResults() {
     return (widget.searchResults['title']?.isEmpty ?? true) &&
         (widget.searchResults['actor']?.isEmpty ?? true) &&

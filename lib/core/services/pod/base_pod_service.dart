@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -44,7 +44,7 @@ class FileOperationResult {
 }
 
 /// Base class for services that interact with Solid POD storage.
-/// Provides common functionality for login validation, context checking,
+/// Provides common functionality for login validation, context checking,.
 /// and POD file operations while preserving exact existing behavior.
 abstract class BasePodService extends ChangeNotifier {
   final BuildContext _context;

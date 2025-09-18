@@ -1,4 +1,4 @@
-/// Kanban Board Controller - State Management Logic
+/// Kanban Board Controller - State Management Logic.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

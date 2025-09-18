@@ -1,4 +1,4 @@
-/// Movie Details Gallery Component - Image Gallery and Media Viewer Functionality
+/// Movie Details Gallery Component - Image Gallery and Media Viewer Functionality.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

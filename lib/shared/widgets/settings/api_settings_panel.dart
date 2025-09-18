@@ -1,4 +1,4 @@
-/// API Settings Panel Component - API Key Configuration and Validation
+/// API Settings Panel Component - API Key Configuration and Validation.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -75,7 +75,7 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
     }
   }
 
-  /// Triggers app reinitialization after API key is set
+  /// Triggers app reinitialization after API key is set.
   void _triggerAppReinitialization() {
     widget.onTriggerAppReinitialization?.call();
   }

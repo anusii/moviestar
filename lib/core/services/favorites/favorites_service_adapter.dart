@@ -22,7 +22,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -241,7 +241,7 @@ class FavoritesServiceAdapter extends FavoritesService {
 
   bool get isPodStorageEnabled => _manager.isPodStorageEnabled;
 
-  /// Custom Lists Methods - Delegate to manager
+  /// Custom Lists Methods - Delegate to manager.
 
   @override
   Future<List<CustomList>> getCustomLists() async {

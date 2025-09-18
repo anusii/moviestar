@@ -1,6 +1,6 @@
 /// Facade maintaining backward compatibility for TurtleSerializer.
 ///
-/// This class delegates to specialized serializers while preserving
+/// This class delegates to specialized serializers while preserving.
 /// the exact same API as the original monolithic TurtleSerializer.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.

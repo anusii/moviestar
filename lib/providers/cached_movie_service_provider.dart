@@ -496,9 +496,6 @@ final directContentServiceProvider =
     FutureProvider<ContentService>((ref) async {
   final apiKey = await ref.watch(directApiKeyProvider.future);
 
-  print(
-    '🔍 [DirectContentServiceProvider] Creating ContentService with API key: ${apiKey != null ? 'Present (${apiKey.length} chars)' : 'NULL'}',
-  );
 
   // Use the new constructor that accepts API key directly
   final contentService = ContentService.withApiKey(apiKey);

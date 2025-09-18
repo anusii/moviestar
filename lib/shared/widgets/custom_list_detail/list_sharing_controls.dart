@@ -1,4 +1,4 @@
-/// List Sharing Controls Component - POD-based Sharing and Batch Sharing UI
+/// List Sharing Controls Component - POD-based Sharing and Batch Sharing UI.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

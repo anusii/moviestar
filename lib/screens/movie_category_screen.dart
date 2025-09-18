@@ -1,4 +1,4 @@
-/// Movie Category Screen - Full list view for a specific category
+/// Movie Category Screen - Full list view for a specific category.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 

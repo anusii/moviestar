@@ -1,4 +1,4 @@
-/// Preferences Panel Component - UI Preferences, Playback Settings and Account Management
+/// Preferences Panel Component - UI Preferences, Playback Settings and Account Management.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

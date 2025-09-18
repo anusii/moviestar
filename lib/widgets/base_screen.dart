@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -31,12 +31,12 @@ import 'package:moviestar/widgets/error_display_widget.dart';
 
 /// Base screen widget that provides common functionality for all screens.
 ///
-/// This widget eliminates boilerplate by providing:
-/// - Consistent Scaffold structure with themed AppBar
-/// - Built-in loading overlay functionality
-/// - Error display integration
-/// - RefreshIndicator support
-/// - Navigation safety
+/// This widget eliminates boilerplate by providing:.
+/// - Consistent Scaffold structure with themed AppBar.
+/// - Built-in loading overlay functionality.
+/// - Error display integration.
+/// - RefreshIndicator support.
+/// - Navigation safety.
 class BaseScreen extends StatelessWidget {
   /// The title to display in the AppBar.
   final String? title;

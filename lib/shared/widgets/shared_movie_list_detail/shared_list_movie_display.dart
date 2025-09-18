@@ -1,4 +1,4 @@
-/// Shared List Movie Display Component - Movie Grid with Ratings, Error States, and Navigation
+/// Shared List Movie Display Component - Movie Grid with Ratings, Error States, and Navigation.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Software Innovation Institute
+/// Authors: Software Innovation Institute.
 
 library;
 
@@ -27,7 +27,7 @@ import 'package:flutter/material.dart';
 
 import 'package:moviestar/models/movie.dart';
 
-/// File information for batch sharing
+/// File information for batch sharing.
 class ShareableFile {
   final String fileName;
   final String displayName;
@@ -54,7 +54,7 @@ class ShareableFile {
   }
 }
 
-/// Share status enum
+/// Share status enum.
 enum ShareStatus {
   idle,
   sharing,
@@ -62,7 +62,7 @@ enum ShareStatus {
   error,
 }
 
-/// Reusable sharing dialog wrapper with consistent theming
+/// Reusable sharing dialog wrapper with consistent theming.
 class ShareDialogWrapper extends StatelessWidget {
   final String title;
   final Widget child;

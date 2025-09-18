@@ -1,4 +1,4 @@
-/// Kanban Drag Handler - Drag & Drop Operations
+/// Kanban Drag Handler - Drag & Drop Operations.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -21,7 +21,7 @@ import 'package:moviestar/models/movie.dart';
 
 import 'kanban_board_controller.dart';
 
-/// Handler for all drag and drop operations in the kanban board
+/// Handler for all drag and drop operations in the kanban board.
 class KanbanDragHandler {
   final FavoritesService favoritesService;
   final KanbanBoardController controller;
@@ -33,7 +33,7 @@ class KanbanDragHandler {
     required this.context,
   });
 
-  /// Handle drop operation with optimistic UI updates
+  /// Handle drop operation with optimistic UI updates.
   Future<void> handleDrop(
     MovieDragData dragData,
     KanbanColumnType targetType,
@@ -80,7 +80,7 @@ class KanbanDragHandler {
     );
   }
 
-  /// Background sync operation
+  /// Background sync operation.
   Future<void> _syncDropOperation(
     MovieDragData dragData,
     KanbanColumnType targetType,
@@ -173,7 +173,7 @@ class KanbanDragHandler {
     }
   }
 
-  /// Remove movie from its current list
+  /// Remove movie from its current list.
   Future<void> _removeFromCurrentList(
     Movie movie,
     KanbanColumnType sourceType,
@@ -212,8 +212,8 @@ class KanbanDragHandler {
     }
   }
 
-  /// Ensure a movie file exists for the given movie
-  /// This is important for movies from the Popular list that might not have local files yet
+  /// Ensure a movie file exists for the given movie.
+  /// This is important for movies from the Popular list that might not have local files yet.
   Future<void> _ensureMovieFileExists(Movie movie) async {
     try {
       // Check if the movie file already exists
@@ -233,7 +233,7 @@ class KanbanDragHandler {
     }
   }
 
-  /// Show context menu for movie copy operations
+  /// Show context menu for movie copy operations.
   void showMovieContextMenu(
     Offset position,
     Movie movie,
@@ -278,7 +278,7 @@ class KanbanDragHandler {
     });
   }
 
-  /// Build context menu items based on current movie location
+  /// Build context menu items based on current movie location.
   List<PopupMenuEntry<String>> _buildContextMenuItems(
     Movie movie,
     KanbanColumnType sourceType,
@@ -373,7 +373,7 @@ class KanbanDragHandler {
     return items;
   }
 
-  /// Handle context menu action with optimistic UI updates
+  /// Handle context menu action with optimistic UI updates.
   Future<void> _handleContextMenuAction(
     String action,
     Movie movie,
@@ -433,7 +433,7 @@ class KanbanDragHandler {
     );
   }
 
-  /// Background sync for context menu actions
+  /// Background sync for context menu actions.
   Future<void> _syncContextMenuAction(
     String action,
     Movie movie,

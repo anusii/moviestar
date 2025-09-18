@@ -1,4 +1,4 @@
-/// Moviestar - Manage and share ratings through private PODs
+/// Moviestar - Manage and share ratings through private PODs.
 ///
 // Time-stamp: <Sunday 2025-08-10 11:10:15 +1000 Graham Williams>
 ///
@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang, Ashley Tang
+/// Authors: Kevin Wang, Ashley Tang.
 
 library;
 
@@ -40,7 +40,7 @@ import 'package:moviestar/shared/widgets/home/home_error_handler.dart';
 import 'package:moviestar/shared/widgets/home/home_view_modes.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 
-/// Main home screen of the Movie Star application, displaying featured and
+/// Main home screen of the Movie Star application, displaying featured and.
 /// trending movies.
 
 class HomeScreen extends ConsumerStatefulWidget {

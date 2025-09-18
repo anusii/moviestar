@@ -1,4 +1,4 @@
-/// List Operations Panel Component - Edit, Delete, and Manage Custom List Operations
+/// List Operations Panel Component - Edit, Delete, and Manage Custom List Operations.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

@@ -1,4 +1,4 @@
-/// Kanban Card Widget - Movie Card Within Kanban with Drag Support
+/// Kanban Card Widget - Movie Card Within Kanban with Drag Support.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -19,7 +19,7 @@ import 'package:moviestar/widgets/movie_card.dart';
 
 import 'kanban_board_controller.dart';
 
-/// Kanban card widget with drag functionality and status indicators
+/// Kanban card widget with drag functionality and status indicators.
 class KanbanCardWidget extends StatelessWidget {
   final Movie movie;
   final String category;

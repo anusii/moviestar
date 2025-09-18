@@ -1,4 +1,4 @@
-/// Movie Details Actions Component - Watch Status and Custom List Operations
+/// Movie Details Actions Component - Watch Status and Custom List Operations.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

@@ -1,4 +1,4 @@
-/// HomeScreen Orchestrator Service - Central coordinator for HomeScreen components and view modes
+/// HomeScreen Orchestrator Service - Central coordinator for HomeScreen components and view modes.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -23,7 +23,7 @@ import 'package:moviestar/shared/widgets/home/home_movie_row_builder.dart';
 import 'package:moviestar/shared/widgets/home/home_screen_view_mode_handler.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 
-/// Service class that orchestrates HomeScreen components and handles complex view mode integration
+/// Service class that orchestrates HomeScreen components and handles complex view mode integration.
 class HomeScreenOrchestrator {
   final FavoritesService favoritesService;
   final WidgetRef ref;
@@ -61,7 +61,7 @@ class HomeScreenOrchestrator {
     _initializeComponents();
   }
 
-  /// Initializes all component instances with proper dependency injection
+  /// Initializes all component instances with proper dependency injection.
   void _initializeComponents() {
     // Initialize movie row builder
     movieRowBuilder = HomeMovieRowBuilder(
@@ -91,7 +91,7 @@ class HomeScreenOrchestrator {
     );
   }
 
-  /// Invalidates all movie providers for refresh
+  /// Invalidates all movie providers for refresh.
   void invalidateProviders() {
     ref.invalidate(popularMoviesWithCacheInfoProvider);
     ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
@@ -99,7 +99,7 @@ class HomeScreenOrchestrator {
     ref.invalidate(upcomingMoviesWithCacheInfoProvider);
   }
 
-  /// Builds the main HomeScreen content with integrated view mode handling
+  /// Builds the main HomeScreen content with integrated view mode handling.
   Widget buildContent({
     required AsyncValue<CacheResult<List<Movie>>> popularMovies,
     required AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,
@@ -153,7 +153,7 @@ class HomeScreenOrchestrator {
     );
   }
 
-  /// Forces refresh of all movie data
+  /// Forces refresh of all movie data.
   Future<void> _forceRefresh() async {
     invalidateProviders();
   }
@@ -289,7 +289,7 @@ class HomeScreenOrchestrator {
     );
   }
 
-  /// Disposes of scroll controllers when orchestrator is no longer needed
+  /// Disposes of scroll controllers when orchestrator is no longer needed.
   void dispose() {
     for (var controller in scrollControllers.values) {
       controller.dispose();

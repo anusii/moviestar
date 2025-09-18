@@ -1,4 +1,4 @@
-/// Kanban Search & Filter - Search and Filtering Logic
+/// Kanban Search & Filter - Search and Filtering Logic.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -14,7 +14,7 @@ import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 
-/// Search and filter controller for kanban board
+/// Search and filter controller for kanban board.
 class KanbanSearchController extends ChangeNotifier {
   String _searchQuery = '';
   final Set<String> _selectedGenres = {};
@@ -36,14 +36,14 @@ class KanbanSearchController extends ChangeNotifier {
   bool get isSearchActive => _isSearchActive;
   bool get hasActiveFilters => _isSearchActive || _hasAnyFilters();
 
-  /// Update search query
+  /// Update search query.
   void updateSearchQuery(String query) {
     _searchQuery = query.trim();
     _isSearchActive = _searchQuery.isNotEmpty;
     notifyListeners();
   }
 
-  /// Toggle genre filter
+  /// Toggle genre filter.
   void toggleGenre(String genre) {
     if (_selectedGenres.contains(genre)) {
       _selectedGenres.remove(genre);
@@ -53,27 +53,27 @@ class KanbanSearchController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Set rating range filter
+  /// Set rating range filter.
   void setRatingRange(double? min, double? max) {
     _minRating = min;
     _maxRating = max;
     notifyListeners();
   }
 
-  /// Set year range filter
+  /// Set year range filter.
   void setYearRange(int? start, int? end) {
     _startYear = start;
     _endYear = end;
     notifyListeners();
   }
 
-  /// Set content type filter
+  /// Set content type filter.
   void setContentTypeFilter(ContentType? contentType) {
     _contentTypeFilter = contentType;
     notifyListeners();
   }
 
-  /// Clear all filters
+  /// Clear all filters.
   void clearAllFilters() {
     _searchQuery = '';
     _selectedGenres.clear();
@@ -86,14 +86,14 @@ class KanbanSearchController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Clear only search query
+  /// Clear only search query.
   void clearSearch() {
     _searchQuery = '';
     _isSearchActive = false;
     notifyListeners();
   }
 
-  /// Check if any filters are active (excluding search)
+  /// Check if any filters are active (excluding search).
   bool _hasAnyFilters() {
     return _selectedGenres.isNotEmpty ||
         _minRating != null ||
@@ -103,7 +103,7 @@ class KanbanSearchController extends ChangeNotifier {
         _contentTypeFilter != null;
   }
 
-  /// Filter movies based on current criteria
+  /// Filter movies based on current criteria.
   List<Movie> filterMovies(List<Movie> movies) {
     if (!hasActiveFilters) return movies;
 
@@ -161,7 +161,7 @@ class KanbanSearchController extends ChangeNotifier {
   }
 }
 
-/// Search bar widget for kanban board
+/// Search bar widget for kanban board.
 class KanbanSearchBar extends StatefulWidget {
   final KanbanSearchController controller;
   final String hintText;
@@ -230,7 +230,7 @@ class _KanbanSearchBarState extends State<KanbanSearchBar> {
   }
 }
 
-/// Filter panel widget for advanced filtering
+/// Filter panel widget for advanced filtering.
 class KanbanFilterPanel extends StatelessWidget {
   final KanbanSearchController controller;
   final List<String> availableGenres;
@@ -466,9 +466,9 @@ class KanbanFilterPanel extends StatelessWidget {
   }
 }
 
-/// Search utility functions
+/// Search utility functions.
 class KanbanSearchUtils {
-  /// Extract unique genres from a list of movies
+  /// Extract unique genres from a list of movies.
   static List<String> extractGenresFromMovies(List<Movie> movies) {
     final genreIds = <int>{};
     for (final movie in movies) {
@@ -477,7 +477,7 @@ class KanbanSearchUtils {
     return genreIds.map((id) => id.toString()).toList()..sort();
   }
 
-  /// Get search suggestions based on current query and movie list
+  /// Get search suggestions based on current query and movie list.
   static List<String> getSearchSuggestions(
     String query,
     List<Movie> movies, {
@@ -501,7 +501,7 @@ class KanbanSearchUtils {
     return suggestions.toList()..sort();
   }
 
-  /// Highlight search terms in text
+  /// Highlight search terms in text.
   static TextSpan highlightSearchTerm(
     String text,
     String searchTerm,

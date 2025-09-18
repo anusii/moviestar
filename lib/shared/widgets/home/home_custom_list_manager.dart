@@ -1,4 +1,4 @@
-/// HomeScreen Custom List Manager Service - Custom list functionality and POD integration
+/// HomeScreen Custom List Manager Service - Custom list functionality and POD integration.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -21,7 +21,7 @@ import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
-/// Service class that handles custom list management, POD integration, and movie rendering
+/// Service class that handles custom list management, POD integration, and movie rendering.
 class HomeCustomListManager {
   final FavoritesService favoritesService;
   final Map<String, ScrollController> scrollControllers;
@@ -53,7 +53,7 @@ class HomeCustomListManager {
     required this.parentWidget,
   });
 
-  /// Builds custom list rows based on user's custom lists
+  /// Builds custom list rows based on user's custom lists.
   Widget buildCustomListRows(
     BuildContext context,
     Widget Function(CustomList) onCustomListTapped,
@@ -93,7 +93,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Builds individual custom list row with movies
+  /// Builds individual custom list row with movies.
   Widget _buildCustomListRow(
     BuildContext context,
     CustomList customList,
@@ -136,7 +136,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Builds "To Watch" movie row
+  /// Builds "To Watch" movie row.
   Widget buildToWatchMovieRow(BuildContext context, WidgetRef ref) {
     return StreamBuilder<List<Movie>>(
       stream: favoritesService.toWatchMovies,
@@ -177,7 +177,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Builds "Watched" movie row
+  /// Builds "Watched" movie row.
   Widget buildWatchedMovieRow(BuildContext context, WidgetRef ref) {
     return StreamBuilder<List<Movie>>(
       stream: favoritesService.watchedMovies,
@@ -218,7 +218,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Builds async list section for list view mode
+  /// Builds async list section for list view mode.
   Widget buildAsyncListSection(
     BuildContext context,
     WidgetRef ref,
@@ -243,7 +243,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Builds custom list sections for list view mode
+  /// Builds custom list sections for list view mode.
   Widget buildCustomListListSections(BuildContext context, WidgetRef ref) {
     return StreamBuilder<List<CustomList>>(
       stream: favoritesService.customLists,
@@ -304,7 +304,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Builds "To Watch" list items for list view mode
+  /// Builds "To Watch" list items for list view mode.
   Widget buildToWatchListItems(BuildContext context) {
     return StreamBuilder<List<Movie>>(
       stream: favoritesService.toWatchMovies,
@@ -327,7 +327,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Builds "Watched" list items for list view mode
+  /// Builds "Watched" list items for list view mode.
   Widget buildWatchedListItems(BuildContext context) {
     return StreamBuilder<List<Movie>>(
       stream: favoritesService.watchedMovies,
@@ -352,7 +352,7 @@ class HomeCustomListManager {
 
   // Helper methods for building UI components
 
-  /// Loads movies for a custom list
+  /// Loads movies for a custom list.
   Future<List<Movie>> _loadMoviesForCustomList(CustomList customList) async {
     try {
       return await favoritesService.getMoviesInCustomList(customList.id);
@@ -362,7 +362,7 @@ class HomeCustomListManager {
     }
   }
 
-  /// Builds a movie row with horizontal scrolling
+  /// Builds a movie row with horizontal scrolling.
   Widget _buildMovieRow(
     BuildContext context,
     String title,
@@ -420,7 +420,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Builds empty custom list row
+  /// Builds empty custom list row.
   Widget _buildEmptyCustomListRow(BuildContext context, CustomList customList) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -440,7 +440,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Builds empty "To Watch" row
+  /// Builds empty "To Watch" row.
   Widget _buildEmptyToWatchRow(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -461,7 +461,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Builds empty "Watched" row
+  /// Builds empty "Watched" row.
   Widget _buildEmptyWatchedRow(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -482,7 +482,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Builds list section for list view mode
+  /// Builds list section for list view mode.
   Widget _buildListSection(BuildContext context, String title, Widget content) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -500,7 +500,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Builds movie list items for list view mode
+  /// Builds movie list items for list view mode.
   Widget _buildMovieListItems(BuildContext context, List<Movie> movies) {
     return Column(
       children: movies.map((movie) {
@@ -545,7 +545,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Builds loading section
+  /// Builds loading section.
   Widget _buildLoadingSection(BuildContext context, String title) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -566,7 +566,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Builds error section
+  /// Builds error section.
   Widget _buildErrorSection(
     BuildContext context,
     WidgetRef ref,
@@ -603,7 +603,7 @@ class HomeCustomListManager {
 
   // Navigation methods
 
-  /// Navigates to movie details screen
+  /// Navigates to movie details screen.
   void _navigateToMovieDetails(Movie movie) {
     if (!isMounted()) return;
 
@@ -617,7 +617,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Navigates to movie category screen
+  /// Navigates to movie category screen.
   void _navigateToMovieCategory(String categoryName, List<Movie> movies) {
     if (!isMounted()) return;
 
@@ -632,7 +632,7 @@ class HomeCustomListManager {
     );
   }
 
-  /// Navigates to custom list detail screen (placeholder)
+  /// Navigates to custom list detail screen (placeholder).
   void _navigateToCustomListDetail(CustomList customList) {
     // TODO: Implement custom list detail screen navigation
     // This would navigate to a screen showing all movies in the custom list

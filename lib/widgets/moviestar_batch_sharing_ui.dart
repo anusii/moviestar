@@ -1,4 +1,4 @@
-/// Custom MovieStar Batch Sharing UI
+/// Custom MovieStar Batch Sharing UI.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Assistant
+/// Authors: Assistant.
 
 library;
 
@@ -37,28 +37,28 @@ import 'package:moviestar/models/sharing_models.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
 import 'package:moviestar/widgets/common_sharing_ui.dart';
 
-/// Custom MovieStar batch sharing UI that shows all files to be shared
-/// and allows per-file permission configuration
+/// Custom MovieStar batch sharing UI that shows all files to be shared.
+/// and allows per-file permission configuration.
 class MovieStarBatchSharingUi extends StatefulWidget {
-  /// The movie list ID
+  /// The movie list ID.
   final String listId;
 
-  /// The movie list name
+  /// The movie list name.
   final String listName;
 
-  /// List of movies in the collection
+  /// List of movies in the collection.
   final List<Movie> movies;
 
-  /// Widget to return to
+  /// Widget to return to.
   final Widget child;
 
-  /// Callback when sharing is complete
+  /// Callback when sharing is complete.
   final VoidCallback onSharingComplete;
 
-  /// Custom app bar
+  /// Custom app bar.
   final PreferredSizeWidget? customAppBar;
 
-  /// Background color
+  /// Background color.
   final Color backgroundColor;
 
   const MovieStarBatchSharingUi({
@@ -351,7 +351,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
     );
   }
 
-  /// Build the sharing progress screen
+  /// Build the sharing progress screen.
   Widget _buildSharingProgress() {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -484,7 +484,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
     );
   }
 
-  /// Build the sharing setup screen
+  /// Build the sharing setup screen.
   Widget _buildSharingSetup() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -516,7 +516,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
     );
   }
 
-  /// Build collection overview section
+  /// Build collection overview section.
   Widget _buildCollectionOverview() {
     return Card(
       child: Padding(
@@ -572,7 +572,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
     );
   }
 
-  /// Build recipient input section
+  /// Build recipient input section.
   Widget _buildRecipientSection() {
     return Card(
       child: Padding(
@@ -603,7 +603,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
     );
   }
 
-  /// Build files and permissions section
+  /// Build files and permissions section.
   Widget _buildFilesPermissionsSection() {
     return Card(
       child: Padding(
@@ -878,7 +878,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
     );
   }
 
-  /// Build share button
+  /// Build share button.
   Widget _buildShareButton() {
     final totalFiles = shareableFiles.length;
     final hasValidRecipient = validatedWebId != null;

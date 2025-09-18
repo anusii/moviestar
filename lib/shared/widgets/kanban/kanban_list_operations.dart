@@ -1,4 +1,4 @@
-/// Kanban List Operations - Custom List Management
+/// Kanban List Operations - Custom List Management.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -22,7 +22,7 @@ import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
 
-/// Widget that loads and displays movies from a custom list with optimistic updates
+/// Widget that loads and displays movies from a custom list with optimistic updates.
 class CustomListMoviesWidget extends ConsumerStatefulWidget {
   final List<int> movieIds;
   final CustomList customList;
@@ -89,7 +89,7 @@ class _CustomListMoviesWidgetState
     }
   }
 
-  /// Get content as movie with proper type handling
+  /// Get content as movie with proper type handling.
   Future<Movie> _getContentAsMovieWithType(
     int contentId,
     String contentType,
@@ -105,7 +105,7 @@ class _CustomListMoviesWidgetState
     }
   }
 
-  /// Load only specific new movies (for optimistic updates)
+  /// Load only specific new movies (for optimistic updates).
   Future<void> _loadNewMovies(List<int> movieIds) async {
     for (final movieId in movieIds) {
       if (_moviesMap.containsKey(movieId) ||
@@ -135,7 +135,7 @@ class _CustomListMoviesWidgetState
     }
   }
 
-  /// Load all movies for the custom list
+  /// Load all movies for the custom list.
   Future<void> _loadMovies() async {
     setState(() {
       _isLoading = true;
@@ -170,7 +170,7 @@ class _CustomListMoviesWidgetState
     await _loadMoviesFromAPI();
   }
 
-  /// Original API loading method
+  /// Original API loading method.
   Future<void> _loadMoviesFromAPI() async {
     // Load all movies needed for sorting
     final moviesToLoad = widget.movieIds.take(widget.maxItems * 2).toList();
@@ -213,7 +213,7 @@ class _CustomListMoviesWidgetState
     }
   }
 
-  /// Get sorted movies with optimistic updates applied
+  /// Get sorted movies with optimistic updates applied.
   List<Movie> _getSortedMovies() {
     // Get all loaded movies
     final loadedMovies = <Movie>[];
@@ -261,9 +261,9 @@ class _CustomListMoviesWidgetState
   }
 }
 
-/// Operations for managing movie lists in the kanban board
+/// Operations for managing movie lists in the kanban board.
 class KanbanListOperations {
-  /// Create a movie item builder function that uses the provided parameters
+  /// Create a movie item builder function that uses the provided parameters.
   static Widget Function(Movie, int) createMovieItemBuilder({
     required String categoryId,
     required bool fromCache,
@@ -289,12 +289,12 @@ class KanbanListOperations {
         );
   }
 
-  /// Check if a movie exists in the given list of movies
+  /// Check if a movie exists in the given list of movies.
   static bool movieExistsInList(List<Movie> movies, int movieId) {
     return movies.any((movie) => movie.id == movieId);
   }
 
-  /// Filter movies by content type
+  /// Filter movies by content type.
   static List<Movie> filterMoviesByContentType(
     List<Movie> movies,
     ContentType? contentType,
@@ -303,7 +303,7 @@ class KanbanListOperations {
     return movies.where((movie) => movie.contentType == contentType).toList();
   }
 
-  /// Get movies that are not in the given list (for filtering duplicates)
+  /// Get movies that are not in the given list (for filtering duplicates).
   static List<Movie> getMoviesNotInList(
     List<Movie> sourceMovies,
     List<Movie> excludeMovies,
@@ -314,7 +314,7 @@ class KanbanListOperations {
         .toList();
   }
 
-  /// Merge two movie lists removing duplicates
+  /// Merge two movie lists removing duplicates.
   static List<Movie> mergeMovieListsNoDuplicates(
     List<Movie> list1,
     List<Movie> list2,
@@ -339,7 +339,7 @@ class KanbanListOperations {
     return combined;
   }
 
-  /// Batch load movie details from IDs
+  /// Batch load movie details from IDs.
   static Future<List<Movie>> batchLoadMovieDetails({
     required List<int> movieIds,
     required CustomList customList,
@@ -379,7 +379,7 @@ class KanbanListOperations {
   }
 }
 
-/// Enum for different column types in the kanban board (re-export for convenience)
+/// Enum for different column types in the kanban board (re-export for convenience).
 enum KanbanColumnType {
   popular,
   toWatch,

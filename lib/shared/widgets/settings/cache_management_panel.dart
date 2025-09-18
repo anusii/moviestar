@@ -1,4 +1,4 @@
-/// Cache Management Panel for Settings Screen
+/// Cache Management Panel for Settings Screen.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

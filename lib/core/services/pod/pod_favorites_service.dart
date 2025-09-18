@@ -34,7 +34,7 @@ class PodFavoritesService extends BasePodService {
   final Set<int> _moviesWithFiles = {};
   final Map<int, Movie> _movieCache = {};
 
-  /// Callback to notify when initial loading is complete
+  /// Callback to notify when initial loading is complete.
   final VoidCallback? _onInitialLoadComplete;
 
   late final PodFavoritesStreamManager _streamManager;

@@ -1,4 +1,4 @@
-/// Utility functions for Turtle serialization
+/// Utility functions for Turtle serialization.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -10,15 +10,15 @@ library;
 
 import 'dart:math';
 
-/// Utility functions for Turtle/RDF processing
+/// Utility functions for Turtle/RDF processing.
 class TurtleUtils {
-  /// Generates a unique ID for RDF resources
+  /// Generates a unique ID for RDF resources.
   static String generateId() {
     final random = Random();
     return random.nextInt(1000000).toString();
   }
 
-  /// Escapes special characters in strings for Turtle format
+  /// Escapes special characters in strings for Turtle format.
   static String escapeString(String input) {
     return input
         .replaceAll('\\', '\\\\')
@@ -28,7 +28,7 @@ class TurtleUtils {
         .replaceAll('\t', '\\t');
   }
 
-  /// Escapes and sanitizes strings for RDF literals
+  /// Escapes and sanitizes strings for RDF literals.
   static String escapeAndSanitizeString(String input) {
     if (input.isEmpty) return input;
 
@@ -68,7 +68,7 @@ class TurtleUtils {
         .replaceAll('\u007f', '');
   }
 
-  /// Validates if a string contains valid UTF-8 characters for RDF
+  /// Validates if a string contains valid UTF-8 characters for RDF.
   static bool isValidRdfString(String input) {
     if (input.isEmpty) return true;
 
@@ -84,7 +84,7 @@ class TurtleUtils {
     return true;
   }
 
-  /// Creates a safe RDF URI local name from a string
+  /// Creates a safe RDF URI local name from a string.
   static String createSafeLocalName(String input) {
     if (input.isEmpty) return 'unnamed';
 

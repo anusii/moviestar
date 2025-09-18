@@ -1,4 +1,4 @@
-/// Movie and List Serialization for Turtle format
+/// Movie and List Serialization for Turtle format.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

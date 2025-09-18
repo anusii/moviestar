@@ -1,4 +1,4 @@
-/// Rating and Comment Serialization for Turtle format
+/// Rating and Comment Serialization for Turtle format.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

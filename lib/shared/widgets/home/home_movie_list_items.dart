@@ -1,4 +1,4 @@
-/// Movie List Items for Home Screen
+/// Movie List Items for Home Screen.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

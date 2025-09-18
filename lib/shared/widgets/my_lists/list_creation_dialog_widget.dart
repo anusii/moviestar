@@ -1,4 +1,4 @@
-/// List Creation Dialog Widget Component - Create and edit custom list forms
+/// List Creation Dialog Widget Component - Create and edit custom list forms.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -14,9 +14,9 @@ import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/core/services/favorites/favorites_service.dart';
 import 'package:moviestar/models/custom_list.dart';
 
-/// Widget that shows dialogs for creating or editing custom lists
+/// Widget that shows dialogs for creating or editing custom lists.
 class ListCreationDialogWidget {
-  /// Shows a dialog to create a new custom list
+  /// Shows a dialog to create a new custom list.
   static Future<void> showCreateDialog({
     required BuildContext context,
     required FavoritesService favoritesService,
@@ -83,7 +83,7 @@ class ListCreationDialogWidget {
     descriptionController.dispose();
   }
 
-  /// Shows a dialog to edit an existing custom list
+  /// Shows a dialog to edit an existing custom list.
   static Future<void> showEditDialog({
     required BuildContext context,
     required CustomList list,

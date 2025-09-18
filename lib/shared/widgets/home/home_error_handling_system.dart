@@ -1,4 +1,4 @@
-/// HomeScreen Error Handling System Component - Comprehensive error management and API key handling
+/// HomeScreen Error Handling System Component - Comprehensive error management and API key handling.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -23,7 +23,7 @@ import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/services/error_mapper_service.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 
-/// Component that handles comprehensive error management and API key validation for HomeScreen
+/// Component that handles comprehensive error management and API key validation for HomeScreen.
 class HomeErrorHandlingSystem extends StatefulWidget {
   final WidgetRef ref;
   final bool mounted;
@@ -46,7 +46,7 @@ class _HomeErrorHandlingSystemState extends State<HomeErrorHandlingSystem> {
   bool _hasApiKeyError = false;
   String? _apiKeyErrorMessage;
 
-  /// Checks all movie providers for API key errors and updates state
+  /// Checks all movie providers for API key errors and updates state.
   void checkForApiKeyErrors(
     AsyncValue<CacheResult<List<Movie>>> popularMovies,
     AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,
@@ -90,7 +90,7 @@ class _HomeErrorHandlingSystemState extends State<HomeErrorHandlingSystem> {
     }
   }
 
-  /// Checks if an error is an API key related error
+  /// Checks if an error is an API key related error.
   bool _isApiKeyError(Object error) {
     final errorString = error.toString().toLowerCase();
     return errorString.contains('401') ||
@@ -100,7 +100,7 @@ class _HomeErrorHandlingSystemState extends State<HomeErrorHandlingSystem> {
         errorString.contains('forbidden');
   }
 
-  /// Invalidates all movie providers for refresh
+  /// Invalidates all movie providers for refresh.
   void invalidateProviders() {
     widget.ref.invalidate(popularMoviesWithCacheInfoProvider);
     widget.ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
@@ -108,7 +108,7 @@ class _HomeErrorHandlingSystemState extends State<HomeErrorHandlingSystem> {
     widget.ref.invalidate(upcomingMoviesWithCacheInfoProvider);
   }
 
-  /// Builds a prominent API key error overlay for the entire view
+  /// Builds a prominent API key error overlay for the entire view.
   Widget buildApiKeyErrorOverlay() {
     return FutureBuilder<UserFriendlyError>(
       future: _createUserFriendlyError(
@@ -180,7 +180,7 @@ class _HomeErrorHandlingSystemState extends State<HomeErrorHandlingSystem> {
     );
   }
 
-  /// Builds a smart error widget that provides user-friendly error messages and actions
+  /// Builds a smart error widget that provides user-friendly error messages and actions.
   Widget buildSmartErrorWidget(
     Object error,
     StackTrace stackTrace,
@@ -214,7 +214,7 @@ class _HomeErrorHandlingSystemState extends State<HomeErrorHandlingSystem> {
     );
   }
 
-  /// Builds a compact smart error widget for movie rows
+  /// Builds a compact smart error widget for movie rows.
   Widget buildSmartErrorWidgetCompact(
     Object error,
     StackTrace stackTrace,
@@ -246,7 +246,7 @@ class _HomeErrorHandlingSystemState extends State<HomeErrorHandlingSystem> {
     );
   }
 
-  /// Builds a compact error widget with retry functionality
+  /// Builds a compact error widget with retry functionality.
   Widget buildSmartErrorWidgetCompactWithRetry(
     Object error,
     StackTrace stackTrace,
@@ -256,7 +256,7 @@ class _HomeErrorHandlingSystemState extends State<HomeErrorHandlingSystem> {
     return buildSmartErrorWidgetCompact(error, stackTrace, title, onRetry);
   }
 
-  /// Helper method to build user-friendly error for full widget
+  /// Helper method to build user-friendly error for full widget.
   Future<UserFriendlyError> _buildUserFriendlyError(
     Object error,
     StackTrace stackTrace,
@@ -269,7 +269,7 @@ class _HomeErrorHandlingSystemState extends State<HomeErrorHandlingSystem> {
     );
   }
 
-  /// Helper method to build user-friendly error for compact widget
+  /// Helper method to build user-friendly error for compact widget.
   Future<UserFriendlyError> _buildUserFriendlyErrorCompact(
     Object error,
     StackTrace stackTrace,
@@ -278,7 +278,7 @@ class _HomeErrorHandlingSystemState extends State<HomeErrorHandlingSystem> {
     return _createUserFriendlyError(widget.ref, error, stackTrace, onRetry);
   }
 
-  /// Creates a user-friendly error with smart detection services
+  /// Creates a user-friendly error with smart detection services.
   Future<UserFriendlyError> _createUserFriendlyError(
     WidgetRef ref,
     Object error,
@@ -327,9 +327,9 @@ class _HomeErrorHandlingSystemState extends State<HomeErrorHandlingSystem> {
   }
 }
 
-/// Static helper class for error handling functions outside of component context
+/// Static helper class for error handling functions outside of component context.
 class ErrorHandlingHelper {
-  /// Creates a user-friendly error with smart detection services
+  /// Creates a user-friendly error with smart detection services.
   static Future<UserFriendlyError> createUserFriendlyError(
     WidgetRef ref,
     Object error,
@@ -366,7 +366,7 @@ class ErrorHandlingHelper {
     }
   }
 
-  /// Checks if an error is an API key related error
+  /// Checks if an error is an API key related error.
   static bool isApiKeyError(Object error) {
     final errorString = error.toString().toLowerCase();
     return errorString.contains('401') ||

@@ -1,4 +1,4 @@
-/// API Error Overlay for Home Screen
+/// API Error Overlay for Home Screen.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

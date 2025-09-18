@@ -2,11 +2,11 @@
 ///
 // Time-stamp: <Tuesday 2025-09-02 14:46:26 +1000 Graham Williams>
 ///
-/// Copyright (C) 2025, Software Innovation Institute, ANU
+/// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
-/// Licensed under the GNU General Public License, Version 3 (the "License");
+/// Licensed under the GNU General Public License, Version 3 (the "License");.
 ///
-/// License: https://www.gnu.org/licenses/gpl-3.0.en.html
+/// License: https://www.gnu.org/licenses/gpl-3.0.en.html.
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang, Graham Williams, Ashley Tang, Tony Chen
+/// Authors: Kevin Wang, Graham Williams, Ashley Tang, Tony Chen.
 
 library;
 
@@ -81,7 +81,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   bool _showSettings = false;
 
-  /// API key service reference for cleanup
+  /// API key service reference for cleanup.
   late final ApiKeyService _apiKeyService;
 
   @override
@@ -325,7 +325,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           );
         }
       } catch (e) {
-        print('🔍 [MyHomePage] Failed to get content service: $e');
         // Show error or fallback
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -359,7 +358,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     });
   }
 
-  /// Reinitializes the app after API key is set
+  /// Reinitializes the app after API key is set.
   Future<void> reinitializeAfterApiKey() async {
     await _initialiseAppData();
   }
@@ -472,7 +471,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     return _showSettings ? _buildSettingsOverlay(solidScaffold) : solidScaffold;
   }
 
-  /// Builds the Settings screen as an overlay on top of the SolidScaffold
+  /// Builds the Settings screen as an overlay on top of the SolidScaffold.
   Widget _buildSettingsOverlay(Widget solidScaffold) {
     return Stack(
       children: [

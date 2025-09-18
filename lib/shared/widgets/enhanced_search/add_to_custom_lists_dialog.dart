@@ -1,4 +1,4 @@
-/// Add to Custom Lists Dialog Component - Dialog for managing custom list membership
+/// Add to Custom Lists Dialog Component - Dialog for managing custom list membership.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -18,7 +18,7 @@ import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 
-/// Dialog for adding a movie to custom lists
+/// Dialog for adding a movie to custom lists.
 class AddToCustomListsDialog extends StatefulWidget {
   final Movie movie;
   final ContentItem originalContentItem;

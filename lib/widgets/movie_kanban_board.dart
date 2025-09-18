@@ -1,4 +1,4 @@
-/// Movie Kanban Board Widget - Orchestrator for Kanban Components
+/// Movie Kanban Board Widget - Orchestrator for Kanban Components.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -82,7 +82,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     super.dispose();
   }
 
-  /// Handle drop operations
+  /// Handle drop operations.
   void _handleDrop(
     MovieDragData dragData,
     KanbanColumnType targetType,
@@ -92,7 +92,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     _dragHandler.handleDrop(dragData, targetType, targetId, targetName);
   }
 
-  /// Show context menu for movie operations
+  /// Show context menu for movie operations.
   void _showMovieContextMenu(
     Offset position,
     Movie movie,
@@ -109,7 +109,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
-  /// Navigate to category screen
+  /// Navigate to category screen.
   void _navigateToCategory(
     String title,
     List<Movie> movies,
@@ -128,7 +128,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
-  /// Navigate to custom list detail screen
+  /// Navigate to custom list detail screen.
   void _navigateToCustomList(CustomList customList) {
     Navigator.push(
       context,
@@ -141,7 +141,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
-  /// Build movie item using the kanban card widget
+  /// Build movie item using the kanban card widget.
   Widget _buildMovieItem(
     Movie movie,
     String category, {
@@ -199,7 +199,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
-  /// Build floating operation queue indicator (no layout shift)
+  /// Build floating operation queue indicator (no layout shift).
   Widget _buildFloatingOperationIndicator() {
     final queue = _kanbanController.operationQueue;
     if (queue.isEmpty) return const SizedBox.shrink();
@@ -250,7 +250,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
-  /// Build the main kanban board with columns
+  /// Build the main kanban board with columns.
   Widget _buildKanbanBoard() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -297,7 +297,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
-  /// Build all kanban columns
+  /// Build all kanban columns.
   Widget _buildKanbanColumns(
     dynamic popularCacheResult,
     AsyncSnapshot<List<Movie>> toWatchSnapshot,
@@ -361,7 +361,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
-  /// Build a single kanban column using the extracted component
+  /// Build a single kanban column using the extracted component.
   Widget _buildSingleColumn({
     required String title,
     required List<Movie> movies,
@@ -393,7 +393,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
-  /// Build unified custom list column using KanbanColumnWidget
+  /// Build unified custom list column using KanbanColumnWidget.
   Widget _buildUnifiedCustomListColumn(CustomList customList) {
     return FutureBuilder<List<Movie>>(
       future: widget.favoritesService.getMoviesInCustomList(customList.id),
@@ -413,7 +413,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     );
   }
 
-  /// Build custom list column (legacy - kept for reference)
+  /// Build custom list column (legacy - kept for reference).
   Widget _buildCustomListColumn(CustomList customList) {
     final movieIds = customList.movieIds.take(_maxItemsPerColumn * 2).toList();
 

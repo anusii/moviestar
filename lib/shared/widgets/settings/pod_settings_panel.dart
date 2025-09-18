@@ -1,4 +1,4 @@
-/// POD Settings Panel Component - Solid POD Storage Configuration and Management
+/// POD Settings Panel Component - Solid POD Storage Configuration and Management.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

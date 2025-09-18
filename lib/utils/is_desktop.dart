@@ -1,9 +1,9 @@
 /// Check if we are running a desktop (and not a browser).
 ///
-/// Copyright (C) 2023, Software Innovation Institute
+/// Copyright (C) 2023, Software Innovation Institute.
 ///
-/// License: GNU General Public License, Version 3 (the "License")
-/// https://www.gnu.org/licenses/gpl-3.0.en.html
+/// License: GNU General Public License, Version 3 (the "License").
+/// https://www.gnu.org/licenses/gpl-3.0.en.html.
 //
 // Time-stamp: <Thursday 2025-07-03 09:36:52 +1000 Graham Williams>
 //
@@ -20,7 +20,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Graham Williams
+/// Authors: Graham Williams.
 
 library;
 

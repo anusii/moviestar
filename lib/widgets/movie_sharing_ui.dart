@@ -1,4 +1,4 @@
-/// Custom MovieStar Single Movie Sharing UI
+/// Custom MovieStar Single Movie Sharing UI.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -20,7 +20,7 @@ import 'package:moviestar/utils/movie_display_utils.dart';
 import 'package:moviestar/widgets/common_sharing_ui.dart'
     show SharingStatusIndicator, WebIdInput, ShareStatus;
 
-/// Custom single movie sharing UI with integrated design
+/// Custom single movie sharing UI with integrated design.
 class MovieSharingUI extends StatefulWidget {
   final Movie movie;
   final VoidCallback onSharingComplete;

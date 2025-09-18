@@ -1,4 +1,4 @@
-/// Shared List Header Widget Component - Display List Metadata, Owner Info, and Permissions
+/// Shared List Header Widget Component - Display List Metadata, Owner Info, and Permissions.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

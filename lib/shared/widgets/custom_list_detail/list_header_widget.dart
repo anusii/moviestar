@@ -1,4 +1,4 @@
-/// List Header Widget Component - Display List Metadata, Title, Description, and Actions
+/// List Header Widget Component - Display List Metadata, Title, Description, and Actions.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

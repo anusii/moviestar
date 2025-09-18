@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -31,11 +31,11 @@ import 'package:moviestar/constants/timing_constants.dart';
 
 /// Mixin that provides common state management functionality for screen widgets.
 ///
-/// This mixin eliminates boilerplate code by providing:
-/// - Safe navigation methods with mounted checks
-/// - Loading state management
-/// - Consistent error and success messaging
-/// - Mounted-safe setState wrapper
+/// This mixin eliminates boilerplate code by providing:.
+/// - Safe navigation methods with mounted checks.
+/// - Loading state management.
+/// - Consistent error and success messaging.
+/// - Mounted-safe setState wrapper.
 mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
   /// Whether the screen is currently in a loading state.
   bool _isLoading = false;
@@ -45,7 +45,7 @@ mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
 
   /// Safely calls setState only if the widget is still mounted.
   ///
-  /// This prevents "setState() called after dispose()" errors that are
+  /// This prevents "setState() called after dispose()" errors that are.
   /// common when async operations complete after widget disposal.
   void safeSetState(VoidCallback fn) {
     if (mounted) {

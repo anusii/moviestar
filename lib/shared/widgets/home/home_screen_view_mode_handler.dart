@@ -1,4 +1,4 @@
-/// HomeScreen View Mode Handler Component - View mode switching and content routing logic
+/// HomeScreen View Mode Handler Component - View mode switching and content routing logic.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -18,7 +18,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/widgets/movie_kanban_board.dart';
 
-/// Component that handles view mode switching and content routing for HomeScreen
+/// Component that handles view mode switching and content routing for HomeScreen.
 class HomeScreenViewModeHandler extends StatelessWidget {
   final AsyncValue<CacheResult<List<Movie>>> popularMovies;
   final AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies;
@@ -80,7 +80,7 @@ class HomeScreenViewModeHandler extends StatelessWidget {
     );
   }
 
-  /// Build content based on the selected view mode
+  /// Build content based on the selected view mode.
   Widget _buildContentForViewMode(
     HomeViewMode viewMode,
     AsyncValue<CacheResult<List<Movie>>> popularMovies,
@@ -118,7 +118,7 @@ class HomeScreenViewModeHandler extends StatelessWidget {
     }
   }
 
-  /// Build the traditional grid/horizontal scroll view
+  /// Build the traditional grid/horizontal scroll view.
   Widget _buildGridView(
     AsyncValue<CacheResult<List<Movie>>> popularMovies,
     AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,
@@ -162,7 +162,7 @@ class HomeScreenViewModeHandler extends StatelessWidget {
     );
   }
 
-  /// Build the kanban view with AppFlowy Board
+  /// Build the kanban view with AppFlowy Board.
   Widget _buildKanbanView(
     AsyncValue<CacheResult<List<Movie>>> popularMovies,
     AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,
@@ -177,7 +177,7 @@ class HomeScreenViewModeHandler extends StatelessWidget {
     );
   }
 
-  /// Build a list view of movies
+  /// Build a list view of movies.
   Widget _buildListView(
     AsyncValue<CacheResult<List<Movie>>> popularMovies,
     AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,

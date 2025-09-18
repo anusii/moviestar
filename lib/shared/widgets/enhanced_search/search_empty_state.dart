@@ -1,4 +1,4 @@
-/// Search Empty State Component - Empty state display for search screen
+/// Search Empty State Component - Empty state display for search screen.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -14,7 +14,7 @@ import 'package:gap/gap.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
 
-/// Widget that displays the empty state for search functionality
+/// Widget that displays the empty state for search functionality.
 class SearchEmptyState extends StatelessWidget {
   final String searchText;
 
@@ -56,7 +56,7 @@ class SearchEmptyState extends StatelessWidget {
     );
   }
 
-  /// Get the appropriate title based on search state
+  /// Get the appropriate title based on search state.
   String _getEmptyStateTitle() {
     if (searchText.isEmpty) {
       return 'Search for movies and TV shows';

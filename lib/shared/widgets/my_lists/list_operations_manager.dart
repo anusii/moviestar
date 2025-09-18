@@ -1,4 +1,4 @@
-/// List Operations Manager Component - Complex POD sharing, deletion and management operations
+/// List Operations Manager Component - Complex POD sharing, deletion and management operations.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -26,9 +26,9 @@ import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/turtle_serializer.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 
-/// Manager class that handles complex list operations like sharing and deletion
+/// Manager class that handles complex list operations like sharing and deletion.
 class ListOperationsManager {
-  /// Shows options for a custom list (edit, share, delete)
+  /// Shows options for a custom list (edit, share, delete).
   static Future<void> showListOptions({
     required BuildContext context,
     required CustomList list,
@@ -101,7 +101,7 @@ class ListOperationsManager {
     );
   }
 
-  /// Shows a confirmation dialog before deleting a list
+  /// Shows a confirmation dialog before deleting a list.
   static Future<void> _showDeleteConfirmation({
     required BuildContext context,
     required CustomList list,
@@ -171,7 +171,7 @@ class ListOperationsManager {
     );
   }
 
-  /// Shows a loading dialog during sharing process
+  /// Shows a loading dialog during sharing process.
   static void _showSharingDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -204,8 +204,8 @@ class ListOperationsManager {
     );
   }
 
-  /// Shares the custom list and all movies using batch sharing UI
-  /// Uses the same mechanism as the app bar sharing by loading movies from POD with correct content types
+  /// Shares the custom list and all movies using batch sharing UI.
+  /// Uses the same mechanism as the app bar sharing by loading movies from POD with correct content types.
   static Future<void> _shareCustomList({
     required BuildContext context,
     required CustomList list,
@@ -377,7 +377,7 @@ class ListOperationsManager {
     }
   }
 
-  /// Creates a movie file if it doesn't exist (needed before sharing)
+  /// Creates a movie file if it doesn't exist (needed before sharing).
   static Future<void> _createMovieFileIfNotExists({
     required Movie movie,
     required BuildContext context,

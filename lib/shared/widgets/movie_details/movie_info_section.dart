@@ -1,4 +1,4 @@
-/// Movie Info Section for Movie Details Screen
+/// Movie Info Section for Movie Details Screen.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

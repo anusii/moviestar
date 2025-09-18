@@ -1,4 +1,4 @@
-/// Movie-specific Turtle serialization functionality
+/// Movie-specific Turtle serialization functionality.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -17,9 +17,9 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/turtle/turtle_namespaces.dart';
 import 'package:moviestar/utils/turtle/turtle_utils.dart';
 
-/// Handles conversion of Movie objects to/from Turtle (TTL) format
+/// Handles conversion of Movie objects to/from Turtle (TTL) format.
 class TurtleMovieSerializer {
-  /// Converts a list of movies to Turtle format with specified list name
+  /// Converts a list of movies to Turtle format with specified list name.
   static String moviesToTurtle(List<Movie> movies, String listName) {
     final graph = Graph();
     final namespaces = TurtleNamespaces.getOntologyNamespaces();
@@ -122,7 +122,7 @@ class TurtleMovieSerializer {
     return fallbackTtl;
   }
 
-  /// Converts movies with user data (ratings, comments) to Turtle format
+  /// Converts movies with user data (ratings, comments) to Turtle format.
   static String movieWithUserDataToTurtle(
     List<Movie> movies,
     String listName,
@@ -258,7 +258,7 @@ class TurtleMovieSerializer {
     return fallbackTtl;
   }
 
-  /// Converts movies from Turtle format back to Movie objects
+  /// Converts movies from Turtle format back to Movie objects.
   static List<Movie> moviesFromTurtle(String ttlContent) {
     try {
       final graph = Graph();
@@ -284,7 +284,7 @@ class TurtleMovieSerializer {
     }
   }
 
-  /// Adds a movie to the RDF graph and returns the movie URI
+  /// Adds a movie to the RDF graph and returns the movie URI.
   static URIRef _addMovieToGraph(Graph graph, Movie movie, URIRef listUri) {
     final movieUri =
         TurtleNamespaces.moviestarDataNS.withAttr('movie_${movie.id}');
@@ -365,7 +365,7 @@ class TurtleMovieSerializer {
     return movieUri;
   }
 
-  /// Adds a rating to the graph for a movie
+  /// Adds a rating to the graph for a movie.
   static void _addRatingToGraph(Graph graph, URIRef movieUri, double rating) {
     final ratingUri = URIRef('${movieUri.value}_rating');
     graph.addTripleToGroups(
@@ -388,7 +388,7 @@ class TurtleMovieSerializer {
     );
   }
 
-  /// Adds a comment to the graph for a movie
+  /// Adds a comment to the graph for a movie.
   static void _addCommentToGraph(Graph graph, URIRef movieUri, String comment) {
     final commentUri = URIRef('${movieUri.value}_comment');
     graph.addTripleToGroups(
@@ -407,7 +407,7 @@ class TurtleMovieSerializer {
     );
   }
 
-  /// Extracts a Movie object from RDF graph triples
+  /// Extracts a Movie object from RDF graph triples.
   static Movie? _extractMovieFromObjects(Graph graph, URIRef movieUri) {
     try {
       // Get movie ID

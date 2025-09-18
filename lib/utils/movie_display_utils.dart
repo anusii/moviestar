@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -30,7 +30,7 @@ import 'package:moviestar/models/content_item.dart';
 /// Formats a movie rating with a star emoji.
 ///
 /// Returns a string with a star emoji followed by the rating to 1 decimal place.
-/// Example: "⭐ 7.5"
+/// Example: "⭐ 7.5".
 String formatMovieRating(double rating) {
   return '⭐ ${rating.toStringAsFixed(1)}';
 }
@@ -38,7 +38,7 @@ String formatMovieRating(double rating) {
 /// Extracts and formats the year from a release date.
 ///
 /// Accepts either a DateTime or String and returns the year.
-/// Example: DateTime(2024, 12, 25) -> "2024"
+/// Example: DateTime(2024, 12, 25) -> "2024".
 String formatMovieYear(dynamic releaseDate) {
   if (releaseDate == null) {
     return '';
@@ -92,7 +92,7 @@ bool isValidImageUrl(String url) {
 
 /// Formats cache age into a human-readable string.
 ///
-/// Example: Duration(hours: 2) -> "2h ago"
+/// Example: Duration(hours: 2) -> "2h ago".
 String formatCacheAge(Duration age) {
   if (age.inDays > 0) {
     return '${age.inDays}d ago';

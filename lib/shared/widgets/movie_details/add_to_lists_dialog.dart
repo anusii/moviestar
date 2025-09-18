@@ -1,4 +1,4 @@
-/// Add to Lists Dialog for Movie Details Screen
+/// Add to Lists Dialog for Movie Details Screen.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

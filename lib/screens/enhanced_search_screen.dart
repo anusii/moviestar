@@ -120,14 +120,10 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
     setLoadingState(true);
 
     try {
-      print('🔍 [EnhancedSearchScreen] Searching for: "$query"');
 
       final results =
           await widget.contentService.searchContentComprehensive(query);
 
-      print(
-        '🔍 [EnhancedSearchScreen] Results found: ${results.entries.map((e) => '${e.key}: ${e.value.length}').join(', ')}',
-      );
 
       // Only update state if this search is still relevant.
 
@@ -138,7 +134,6 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
         setLoadingState(false);
       }
     } catch (e) {
-      print('🔍 [EnhancedSearchScreen] Search failed for "$query": $e');
 
       // Only update state if this search is still relevant.
 

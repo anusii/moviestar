@@ -1,4 +1,4 @@
-/// RDF Namespaces and Constants for Turtle Serialization
+/// RDF Namespaces and Constants for Turtle Serialization.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -10,7 +10,7 @@ library;
 
 import 'package:rdflib/rdflib.dart';
 
-/// Central registry for all RDF namespaces and properties used in MovieStar Turtle serialization
+/// Central registry for all RDF namespaces and properties used in MovieStar Turtle serialization.
 class TurtleNamespaces {
   // Primary namespaces
   static final moviestarOntoNS =
@@ -78,7 +78,7 @@ class TurtleNamespaces {
   // RDFS properties
   static final rdfsLabel = rdfsNS.withAttr('label');
 
-  /// Returns map of all ontology namespaces for Turtle generation
+  /// Returns map of all ontology namespaces for Turtle generation.
   static Map<String, Namespace> getOntologyNamespaces() {
     return {
       'moviestar': moviestarOntoNS,

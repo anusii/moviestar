@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang, Tony Chen
+/// Authors: Kevin Wang, Tony Chen.
 
 library;
 
@@ -236,7 +236,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     );
   }
 
-  /// Triggers app reinitialization after API key is set
+  /// Triggers app reinitialization after API key is set.
   void _triggerAppReinitialization() {
     // The provider invalidations we added earlier will handle the reinitialization
     // No additional action needed here since the providers are already invalidated

@@ -1,4 +1,4 @@
-/// Movie Details Content Component - Synopsis, Cast, Crew and Technical Details
+/// Movie Details Content Component - Synopsis, Cast, Crew and Technical Details.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

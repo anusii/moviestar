@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Software Innovation Institute
+/// Authors: Software Innovation Institute.
 
 library;
 
@@ -27,7 +27,7 @@ import 'package:flutter/material.dart';
 
 import 'package:moviestar/core/services/pod/pod_sharing_service.dart';
 
-/// Permission selector widget for choosing access levels
+/// Permission selector widget for choosing access levels.
 class PermissionSelector extends StatefulWidget {
   final List<String> availablePermissions;
   final List<String> selectedPermissions;
@@ -205,7 +205,7 @@ class _PermissionSelectorState extends State<PermissionSelector> {
   }
 }
 
-/// WebID input field with validation
+/// WebID input field with validation.
 class WebIdInput extends StatefulWidget {
   final TextEditingController controller;
   final Function(String?) onValidated;

@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -33,14 +33,14 @@ import 'package:moviestar/utils/create_app_folder.dart';
 
 /// Initialises required app folders in the user's POD.
 ///
-/// This function checks for the existence of essential app folders and creates
+/// This function checks for the existence of essential app folders and creates.
 /// them if they don't exist.
 /// Returns a [Future<void>] that completes when all folders are verified/created.
 ///
-/// Parameters:
-/// - [context]: The BuildContext for showing progress indicators and error messages
-/// - [onProgress]: Optional callback to track initialisation progress
-/// - [onComplete]: Optional callback triggered when initialisation is complete
+/// Parameters:.
+/// - [context]: The BuildContext for showing progress indicators and error messages.
+/// - [onProgress]: Optional callback to track initialisation progress.
+/// - [onComplete]: Optional callback triggered when initialisation is complete.
 
 Future<void> initialiseAppFolders({
   required BuildContext context,

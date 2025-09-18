@@ -1,4 +1,4 @@
-/// Shared List Permissions Panel Component - Access Controls, Sharing Status, and User Management
+/// Shared List Permissions Panel Component - Access Controls, Sharing Status, and User Management.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

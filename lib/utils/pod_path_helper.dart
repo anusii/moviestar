@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -29,11 +29,11 @@ import 'package:solidpod/solidpod.dart';
 
 /// Gets the correct path for reading files from POD.
 ///
-/// Due to a discrepancy in solidpod:
-/// - writePod automatically prepends getDataDirPath() to the fileName
-/// - readPod uses the filePath directly without preprocessing
+/// Due to a discrepancy in solidpod:.
+/// - writePod automatically prepends getDataDirPath() to the fileName.
+/// - readPod uses the filePath directly without preprocessing.
 ///
-/// This function constructs the full path that readPod needs to match
+/// This function constructs the full path that readPod needs to match.
 /// what writePod actually writes.
 
 Future<String> getReadPath(String relativePath) async {

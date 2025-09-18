@@ -1,4 +1,4 @@
-/// Kanban Column Widget - Individual Column Implementation
+/// Kanban Column Widget - Individual Column Implementation.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -23,7 +23,7 @@ import 'package:moviestar/widgets/sort_controls.dart';
 
 import 'kanban_board_controller.dart';
 
-/// Column data for building kanban columns
+/// Column data for building kanban columns.
 class KanbanColumnData {
   final String title;
   final List<Movie> movies;
@@ -44,7 +44,7 @@ class KanbanColumnData {
   });
 }
 
-/// Kanban column widget with drag target support
+/// Kanban column widget with drag target support.
 class KanbanColumnWidget extends StatelessWidget {
   final KanbanColumnData columnData;
   final KanbanBoardController controller;

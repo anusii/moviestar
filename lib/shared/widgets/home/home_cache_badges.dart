@@ -1,4 +1,4 @@
-/// Cache Badges for Home Screen
+/// Cache Badges for Home Screen.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

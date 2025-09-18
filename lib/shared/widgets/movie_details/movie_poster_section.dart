@@ -1,4 +1,4 @@
-/// Movie Poster Section for Movie Details Screen
+/// Movie Poster Section for Movie Details Screen.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

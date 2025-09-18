@@ -1,4 +1,4 @@
-/// Movie Details Header Component - Poster, Title, Rating Display and Action Buttons
+/// Movie Details Header Component - Poster, Title, Rating Display and Action Buttons.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

@@ -1,4 +1,4 @@
-/// Lists Empty State Widget Component - Welcome screen for when no custom lists exist
+/// Lists Empty State Widget Component - Welcome screen for when no custom lists exist.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -10,7 +10,7 @@ library;
 
 import 'package:flutter/material.dart';
 
-/// Widget that displays the empty state when no custom lists exist
+/// Widget that displays the empty state when no custom lists exist.
 class ListsEmptyStateWidget extends StatelessWidget {
   final VoidCallback onCreateFirstList;
 

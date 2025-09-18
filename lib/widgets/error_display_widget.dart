@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -35,29 +35,29 @@ import 'package:moviestar/models/app_error.dart';
 
 /// A reusable widget for displaying error states with consistent styling.
 ///
-/// This widget provides a standard way to display errors across the app,
-/// including an error icon, message, multiple action buttons, and expandable
+/// This widget provides a standard way to display errors across the app,.
+/// including an error icon, message, multiple action buttons, and expandable.
 /// technical details for debugging.
 ///
-/// Usage examples:
-/// ```dart
-/// // Using UserFriendlyError (recommended)
-/// ErrorDisplayWidget.fromUserFriendlyError(
-///   error: userFriendlyError,
-/// )
+/// Usage examples:.
+/// ```dart.
+/// // Using UserFriendlyError (recommended).
+/// ErrorDisplayWidget.fromUserFriendlyError(.
+///   error: userFriendlyError,.
+/// ).
 ///
-/// // Legacy usage for backward compatibility
-/// ErrorDisplayWidget(
-///   message: 'Failed to load data',
-///   onRetry: () => refreshData(),
-/// )
+/// // Legacy usage for backward compatibility.
+/// ErrorDisplayWidget(.
+///   message: 'Failed to load data',.
+///   onRetry: () => refreshData(),.
+/// ).
 ///
-/// // Compact error widget for smaller spaces
-/// ErrorDisplayWidget.compact(
-///   message: 'Failed to load movies',
-///   onRetry: () => retryLoad(),
-/// )
-/// ```
+/// // Compact error widget for smaller spaces.
+/// ErrorDisplayWidget.compact(.
+///   message: 'Failed to load movies',.
+///   onRetry: () => retryLoad(),.
+/// ).
+/// ```.
 
 class ErrorDisplayWidget extends StatelessWidget {
   /// The error message to display.

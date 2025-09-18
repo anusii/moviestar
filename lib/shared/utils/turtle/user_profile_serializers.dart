@@ -1,4 +1,4 @@
-/// User Profile and API Key Serialization for Turtle format
+/// User Profile and API Key Serialization for Turtle format.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///

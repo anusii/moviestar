@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -38,7 +38,7 @@ import 'package:moviestar/widgets/sort_controls.dart';
 
 /// A standardized widget for displaying a list of movies.
 ///
-/// This widget provides a consistent way to display movies in a vertical list
+/// This widget provides a consistent way to display movies in a vertical list.
 /// with optional sorting, loading states, empty states, and error handling.
 class MovieListWidget extends StatefulWidget {
   /// The list of movies to display.

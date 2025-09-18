@@ -75,6 +75,7 @@ class _SharedMovieListDetailScreenState
       widget: widget,
       screenStateMixin: this,
       dataLoader: _dataLoader,
+      favoritesService: null, // Will use fallback for shared context
     );
   }
 

@@ -250,6 +250,25 @@ class DirectMovieService extends MovieService {
   }
 
   @override
+  Future<Movie> getMovieDetails(int movieId) async {
+    debugPrint('🔑 [DirectMovieService] getMovieDetails called for ID: $movieId');
+    await _ensureDirectClientInitialized();
+
+    // Use direct client instead of going through ContentService
+    try {
+      final data = await _directClient!.getJson('movie/$movieId');
+      final contentItem = ContentItem.fromMovieJson(data);
+      return Movie.fromContentItem(contentItem);
+    } catch (e) {
+      // Try TV endpoint if movie fails (for TV shows)
+      debugPrint('🔑 [DirectMovieService] Movie endpoint failed, trying TV endpoint: $e');
+      final data = await _directClient!.getJson('tv/$movieId');
+      final contentItem = ContentItem.fromTVJson(data);
+      return Movie.fromContentItem(contentItem);
+    }
+  }
+
+  @override
   void dispose() {
     debugPrint('🔑 [DirectMovieService] Disposing services');
     _directClient?.dispose();

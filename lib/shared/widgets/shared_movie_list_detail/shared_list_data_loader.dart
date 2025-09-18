@@ -240,6 +240,7 @@ class SharedListDataLoader {
           if (parsedData != null || isTvShow) {
             final enhancedData = Map<String, dynamic>.from(movieData);
             if (parsedData != null) {
+              // Add user-specific data
               if (parsedData['title'] != null) {
                 enhancedData['title'] = parsedData['title'];
                 enhancedData['fileName'] = parsedData['title'];
@@ -250,6 +251,26 @@ class SharedListDataLoader {
               }
               if (parsedData['comments'] != null) {
                 enhancedData['comments'] = parsedData['comments'];
+              }
+
+              // Add TMDB metadata if available
+              if (parsedData['posterUrl'] != null) {
+                enhancedData['posterUrl'] = parsedData['posterUrl'];
+              }
+              if (parsedData['backdropUrl'] != null) {
+                enhancedData['backdropUrl'] = parsedData['backdropUrl'];
+              }
+              if (parsedData['overview'] != null) {
+                enhancedData['overview'] = parsedData['overview'];
+              }
+              if (parsedData['releaseDate'] != null) {
+                enhancedData['releaseDate'] = parsedData['releaseDate'];
+              }
+              if (parsedData['voteAverage'] != null) {
+                enhancedData['voteAverage'] = parsedData['voteAverage'];
+              }
+              if (parsedData['genreIds'] != null) {
+                enhancedData['genreIds'] = parsedData['genreIds'];
               }
             }
 
@@ -400,6 +421,7 @@ class SharedListDataLoader {
       // Merge the parsed data with the original movie data.
       final enhancedData = Map<String, dynamic>.from(movieData);
       if (parsedData != null) {
+        // Add user-specific data
         if (parsedData['title'] != null) {
           enhancedData['title'] = parsedData['title'];
           // Also update the fileName with the actual title
@@ -411,6 +433,26 @@ class SharedListDataLoader {
         }
         if (parsedData['comments'] != null) {
           enhancedData['comments'] = parsedData['comments'];
+        }
+
+        // Add TMDB metadata if available
+        if (parsedData['posterUrl'] != null) {
+          enhancedData['posterUrl'] = parsedData['posterUrl'];
+        }
+        if (parsedData['backdropUrl'] != null) {
+          enhancedData['backdropUrl'] = parsedData['backdropUrl'];
+        }
+        if (parsedData['overview'] != null) {
+          enhancedData['overview'] = parsedData['overview'];
+        }
+        if (parsedData['releaseDate'] != null) {
+          enhancedData['releaseDate'] = parsedData['releaseDate'];
+        }
+        if (parsedData['voteAverage'] != null) {
+          enhancedData['voteAverage'] = parsedData['voteAverage'];
+        }
+        if (parsedData['genreIds'] != null) {
+          enhancedData['genreIds'] = parsedData['genreIds'];
         }
       }
 
@@ -449,12 +491,14 @@ class SharedListDataLoader {
         r'# JSON_MOVIE_DATA: (.+)',
       ).firstMatch(ttlContent);
 
+      Map<String, dynamic>? movieMetadata;
       if (movieJsonMatch != null) {
         debugPrint('   - Found JSON_MOVIE_DATA section');
         final movieJsonData = movieJsonMatch.group(1)!;
-        final movieData = jsonDecode(movieJsonData) as Map<String, dynamic>;
-        title = movieData['title'] as String?;
+        movieMetadata = jsonDecode(movieJsonData) as Map<String, dynamic>;
+        title = movieMetadata['title'] as String?;
         debugPrint('   - JSON title: "$title"');
+        debugPrint('   - JSON metadata available: ${movieMetadata.keys.toList()}');
       } else {
         debugPrint('   - No JSON_MOVIE_DATA found, will try TTL parsing');
       }
@@ -506,13 +550,38 @@ class SharedListDataLoader {
         }
       }
 
-      if (title != null ||
-          rating != null ||
-          (comments != null && comments.isNotEmpty)) {
+      // Build comprehensive result with TMDB metadata if available
+      final result = <String, dynamic>{};
+
+      if (title != null) result['title'] = title;
+      if (rating != null) result['rating'] = rating;
+      if (comments != null && comments.isNotEmpty) result['comments'] = comments;
+
+      // Include TMDB metadata from JSON backup if available
+      if (movieMetadata != null) {
+        // Add poster and backdrop URLs
+        if (movieMetadata['poster_path'] != null) {
+          result['posterUrl'] = 'https://image.tmdb.org/t/p/w500${movieMetadata['poster_path']}';
+        }
+        if (movieMetadata['backdrop_path'] != null) {
+          result['backdropUrl'] = 'https://image.tmdb.org/t/p/w1280${movieMetadata['backdrop_path']}';
+        }
+
+        // Add other TMDB fields
+        if (movieMetadata['overview'] != null) result['overview'] = movieMetadata['overview'];
+        if (movieMetadata['release_date'] != null) result['releaseDate'] = movieMetadata['release_date'];
+        if (movieMetadata['first_air_date'] != null) result['releaseDate'] = movieMetadata['first_air_date']; // For TV shows
+        if (movieMetadata['vote_average'] != null) result['voteAverage'] = movieMetadata['vote_average'];
+        if (movieMetadata['genre_ids'] != null) result['genreIds'] = movieMetadata['genre_ids'];
+
+        debugPrint('   - Added TMDB metadata: posterUrl=${result['posterUrl'] != null}, backdropUrl=${result['backdropUrl'] != null}, voteAverage=${result['voteAverage']}');
+      }
+
+      if (result.isNotEmpty) {
         debugPrint(
-          '   - Parse results: title="$title", rating=$rating, hasComments=${comments != null && comments.isNotEmpty}',
+          '   - Parse results: title="$title", rating=$rating, hasComments=${comments != null && comments.isNotEmpty}, tmdbFields=${result.keys.where((k) => !['title', 'rating', 'comments'].contains(k)).toList()}',
         );
-        return {'title': title, 'rating': rating, 'comments': comments};
+        return result;
       }
 
       debugPrint('   - No data extracted from TTL content');

@@ -18,6 +18,7 @@ import 'package:moviestar/core/services/api/key_validation_service.dart';
 import 'package:moviestar/core/services/network/connectivity_service.dart';
 import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
+import 'package:moviestar/services/error_mapper/smart_detection.dart';
 import 'package:moviestar/services/error_mapper_service.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 

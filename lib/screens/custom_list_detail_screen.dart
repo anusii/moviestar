@@ -29,21 +29,18 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
-import 'package:solidpod/solidpod.dart';
 
-import 'package:moviestar/core/services/favorites/movie_list_service.dart';
 import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/core/services/favorites/service_adapter.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/services/user_profile_service.dart';
+import 'package:moviestar/screens/custom_list_detail/dialog_builders.dart';
+import 'package:moviestar/screens/custom_list_detail/movie_loader.dart';
+import 'package:moviestar/screens/custom_list_detail/sharing_helper.dart';
 import 'package:moviestar/shared/widgets/custom_list_detail/list_header_widget.dart';
 import 'package:moviestar/shared/widgets/custom_list_detail/list_movie_grid.dart';
-import 'package:moviestar/utils/serializer.dart';
 import 'package:moviestar/widgets/base_screen.dart';
-import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 
 /// A screen that displays the detailed view of a custom movie list.
 
@@ -98,21 +95,6 @@ class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
 
   // Gets content as movie with proper type routing.
 
-  Future<Movie> _getContentAsMovieWithType(
-    int contentId,
-    String contentType,
-  ) async {
-    final cachedMovieService = ref.read(cachedMovieServiceProvider);
-    final contentService = ref.read(contentServiceProvider);
-
-    if (contentType == 'tv') {
-      final tvShowContent = await contentService.getTVDetails(contentId);
-      return Movie.fromContentItem(tvShowContent);
-    } else {
-      return await cachedMovieService.getMovieDetails(contentId);
-    }
-  }
-
   // Loads movies in this custom list from cache.
 
   Future<void> _loadMovies() async {
@@ -157,207 +139,68 @@ class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
   }
 
   // Loads specific movies from API.
-
   Future<void> _loadMoviesFromAPI(List<int> movieIds) async {
-    for (int i = 0; i < movieIds.length; i++) {
-      final movieId = movieIds[i];
+    final filtered = movieIds
+        .where(
+          (id) => !_moviesMap.containsKey(id) && !_loadingMovieIds.contains(id),
+        )
+        .toList();
 
-      if (_moviesMap.containsKey(movieId) ||
-          _loadingMovieIds.contains(movieId)) {
-        continue; // Already loaded or loading.
-      }
-
-      safeSetState(() {
-        _loadingMovieIds.add(movieId);
-      });
-
-      try {
-        final contentType = _currentList.getContentTypeAt(
-          _currentList.movieIds.indexOf(movieId),
-        );
-        final movie = await _getContentAsMovieWithType(movieId, contentType);
-
+    await MovieLoader.loadMoviesFromAPI(
+      ref,
+      filtered,
+      (movieId, movie) {
         if (mounted) {
           safeSetState(() {
             _moviesMap[movieId] = movie;
             _loadingMovieIds.remove(movieId);
-            _failedMovieIds
-                .remove(movieId); // Remove from failed if it was there.
+            _failedMovieIds.remove(movieId);
           });
         }
-      } catch (e) {
+      },
+      (movieId, error) {
         if (mounted) {
           safeSetState(() {
             _loadingMovieIds.remove(movieId);
             _failedMovieIds.add(movieId);
           });
         }
-      }
-    }
+      },
+    );
   }
 
   // Shows options for the custom list (edit, share, delete).
 
   Future<void> _showListOptions() async {
-    final hasMovies = _currentList.movieIds.isNotEmpty;
-    final isPodEnabled = widget.favoritesService is FavoritesServiceAdapter &&
-        (widget.favoritesService as FavoritesServiceAdapter)
-            .isPodStorageEnabled;
-
-    await showModalBottomSheet(
-      context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.edit),
-            title: const Text('Edit List'),
-            onTap: () {
-              Navigator.pop(context);
-              _showEditListDialog();
-            },
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.share,
-              color: (hasMovies && isPodEnabled)
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.38),
-            ),
-            title: Text(
-              'Share List',
-              style: TextStyle(
-                color: (hasMovies && isPodEnabled)
-                    ? Theme.of(context).colorScheme.onSurface
-                    : Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.38),
-              ),
-            ),
-            onTap: (hasMovies && isPodEnabled)
-                ? () {
-                    Navigator.pop(context);
-                    _shareCustomList();
-                  }
-                : null,
-          ),
-          ListTile(
-            leading: const Icon(Icons.delete, color: Colors.red),
-            title: const Text('Delete List'),
-            onTap: () {
-              Navigator.pop(context);
-              _showDeleteConfirmation();
-            },
-          ),
-        ],
-      ),
+    await CustomListDialogBuilders.showListOptions(
+      context,
+      _currentList,
+      onEdit: _showEditListDialog,
+      onShare: _shareCustomList,
+      onDelete: _showDeleteConfirmation,
     );
   }
 
   // Shows a dialog to edit the custom list.
 
   Future<void> _showEditListDialog() async {
-    final TextEditingController nameController =
-        TextEditingController(text: _currentList.name);
-    final TextEditingController descriptionController =
-        TextEditingController(text: _currentList.description ?? '');
-
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit List'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'List Name',
-                border: OutlineInputBorder(),
-              ),
-              autofocus: true,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Description (Optional)',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final name = nameController.text.trim();
-              if (name.isNotEmpty) {
-                final description = descriptionController.text.trim();
-                final updatedList = _currentList.copyWith(
-                  name: name,
-                  description: description.isEmpty ? null : description,
-                );
-                await widget.favoritesService.updateCustomList(updatedList);
-                setState(() {
-                  _currentList = updatedList;
-                });
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  showSuccessSnackBar('Updated "$name" list');
-                }
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+    await CustomListDialogBuilders.showEditListDialog(
+      context,
+      _currentList,
+      widget.favoritesService,
+      () {
+        _loadMovies();
+      },
     );
-
-    nameController.dispose();
-    descriptionController.dispose();
   }
 
   // Shows a confirmation dialog before deleting the list.
 
   Future<void> _showDeleteConfirmation() async {
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete List'),
-        content: Text(
-          'Are you sure you want to delete "${_currentList.name}"? This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () async {
-              await widget.favoritesService.deleteCustomList(_currentList.id);
-              if (context.mounted) {
-                Navigator.pop(context); // Close dialog.
-                Navigator.pop(context); // Go back to lists screen.
-                showSuccessSnackBar('Deleted "${_currentList.name}" list');
-              }
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+    await CustomListDialogBuilders.showDeleteConfirmation(
+      context,
+      _currentList,
+      widget.favoritesService,
     );
   }
 
@@ -461,29 +304,29 @@ Recipients will be able to:
 
   /// Retry loading a specific movie.
   Future<void> _retryLoadMovie(int movieId) async {
-    setState(() {
-      _failedMovieIds.remove(movieId);
-      _loadingMovieIds.add(movieId);
-    });
-
-    // Load the specific movie
-    try {
-      final movie = await _getContentAsMovieWithType(movieId, 'movie');
-
-      if (mounted) {
-        setState(() {
-          _moviesMap[movieId] = movie;
-          _loadingMovieIds.remove(movieId);
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _loadingMovieIds.remove(movieId);
-          _failedMovieIds.add(movieId);
-        });
-      }
-    }
+    await MovieLoader.retryLoadMovie(
+      ref,
+      movieId,
+      _moviesMap,
+      {},
+      (id, movie) {
+        if (mounted) {
+          setState(() {
+            _moviesMap[id] = movie;
+            _loadingMovieIds.remove(id);
+            _failedMovieIds.remove(id);
+          });
+        }
+      },
+      (id, error) {
+        if (mounted) {
+          setState(() {
+            _loadingMovieIds.remove(id);
+            _failedMovieIds.add(id);
+          });
+        }
+      },
+    );
   }
 
   // Builds the empty state when there are no movies in the list.
@@ -521,186 +364,20 @@ Recipients will be able to:
     );
   }
 
-  // Shows a loading dialog during sharing process.
-  void _showSharingDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Dialog(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Preparing to share...',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'This may take a few seconds',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   // Shares the custom list and all movies using batch sharing UI.
 
   Future<void> _shareCustomList() async {
-    if (_currentList.movieIds.isEmpty) {
-      showErrorSnackBar('No movies to share');
-      return;
-    }
+    final moviesToShare = _currentList.movieIds
+        .map((id) => _moviesMap[id])
+        .where((movie) => movie != null)
+        .cast<Movie>()
+        .toList();
 
-    // Show loading dialog
-    _showSharingDialog();
-
-    // Get all loaded movies from the current list.
-
-    final moviesToShare = <Movie>[];
-    for (final movieId in _currentList.movieIds) {
-      final movie = _moviesMap[movieId];
-      if (movie != null) {
-        moviesToShare.add(movie);
-      }
-    }
-
-    if (moviesToShare.isEmpty) {
-      showErrorSnackBar('Movies are still loading. Please wait.');
-      return;
-    }
-
-    // Store context references before async operations.
-
-    final theme = Theme.of(context);
-
-    try {
-      // Create MovieList service to create the list file first.
-
-      final userProfileService = UserProfileService(context, widget);
-      final movieListService = MovieListService(
-        context,
-        widget,
-        userProfileService,
-      );
-
-      // Create the MovieList TTL file.
-
-      final listId = await movieListService.createMovieList(
-        _currentList.name,
-        movies: moviesToShare,
-        description: _currentList.description ?? 'Custom movie list',
-      );
-
-      if (!mounted) return;
-
-      if (listId == null) {
-        if (mounted) {
-          showErrorSnackBar('Failed to create movie list');
-        }
-        return;
-      }
-
-      // Ensure all individual movie files exist before sharing.
-
-      for (final movie in moviesToShare) {
-        try {
-          await _createMovieFileIfNotExists(movie);
-        } catch (e) {
-          // Continue with other movies - the batch UI will handle individual failures.
-        }
-        if (!mounted) return;
-      }
-
-      // Navigate to the batch sharing UI.
-
-      if (mounted) {
-        await safeNavigateTo(
-          MaterialPageRoute(
-            fullscreenDialog: true,
-            builder: (context) => MovieStarBatchSharingUi(
-              listId: listId,
-              listName: _currentList.name,
-              movies: moviesToShare,
-              backgroundColor: theme.scaffoldBackgroundColor,
-              onSharingComplete: () {
-                // Handle completion callback.
-              },
-              child: widget,
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        showErrorSnackBar('Error sharing list: $e');
-      }
-    } finally {
-      // Dismiss loading dialog
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-    }
-  }
-
-  // Creates a movie file if it doesn't exist (needed before sharing).
-
-  Future<void> _createMovieFileIfNotExists(Movie movie) async {
-    try {
-      final movieFileName = 'movies/Movie-${movie.id}.ttl';
-
-      // Check if the file already exists.
-
-      try {
-        if (!mounted) return;
-        final existingContent = await readPod(movieFileName, context, widget);
-        if (existingContent.isNotEmpty) {
-          return;
-        }
-      } catch (e) {
-        // File doesn't exist, we'll create it.
-      }
-
-      // Get current rating and comments from favorites service.
-
-      final adapter = widget.favoritesService as FavoritesServiceAdapter;
-      final currentRating = await adapter.getPersonalRating(movie);
-      final currentComments = await adapter.getMovieComments(movie);
-
-      // Create the movie TTL content with any existing user data.
-
-      final ttlContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
-        movie,
-        currentRating,
-        currentComments,
-      );
-
-      // Write the movie file to POD.
-
-      if (!mounted) return;
-      final result = await writePod(
-        movieFileName,
-        ttlContent,
-        context,
-        widget,
-        encrypted: false,
-      );
-
-      if (result != SolidFunctionCallStatus.success) {
-        throw Exception('Failed to write movie file to POD');
-      }
-    } catch (e) {
-      rethrow;
-    }
+    CustomListSharingHelper.showSharingDialog(
+      context,
+      _currentList,
+      moviesToShare,
+      widget,
+    );
   }
 }

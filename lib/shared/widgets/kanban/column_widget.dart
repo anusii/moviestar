@@ -10,9 +10,6 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:gap/gap.dart';
-import 'package:markdown_tooltip/markdown_tooltip.dart';
-
 import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/core/services/favorites/service.dart';
@@ -20,8 +17,14 @@ import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
+import 'package:moviestar/shared/widgets/kanban/column_widget/header_builder.dart';
+import 'package:moviestar/shared/widgets/kanban/column_widget/movie_list_builder.dart';
 
 import 'board_controller.dart';
+
+// Re-export helper classes for backward compatibility
+export 'package:moviestar/shared/widgets/kanban/column_widget/header_builder.dart';
+export 'package:moviestar/shared/widgets/kanban/column_widget/movie_list_builder.dart';
 
 /// Column data for building kanban columns.
 class KanbanColumnData {
@@ -114,11 +117,32 @@ class KanbanColumnWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Column header
-          _buildColumnHeader(context, sortedMovies, hasMore, hasPendingOps),
+          HeaderBuilder.buildColumnHeader(
+            context,
+            columnData.title,
+            columnData.customList,
+            sortedMovies,
+            hasMore,
+            hasPendingOps,
+            columnData.categoryId,
+            controller,
+            onNavigateToCustomList,
+            onNavigateToCategory,
+            columnData.fromCache,
+          ),
 
           // Movie items
           Expanded(
-            child: _buildMovieList(context, displayMovies),
+            child: MovieListBuilder.buildMovieList(
+              context,
+              columnData.title,
+              columnData.categoryId,
+              columnData.fromCache,
+              columnData.columnType,
+              columnData.isLoading,
+              displayMovies,
+              buildMovieItem,
+            ),
           ),
         ],
       ),
@@ -153,288 +177,6 @@ class KanbanColumnWidget extends StatelessWidget {
                 : null,
           ),
           child: columnContent,
-        );
-      },
-    );
-  }
-
-  Widget _buildColumnHeader(
-    BuildContext context,
-    List<Movie> sortedMovies,
-    bool hasMore,
-    bool hasPendingOps,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(Dimensions.xl),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(12),
-          topRight: Radius.circular(12),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // First row: Title + Count Badge + Sort button
-          Row(
-            children: [
-              Expanded(
-                child: _buildColumnTitle(context),
-              ),
-              _buildCountBadge(context, sortedMovies, hasMore, hasPendingOps),
-              const SizedBox(width: 8),
-              _buildSortButton(context),
-            ],
-          ),
-          // Second row: View More button (only when needed)
-          if (hasMore) ...[
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Spacer(),
-                _buildViewMoreButton(context, sortedMovies),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildColumnTitle(BuildContext context) {
-    if (columnData.customList != null) {
-      return GestureDetector(
-        onTap: () => onNavigateToCustomList(columnData.customList!),
-        child: Text(
-          columnData.customList!.name,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-      );
-    }
-
-    return Text(
-      columnData.title,
-      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-    );
-  }
-
-  Widget _buildCountBadge(
-    BuildContext context,
-    List<Movie> sortedMovies,
-    bool hasMore,
-    bool hasPendingOps,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 2,
-      ),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '${sortedMovies.length}${hasMore ? '+' : ''}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.w500,
-                ),
-          ),
-          if (hasPendingOps) ...[
-            const SizedBox(width: 4),
-            SizedBox(
-              width: 8,
-              height: 8,
-              child: CircularProgressIndicator(
-                strokeWidth: 1,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Theme.of(context).colorScheme.onPrimaryContainer,
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSortButton(BuildContext context) {
-    return MarkdownTooltip(
-      message:
-          '**Sort** movies in this column\n\nClick to choose from:\n• Name (A-Z / Z-A)\n• Rating (High-Low / Low-High)\n• Date (Newest / Oldest)',
-      child: PopupMenuButton<MovieSortCriteria>(
-        tooltip: 'Sort',
-        icon: Icon(
-          Icons.sort,
-          size: 18,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
-        onSelected: (criteria) =>
-            controller.onSortChanged(columnData.categoryId, criteria),
-        itemBuilder: (context) {
-          final currentSort =
-              controller.columnSortCriteria[columnData.categoryId] ??
-                  MovieSortCriteria.nameAsc;
-          return [
-            _buildSortMenuItem(
-              context,
-              currentSort,
-              MovieSortCriteria.nameAsc,
-              'Name (A-Z)',
-            ),
-            _buildSortMenuItem(
-              context,
-              currentSort,
-              MovieSortCriteria.nameDesc,
-              'Name (Z-A)',
-            ),
-            _buildSortMenuItem(
-              context,
-              currentSort,
-              MovieSortCriteria.ratingDesc,
-              'Rating (High to Low)',
-            ),
-            _buildSortMenuItem(
-              context,
-              currentSort,
-              MovieSortCriteria.ratingAsc,
-              'Rating (Low to High)',
-            ),
-            _buildSortMenuItem(
-              context,
-              currentSort,
-              MovieSortCriteria.dateDesc,
-              'Date (Newest First)',
-            ),
-            _buildSortMenuItem(
-              context,
-              currentSort,
-              MovieSortCriteria.dateAsc,
-              'Date (Oldest First)',
-            ),
-          ];
-        },
-      ),
-    );
-  }
-
-  PopupMenuItem<MovieSortCriteria> _buildSortMenuItem(
-    BuildContext context,
-    MovieSortCriteria currentSort,
-    MovieSortCriteria criteria,
-    String label,
-  ) {
-    return PopupMenuItem(
-      value: criteria,
-      child: Row(
-        children: [
-          Icon(
-            currentSort == criteria
-                ? Icons.radio_button_checked
-                : Icons.radio_button_unchecked,
-            size: 16,
-          ),
-          const SizedBox(width: 8),
-          Text(label),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildViewMoreButton(BuildContext context, List<Movie> sortedMovies) {
-    return TextButton(
-      onPressed: () => onNavigateToCategory(
-        columnData.title,
-        sortedMovies,
-        columnData.fromCache,
-      ),
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 6,
-          vertical: 2,
-        ),
-        minimumSize: Size.zero,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-      child: Text(
-        'View More',
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontSize: 11,
-            ),
-      ),
-    );
-  }
-
-  Widget _buildMovieList(BuildContext context, List<Movie> displayMovies) {
-    if (columnData.isLoading) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Theme.of(context).colorScheme.primary,
-                ),
-              ),
-            ),
-            const Gap(8),
-            Text(
-              'Loading ${columnData.title}...',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
-                  ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (displayMovies.isEmpty) {
-      return Center(
-        child: Text(
-          'No movies',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withValues(alpha: 0.5),
-              ),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(8),
-      itemCount: displayMovies.length,
-      itemBuilder: (context, index) {
-        final movie = displayMovies[index];
-        return buildMovieItem(
-          movie,
-          columnData.categoryId,
-          fromCache: columnData.fromCache,
-          columnType: columnData.columnType,
-          columnId: columnData.categoryId,
-          columnName: columnData.title,
         );
       },
     );

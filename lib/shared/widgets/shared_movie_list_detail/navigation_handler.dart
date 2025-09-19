@@ -60,7 +60,13 @@ class SharedListNavigationHandler {
 
       // Get enhanced movie data for ratings and comments
       final enhancedMovieData =
-          await dataLoader.fetchIndividualMovieData(movieData);
+          await FetchOperations.fetchIndividualMovieData(
+            context,
+            widget,
+            dataLoader.ownerWebId,
+            dataLoader.sharedByWebId,
+            movieData,
+          );
 
       // Create Movie object directly from available data (like working Shared tab logic)
       // This avoids TMDB API calls and associated API key/network issues

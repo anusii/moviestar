@@ -354,15 +354,19 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Title row with action buttons
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: MovieInfoSection(
-                          movie: widget.movie,
-                          favoritesService: widget.favoritesService,
-                          isSharedMovie: _isSharedMovie,
-                          sharedMovieData: widget.sharedMovieData,
+                        child: Text(
+                          widget.movie.title,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       MovieActionButtons(
@@ -377,6 +381,14 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
                         onShareMovie: _shareMovie,
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Rest of movie info (without title)
+                  MovieInfoSectionWithoutTitle(
+                    movie: widget.movie,
+                    favoritesService: widget.favoritesService,
+                    isSharedMovie: _isSharedMovie,
+                    sharedMovieData: widget.sharedMovieData,
                   ),
                 ],
               ),

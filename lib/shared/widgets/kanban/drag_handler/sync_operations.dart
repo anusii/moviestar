@@ -146,7 +146,8 @@ class SyncOperations {
             action,
             movie,
             successMessage.substring(
-                successMessage.indexOf('"') + movie.title.length + 2),
+              successMessage.indexOf('"') + movie.title.length + 2,
+            ),
           );
         }
       }

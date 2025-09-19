@@ -140,46 +140,117 @@ class RatingSection {
     );
   }
 
-  /// Build the star rating widget.
+  /// Build the rating widget with 0-10 scale and 0.1 increments.
   static Widget _buildStarRating(
     BuildContext context, {
     required double? rating,
     required Function(double?) onRatingChanged,
     required bool isSharedMovie,
   }) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (int i = 1; i <= 5; i++)
-          GestureDetector(
-            onTap: isSharedMovie
-                ? null
-                : () {
-                    final newRating = i.toDouble();
-                    onRatingChanged(rating == newRating ? null : newRating);
+        if (!isSharedMovie) ...[
+          // Slider for interactive rating
+          Row(
+            children: [
+              Expanded(
+                child: Slider(
+                  value: rating ?? 0.0,
+                  min: 0.0,
+                  max: 10.0,
+                  divisions: 100, // 0.1 increments
+                  onChanged: (value) {
+                    onRatingChanged(value == 0.0 ? null : value);
                   },
-            child: Icon(
-              rating != null && i <= rating ? Icons.star : Icons.star_border,
-              color: rating != null && i <= rating ? Colors.amber : Colors.grey,
-              size: 30,
-            ),
+                ),
+              ),
+              const Gap(Gaps.s),
+              SizedBox(
+                width: 60,
+                child: rating != null
+                    ? Text(
+                        '${rating.toStringAsFixed(1)}/10',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                      )
+                    : Text(
+                        '0.0/10',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                      ),
+              ),
+            ],
           ),
-        const Gap(Gaps.m),
+        ] else ...[
+          // Display-only for shared movies
+          Row(
+            children: [
+              // Star icons for visual representation
+              for (int i = 1; i <= 5; i++)
+                Icon(
+                  rating != null && i <= (rating / 2)
+                      ? Icons.star
+                      : Icons.star_border,
+                  color: rating != null && i <= (rating / 2)
+                      ? Colors.amber
+                      : Colors.grey,
+                  size: 24,
+                ),
+              const Gap(Gaps.m),
+              if (rating != null)
+                Text(
+                  '${rating.toStringAsFixed(1)}/10',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                )
+              else
+                Text(
+                  'Not rated',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                ),
+            ],
+          ),
+        ],
+        const Gap(Gaps.xs),
+        // Rating description
         if (rating != null)
           Text(
-            '${rating.toStringAsFixed(1)}/5',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
+            _getRatingDescription(rating),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.grey[600],
+                  fontStyle: FontStyle.italic,
                 ),
           )
-        else
+        else if (!isSharedMovie)
           Text(
-            'Not rated',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            'Move the slider to rate',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Colors.grey[600],
+                  fontStyle: FontStyle.italic,
                 ),
           ),
       ],
     );
+  }
+
+  /// Get a descriptive text for the rating value.
+  static String _getRatingDescription(double rating) {
+    if (rating >= 9.0) return 'Masterpiece';
+    if (rating >= 8.0) return 'Excellent';
+    if (rating >= 7.0) return 'Very Good';
+    if (rating >= 6.0) return 'Good';
+    if (rating >= 5.0) return 'Average';
+    if (rating >= 4.0) return 'Below Average';
+    if (rating >= 3.0) return 'Poor';
+    if (rating >= 2.0) return 'Very Poor';
+    if (rating >= 1.0) return 'Awful';
+    return 'Terrible';
   }
 
   /// Build the shared movie indicator.

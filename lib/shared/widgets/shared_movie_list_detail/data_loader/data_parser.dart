@@ -14,7 +14,8 @@ import 'dart:convert';
 class DataParser {
   /// Extract title from enhanced movie data.
   static String? extractTitleFromEnhancedData(
-      Map<String, dynamic> enhancedData) {
+    Map<String, dynamic> enhancedData,
+  ) {
     // Check if we have a title field in the enhanced data
     final title = enhancedData['title'] as String?;
     if (title != null && title.isNotEmpty) {

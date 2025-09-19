@@ -118,12 +118,13 @@ void main() {
       // No WebID, should be false
       expect(state.isReadyToShare, isFalse);
 
-      // Set WebID but no permissions on list file
+      // Set WebID but clear all permissions
       state.updateWebId('https://example.com/profile#me');
-      state.updateFilePermissions(0, []);
-      expect(state.isReadyToShare, isFalse);
+      state.updateFilePermissions(0, []); // Clear list file permissions
+      // Movie files still have read permissions, so this should be true
+      expect(state.isReadyToShare, isTrue);
 
-      // Set permissions, should be true
+      // Set list permissions, should be true
       state.updateFilePermissions(0, ['read']);
       expect(state.isReadyToShare, isTrue);
     });

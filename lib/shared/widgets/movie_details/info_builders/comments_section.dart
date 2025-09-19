@@ -22,6 +22,7 @@ class CommentsSection {
     required bool commentsSaved,
     required VoidCallback onSaveComments,
     required VoidCallback onClearComments,
+    required bool hasTextInField, // Add this parameter to track text changes
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,19 +97,22 @@ class CommentsSection {
               const Gap(Gaps.s),
               Row(
                 children: [
-                  if (commentsController.text.isNotEmpty)
+                  if (hasTextInField)
                     ElevatedButton.icon(
                       onPressed: onSaveComments,
                       icon: const Icon(Icons.save, size: 16),
                       label: const Text('Save'),
                       style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
+                          horizontal: 16,
+                          vertical: 10,
                         ),
                       ),
                     ),
-                  if (commentsController.text.isNotEmpty) const Gap(Gaps.s),
+                  if (hasTextInField) const Gap(Gaps.s),
                   if (comments != null && comments.isNotEmpty)
                     TextButton.icon(
                       onPressed: onClearComments,

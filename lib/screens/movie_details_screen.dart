@@ -37,7 +37,7 @@ import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/shared/widgets/movie_details/action_buttons.dart';
 import 'package:moviestar/shared/widgets/movie_details/add_to_lists_dialog.dart';
-import 'package:moviestar/shared/widgets/movie_details/info_section.dart';
+import 'package:moviestar/shared/widgets/movie_details/info_section_without_title.dart';
 import 'package:moviestar/shared/widgets/movie_details/poster_section.dart';
 import 'package:moviestar/widgets/movie_sharing_ui.dart';
 

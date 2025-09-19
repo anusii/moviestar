@@ -1,5 +1,5 @@
-/// Movie Info Section for Movie Details Screen.
-/// Decomposed version using helper classes to reduce file size.
+/// Movie Info Section without title for Movie Details Screen.
+/// Extracted to reduce file size and avoid code duplication.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -23,9 +23,9 @@ import 'package:moviestar/shared/widgets/movie_details/info_builders/comments_se
 import 'package:moviestar/shared/widgets/movie_details/info_builders/movie_info.dart';
 import 'package:moviestar/shared/widgets/movie_details/info_builders/rating_section.dart';
 
-/// A widget that displays the main info section of a movie details screen.
-/// This component shows the title, rating, content type, and personal sections.
-class MovieInfoSection extends StatefulWidget {
+/// A widget that displays the movie info section without the title.
+/// Used when the title is displayed separately with action buttons.
+class MovieInfoSectionWithoutTitle extends StatefulWidget {
   /// The movie to display.
   final Movie movie;
 
@@ -38,8 +38,8 @@ class MovieInfoSection extends StatefulWidget {
   /// Shared movie data if applicable.
   final Map<String, dynamic>? sharedMovieData;
 
-  /// Creates a new [MovieInfoSection] widget.
-  const MovieInfoSection({
+  /// Creates a new [MovieInfoSectionWithoutTitle] widget.
+  const MovieInfoSectionWithoutTitle({
     super.key,
     required this.movie,
     required this.favoritesService,
@@ -48,10 +48,12 @@ class MovieInfoSection extends StatefulWidget {
   });
 
   @override
-  State<MovieInfoSection> createState() => _MovieInfoSectionState();
+  State<MovieInfoSectionWithoutTitle> createState() =>
+      _MovieInfoSectionWithoutTitleState();
 }
 
-class _MovieInfoSectionState extends State<MovieInfoSection> {
+class _MovieInfoSectionWithoutTitleState
+    extends State<MovieInfoSectionWithoutTitle> {
   double? _personalRating;
   String? _personalComments;
   bool _ratingSaved = false;
@@ -241,11 +243,7 @@ class _MovieInfoSectionState extends State<MovieInfoSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Movie title (action buttons will be added at screen level)
-        MovieInfoBuilder.buildTitle(context, widget.movie),
-        const Gap(Gaps.m),
-
-        // Rating and content type row
+        // Rating and content type row (no title)
         RatingSection.buildRatingRow(
           context,
           contentType: contentTypeInfo['text'],

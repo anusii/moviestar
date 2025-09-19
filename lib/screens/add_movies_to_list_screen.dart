@@ -275,7 +275,6 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     );
   }
 
-
   // Builds the suggestions tab content.
 
   Widget _buildSuggestionsTab() {
@@ -346,7 +345,6 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
       ],
     );
   }
-
 
   @override
   Widget build(BuildContext context) {

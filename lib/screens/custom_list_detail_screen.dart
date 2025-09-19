@@ -37,9 +37,9 @@ import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/custom_list_detail/dialog_builders.dart';
 import 'package:moviestar/screens/custom_list_detail/movie_loader.dart';
-import 'package:moviestar/screens/custom_list_detail/sharing_helper.dart';
 import 'package:moviestar/shared/widgets/custom_list_detail/list_header_widget.dart';
 import 'package:moviestar/shared/widgets/custom_list_detail/list_movie_grid.dart';
+import 'package:moviestar/shared/widgets/lists/list_sharing_handler.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 
 /// A screen that displays the detailed view of a custom movie list.
@@ -263,41 +263,43 @@ Recipients will be able to:
                 : null,
           ),
         ),
-        // Add padding to move the button away from the right edge to avoid debug banner.
-        Padding(
-          padding: const EdgeInsets.only(right: 60),
-          child: IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: _showListOptions,
-          ),
+        IconButton(
+          icon: const Icon(Icons.more_vert),
+          onPressed: _showListOptions,
         ),
       ],
-      body: Column(
-        children: [
-          // List info header.
-          ListHeaderWidget(
-            customList: _currentList,
-            totalMovies: _currentList.movieIds.length,
-            loadedMovies: _moviesMap.length,
-            onOptionsPressed: _showListOptions,
-          ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // List info header.
+            ListHeaderWidget(
+              customList: _currentList,
+              totalMovies: _currentList.movieIds.length,
+              loadedMovies: _moviesMap.length,
+              showTitle: false,
+              showOptions: false,
+            ),
 
-          // Movies list.
-          Expanded(
-            child: _currentList.movieIds.isEmpty
-                ? _buildEmptyState()
-                : ListMovieGrid(
-                    movieIds: _currentList.movieIds,
-                    moviesMap: _moviesMap,
-                    loadingMovieIds: _loadingMovieIds,
-                    failedMovieIds: _failedMovieIds,
-                    onRemoveMovie: _removeMovieFromList,
-                    onRetryLoad: _retryLoadMovie,
-                    onRefresh: _loadMovies,
-                    favoritesService: widget.favoritesService,
-                  ),
-          ),
-        ],
+            const SizedBox(height: 8),
+
+            // Movies list.
+            Expanded(
+              child: _currentList.movieIds.isEmpty
+                  ? _buildEmptyState()
+                  : ListMovieGrid(
+                      movieIds: _currentList.movieIds,
+                      moviesMap: _moviesMap,
+                      loadingMovieIds: _loadingMovieIds,
+                      failedMovieIds: _failedMovieIds,
+                      onRemoveMovie: _removeMovieFromList,
+                      onRetryLoad: _retryLoadMovie,
+                      onRefresh: _loadMovies,
+                      favoritesService: widget.favoritesService,
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -367,17 +369,14 @@ Recipients will be able to:
   // Shares the custom list and all movies using batch sharing UI.
 
   Future<void> _shareCustomList() async {
-    final moviesToShare = _currentList.movieIds
-        .map((id) => _moviesMap[id])
-        .where((movie) => movie != null)
-        .cast<Movie>()
-        .toList();
-
-    CustomListSharingHelper.showSharingDialog(
-      context,
-      _currentList,
-      moviesToShare,
-      widget,
+    final sharingHandler = ListSharingHandler(
+      context: context,
+      widget: widget,
+      ref: ref,
+      favoritesService: widget.favoritesService,
+      screenState: this,
     );
+
+    await sharingHandler.shareCustomList(_currentList);
   }
 }

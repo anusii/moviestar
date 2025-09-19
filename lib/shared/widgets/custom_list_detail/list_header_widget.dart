@@ -19,14 +19,18 @@ class ListHeaderWidget extends ConsumerWidget {
   final CustomList customList;
   final int totalMovies;
   final int loadedMovies;
-  final VoidCallback onOptionsPressed;
+  final VoidCallback? onOptionsPressed;
+  final bool showTitle;
+  final bool showOptions;
 
   const ListHeaderWidget({
     super.key,
     required this.customList,
     required this.totalMovies,
     required this.loadedMovies,
-    required this.onOptionsPressed,
+    this.onOptionsPressed,
+    this.showTitle = true,
+    this.showOptions = true,
   });
 
   @override
@@ -34,28 +38,31 @@ class ListHeaderWidget extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // List name and options
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                customList.name,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.more_vert),
-              onPressed: onOptionsPressed,
-              tooltip: 'List Options',
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 8),
+        // List name and options (conditionally shown)
+        if (showTitle || showOptions) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (showTitle)
+                Expanded(
+                  child: Text(
+                    customList.name,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              if (showOptions && onOptionsPressed != null)
+                IconButton(
+                  icon: const Icon(Icons.more_vert),
+                  onPressed: onOptionsPressed,
+                  tooltip: 'List Options',
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+        ],
 
         // List description with tooltip if it's long
         if (customList.description?.isNotEmpty == true) ...[
@@ -109,7 +116,7 @@ class ListHeaderWidget extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                totalMovies == 1 ? '1 movie' : '$totalMovies movies',
+                totalMovies == 1 ? '1 item' : '$totalMovies items',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                       fontWeight: FontWeight.w500,

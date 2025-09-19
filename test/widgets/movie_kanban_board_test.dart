@@ -15,6 +15,7 @@ import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/widgets/movie_kanban_board.dart';
+import 'package:moviestar/shared/widgets/kanban/skeleton_column.dart';
 import 'package:rxdart/rxdart.dart';
 
 // Mock FavoritesService for testing
@@ -435,8 +436,8 @@ void main() {
     testWidgets('should handle loading states', (WidgetTester tester) async {
       await tester.pumpWidget(createKanbanBoard());
 
-      // Initially should show loading or empty state
-      expect(find.byType(CircularProgressIndicator), findsWidgets);
+      // Initially should show skeleton loading or kanban board
+      expect(find.byType(KanbanColumnSkeleton), findsWidgets);
     });
 
     testWidgets('should handle multiple movies in same column',

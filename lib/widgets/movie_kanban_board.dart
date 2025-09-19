@@ -11,9 +11,8 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gap/gap.dart';
 
-import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
 import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
@@ -27,7 +26,10 @@ import 'package:moviestar/shared/widgets/kanban/column_widget.dart';
 import 'package:moviestar/shared/widgets/kanban/drag_handler.dart';
 import 'package:moviestar/shared/widgets/kanban/search_filter.dart';
 import 'package:moviestar/shared/widgets/kanban/settings_panel.dart';
+import 'package:moviestar/shared/widgets/kanban/skeleton_column.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
+import 'package:moviestar/widgets/kanban_stream_builder.dart';
+import 'package:moviestar/widgets/movie_kanban_board/operation_indicator.dart';
 
 /// Custom Kanban board widget for displaying movies in columns.
 /// Now serves as an orchestrator for the extracted kanban components.
@@ -187,61 +189,12 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
             // Floating operation queue indicator (no layout shift)
             if (_kanbanController.operationQueue.isNotEmpty)
-              _buildFloatingOperationIndicator(),
+              KanbanOperationIndicator(
+                queueCount: _kanbanController.operationQueue.length,
+              ),
           ],
         );
       },
-    );
-  }
-
-  /// Build floating operation queue indicator (no layout shift).
-  Widget _buildFloatingOperationIndicator() {
-    final queue = _kanbanController.operationQueue;
-    if (queue.isEmpty) return const SizedBox.shrink();
-
-    return Positioned(
-      top: 16,
-      right: 16,
-      child: Material(
-        elevation: 4,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Dimensions.m,
-            vertical: Dimensions.s,
-          ),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color:
-                  Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: 12,
-                height: 12,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-              ),
-              const Gap(Dimensions.s),
-              Text(
-                '${queue.length}',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -256,29 +209,20 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
               ref.watch(popularMoviesWithCacheInfoProvider);
           return popularMoviesAsync.when(
             data: (popularCacheResult) {
-              return StreamBuilder<List<Movie>>(
-                stream: widget.favoritesService.toWatchMovies,
-                builder: (context, toWatchSnapshot) {
-                  return StreamBuilder<List<Movie>>(
-                    stream: widget.favoritesService.watchedMovies,
-                    builder: (context, watchedSnapshot) {
-                      return StreamBuilder<List<CustomList>>(
-                        stream: widget.favoritesService.customLists,
-                        builder: (context, customListsSnapshot) {
-                          return _buildKanbanColumns(
-                            popularCacheResult,
-                            toWatchSnapshot,
-                            watchedSnapshot,
-                            customListsSnapshot,
-                          );
-                        },
-                      );
-                    },
-                  );
-                },
+              return KanbanStreamBuilder(
+                favoritesService: widget.favoritesService,
+                popularCacheResult: popularCacheResult,
+                builder: _buildKanbanColumns,
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => KanbanStreamBuilder(
+              favoritesService: widget.favoritesService,
+              popularCacheResult: CacheResult<List<Movie>>(
+                data: <Movie>[],
+                fromCache: false,
+              ),
+              builder: _buildKanbanColumns,
+            ),
             error: (error, stackTrace) {
               return ErrorDisplayWidget(
                 message: 'Error loading movies: $error',
@@ -298,6 +242,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     AsyncSnapshot<List<Movie>> toWatchSnapshot,
     AsyncSnapshot<List<Movie>> watchedSnapshot,
     AsyncSnapshot<List<CustomList>> customListsSnapshot,
+    KanbanLoadingData loadingData,
   ) {
     final popularMovies = popularCacheResult.data ?? <Movie>[];
     final toWatchMovies = toWatchSnapshot.data ?? [];
@@ -349,9 +294,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           isLoading: !watchedSnapshot.hasData,
         ),
 
-        // Custom list columns
-        ...customLists
-            .map((customList) => _buildUnifiedCustomListColumn(customList)),
+        // Custom list columns with skeleton support and smooth transitions
+        ..._buildCustomListColumnsWithTransitions(customLists, loadingData),
       ],
     );
   }
@@ -406,5 +350,43 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
         );
       },
     );
+  }
+
+  /// Build custom list columns with smooth transitions from skeleton to real content.
+  List<Widget> _buildCustomListColumnsWithTransitions(
+    List<CustomList> customLists,
+    KanbanLoadingData loadingData,
+  ) {
+    // If we're in initial loading and have no custom lists yet, show skeleton columns
+    if (loadingData.showSkeletonColumns) {
+      return [
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: KanbanColumnSkeleton(
+            key: const ValueKey('skeleton_1'),
+            title: 'Loading Lists...',
+            itemCount: 2,
+          ),
+        ),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: KanbanColumnSkeleton(
+            key: const ValueKey('skeleton_2'),
+            title: 'Loading Lists...',
+            itemCount: 1,
+          ),
+        ),
+      ];
+    }
+
+    // Show actual custom list columns with smooth transitions
+    return customLists
+        .map(
+          (customList) => AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: _buildUnifiedCustomListColumn(customList),
+          ),
+        )
+        .toList();
   }
 }

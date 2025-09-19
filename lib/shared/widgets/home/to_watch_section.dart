@@ -274,6 +274,17 @@ class HomeToWatchSection extends ConsumerWidget {
     return StreamBuilder<List<Movie>>(
       stream: favoritesService.toWatchMovies,
       builder: (context, snapshot) {
+        // Check if the service is a FavoritesServiceAdapter with caching.
+        final isCached = favoritesService is FavoritesServiceAdapter;
+        bool fromCache = false;
+
+        if (isCached) {
+          final adapter = favoritesService as FavoritesServiceAdapter;
+          final cacheStats = adapter.getCacheStats();
+          final toWatchStats = cacheStats['toWatch'];
+          fromCache = toWatchStats?['valid'] ?? false;
+        }
+
         if (snapshot.hasError) {
           return Padding(
             padding: const EdgeInsets.all(16),
@@ -319,7 +330,7 @@ class HomeToWatchSection extends ConsumerWidget {
             child: Text('No movies in your watchlist'),
           );
         }
-        return buildMovieListItems(movies.take(5).toList(), false);
+        return buildMovieListItems(movies.take(5).toList(), fromCache);
       },
     );
   }

@@ -65,11 +65,8 @@ class FavoritesServiceManager extends ChangeNotifier {
       await _enablePodService();
     } else {}
 
-    // Don't initialize custom lists stream immediately for POD - let POD service handle it
-    // when it finishes loading. For local service, do it now.
-    if (!_isPodStorageEnabled || _podService == null) {
-      await _updateCustomListsStream();
-    }
+    // Initialize custom lists stream immediately for better UX - POD service now loads concurrently
+    await _updateCustomListsStream();
 
     notifyListeners();
   }

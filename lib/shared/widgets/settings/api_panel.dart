@@ -100,27 +100,50 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
     if (!context.mounted) return;
 
     if (mounted) {
-      // Invalidate all movie providers to force refresh with new API key.
-      // IMPORTANT: Must invalidate apiKeyProvider first so dependent providers refresh
+      // Invalidate providers in correct order for immediate effect
+      // IMPORTANT: Invalidate core providers first, then dependent ones
+      ref.invalidate(directApiKeyProvider);
       ref.invalidate(apiKeyProvider);
+
+      // Allow time for core providers to refresh
+      await Future.delayed(const Duration(milliseconds: 50));
+
+      if (!mounted) return;
+
+      // Clear cache to force fresh data with new API key
+      try {
+        final cachedService = ref.read(configuredCachedMovieServiceProvider);
+        await cachedService.clearAllCache();
+      } catch (e) {
+        // Log but don't fail - provider invalidation will still work
+      }
+
+      // Now invalidate all dependent movie providers
+      ref.invalidate(movieServiceProvider);
+      ref.invalidate(contentServiceProvider);
       ref.invalidate(popularMoviesWithCacheInfoProvider);
       ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
       ref.invalidate(topRatedMoviesWithCacheInfoProvider);
       ref.invalidate(upcomingMoviesWithCacheInfoProvider);
-      ref.invalidate(movieServiceProvider);
-      ref.invalidate(contentServiceProvider);
+      ref.invalidate(configuredCachedMovieServiceProvider);
 
-      // Give providers time to refresh before showing success message
-      await Future.delayed(const Duration(milliseconds: 100));
+      // Give providers time to refresh for immediate UI update
+      await Future.delayed(const Duration(milliseconds: 150));
 
       if (!mounted) return;
 
       // Show success message.
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('API key saved successfully'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: Text(
+              _apiKeyController.text.trim().isEmpty
+                  ? 'API key cleared - movie data will no longer load'
+                  : 'API key saved - movie data will now refresh',
+            ),
+            backgroundColor: _apiKeyController.text.trim().isEmpty
+                ? Colors.orange
+                : Colors.green,
           ),
         );
 

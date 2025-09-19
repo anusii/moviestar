@@ -76,8 +76,8 @@ class PodFavoritesService extends BasePodService {
       safeReadFile,
     );
 
-    // Initialize by loading favorites from POD
-    loadFavorites().then((_) {
+    // Initialize by loading favorites and custom lists concurrently
+    _initializeConcurrently().then((_) {
       // Notify manager that initial loading is complete
       if (_onInitialLoadComplete != null) {
         _onInitialLoadComplete();
@@ -111,6 +111,14 @@ class PodFavoritesService extends BasePodService {
   /// Current watched list.
   List<Movie> get watched => _streamManager.watched;
 
+  /// Initialize favorites and custom lists concurrently for better performance.
+  Future<void> _initializeConcurrently() async {
+    await Future.wait([
+      loadFavorites(),
+      _listOperations.loadCustomLists(),
+    ]);
+  }
+
   /// Loads the user's favorites from POD.
   Future<void> loadFavorites() async {
     await executePodOperation(
@@ -120,7 +128,7 @@ class PodFavoritesService extends BasePodService {
         _streamManager.updateToWatch(favoritesData['toWatch'] ?? []);
         _streamManager.updateWatched(favoritesData['watched'] ?? []);
 
-        await _listOperations.loadCustomLists();
+        // Custom lists are now loaded concurrently in _initializeConcurrently
         return null;
       },
       operationName: 'loadFavorites',

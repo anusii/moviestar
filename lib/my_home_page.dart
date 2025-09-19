@@ -37,7 +37,10 @@ import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/core/services/favorites/service_adapter.dart';
 import 'package:moviestar/core/services/favorites/service_manager.dart';
 import 'package:moviestar/moviestar.dart';
-import 'package:moviestar/providers/cached_movie_service_provider.dart';
+import 'package:moviestar/providers/cached_movie_service_provider.dart'
+    hide directApiKeyProvider;
+import 'package:moviestar/providers/cached_movie_service_provider/provider_definitions.dart'
+    show directApiKeyProvider;
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/enhanced_search_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
@@ -165,13 +168,22 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     }
   }
 
-  void _onApiKeyChanged() {
+  Future<void> _onApiKeyChanged() async {
+    if (!mounted) return;
+
     // When API key changes, update the movie service.
     final movieService = ref.read(movieServiceProvider);
     movieService.updateApiKey();
 
-    // Invalidate all movie providers to force refresh with new API key.
+    // Clear cache to force fresh data with new API key
+    try {
+      final cachedService = ref.read(configuredCachedMovieServiceProvider);
+      await cachedService.clearAllCache();
+    } catch (e) {
+      // Log but don't fail - provider invalidation will still work
+    }
 
+    // Invalidate all movie providers to force refresh with new API key.
     ref.invalidate(popularMoviesWithCacheInfoProvider);
     ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
     ref.invalidate(topRatedMoviesWithCacheInfoProvider);
@@ -179,14 +191,15 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     ref.invalidate(configuredCachedMovieServiceProvider);
 
     // Rebuild screens to ensure they have the latest data.
+    if (mounted) {
+      setState(() {
+        _buildScreens();
+      });
 
-    setState(() {
-      _buildScreens();
-    });
+      // Force refresh by rebuilding.
 
-    // Force refresh by rebuilding.
-
-    setState(() {});
+      setState(() {});
+    }
   }
 
   void _buildScreens() {
@@ -345,23 +358,56 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   void _handleSettings() {
     // Show Settings by replacing the body content
-    setState(() {
-      _showSettings = true;
-    });
+    if (mounted) {
+      setState(() {
+        _showSettings = true;
+      });
+    }
   }
 
   /// Reinitializes the app after API key is set.
   Future<void> reinitializeAfterApiKey() async {
+    if (!mounted) return;
+
+    // Invalidate all providers immediately to trigger API key refresh
+    ref.invalidate(directApiKeyProvider);
+    ref.invalidate(apiKeyProvider);
+
+    // Allow time for core providers to refresh
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    if (!mounted) return;
+
+    // Clear cache to force fresh data with new API key
+    try {
+      final cachedService = ref.read(configuredCachedMovieServiceProvider);
+      await cachedService.clearAllCache();
+    } catch (e) {
+      // Log but don't fail - provider invalidation will still work
+    }
+
+    // Invalidate all movie providers for immediate refresh
+    ref.invalidate(movieServiceProvider);
+    ref.invalidate(contentServiceProvider);
+    ref.invalidate(popularMoviesWithCacheInfoProvider);
+    ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+    ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+    ref.invalidate(upcomingMoviesWithCacheInfoProvider);
+    ref.invalidate(configuredCachedMovieServiceProvider);
+
+    // Re-initialize app data
     await _initialiseAppData();
   }
 
   /// Handles menu tab selection.
 
   void _onTabSelected(int index) {
-    setState(() {
-      _selectedTabIndex = index;
-      _showSettings = false; // Hide Settings when navigating to other tabs
-    });
+    if (mounted) {
+      setState(() {
+        _selectedTabIndex = index;
+        _showSettings = false; // Hide Settings when navigating to other tabs
+      });
+    }
   }
 
   @override
@@ -377,23 +423,19 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       avatarIcon: Icons.account_circle,
     );
 
-    // Create loading overlay if needed.
-
-    final loadingOverlay = _isLoadingFolders
-        ? const Center(child: CircularProgressIndicator())
-        : null;
-
     final solidScaffold = SolidScaffold(
       menu: _menuItems,
       selectedIndex: _selectedTabIndex,
       onMenuSelected: _onTabSelected,
       appBar: SolidAppBarConfig(
         title: 'MovieStar',
-        versionConfig: SolidVersionConfig(
-          changelogUrl:
-              'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
-          showDate: true,
-        ),
+        versionConfig: mounted
+            ? SolidVersionConfig(
+                changelogUrl:
+                    'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
+                showDate: true,
+              )
+            : null,
         actions: SolidScaffoldConfig.createAppBarActions(
           ref: ref,
           onViewModeToggle: _handleViewModeToggle,
@@ -456,11 +498,17 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         enabled: true,
         showInAppBarActions: true,
       ),
-      child: loadingOverlay,
     );
 
-    // Return Settings screen overlay if Settings is active, otherwise return SolidScaffold
-    return _showSettings ? _buildSettingsOverlay(solidScaffold) : solidScaffold;
+    // Return appropriate widget with proper loading overlay
+    if (_showSettings) {
+      return _buildSettingsOverlay(solidScaffold);
+    }
+
+    // Individual components handle their own loading states
+    // Removed full-screen loading overlay to prevent sudden loading indicator
+
+    return solidScaffold;
   }
 
   /// Builds the Settings screen as an overlay on top of the SolidScaffold.
@@ -473,9 +521,11 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                setState(() {
-                  _showSettings = false;
-                });
+                if (mounted) {
+                  setState(() {
+                    _showSettings = false;
+                  });
+                }
               },
             ),
           ),

@@ -62,30 +62,79 @@ class MovieListBuilder {
 
   /// Build loading state widget.
   static Widget buildLoadingState(BuildContext context, String title) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+    return _buildSkeletonLoadingState(context, title);
+  }
+
+  /// Build skeleton-style loading state for consistent kanban column loading UX.
+  static Widget _buildSkeletonLoadingState(BuildContext context, String title) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(8),
+      itemCount: 3,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: _buildLoadingMovieItem(context),
+        );
+      },
+    );
+  }
+
+  /// Build a loading skeleton for a movie item.
+  static Widget _buildLoadingMovieItem(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      height: 80,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
         children: [
-          SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                Theme.of(context).colorScheme.primary,
-              ),
+          // Poster skeleton
+          Container(
+            width: 50,
+            height: 70,
+            margin: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(4),
             ),
           ),
           const Gap(8),
-          Text(
-            'Loading $title...',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.7),
+          // Text content skeleton
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Title skeleton
+                Container(
+                  height: 16,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
+                const Gap(4),
+                // Subtitle skeleton
+                Container(
+                  height: 12,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.07),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
+            ),
           ),
+          const Gap(8),
         ],
       ),
     );

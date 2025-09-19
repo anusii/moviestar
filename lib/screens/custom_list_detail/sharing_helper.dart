@@ -77,7 +77,7 @@ class CustomListSharingHelper {
 
       final movieDataList = movies.map((movie) {
         final movieContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
-            movie, null, null);
+            movie, null, null,);
         final base64Content = base64Encode(utf8.encode(movieContent));
         return {
           'id': movie.id,

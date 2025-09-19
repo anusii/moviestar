@@ -54,7 +54,7 @@ class ErrorMapperService {
   }) async {
     try {
       return await SmartErrorDetection.mapErrorSmart(error, stackTrace,
-          context: context);
+          context: context,);
     } catch (e) {
       // Fall back to traditional error mapping
       return _mapErrorTraditionally(error, stackTrace, context);
@@ -73,7 +73,7 @@ class ErrorMapperService {
       return ExceptionMappers.mapNetworkException(error, stackTrace, actions);
     } else if (error is http.ClientException) {
       return ExceptionMappers.mapHttpClientException(
-          error, stackTrace, actions);
+          error, stackTrace, actions,);
     } else if (error is SocketException) {
       return ExceptionMappers.mapSocketException(error, stackTrace, actions);
     } else if (error is FormatException) {

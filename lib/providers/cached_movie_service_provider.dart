@@ -240,4 +240,3 @@ final configuredCachedMovieServiceProvider =
 
   return cachedService;
 });
-

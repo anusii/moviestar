@@ -83,8 +83,6 @@ class KanbanDragHandler {
     );
   }
 
-
-
   /// Show context menu for movie copy operations.
   void showMovieContextMenu(
     Offset position,
@@ -105,7 +103,6 @@ class KanbanDragHandler {
     );
   }
 
-
   /// Handle context menu action with optimistic UI updates.
   Future<void> _handleContextMenuAction(
     String action,
@@ -122,7 +119,8 @@ class KanbanDragHandler {
 
     if (action == 'remove') {
       controller.removeOptimisticMovie(sourceType, sourceId, movie);
-    } else if (actionData.targetType != null && actionData.targetListId != null) {
+    } else if (actionData.targetType != null &&
+        actionData.targetListId != null) {
       controller.addOptimisticMovie(
         actionData.targetType!,
         actionData.targetListId!,
@@ -151,5 +149,4 @@ class KanbanDragHandler {
       operationId,
     );
   }
-
 }

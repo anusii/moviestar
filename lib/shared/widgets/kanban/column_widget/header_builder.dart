@@ -174,7 +174,8 @@ class HeaderBuilder {
           size: 18,
           color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
-        onSelected: (criteria) => controller.onSortChanged(categoryId, criteria),
+        onSelected: (criteria) =>
+            controller.onSortChanged(categoryId, criteria),
         itemBuilder: (context) {
           final currentSort = controller.columnSortCriteria[categoryId] ??
               MovieSortCriteria.nameAsc;

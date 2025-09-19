@@ -46,7 +46,11 @@ class FetchOperations {
       // First, try to find the individual file in the shared resources
       String? actualSharedUrl =
           await UrlHandlers.findIndividualFileInSharedResources(
-              context, widget, movieId, providedFilePath,);
+        context,
+        widget,
+        movieId,
+        providedFilePath,
+      );
 
       if (actualSharedUrl != null) {
         if (!context.mounted) return {};
@@ -63,10 +67,12 @@ class FetchOperations {
             movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
             movieFileContent is String &&
             movieFileContent.isNotEmpty) {
-          final isTvShow = UrlHandlers.isTelevisionShow(providedFilePath, actualSharedUrl);
+          final isTvShow =
+              UrlHandlers.isTelevisionShow(providedFilePath, actualSharedUrl);
 
           // Parse and return the enhanced data
-          final parsedData = await DataParser.parseIndividualMovieData(movieFileContent);
+          final parsedData =
+              await DataParser.parseIndividualMovieData(movieFileContent);
 
           if (parsedData != null || isTvShow) {
             final enhancedData = Map<String, dynamic>.from(movieData);
@@ -181,7 +187,8 @@ class FetchOperations {
     }
 
     // Parse the movie/TV show file content to extract rating and comments.
-    final parsedData = await DataParser.parseIndividualMovieData(movieFileContent);
+    final parsedData =
+        await DataParser.parseIndividualMovieData(movieFileContent);
 
     if (parsedData != null || isTvShow) {
       // Merge the parsed data with the original movie data.

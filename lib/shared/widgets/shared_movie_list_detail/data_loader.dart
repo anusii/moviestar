@@ -63,7 +63,8 @@ class SharedListDataLoader {
             final contentType = enhancedData['content_type'] ?? 'movie';
 
             // Check if we got an actual title from the TTL file
-            String? actualTitle = DataParser.extractTitleFromEnhancedData(enhancedData);
+            String? actualTitle =
+                DataParser.extractTitleFromEnhancedData(enhancedData);
 
             if (actualTitle != null) {
               // We have the actual title from the shared file

@@ -54,8 +54,9 @@ class ListOperations {
     bool add,
   ) async {
     if (add) {
-      final contentType =
-          originalContentItem.contentType == ContentType.tvShow ? 'tv' : 'movie';
+      final contentType = originalContentItem.contentType == ContentType.tvShow
+          ? 'tv'
+          : 'movie';
       await favoritesService.addMovieToCustomList(
         listId,
         movie,

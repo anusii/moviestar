@@ -62,7 +62,8 @@ class _AddToCustomListsDialogState extends State<AddToCustomListsDialog> {
 
   Future<void> _loadCustomLists() async {
     try {
-      final lists = await ListOperations.loadCustomLists(widget.favoritesService);
+      final lists =
+          await ListOperations.loadCustomLists(widget.favoritesService);
       setState(() {
         _customLists = lists;
       });
@@ -88,7 +89,8 @@ class _AddToCustomListsDialogState extends State<AddToCustomListsDialog> {
 
   Future<void> _refreshCustomListCounts() async {
     try {
-      final lists = await ListOperations.loadCustomLists(widget.favoritesService);
+      final lists =
+          await ListOperations.loadCustomLists(widget.favoritesService);
       setState(() {
         _customLists = lists;
       });
@@ -160,7 +162,6 @@ class _AddToCustomListsDialogState extends State<AddToCustomListsDialog> {
       ),
     );
   }
-
 
   void _showCreateNewListDialog() {
     DialogHelpers.showCreateNewListDialog(

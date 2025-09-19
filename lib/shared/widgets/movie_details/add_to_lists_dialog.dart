@@ -130,7 +130,8 @@ class _AddToListsDialogState extends State<AddToListsDialog> {
                           isSelected,
                           _isLoading,
                           _getUpdatedMovieCount(list),
-                          (value) => _toggleMovieInList(list.id, value ?? false),
+                          (value) =>
+                              _toggleMovieInList(list.id, value ?? false),
                         );
                       },
                     )

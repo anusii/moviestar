@@ -15,10 +15,10 @@ import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/utils/movie_sort_util.dart';
-import 'package:moviestar/widgets/sort_controls.dart';
 import 'package:moviestar/shared/widgets/kanban/column_widget/header_builder.dart';
 import 'package:moviestar/shared/widgets/kanban/column_widget/movie_list_builder.dart';
+import 'package:moviestar/utils/movie_sort_util.dart';
+import 'package:moviestar/widgets/sort_controls.dart';
 
 import 'board_controller.dart';
 

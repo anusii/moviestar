@@ -14,12 +14,12 @@ import 'package:solidpod/solidpod.dart' show getWebId;
 
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
 import 'package:moviestar/models/movie.dart';
-
 // Import providers from main file to resolve dependencies
-import 'package:moviestar/providers/cached_movie_service_provider.dart' show
-    configuredCachedMovieServiceProvider,
-    cachingEnabledProvider,
-    cacheOnlyModeProvider;
+import 'package:moviestar/providers/cached_movie_service_provider.dart'
+    show
+        configuredCachedMovieServiceProvider,
+        cachingEnabledProvider,
+        cacheOnlyModeProvider;
 
 /// Direct API key provider that accesses secure storage without service dependency
 final directApiKeyProvider = FutureProvider<String?>((ref) async {

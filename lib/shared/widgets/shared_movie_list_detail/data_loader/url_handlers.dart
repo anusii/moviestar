@@ -97,7 +97,8 @@ class UrlHandlers {
         urlsToTry.add('${ownerBaseUrl}moviestar/data/movies/$providedFilePath');
       }
       if (sharerBaseUrl != null && sharerBaseUrl != ownerBaseUrl) {
-        urlsToTry.add('${sharerBaseUrl}moviestar/data/movies/$providedFilePath');
+        urlsToTry
+            .add('${sharerBaseUrl}moviestar/data/movies/$providedFilePath');
       }
     } else {
       // Fall back to trying both patterns on both PODs

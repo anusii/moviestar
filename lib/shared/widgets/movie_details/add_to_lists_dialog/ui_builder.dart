@@ -72,10 +72,8 @@ class UiBuilder {
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.close),
             style: IconButton.styleFrom(
-              backgroundColor: Theme.of(context)
-                  .colorScheme
-                  .surface
-                  .withValues(alpha: 0.8),
+              backgroundColor:
+                  Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
             ),
           ),
         ],

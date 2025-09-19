@@ -193,9 +193,8 @@ class UiBuilders {
         ),
         value: isSelected,
         activeColor: Theme.of(context).colorScheme.primary,
-        onChanged: isLoading
-            ? null
-            : (value) => onToggleList(list.id, value ?? false),
+        onChanged:
+            isLoading ? null : (value) => onToggleList(list.id, value ?? false),
       ),
     );
   }

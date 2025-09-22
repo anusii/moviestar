@@ -11,6 +11,8 @@ HOST=solidcommunity.au
 FLDR=/var/www/html/installers/
 DEST=${HOST}:${FLDR}
 
+ssh ${HOST} 'if [ ! -d ${FLDR} ]; then mkdir ${FLDR}; chown gjw:gjw ${FLDR}; fi'
+
 # From the recent 'Build Installers' workflows, identify the 'Bump
 # version' pushes to the repository and get the latest one as the one
 # we want to download the artefacts.
@@ -105,7 +107,24 @@ if [[ "${status}" == "completed" && "${conclusion}" == "success" ]]; then
 
     echo ""
 
-    echo '***** UPLOAD MACOS'
+    echo '***** UPLOAD MACOS DMG'
+
+    ## gh run download ${bumpId} --name ${APP}-macos-zip
+
+    artifactId=$(gh api -H "Accept: application/vnd.github+json" /repos/${REP}/${APP}/actions/artifacts \
+		    --jq '.artifacts[] | select(.name | endswith("-macos-dmg")) | .id' | head -n 1)
+    echo "artifact id: $artifactId"
+    gh api -H "Accept: application/vnd.github+json" repos/${REP}/${APP}/actions/artifacts/${artifactId}/zip > artifact.zip
+    unzip artifact.zip
+    rm -f artifact.zip
+
+    rsync -avzh ${APP}-dev-macos-unsigned.dmg ${DEST}
+    mv ${APP}-dev-macos-unsigned.dmg ARCHIVE/${APP}_${version}_macos_unsigned.dmg
+    ssh ${HOST} "cd ${FLDR}; chmod a+r ${APP}-dev-macos-unsigned.dmg"
+
+    echo ""
+
+    echo '***** UPLOAD MACOS ZIP'
 
     ## gh run download ${bumpId} --name ${APP}-macos-zip
 

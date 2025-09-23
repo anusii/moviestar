@@ -173,7 +173,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     // When API key changes, update the movie service.
     final movieService = ref.read(movieServiceProvider);
-    movieService.updateApiKey();
+    await movieService.updateApiKey();
 
     // Clear cache to force fresh data with new API key
     try {

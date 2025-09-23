@@ -25,6 +25,7 @@ au](https://solidcommunity.au/docs/moviestar)
 
 ## 0.1 First stable release
 
++ REFACTOR pod sharing [0.0.32 20250917 atangster]
 + Update SolidScaffold from solidui [0.0.31 20250913 tonypioneer]
 + Refactor code to reduce technical debt [0.0.30 20250910 atangster]
 + BUGs: TV mis-coded as MOVIE, API key fixes, Secret key fixes [0.0.29 20250910 atangster]

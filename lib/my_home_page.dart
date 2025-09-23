@@ -44,6 +44,7 @@ import 'package:moviestar/providers/cached_movie_service_provider/provider_defin
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/enhanced_search_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
+import 'package:moviestar/utils/create_solid_login.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/utils/show_api_key_dialog.dart';
@@ -354,6 +355,27 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     logoutPopup(context, const MovieStar());
   }
 
+  /// Handles the login action.
+
+  void _handleLogin() {
+    // Navigate to login page using createSolidLogin.
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: const Text('Login to Movie Star'),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+          body: createSolidLogin(context, widget.prefs),
+        ),
+      ),
+    );
+  }
+
   /// Handles the settings action.
 
   void _handleSettings() {
@@ -482,6 +504,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           webId: _webId,
           onTap: _handleLogout,
         ),
+        onLogin: _handleLogin,
         securityKeyStatus: SolidSecurityKeyStatus(
           isKeySaved: true,
           onTap: () => {

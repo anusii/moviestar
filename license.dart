@@ -1,8 +1,8 @@
 /// Moviestar - Manage and share ratings through private PODs.
 ///
-// Time-stamp: <Friday 2025-07-04 14:53:04 +1000 Graham Williams>
+// Time-stamp: <Wednesday 2025-09-17 09:19:18 +1000 Graham Williams>
 ///
-/// Copyright (C) 2025, Software Innovation Institute, ANU
+/// Copyright (C) 2025, Software Innovation Institute ANU
 ///
 /// Licensed under the GNU General Public License, Version 3 (the "License");
 ///
@@ -22,5 +22,8 @@
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
 /// Authors: AUTHORS
+
+// Add the library directive as we have doc entries above. We publish the above
+// meta doc lines in the docs.
 
 library;

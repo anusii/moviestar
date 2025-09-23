@@ -4,14 +4,19 @@
 #define MyAppName "MovieStar"
 #define MyAppVersion "dev-windows-inno"
 #define MyAppPublisher "ANU Software Innovation Institute"
-#define MyAppURL "https://pods.dev.solidcommunity.au/"
+#define MyAppURL "https://github.com/anusii/moviestar
 #define MyAppExeName "moviestar.exe"
 
 [Setup]
+;
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 ; (On Ubuntu run `uuidgen` to generate a unique AppId.)
+;
+; Also notice the consecutive "{" characters required, it seems. Looks
+; like it is for embedding a single "{" and not a constant.
+;
 AppId={{a11d20f0-a287-497b-a42d-59a5caf38187}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}

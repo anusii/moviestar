@@ -36,7 +36,7 @@ class KanbanSettings {
     this.cardWidth = 100,
     this.cardHeight = 150,
     this.defaultSortCriteria = const {
-      'popular': MovieSortCriteria.ratingDesc,
+      'recommended': MovieSortCriteria.ratingDesc,
       'towatch': MovieSortCriteria.nameAsc,
       'watched': MovieSortCriteria.dateDesc,
     },

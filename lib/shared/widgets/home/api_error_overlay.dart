@@ -55,7 +55,7 @@ class HomeApiErrorOverlay extends ConsumerWidget {
         StackTrace.current,
         () {
           // Retry by refreshing all providers.
-          ref.invalidate(popularMoviesWithCacheInfoProvider);
+          ref.invalidate(recommendedMoviesWithCacheInfoProvider);
           ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
           ref.invalidate(topRatedMoviesWithCacheInfoProvider);
           ref.invalidate(upcomingMoviesWithCacheInfoProvider);

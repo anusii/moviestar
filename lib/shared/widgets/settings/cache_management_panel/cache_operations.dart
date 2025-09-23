@@ -29,7 +29,7 @@ class CacheOperations {
       await cachedService.clearAllCache();
 
       // Invalidate providers that depend on cache state to refresh UI
-      ref.invalidate(popularMoviesWithCacheInfoProvider);
+      ref.invalidate(recommendedMoviesWithCacheInfoProvider);
       ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
       ref.invalidate(topRatedMoviesWithCacheInfoProvider);
       ref.invalidate(upcomingMoviesWithCacheInfoProvider);

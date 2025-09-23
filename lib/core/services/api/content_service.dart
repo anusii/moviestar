@@ -116,9 +116,9 @@ class ContentService {
 
   // MOVIE METHODS
 
-  // Gets a list of popular movies.
+  // Gets a list of recommended movies.
 
-  Future<List<ContentItem>> getPopularMovies() async {
+  Future<List<ContentItem>> getRecommendedMovies() async {
     await _ensureClientInitialized();
     final results = await _client!.getJsonList('movie/popular');
     return results.map((movie) => ContentItem.fromMovieJson(movie)).toList();
@@ -150,23 +150,23 @@ class ContentService {
 
   // TV SHOW METHODS
 
-  // Gets a list of popular TV shows.
+  // Gets a list of recommended TV shows.
 
-  Future<List<ContentItem>> getPopularTVShows() async {
+  Future<List<ContentItem>> getRecommendedTVShows() async {
     await _ensureClientInitialized();
     final results = await _client!.getJsonList('tv/popular');
     return results.map((tvShow) => ContentItem.fromTVJson(tvShow)).toList();
   }
 
-  // Gets a mixed list of popular movies and TV shows for better content diversity.
+  // Gets a mixed list of recommended movies and TV shows for better content diversity.
 
-  Future<List<ContentItem>> getPopularMixedContent() async {
+  Future<List<ContentItem>> getRecommendedMixedContent() async {
     await _ensureClientInitialized();
 
-    // Fetch both popular movies and TV shows.
+    // Fetch both recommended movies and TV shows.
 
-    final moviesFuture = getPopularMovies();
-    final tvShowsFuture = getPopularTVShows();
+    final moviesFuture = getRecommendedMovies();
+    final tvShowsFuture = getRecommendedTVShows();
 
     final results = await Future.wait([moviesFuture, tvShowsFuture]);
     final movies = results[0];

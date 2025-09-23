@@ -87,8 +87,8 @@ class ContextMenuBuilder {
       );
     }
 
-    // Add divider before remove option (only for non-Popular movies)
-    if (sourceType != KanbanColumnType.popular) {
+    // Add divider before remove option (only for non-Recommended movies)
+    if (sourceType != KanbanColumnType.recommended) {
       if (items.isNotEmpty) {
         items.add(const PopupMenuDivider());
       }

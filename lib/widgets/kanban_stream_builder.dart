@@ -34,9 +34,9 @@ class KanbanLoadingData {
 /// Helper class for concurrent stream loading in kanban board.
 class KanbanStreamBuilder extends StatelessWidget {
   final FavoritesService favoritesService;
-  final dynamic popularCacheResult;
+  final dynamic recommendedCacheResult;
   final Widget Function(
-    dynamic popularCacheResult,
+    dynamic recommendedCacheResult,
     AsyncSnapshot<List<Movie>> toWatchSnapshot,
     AsyncSnapshot<List<Movie>> watchedSnapshot,
     AsyncSnapshot<List<CustomList>> customListsSnapshot,
@@ -46,7 +46,7 @@ class KanbanStreamBuilder extends StatelessWidget {
   const KanbanStreamBuilder({
     super.key,
     required this.favoritesService,
-    required this.popularCacheResult,
+    required this.recommendedCacheResult,
     required this.builder,
   });
 
@@ -119,7 +119,7 @@ class KanbanStreamBuilder extends StatelessWidget {
         );
 
         return builder(
-          popularCacheResult,
+          recommendedCacheResult,
           toWatchSnapshot,
           watchedSnapshot,
           customListsSnapshot,

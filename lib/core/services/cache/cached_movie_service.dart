@@ -199,12 +199,12 @@ class CachedMovieService {
     }
   }
 
-  /// Get popular movies with caching.
+  /// Get recommended movies with caching.
 
-  Future<List<Movie>> getPopularMovies() async {
+  Future<List<Movie>> getRecommendedMovies() async {
     final result = await _getMoviesWithCache(
-      CacheCategory.popular,
-      () => _movieService.getPopularMovies(),
+      CacheCategory.recommended,
+      () => _movieService.getRecommendedMovies(),
     );
     return result.data;
   }
@@ -239,12 +239,12 @@ class CachedMovieService {
     return result.data;
   }
 
-  /// Get popular movies with cache information.
+  /// Get recommended movies with cache information.
 
-  Future<CacheResult<List<Movie>>> getPopularMoviesWithCacheInfo() async {
+  Future<CacheResult<List<Movie>>> getRecommendedMoviesWithCacheInfo() async {
     return _getMoviesWithCache(
-      CacheCategory.popular,
-      () => _movieService.getPopularMovies(),
+      CacheCategory.recommended,
+      () => _movieService.getRecommendedMovies(),
     );
   }
 
@@ -321,8 +321,8 @@ class CachedMovieService {
           'Watched movies are user data and should not be cached via CachedMovieService. '
           'Use FavoritesService instead.',
         );
-      case CacheCategory.popular:
-        movies = await _movieService.getPopularMovies();
+      case CacheCategory.recommended:
+        movies = await _movieService.getRecommendedMovies();
       case CacheCategory.nowPlaying:
         movies = await _movieService.getNowPlayingMovies();
       case CacheCategory.topRated:
@@ -432,8 +432,8 @@ class CachedMovieService {
         return 'To Watch';
       case CacheCategory.watched:
         return 'Watched';
-      case CacheCategory.popular:
-        return 'popular movies';
+      case CacheCategory.recommended:
+        return 'recommended movies';
       case CacheCategory.nowPlaying:
         return 'now playing movies';
       case CacheCategory.topRated:

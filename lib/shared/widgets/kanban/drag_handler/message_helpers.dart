@@ -34,8 +34,8 @@ class MessageHelpers {
       case KanbanColumnType.customList:
         message = 'Removed "${movie.title}" from custom list';
         break;
-      case KanbanColumnType.popular:
-        return; // Can't remove from popular
+      case KanbanColumnType.recommended:
+        return; // Can't remove from recommended
     }
 
     ScaffoldMessenger.of(context).showSnackBar(

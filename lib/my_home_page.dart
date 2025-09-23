@@ -185,7 +185,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     }
 
     // Invalidate all movie providers to force refresh with new API key.
-    ref.invalidate(popularMoviesWithCacheInfoProvider);
+    ref.invalidate(recommendedMoviesWithCacheInfoProvider);
     ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
     ref.invalidate(topRatedMoviesWithCacheInfoProvider);
     ref.invalidate(upcomingMoviesWithCacheInfoProvider);
@@ -304,7 +304,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   void _handleRefresh() {
     // Invalidate all movie providers to force refresh.
 
-    ref.invalidate(popularMoviesWithCacheInfoProvider);
+    ref.invalidate(recommendedMoviesWithCacheInfoProvider);
     ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
     ref.invalidate(topRatedMoviesWithCacheInfoProvider);
     ref.invalidate(upcomingMoviesWithCacheInfoProvider);
@@ -411,7 +411,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     // Invalidate all movie providers for immediate refresh
     ref.invalidate(movieServiceProvider);
     ref.invalidate(contentServiceProvider);
-    ref.invalidate(popularMoviesWithCacheInfoProvider);
+    ref.invalidate(recommendedMoviesWithCacheInfoProvider);
     ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
     ref.invalidate(topRatedMoviesWithCacheInfoProvider);
     ref.invalidate(upcomingMoviesWithCacheInfoProvider);

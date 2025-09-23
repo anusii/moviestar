@@ -16,9 +16,9 @@ import 'package:moviestar/shared/widgets/kanban/board_controller.dart';
 
 /// Static helper class for handling drop operations.
 class DropOperations {
-  /// Determine if the drop operation is a copy (from Popular) or move.
+  /// Determine if the drop operation is a copy (from Recommended) or move.
   static bool isCopyOperation(KanbanColumnType sourceType) {
-    return sourceType == KanbanColumnType.popular;
+    return sourceType == KanbanColumnType.recommended;
   }
 
   /// Apply optimistic UI updates for drop operation.
@@ -69,7 +69,7 @@ class DropOperations {
           contentType: contentTypeString,
         );
         break;
-      case KanbanColumnType.popular:
+      case KanbanColumnType.recommended:
       // Can't drop into popular
     }
   }
@@ -91,14 +91,14 @@ class DropOperations {
       case KanbanColumnType.customList:
         await favoritesService.removeMovieFromCustomList(sourceId, movie.id);
         break;
-      case KanbanColumnType.popular:
+      case KanbanColumnType.recommended:
         // Can't remove from popular
         break;
     }
   }
 
   /// Ensure a movie file exists for the given movie.
-  /// This is important for movies from the Popular list that might not have local files yet.
+  /// This is important for movies from the Recommended list that might not have local files yet.
   static Future<void> ensureMovieFileExists(
     FavoritesService favoritesService,
     Movie movie,
@@ -108,7 +108,7 @@ class DropOperations {
       final hasFile = await favoritesService.hasMovieFile(movie);
 
       if (!hasFile) {
-        // For new movies (typically from Popular), we might need to create basic metadata
+        // For new movies (typically from Recommended), we might need to create basic metadata
         // The favorites service should handle this automatically when adding to lists,
         // but we can add a small delay to ensure the movie data is properly cached
         await Future.delayed(TimingConstants.movieCardHoverHideDelay);

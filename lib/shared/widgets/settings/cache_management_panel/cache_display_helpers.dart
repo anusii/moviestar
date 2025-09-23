@@ -23,8 +23,8 @@ class CacheDisplayHelpers {
         return 'To Watch';
       case CacheCategory.watched:
         return 'Watched';
-      case CacheCategory.popular:
-        return 'Popular Movies';
+      case CacheCategory.recommended:
+        return 'Recommended Movies';
       case CacheCategory.nowPlaying:
         return 'Now Playing';
       case CacheCategory.topRated:

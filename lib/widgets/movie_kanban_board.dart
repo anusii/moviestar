@@ -205,19 +205,19 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       controller: _horizontalScrollController,
       child: Consumer(
         builder: (context, ref, child) {
-          final popularMoviesAsync =
-              ref.watch(popularMoviesWithCacheInfoProvider);
-          return popularMoviesAsync.when(
-            data: (popularCacheResult) {
+          final recommendedMoviesAsync =
+              ref.watch(recommendedMoviesWithCacheInfoProvider);
+          return recommendedMoviesAsync.when(
+            data: (recommendedCacheResult) {
               return KanbanStreamBuilder(
                 favoritesService: widget.favoritesService,
-                popularCacheResult: popularCacheResult,
+                recommendedCacheResult: recommendedCacheResult,
                 builder: _buildKanbanColumns,
               );
             },
             loading: () => KanbanStreamBuilder(
               favoritesService: widget.favoritesService,
-              popularCacheResult: CacheResult<List<Movie>>(
+              recommendedCacheResult: CacheResult<List<Movie>>(
                 data: <Movie>[],
                 fromCache: false,
               ),
@@ -227,7 +227,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
               return ErrorDisplayWidget(
                 message: 'Error loading movies: $error',
                 onRetry: () =>
-                    ref.invalidate(popularMoviesWithCacheInfoProvider),
+                    ref.invalidate(recommendedMoviesWithCacheInfoProvider),
               );
             },
           );
@@ -238,21 +238,21 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
   /// Build all kanban columns.
   Widget _buildKanbanColumns(
-    dynamic popularCacheResult,
+    dynamic recommendedCacheResult,
     AsyncSnapshot<List<Movie>> toWatchSnapshot,
     AsyncSnapshot<List<Movie>> watchedSnapshot,
     AsyncSnapshot<List<CustomList>> customListsSnapshot,
     KanbanLoadingData loadingData,
   ) {
-    final popularMovies = popularCacheResult.data ?? <Movie>[];
+    final recommendedMovies = recommendedCacheResult.data ?? <Movie>[];
     final toWatchMovies = toWatchSnapshot.data ?? [];
     final watchedMovies = watchedSnapshot.data ?? [];
     final customLists = customListsSnapshot.data ?? [];
 
     // Apply search filters if active
-    final filteredPopular = _searchController.hasActiveFilters
-        ? _searchController.filterMovies(popularMovies)
-        : popularMovies;
+    final filteredRecommended = _searchController.hasActiveFilters
+        ? _searchController.filterMovies(recommendedMovies)
+        : recommendedMovies;
     final filteredToWatch = _searchController.hasActiveFilters
         ? _searchController.filterMovies(toWatchMovies)
         : toWatchMovies;
@@ -263,15 +263,15 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Popular column
+        // Recommended column
         _buildSingleColumn(
-          title: 'Popular',
-          movies: filteredPopular,
-          categoryId: 'popular',
-          columnType: KanbanColumnType.popular,
-          fromCache: popularCacheResult.fromCache ?? false,
-          isLoading:
-              popularMovies.isEmpty && !(popularCacheResult.fromCache ?? false),
+          title: 'Recommended',
+          movies: filteredRecommended,
+          categoryId: 'recommended',
+          columnType: KanbanColumnType.recommended,
+          fromCache: recommendedCacheResult.fromCache ?? false,
+          isLoading: recommendedMovies.isEmpty &&
+              !(recommendedCacheResult.fromCache ?? false),
         ),
 
         // To Watch column

@@ -16,7 +16,7 @@ import 'package:moviestar/widgets/sort_controls.dart';
 
 /// Enum for different column types in the kanban board.
 enum KanbanColumnType {
-  popular,
+  recommended,
   toWatch,
   watched,
   customList,
@@ -86,7 +86,7 @@ class KanbanBoardController extends ChangeNotifier {
 
   // Sorting state for each column
   final Map<String, MovieSortCriteria> _columnSortCriteria = {
-    'popular': MovieSortCriteria.ratingDesc, // Default: by rating
+    'recommended': MovieSortCriteria.ratingDesc, // Default: by rating
     'towatch': MovieSortCriteria.nameAsc, // Default: alphabetical
     'watched': MovieSortCriteria.dateDesc, // Default: recent first
   };

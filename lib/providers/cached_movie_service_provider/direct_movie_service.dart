@@ -39,10 +39,10 @@ class DirectMovieService extends MovieService {
   }
 
   @override
-  Future<List<Movie>> getPopularMovies() async {
+  Future<List<Movie>> getRecommendedMovies() async {
     await _ensureDirectClientInitialized();
 
-    // Fetch both popular movies and TV shows directly
+    // Fetch both recommended movies and TV shows directly
     final moviesFuture = _directClient!.getJsonList('movie/popular');
     final tvShowsFuture = _directClient!.getJsonList('tv/popular');
 

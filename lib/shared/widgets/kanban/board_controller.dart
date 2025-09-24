@@ -75,23 +75,27 @@ enum OperationStatus {
 
 /// Controller for managing kanban board state, optimistic updates, and operations.
 class KanbanBoardController extends ChangeNotifier {
-  // Optimistic UI state tracking
+  // Optimistic UI state tracking.
+
   final Map<String, Set<int>> _pendingOperations = {};
   final Map<String, Movie> _optimisticMovies = {};
   final Set<String> _syncErrors = {};
 
-  // Queue-based progress tracking
+  // Queue-based progress tracking.
+
   final List<OperationQueueItem> _operationQueue = [];
   int _nextOperationId = 0;
 
-  // Sorting state for each column
+  // Sorting state for each column.
+
   final Map<String, MovieSortCriteria> _columnSortCriteria = {
     'recommended': MovieSortCriteria.ratingDesc, // Default: by rating
     'towatch': MovieSortCriteria.nameAsc, // Default: alphabetical
     'watched': MovieSortCriteria.dateDesc, // Default: recent first
   };
 
-  // Getters
+  // Getters.
+
   List<OperationQueueItem> get operationQueue =>
       List.unmodifiable(_operationQueue);
   Map<String, MovieSortCriteria> get columnSortCriteria =>
@@ -130,7 +134,8 @@ class KanbanBoardController extends ChangeNotifier {
       _operationQueue[index] = _operationQueue[index].copyWith(status: status);
       notifyListeners();
 
-      // Auto-remove completed/failed operations after delay
+      // Auto-remove completed/failed operations after delay.
+
       if (status == OperationStatus.completed ||
           status == OperationStatus.failed) {
         Future.delayed(TimingConstants.autoRemoveDelay, () {
@@ -183,7 +188,8 @@ class KanbanBoardController extends ChangeNotifier {
   void markSyncError(KanbanColumnType type, String id, int movieId) {
     final key = _getOperationKey(type, id);
     _syncErrors.add('${movieId}_$key');
-    // Remove the optimistic state to revert UI
+    // Remove the optimistic state to revert UI.
+
     clearOptimisticState(type, id, movieId);
   }
 
@@ -203,7 +209,8 @@ class KanbanBoardController extends ChangeNotifier {
 
     for (final opId in pendingOps) {
       if (opId > 0) {
-        // Addition - add if not already present
+        // Addition - add if not already present.
+
         final movieKey = '${opId}_$key';
         final movie = _optimisticMovies[movieKey];
 
@@ -213,7 +220,8 @@ class KanbanBoardController extends ChangeNotifier {
           } else {}
         }
       } else {
-        // Removal - remove from result
+        // Removal - remove from result.
+
         final movieId = -opId;
         result.removeWhere((m) => m.id == movieId);
       }

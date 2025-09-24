@@ -29,7 +29,8 @@ class ContextMenuHandler {
     FavoritesService favoritesService,
     Function(String, Movie, KanbanColumnType, String) onContextMenuAction,
   ) {
-    // Get current custom lists for dynamic menu
+    // Get current custom lists for dynamic menu.
+
     favoritesService.customLists.first.then((customLists) {
       if (!context.mounted) return;
       showMenu<String>(
@@ -53,7 +54,8 @@ class ContextMenuHandler {
         }
       });
     }).catchError((e) {
-      // Fallback to basic menu if custom lists can't be loaded
+      // Fallback to basic menu if custom lists can't be loaded.
+
       if (!context.mounted) return;
       showMenu<String>(
         context: context,

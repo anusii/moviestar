@@ -52,7 +52,8 @@ String formatMovieYear(dynamic releaseDate) {
     if (releaseDate.isEmpty) {
       return '';
     }
-    // Extract year from ISO date format (YYYY-MM-DD)
+    // Extract year from ISO date format (YYYY-MM-DD).
+
     final parts = releaseDate.split('-');
     if (parts.isNotEmpty) {
       return parts[0];

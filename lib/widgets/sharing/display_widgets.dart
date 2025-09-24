@@ -137,7 +137,8 @@ class ShareableItemTile extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            // Icon or thumbnail
+            // Icon or thumbnail.
+
             if (hasMovie)
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
@@ -181,7 +182,8 @@ class ShareableItemTile extends StatelessWidget {
                 ),
               ),
             const SizedBox(width: 12),
-            // File info
+            // File info.
+
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,7 +214,8 @@ class ShareableItemTile extends StatelessWidget {
                 ],
               ),
             ),
-            // Permissions
+            // Permissions.
+
             if (isReadOnly)
               Chip(
                 label: Text(
@@ -235,7 +238,8 @@ class ShareableItemTile extends StatelessWidget {
                 readOnly: !isMovieList,
                 requireRead: isMovieList, // Movie lists require read permission
               ),
-            // Remove button
+            // Remove button.
+
             if (onRemove != null)
               IconButton(
                 icon: const Icon(Icons.remove_circle_outline),

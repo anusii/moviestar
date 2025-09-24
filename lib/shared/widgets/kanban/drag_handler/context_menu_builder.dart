@@ -29,7 +29,8 @@ class ContextMenuBuilder {
   ) {
     final items = <PopupMenuEntry<String>>[];
 
-    // Add "Copy to..." options
+    // Add "Copy to..." options.
+
     if (sourceType != KanbanColumnType.toWatch) {
       items.add(
         const PopupMenuItem(
@@ -60,9 +61,11 @@ class ContextMenuBuilder {
       );
     }
 
-    // Add custom list options
+    // Add custom list options.
+
     for (final customList in customLists) {
-      // Skip if the movie is already in this custom list
+      // Skip if the movie is already in this custom list.
+
       if (sourceType == KanbanColumnType.customList &&
           sourceId == customList.id) {
         continue;
@@ -87,7 +90,8 @@ class ContextMenuBuilder {
       );
     }
 
-    // Add divider before remove option (only for non-Recommended movies)
+    // Add divider before remove option (only for non-Recommended movies).
+
     if (sourceType != KanbanColumnType.recommended) {
       if (items.isNotEmpty) {
         items.add(const PopupMenuDivider());

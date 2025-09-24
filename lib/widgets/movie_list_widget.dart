@@ -205,14 +205,16 @@ class _MovieListWidgetState extends State<MovieListWidget> {
   }
 
   Widget _buildContent() {
-    // Handle loading state
+    // Handle loading state.
+
     if (widget.isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
 
-    // Handle error state
+    // Handle error state.
+
     if (widget.errorMessage != null) {
       return Center(
         child: Column(
@@ -239,7 +241,8 @@ class _MovieListWidgetState extends State<MovieListWidget> {
       );
     }
 
-    // Handle empty state
+    // Handle empty state.
+
     if (_sortedMovies.isEmpty) {
       return widget.emptyWidget ??
           Center(
@@ -268,7 +271,8 @@ class _MovieListWidgetState extends State<MovieListWidget> {
           );
     }
 
-    // Build the movie list
+    // Build the movie list.
+
     final listView = ListView.builder(
       shrinkWrap: !widget.sliver,
       physics: widget.sliver ? const NeverScrollableScrollPhysics() : null,

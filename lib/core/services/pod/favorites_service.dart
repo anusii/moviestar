@@ -35,7 +35,8 @@ class PodFavoritesService extends BasePodService {
   late final MovieListService _movieListService;
   late final UserProfileService _userProfileService;
 
-  // Decomposed operation classes
+  // Decomposed operation classes.
+
   late final PodFavoritesMovieOperations _movieOperations;
   late final PodFavoritesListOperations _listOperations;
   late final PodFavoritesCacheManager _cacheManager;
@@ -51,7 +52,8 @@ class PodFavoritesService extends BasePodService {
     _userProfileService = UserProfileService(context, child);
     _movieListService = MovieListService(context, child, _userProfileService);
 
-    // Initialize decomposed operation classes
+    // Initialize decomposed operation classes.
+
     _movieOperations = PodFavoritesMovieOperations(
       _streamManager,
       _fileManager,
@@ -76,14 +78,17 @@ class PodFavoritesService extends BasePodService {
       safeReadFile,
     );
 
-    // Initialize by loading favorites and custom lists concurrently
+    // Initialize by loading favorites and custom lists concurrently.
+
     _initializeConcurrently().then((_) {
-      // Notify manager that initial loading is complete
+      // Notify manager that initial loading is complete.
+
       if (_onInitialLoadComplete != null) {
         _onInitialLoadComplete();
       }
     }).catchError((error) {
-      // Even on error, notify that loading attempt is complete
+      // Even on error, notify that loading attempt is complete.
+
       if (_onInitialLoadComplete != null) {
         _onInitialLoadComplete();
       }
@@ -128,7 +133,8 @@ class PodFavoritesService extends BasePodService {
         _streamManager.updateToWatch(favoritesData['toWatch'] ?? []);
         _streamManager.updateWatched(favoritesData['watched'] ?? []);
 
-        // Custom lists are now loaded concurrently in _initializeConcurrently
+        // Custom lists are now loaded concurrently in _initializeConcurrently.
+
         return null;
       },
       operationName: 'loadFavorites',
@@ -335,12 +341,12 @@ class PodFavoritesService extends BasePodService {
 
   /// Migrates data to POD.
   Future<void> migrateToPod() async {
-    // Migration logic would be implemented here
+    // Migration logic would be implemented here.
   }
 
   /// Migrates custom lists to POD.
   Future<void> migrateCustomListsToPod() async {
-    // Custom list migration logic would be implemented here
+    // Custom list migration logic would be implemented here.
   }
 
   /// Syncs data with POD.

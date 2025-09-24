@@ -88,7 +88,8 @@ class ErrorDisplayWidget extends StatelessWidget {
 
   /// Creates a new [ErrorDisplayWidget].
 
-  // ignore: avoid-unnecessary-nullable-parameters
+  // ignore: avoid-unnecessary-nullable-parameters.
+
   const ErrorDisplayWidget({
     super.key,
     required this.message,
@@ -140,7 +141,8 @@ class ErrorDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use UserFriendlyError if available, otherwise fall back to legacy fields
+    // Use UserFriendlyError if available, otherwise fall back to legacy fields.
+
     if (userFriendlyError != null) {
       return UserFriendlyErrorRenderer(
         error: userFriendlyError!,

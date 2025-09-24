@@ -54,9 +54,11 @@ class SmartErrorDetection {
     StackTrace stackTrace, {
     ErrorContext? context = const ErrorContext(),
   }) async {
-    // Step 1: Check if this is clearly an API key error based on error content
+    // Step 1: Check if this is clearly an API key error based on error content.
+
     if (ApiKeyValidationService.isApiKeyError(error)) {
-      // Verify API key status if service is available
+      // Verify API key status if service is available.
+
       if (context?.apiKeyValidationService != null) {
         try {
           final apiKeyResult =
@@ -65,14 +67,16 @@ class SmartErrorDetection {
             return _createApiKeyError(error, stackTrace, context, apiKeyResult);
           }
         } catch (e) {
-          // If API key validation fails, fall back to error-based detection
+          // If API key validation fails, fall back to error-based detection.
         }
       }
-      // Fallback to error-based API key detection
+      // Fallback to error-based API key detection.
+
       return _mapApiKeyError(error, stackTrace, context);
     }
 
-    // Step 2: Check network connectivity if this seems like a network error
+    // Step 2: Check network connectivity if this seems like a network error.
+
     if (NetworkConnectivityService.isNetworkError(error) &&
         context?.networkConnectivityService != null) {
       try {
@@ -80,7 +84,8 @@ class SmartErrorDetection {
             await context!.networkConnectivityService!.quickCheck();
 
         if (connectivityResult.isNetworkProblem) {
-          // Definitive network problem
+          // Definitive network problem.
+
           return _createNetworkError(
             error,
             stackTrace,
@@ -88,17 +93,20 @@ class SmartErrorDetection {
             connectivityResult,
           );
         } else if (connectivityResult.isInconclusive) {
-          // Network check failed, might still be network issue
+          // Network check failed, might still be network issue.
+
           return _mapPossibleNetworkError(error, stackTrace, context);
         }
-        // If network is fine, continue with other checks
+        // If network is fine, continue with other checks.
       } catch (e) {
-        // If network check fails, assume it could be a network issue
+        // If network check fails, assume it could be a network issue.
+
         return _mapPossibleNetworkError(error, stackTrace, context);
       }
     }
 
-    // Step 3: Double-check API key if network seems fine but we have auth-like errors
+    // Step 3: Double-check API key if network seems fine but we have auth-like errors.
+
     if (context?.apiKeyValidationService != null &&
         _couldBeApiKeyIssue(error)) {
       try {
@@ -108,11 +116,12 @@ class SmartErrorDetection {
           return _createApiKeyError(error, stackTrace, context, apiKeyResult);
         }
       } catch (e) {
-        // If API key validation fails, continue with traditional mapping
+        // If API key validation fails, continue with traditional mapping.
       }
     }
 
-    // Step 4: Should not reach here - caller should handle fallback
+    // Step 4: Should not reach here - caller should handle fallback.
+
     throw Exception('Smart detection failed, fallback required');
   }
 

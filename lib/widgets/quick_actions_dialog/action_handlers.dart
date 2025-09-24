@@ -100,26 +100,31 @@ class ActionHandlers {
   }) async {
     try {
       // Check if user has POD storage enabled and is using the adapter.
+
       if (favoritesService is! FavoritesServiceAdapter) {
         onError('POD storage is required for sharing');
         return;
       }
 
       // Check if POD storage is enabled.
+
       if (!favoritesService.isPodStorageEnabled) {
         onError('POD storage must be enabled to share movies');
         return;
       }
 
-      // Ensure the movie file exists before sharing - use simplified approach
+      // Ensure the movie file exists before sharing - use simplified approach.
+
       final hasFile = await favoritesService.hasMovieFile(movie);
       if (!hasFile) {
-        // Create a minimal movie file to enable sharing
+        // Create a minimal movie file to enable sharing.
+
         await favoritesService.setMovieComments(movie, '');
         await favoritesService.removeMovieComments(movie);
       }
 
-      // Navigate to MovieSharingUI which handles all the complex sharing logic
+      // Navigate to MovieSharingUI which handles all the complex sharing logic.
+
       if (!context.mounted) return;
 
       await Navigator.of(context).push(

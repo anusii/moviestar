@@ -68,7 +68,8 @@ class CustomListDialogBuilders {
     if (result == true) {
       final newName = nameController.text.trim();
       if (newName.isNotEmpty) {
-        // Update the list
+        // Update the list.
+
         final updatedList = CustomList(
           id: customList.id,
           name: newName,

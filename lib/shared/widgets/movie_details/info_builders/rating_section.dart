@@ -23,7 +23,8 @@ class RatingSection {
   }) {
     return Row(
       children: [
-        // Content type indicator
+        // Content type indicator.
+
         Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 8,
@@ -47,7 +48,8 @@ class RatingSection {
         ),
         const Gap(Gaps.m),
 
-        // TMDB Rating
+        // TMDB Rating.
+
         Row(
           children: [
             const Icon(
@@ -66,7 +68,8 @@ class RatingSection {
         ),
         const Gap(Gaps.m),
 
-        // Release Date
+        // Release Date.
+
         if (releaseDate.isNotEmpty) ...[
           const Icon(
             Icons.calendar_today,
@@ -151,7 +154,8 @@ class RatingSection {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (!isSharedMovie) ...[
-          // Slider for interactive rating
+          // Slider for interactive rating.
+
           Row(
             children: [
               Expanded(
@@ -185,10 +189,12 @@ class RatingSection {
             ],
           ),
         ] else ...[
-          // Display-only for shared movies
+          // Display-only for shared movies.
+
           Row(
             children: [
-              // Star icons for visual representation
+              // Star icons for visual representation.
+
               for (int i = 1; i <= 5; i++)
                 Icon(
                   rating != null && i <= (rating / 2)
@@ -218,7 +224,8 @@ class RatingSection {
           ),
         ],
         const Gap(Gaps.xs),
-        // Rating description
+        // Rating description.
+
         if (rating != null)
           Text(
             _getRatingDescription(rating),

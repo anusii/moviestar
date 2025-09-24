@@ -56,7 +56,8 @@ class BatchSharingProgressTracker extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Progress header
+          // Progress header.
+
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -76,7 +77,8 @@ class BatchSharingProgressTracker extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Files progress list
+          // Files progress list.
+
           Expanded(
             child: Card(
               child: Padding(

@@ -52,7 +52,8 @@ class KanbanStreamBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use concurrent stream loading instead of nested StreamBuilders
+    // Use concurrent stream loading instead of nested StreamBuilders.
+
     return StreamBuilder<List<dynamic>>(
       stream: Rx.combineLatest3(
         favoritesService.toWatchMovies,
@@ -66,7 +67,8 @@ class KanbanStreamBuilder extends StatelessWidget {
             [toWatch, watched, customLists],
       ),
       builder: (context, combinedSnapshot) {
-        // Extract data with loading states
+        // Extract data with loading states.
+
         final toWatchMovies =
             combinedSnapshot.hasData && combinedSnapshot.data!.isNotEmpty
                 ? combinedSnapshot.data![0] as List<Movie>
@@ -80,8 +82,9 @@ class KanbanStreamBuilder extends StatelessWidget {
                 ? combinedSnapshot.data![2] as List<CustomList>
                 : <CustomList>[];
 
-        // Create snapshot objects for backward compatibility
-        // Use proper loading state detection - if connection is waiting and no data yet, mark as loading
+        // Create snapshot objects for backward compatibility.
+        // Use proper loading state detection - if connection is waiting and no data yet, mark as loading.
+
         final isInitialLoading =
             combinedSnapshot.connectionState == ConnectionState.waiting &&
                 !combinedSnapshot.hasData;
@@ -105,8 +108,9 @@ class KanbanStreamBuilder extends StatelessWidget {
                 customLists,
               );
 
-        // Create loading coordination data
-        // Show skeleton columns during initial loading or when custom lists are expected but not loaded
+        // Create loading coordination data.
+        // Show skeleton columns during initial loading or when custom lists are expected but not loaded.
+
         final expectedCustomListCount = customLists.length;
         final showSkeletonColumns =
             isInitialLoading && expectedCustomListCount == 0;

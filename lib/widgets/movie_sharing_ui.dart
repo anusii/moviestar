@@ -58,7 +58,8 @@ class _MovieSharingUIState extends State<MovieSharingUI> {
     });
 
     try {
-      // Construct file name based on content type
+      // Construct file name based on content type.
+
       final isTV = widget.movie.contentType == ContentType.tvShow;
       final filePrefix = isTV ? 'TVShow' : 'Movie';
 

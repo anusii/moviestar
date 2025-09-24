@@ -216,6 +216,7 @@ class _QuickActionsDialogState extends State<QuickActionsDialog> {
   }
 
   // Shares the movie file using the custom movie sharing UI.
+
   Future<void> _shareMovie() async {
     await ActionHandlers.shareMovie(
       context: context,

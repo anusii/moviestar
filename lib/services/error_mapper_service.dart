@@ -59,7 +59,8 @@ class ErrorMapperService {
         context: context,
       );
     } catch (e) {
-      // Fall back to traditional error mapping
+      // Fall back to traditional error mapping.
+
       return _mapErrorTraditionally(error, stackTrace, context);
     }
   }

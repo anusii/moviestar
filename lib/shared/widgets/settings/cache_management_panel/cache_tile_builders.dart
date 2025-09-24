@@ -52,6 +52,7 @@ class CacheTileBuilders {
               ref.read(cacheOnlyModeProvider.notifier).setCacheOnlyMode(value);
 
               // Show feedback about the mode change.
+
               CacheFeedbackWidget.showOfflineModeNotification(
                 context,
                 isEnabled: value,
@@ -89,6 +90,7 @@ class CacheTileBuilders {
                 .setLocalApiKeyCachingEnabled(value);
 
             // Show feedback about the change.
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(

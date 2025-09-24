@@ -52,7 +52,8 @@ mixin PodOperationsMixin {
           return null;
         }
 
-        // Calculate delay with exponential backoff if enabled
+        // Calculate delay with exponential backoff if enabled.
+
         final delay =
             exponentialBackoff ? initialDelay * attempt : initialDelay;
 

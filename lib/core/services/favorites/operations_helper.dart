@@ -113,7 +113,7 @@ class MovieListOperationsHelper with PodOperationsMixin {
         }
       } else {}
     } catch (e) {
-      // Failed to remove movie from list
+      // Failed to remove movie from list.
     }
     return false;
   }
@@ -213,7 +213,8 @@ class MovieListOperationsHelper with PodOperationsMixin {
       return _cache[movieListId];
     }
 
-    // Load from POD if not in cache
+    // Load from POD if not in cache.
+
     final fileName = getMovieListFilePath(movieListId);
 
     final result = await PodFileOperationsService.readFile(

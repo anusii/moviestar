@@ -129,7 +129,7 @@ class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
           return;
         }
       } catch (e) {
-        // Failed to load cached movies
+        // Failed to load cached movies.
       }
     }
 
@@ -139,6 +139,7 @@ class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
   }
 
   // Loads specific movies from API.
+
   Future<void> _loadMoviesFromAPI(List<int> movieIds) async {
     final filtered = movieIds
         .where(
@@ -214,6 +215,7 @@ class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
         .removeMovieFromCustomList(_currentList.id, movieId);
 
     // Update the current list and remove from local map.
+
     final updatedList = _currentList.copyWith(
       movieIds: _currentList.movieIds.where((id) => id != movieId).toList(),
       updatedAt: DateTime.now(),
@@ -237,7 +239,8 @@ class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
       title: _currentList.name,
       automaticallyImplyLeading: true,
       actions: [
-        // Share button with tooltip
+        // Share button with tooltip.
+
         MarkdownTooltip(
           message: '''
 
@@ -273,6 +276,7 @@ Recipients will be able to:
         child: Column(
           children: [
             // List info header.
+
             ListHeaderWidget(
               customList: _currentList,
               totalMovies: _currentList.movieIds.length,
@@ -284,6 +288,7 @@ Recipients will be able to:
             const SizedBox(height: 8),
 
             // Movies list.
+
             Expanded(
               child: _currentList.movieIds.isEmpty
                   ? _buildEmptyState()

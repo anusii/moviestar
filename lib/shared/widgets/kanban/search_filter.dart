@@ -25,7 +25,8 @@ class KanbanSearchController extends ChangeNotifier {
   ContentType? _contentTypeFilter;
   bool _isSearchActive = false;
 
-  // Getters
+  // Getters.
+
   String get searchQuery => _searchQuery;
   Set<String> get selectedGenres => Set.unmodifiable(_selectedGenres);
   double? get minRating => _minRating;
@@ -108,13 +109,15 @@ class KanbanSearchController extends ChangeNotifier {
     if (!hasActiveFilters) return movies;
 
     return movies.where((movie) {
-      // Search query filter
+      // Search query filter.
+
       if (_isSearchActive && _searchQuery.isNotEmpty) {
         final query = _searchQuery.toLowerCase();
         final titleMatch = movie.title.toLowerCase().contains(query);
         final overviewMatch = movie.overview.toLowerCase().contains(query);
         final genreMatch = movie.genreIds.any((genreId) {
-          // Simple genre matching - could be enhanced with genre name lookup
+          // Simple genre matching - could be enhanced with genre name lookup.
+
           return genreId.toString().contains(query);
         });
 
@@ -123,7 +126,8 @@ class KanbanSearchController extends ChangeNotifier {
         }
       }
 
-      // Genre filter
+      // Genre filter.
+
       if (_selectedGenres.isNotEmpty) {
         final movieGenres = movie.genreIds.map((id) => id.toString()).toSet();
         if (!_selectedGenres.any((genre) => movieGenres.contains(genre))) {
@@ -131,7 +135,8 @@ class KanbanSearchController extends ChangeNotifier {
         }
       }
 
-      // Rating filter
+      // Rating filter.
+
       if (_minRating != null && movie.voteAverage < _minRating!) {
         return false;
       }
@@ -139,7 +144,8 @@ class KanbanSearchController extends ChangeNotifier {
         return false;
       }
 
-      // Year filter
+      // Year filter.
+
       if (_startYear != null || _endYear != null) {
         final movieYear = movie.releaseDate.year;
         if (_startYear != null && movieYear < _startYear!) {
@@ -150,7 +156,8 @@ class KanbanSearchController extends ChangeNotifier {
         }
       }
 
-      // Content type filter
+      // Content type filter.
+
       if (_contentTypeFilter != null &&
           movie.contentType != _contentTypeFilter) {
         return false;

@@ -65,7 +65,8 @@ class FavoritesServiceManager extends ChangeNotifier {
       await _enablePodService();
     } else {}
 
-    // Initialize custom lists stream immediately for better UX - POD service now loads concurrently
+    // Initialize custom lists stream immediately for better UX - POD service now loads concurrently.
+
     await _updateCustomListsStream();
 
     notifyListeners();
@@ -79,7 +80,7 @@ class FavoritesServiceManager extends ChangeNotifier {
         _context,
         _child,
         onInitialLoadComplete: () {
-          // POD service manages its own custom lists stream, no need to update here
+          // POD service manages its own custom lists stream, no need to update here.
         },
       );
     } catch (e) {
@@ -142,7 +143,8 @@ class FavoritesServiceManager extends ChangeNotifier {
   /// Stream of custom lists from the active service.
 
   Stream<List<CustomList>> get customLists {
-    // If POD storage is enabled, delegate directly to POD service to avoid duplication
+    // If POD storage is enabled, delegate directly to POD service to avoid duplication.
+
     if (_isPodStorageEnabled && _podService != null) {
       return _podService!.customLists;
     }
@@ -376,7 +378,8 @@ class FavoritesServiceManager extends ChangeNotifier {
           await _localService.createCustomList(name, description: description);
     }
 
-    // Update stream after creating (only for local service)
+    // Update stream after creating (only for local service).
+
     if (!_isPodStorageEnabled || _podService == null) {
       await _updateCustomListsStream();
     }
@@ -392,7 +395,8 @@ class FavoritesServiceManager extends ChangeNotifier {
       await _localService.updateCustomList(updatedList);
     }
 
-    // Update stream after updating custom list (only for local service)
+    // Update stream after updating custom list (only for local service).
+
     if (!_isPodStorageEnabled || _podService == null) {
       await _updateCustomListsStream();
     }
@@ -407,7 +411,8 @@ class FavoritesServiceManager extends ChangeNotifier {
       await _localService.deleteCustomList(listId);
     }
 
-    // Update stream after deleting custom list (only for local service)
+    // Update stream after deleting custom list (only for local service).
+
     if (!_isPodStorageEnabled || _podService == null) {
       await _updateCustomListsStream();
     }
@@ -434,8 +439,8 @@ class FavoritesServiceManager extends ChangeNotifier {
       );
     }
 
-    // Note: Stream refresh now happens in background via POD service
-    // This allows for immediate optimistic UI updates
+    // Note: Stream refresh now happens in background via POD service.
+    // This allows for immediate optimistic UI updates.
   }
 
   /// Removes a movie from a custom list.
@@ -447,8 +452,8 @@ class FavoritesServiceManager extends ChangeNotifier {
       await _localService.removeMovieFromCustomList(listId, movieId);
     }
 
-    // Note: Stream refresh now happens in background via POD service
-    // This allows for immediate optimistic UI updates
+    // Note: Stream refresh now happens in background via POD service.
+    // This allows for immediate optimistic UI updates.
   }
 
   /// Checks if a movie is in a specific custom list.
@@ -498,7 +503,7 @@ class FavoritesServiceManager extends ChangeNotifier {
         _context,
         _child,
         onInitialLoadComplete: () {
-          // POD service manages its own custom lists stream, no need to update here
+          // POD service manages its own custom lists stream, no need to update here.
         },
       );
 
@@ -514,7 +519,8 @@ class FavoritesServiceManager extends ChangeNotifier {
 
       await _podService!.migrateToPod();
 
-      // Also migrate custom lists to POD
+      // Also migrate custom lists to POD.
+
       await _podService!.migrateCustomListsToPod();
 
       // Update preference.
@@ -522,7 +528,7 @@ class FavoritesServiceManager extends ChangeNotifier {
       _isPodStorageEnabled = true;
       await _prefs.setBool(_podStorageEnabledKey, true);
 
-      // Streams are now delegated to POD service, no need to update here
+      // Streams are now delegated to POD service, no need to update here.
 
       notifyListeners();
       return true;

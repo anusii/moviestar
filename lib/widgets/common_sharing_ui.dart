@@ -23,7 +23,8 @@
 
 library;
 
-// Export all sharing widget components for backwards compatibility
+// Export all sharing widget components for backwards compatibility.
+
 export 'package:moviestar/widgets/sharing/components.dart';
 export 'package:moviestar/widgets/sharing/form_widgets.dart';
 export 'package:moviestar/widgets/sharing/display_widgets.dart';

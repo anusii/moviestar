@@ -40,12 +40,14 @@ class ShareOperationHandler {
     Widget widget,
   ) async {
     try {
-      // Check if context is still mounted before async operations
+      // Check if context is still mounted before async operations.
+
       if (!context.mounted) {
         return ShareResult.failure('Context no longer mounted');
       }
 
-      // Ensure user is logged in and has proper keys
+      // Ensure user is logged in and has proper keys.
+
       await loginIfRequired(context);
       if (!context.mounted) {
         return ShareResult.failure('Context no longer mounted');
@@ -56,12 +58,14 @@ class ShareOperationHandler {
         return ShareResult.failure('Context no longer mounted');
       }
 
-      // Validate WebID
+      // Validate WebID.
+
       if (!await WebIdValidator.validateWebId(request.recipientWebId)) {
         return ShareResult.failure('Invalid WebID: ${request.recipientWebId}');
       }
 
-      // Get current user's WebID
+      // Get current user's WebID.
+
       final ownerWebId = await getCurrentWebId();
       if (ownerWebId == null) {
         return ShareResult.failure('Unable to get current user WebID');
@@ -71,7 +75,8 @@ class ShareOperationHandler {
         return ShareResult.failure('Context no longer mounted');
       }
 
-      // Grant permission using actual solidpod call
+      // Grant permission using actual solidpod call.
+
       final result = await grantPermission(
         request.fileName,
         true, // fileFlag - this is a file, not a folder
@@ -134,7 +139,8 @@ class ShareOperationHandler {
     Widget widget,
   ) async {
     try {
-      // Check if context is still mounted before async operations
+      // Check if context is still mounted before async operations.
+
       if (!context.mounted) {
         return const PermissionResult(
           granted: false,
@@ -142,7 +148,8 @@ class ShareOperationHandler {
         );
       }
 
-      // Ensure user is logged in and has proper keys
+      // Ensure user is logged in and has proper keys.
+
       await loginIfRequired(context);
       if (!context.mounted) {
         return const PermissionResult(
@@ -159,7 +166,8 @@ class ShareOperationHandler {
         );
       }
 
-      // Get current user's WebID
+      // Get current user's WebID.
+
       final ownerWebId = await getCurrentWebId();
       if (ownerWebId == null) {
         return const PermissionResult(
@@ -175,7 +183,8 @@ class ShareOperationHandler {
         );
       }
 
-      // Grant permission using actual solidpod call
+      // Grant permission using actual solidpod call.
+
       final result = await grantPermission(
         request.fileName,
         true, // fileFlag

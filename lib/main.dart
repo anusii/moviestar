@@ -43,8 +43,8 @@ import 'package:moviestar/utils/is_desktop.dart';
 /// Main entry point for the Movie Star application.
 
 void main() async {
-  // This is the main entry point for the app. The [async] is required because
-  // we asynchronously [await] the window manager below. Often, `main()` will
+  // This is the main entry point for the app. The [async] is required because.
+  // we asynchronously [await] the window manager below. Often, `main()` will.
   // include only [runApp].
 
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,7 +66,7 @@ void main() async {
   Hive.registerAdapter(ContentItemAdapter());
   Hive.registerAdapter(ContentTypeAdapter());
 
-  // Ensure Flutter bindings are initialized for async operations
+  // Ensure Flutter bindings are initialized for async operations.
 
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -76,13 +76,15 @@ void main() async {
     const windowOptions = WindowOptions(
       // Set various desktop window options here.
 
-      // Setting [alwaysOnTop] here will ensure the app starts on top of other
-      // apps on the desktop so that it is visible (otherwise, with GNOME on
+      // Setting [alwaysOnTop] here will ensure the app starts on top of other.
+      // apps on the desktop so that it is visible (otherwise, with GNOME on.
       // Ubuntu the app is often lost below other windows on startup).
       // We later turn it off as we don't want to force it always on top.
+
       alwaysOnTop: true,
 
       // The [title] is used for the window manager's window title.
+
       title: 'Movie Star - Manage and share ratings through private PODs',
 
       // Set minimum window size to prevent UI element overlap.
@@ -99,7 +101,7 @@ void main() async {
     });
   }
 
-  // The runApp() function takes the given Widget and makes it the root of the
+  // The runApp() function takes the given Widget and makes it the root of the.
   // widget tree.
 
   runApp(

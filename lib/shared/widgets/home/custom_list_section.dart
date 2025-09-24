@@ -105,7 +105,8 @@ class CustomListSection extends ConsumerWidget {
       );
     }
 
-    // Check if we have POD data available
+    // Check if we have POD data available.
+
     if (favoritesService is FavoritesServiceAdapter) {
       final adapter = favoritesService as FavoritesServiceAdapter;
 
@@ -114,7 +115,8 @@ class CustomListSection extends ConsumerWidget {
           future: favoritesService.getMoviesInCustomList(customList.id),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              // Fallback to ID-based loading
+              // Fallback to ID-based loading.
+
               return _buildItemsFromIds(movieIds);
             }
 

@@ -27,7 +27,8 @@ class DirectMovieService extends MovieService {
 
   /// Initializes the service with the provided API key directly.
   void _initializeWithDirectApiKey() {
-    // Create NetworkClient directly without ContentService to avoid type compatibility issues
+    // Create NetworkClient directly without ContentService to avoid type compatibility issues.
+
     _directClient = NetworkClient(baseUrl: _baseUrl, apiKey: _apiKey ?? '');
   }
 
@@ -42,7 +43,8 @@ class DirectMovieService extends MovieService {
   Future<List<Movie>> getRecommendedMovies() async {
     await _ensureDirectClientInitialized();
 
-    // Fetch both recommended movies and TV shows directly
+    // Fetch both recommended movies and TV shows directly.
+
     final moviesFuture = _directClient!.getJsonList('movie/popular');
     final tvShowsFuture = _directClient!.getJsonList('tv/popular');
 
@@ -50,12 +52,14 @@ class DirectMovieService extends MovieService {
     final movies = results[0];
     final tvShows = results[1];
 
-    // Convert to ContentItems
+    // Convert to ContentItems.
+
     final movieItems =
         movies.map((movie) => ContentItem.fromMovieJson(movie)).toList();
     final tvItems = tvShows.map((tv) => ContentItem.fromTVJson(tv)).toList();
 
-    // Combine and sort by vote average
+    // Combine and sort by vote average.
+
     final combined = <ContentItem>[];
     combined.addAll(movieItems);
     combined.addAll(tvItems);
@@ -68,7 +72,8 @@ class DirectMovieService extends MovieService {
   Future<List<Movie>> getNowPlayingMovies() async {
     await _ensureDirectClientInitialized();
 
-    // Fetch both now playing movies and on the air TV shows directly
+    // Fetch both now playing movies and on the air TV shows directly.
+
     final moviesFuture = _directClient!.getJsonList('movie/now_playing');
     final tvShowsFuture = _directClient!.getJsonList('tv/on_the_air');
 
@@ -92,7 +97,8 @@ class DirectMovieService extends MovieService {
   Future<List<Movie>> getTopRatedMovies() async {
     await _ensureDirectClientInitialized();
 
-    // Fetch both top rated movies and TV shows directly
+    // Fetch both top rated movies and TV shows directly.
+
     final moviesFuture = _directClient!.getJsonList('movie/top_rated');
     final tvShowsFuture = _directClient!.getJsonList('tv/top_rated');
 
@@ -116,7 +122,8 @@ class DirectMovieService extends MovieService {
   Future<List<Movie>> getUpcomingMovies() async {
     await _ensureDirectClientInitialized();
 
-    // Fetch both upcoming movies and airing today TV shows directly
+    // Fetch both upcoming movies and airing today TV shows directly.
+
     final moviesFuture = _directClient!.getJsonList('movie/upcoming');
     final tvShowsFuture = _directClient!.getJsonList('tv/airing_today');
 
@@ -147,7 +154,8 @@ class DirectMovieService extends MovieService {
   @override
   Future<List<Movie>> searchMoviesByActor(String actorName) async {
     await _ensureDirectClientInitialized();
-    // First search for the person
+    // First search for the person.
+
     final personResults = await _directClient!
         .getJsonList('search/person?query=${Uri.encodeComponent(actorName)}');
     if (personResults.isEmpty) return [];
@@ -163,7 +171,8 @@ class DirectMovieService extends MovieService {
   @override
   Future<List<Movie>> searchMoviesByGenre(String genreName) async {
     await _ensureDirectClientInitialized();
-    // First get genre list to find the ID
+    // First get genre list to find the ID.
+
     final genreData = await _directClient!.getJson('genre/movie/list');
     final genres = genreData['genres'] as List<dynamic>? ?? [];
 
@@ -185,13 +194,15 @@ class DirectMovieService extends MovieService {
   Future<Movie> getMovieDetails(int movieId) async {
     await _ensureDirectClientInitialized();
 
-    // Use direct client instead of going through ContentService
+    // Use direct client instead of going through ContentService.
+
     try {
       final data = await _directClient!.getJson('movie/$movieId');
       final contentItem = ContentItem.fromMovieJson(data);
       return Movie.fromContentItem(contentItem);
     } catch (e) {
-      // Try TV endpoint if movie fails (for TV shows)
+      // Try TV endpoint if movie fails (for TV shows).
+
       final data = await _directClient!.getJson('tv/$movieId');
       final contentItem = ContentItem.fromTVJson(data);
       return Movie.fromContentItem(contentItem);

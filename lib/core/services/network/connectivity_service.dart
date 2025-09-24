@@ -99,7 +99,8 @@ class NetworkConnectivityService {
 
   /// Creates a service with custom check options for TMDB endpoints.
   factory NetworkConnectivityService.forTMDB() {
-    // Create custom checker that tests TMDB endpoints specifically
+    // Create custom checker that tests TMDB endpoints specifically.
+
     final customConnection = InternetConnection.createInstance(
       customCheckOptions: [
         InternetCheckOption(
@@ -166,7 +167,8 @@ class NetworkConnectivityService {
     try {
       final stopwatch = Stopwatch()..start();
 
-      // Try to resolve TMDB domain
+      // Try to resolve TMDB domain.
+
       final lookupResult = await InternetAddress.lookup(
         'api.themoviedb.org',
       ).timeout(NetworkTimingConstants.dnsLookupTimeout);
@@ -250,6 +252,6 @@ class NetworkConnectivityService {
 
   /// Dispose of resources (if needed in the future).
   void dispose() {
-    // Currently no resources to dispose, but keeping for future use
+    // Currently no resources to dispose, but keeping for future use.
   }
 }

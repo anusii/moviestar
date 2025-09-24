@@ -319,7 +319,7 @@ class HiveMovieCacheService {
       }
       _isInitialized = false;
     } catch (e) {
-      // Silently handle disposal errors
+      // Silently handle disposal errors.
     }
   }
 }

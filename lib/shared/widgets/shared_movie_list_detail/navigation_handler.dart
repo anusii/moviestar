@@ -49,6 +49,7 @@ class SharedListNavigationHandler {
       }
 
       // Show loading indicator.
+
       if (context.mounted) {
         showDialog(
           context: context,
@@ -58,7 +59,8 @@ class SharedListNavigationHandler {
         );
       }
 
-      // Get enhanced movie data for ratings and comments
+      // Get enhanced movie data for ratings and comments.
+
       final enhancedMovieData = await FetchOperations.fetchIndividualMovieData(
         context,
         widget,
@@ -67,8 +69,9 @@ class SharedListNavigationHandler {
         movieData,
       );
 
-      // Create Movie object directly from available data (like working Shared tab logic)
-      // This avoids TMDB API calls and associated API key/network issues
+      // Create Movie object directly from available data (like working Shared tab logic).
+      // This avoids TMDB API calls and associated API key/network issues.
+
       final movieTitle = enhancedMovieData['title'] ??
           enhancedMovieData['fileName'] ??
           'Unknown Movie';
@@ -98,17 +101,20 @@ class SharedListNavigationHandler {
         genreIds: genreIds,
       );
 
-      // Dismiss loading indicator
+      // Dismiss loading indicator.
+
       if (context.mounted) {
         Navigator.pop(context);
       }
 
       // Use provided favorites service or create a minimal one for shared context.
+
       FavoritesService finalFavoritesService;
       if (favoritesService != null) {
         finalFavoritesService = favoritesService!;
       } else {
-        // Create a minimal favorites service for shared viewing context
+        // Create a minimal favorites service for shared viewing context.
+
         final prefs = await SharedPreferences.getInstance();
         if (!context.mounted) return;
 
@@ -122,6 +128,7 @@ class SharedListNavigationHandler {
       }
 
       // Navigate to MovieDetailsScreen with enhanced shared movie data.
+
       if (context.mounted) {
         await screenStateMixin.safeNavigateTo(
           MaterialPageRoute(
@@ -141,6 +148,7 @@ class SharedListNavigationHandler {
   /// Handle navigation errors with appropriate user feedback.
   Future<void> _handleNavigationError(dynamic error) async {
     // Dismiss loading indicator if it's showing.
+
     if (context.mounted) {
       Navigator.of(
         context,

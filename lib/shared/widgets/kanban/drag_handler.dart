@@ -20,7 +20,8 @@ import 'package:moviestar/shared/widgets/kanban/drag_handler/sync_operations.dar
 
 import 'board_controller.dart';
 
-// Re-export helper classes for backward compatibility
+// Re-export helper classes for backward compatibility.
+
 export 'package:moviestar/shared/widgets/kanban/drag_handler/context_menu_builder.dart';
 export 'package:moviestar/shared/widgets/kanban/drag_handler/context_menu_handler.dart';
 export 'package:moviestar/shared/widgets/kanban/drag_handler/drop_operations.dart';
@@ -46,15 +47,18 @@ class KanbanDragHandler {
     String targetId,
     String targetName,
   ) async {
-    // Don't allow dropping on same column
+    // Don't allow dropping on same column.
+
     if (dragData.sourceType == targetType && dragData.sourceId == targetId) {
       return;
     }
 
-    // Determine if this is a copy or move operation
+    // Determine if this is a copy or move operation.
+
     final isCopyOperation = DropOperations.isCopyOperation(dragData.sourceType);
 
-    // Apply optimistic UI updates immediately
+    // Apply optimistic UI updates immediately.
+
     DropOperations.applyOptimisticUpdates(
       controller,
       dragData,
@@ -63,7 +67,8 @@ class KanbanDragHandler {
       isCopyOperation,
     );
 
-    // Add to queue for progress tracking
+    // Add to queue for progress tracking.
+
     final operationDescription = MessageHelpers.generateOperationDescription(
       dragData.movie,
       targetName,
@@ -71,7 +76,8 @@ class KanbanDragHandler {
     );
     final operationId = controller.addToQueue(operationDescription);
 
-    // Perform background sync
+    // Perform background sync.
+
     SyncOperations.syncDropOperation(
       favoritesService,
       controller,
@@ -111,7 +117,8 @@ class KanbanDragHandler {
     String sourceId, {
     String contentType = 'movie',
   }) async {
-    // Parse action and apply optimistic UI updates
+    // Parse action and apply optimistic UI updates.
+
     final actionData = ContextMenuBuilder.parseAction(action);
     final successMessage = action == 'remove'
         ? 'Removed "${movie.title}" ${actionData.successMessage}'
@@ -128,12 +135,14 @@ class KanbanDragHandler {
       );
     }
 
-    // Add to queue for progress tracking
+    // Add to queue for progress tracking.
+
     final operationId = controller.addToQueue(
       MessageHelpers.successMessageToOperation(successMessage),
     );
 
-    // Perform background sync
+    // Perform background sync.
+
     SyncOperations.syncContextMenuAction(
       context,
       favoritesService,

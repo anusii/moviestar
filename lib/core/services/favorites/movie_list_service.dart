@@ -42,7 +42,8 @@ class MovieListService extends BasePodService with PodOperationsMixin {
   }) async {
     return await executePodOperation(
       operation: () async {
-        // Check if a custom list with this name already exists
+        // Check if a custom list with this name already exists.
+
         final existingListId = await _fileHelper.findExistingMovieList(
           'custom', // Use 'custom' as list type for user-created lists
           listName,
@@ -96,7 +97,8 @@ class MovieListService extends BasePodService with PodOperationsMixin {
       final cached = _cache[movieListId];
       final movies = cached?['movies'] as List<Movie>? ?? [];
 
-      // Check if cached data contains placeholder movies
+      // Check if cached data contains placeholder movies.
+
       final hasPlaceholders =
           movies.any((movie) => movie.title == 'Loading...');
       if (hasPlaceholders) {
@@ -117,7 +119,8 @@ class MovieListService extends BasePodService with PodOperationsMixin {
           if (movieListData != null) {
             movieListData['id'] = movieListId;
 
-            // Load full movie data
+            // Load full movie data.
+
             final placeholderMovies =
                 movieListData['movies'] as List<Movie>? ?? [];
             final fullMovies = <Movie>[];

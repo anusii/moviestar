@@ -20,7 +20,8 @@ class ExceptionMappers {
     StackTrace stackTrace,
     List<ErrorAction> actions,
   ) {
-    // Analyze status code to determine error type and actions
+    // Analyze status code to determine error type and actions.
+
     if (error.statusCode == 401) {
       return UserFriendlyError.apiKeyError(
         actions: actions,

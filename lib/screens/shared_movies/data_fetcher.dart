@@ -18,11 +18,13 @@ class SharedMoviesDataFetcher {
     BuildContext context,
     StatefulWidget widget,
   ) async {
-    // Store context locally to avoid async gap issues
+    // Store context locally to avoid async gap issues.
+
     final localContext = context;
     final localWidget = widget;
     try {
       // Get shared resources from POD.
+
       final sharedResourcesResult =
           await sharedResources(localContext, localWidget);
 
@@ -38,18 +40,22 @@ class SharedMoviesDataFetcher {
       final Map<String, dynamic> movieListData = {};
 
       // Filter for movie files and movie list files, then fetch their content.
+
       for (final entry in sharedResourcesResult.entries) {
         final resourceUrl = entry.key as String;
         final resourceInfo = entry.value as Map;
 
         try {
           // Check if this is a movie file.
+
           if (resourceUrl.contains('/movies/') &&
               resourceUrl.endsWith('.ttl')) {
-            // Check if context is still valid
+            // Check if context is still valid.
+
             if (!localContext.mounted) continue;
 
             // Read the movie file content.
+
             final movieContent = await readExternalPod(
               resourceUrl,
               localContext,
@@ -59,6 +65,7 @@ class SharedMoviesDataFetcher {
             if (movieContent != null &&
                 movieContent != SolidFunctionCallStatus.notLoggedIn) {
               // Parse the movie data from TTL content.
+
               final movieInfo = await SharedMoviesDataParser.parseMovieData(
                 movieContent,
                 resourceUrl,
@@ -70,12 +77,15 @@ class SharedMoviesDataFetcher {
             }
           }
           // Check if this is a movie list file.
+
           else if (resourceUrl.contains('user_lists/MovieList-') &&
               resourceUrl.endsWith('.ttl')) {
-            // Check if context is still valid
+            // Check if context is still valid.
+
             if (!localContext.mounted) continue;
 
             // Read the movie list file content.
+
             final listContent = await readExternalPod(
               resourceUrl,
               localContext,
@@ -85,6 +95,7 @@ class SharedMoviesDataFetcher {
             if (listContent != null &&
                 listContent != SolidFunctionCallStatus.notLoggedIn) {
               // Parse the movie list data from TTL content.
+
               final listInfo = await SharedMoviesDataParser.parseMovieListData(
                 listContent,
                 resourceUrl,
@@ -96,12 +107,14 @@ class SharedMoviesDataFetcher {
             }
           }
         } catch (e) {
-          // Skip this resource and continue with others
+          // Skip this resource and continue with others.
+
           continue;
         }
       }
 
       // Combine movie data and movie list data.
+
       final combinedData = <String, dynamic>{};
       if (movieData.isNotEmpty) {
         combinedData['movies'] = movieData;

@@ -73,15 +73,17 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
 
   /// Triggers app reinitialization after API key is set.
   void _triggerAppReinitialization() {
-    // The provider invalidations handle the reinitialization
-    // No additional action needed since providers are already invalidated
+    // The provider invalidations handle the reinitialization.
+    // No additional action needed since providers are already invalidated.
   }
 
   void _navigateToHomeScreen() {
-    // Navigate back to the main home screen
+    // Navigate back to the main home screen.
+
     Navigator.of(context).popUntil((route) => route.isFirst);
 
-    // Show message to user
+    // Show message to user.
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -100,25 +102,29 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
     if (!context.mounted) return;
 
     if (mounted) {
-      // Invalidate providers in correct order for immediate effect
-      // IMPORTANT: Invalidate core providers first, then dependent ones
+      // Invalidate providers in correct order for immediate effect.
+      // IMPORTANT: Invalidate core providers first, then dependent ones.
+
       ref.invalidate(directApiKeyProvider);
       ref.invalidate(apiKeyProvider);
 
-      // Allow time for core providers to refresh
+      // Allow time for core providers to refresh.
+
       await Future.delayed(const Duration(milliseconds: 50));
 
       if (!mounted) return;
 
-      // Clear cache to force fresh data with new API key
+      // Clear cache to force fresh data with new API key.
+
       try {
         final cachedService = ref.read(configuredCachedMovieServiceProvider);
         await cachedService.clearAllCache();
       } catch (e) {
-        // Log but don't fail - provider invalidation will still work
+        // Log but don't fail - provider invalidation will still work.
       }
 
-      // Now invalidate all dependent movie providers
+      // Now invalidate all dependent movie providers.
+
       ref.invalidate(movieServiceProvider);
       ref.invalidate(contentServiceProvider);
       ref.invalidate(recommendedMoviesWithCacheInfoProvider);
@@ -127,12 +133,14 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
       ref.invalidate(upcomingMoviesWithCacheInfoProvider);
       ref.invalidate(configuredCachedMovieServiceProvider);
 
-      // Give providers time to refresh for immediate UI update
+      // Give providers time to refresh for immediate UI update.
+
       await Future.delayed(const Duration(milliseconds: 150));
 
       if (!mounted) return;
 
       // Show success message.
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -148,12 +156,14 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
         );
 
         // If we navigated here from the API key prompt, navigate back to home.
+
         if (widget.fromApiKeyPrompt) {
           _navigateToHomeScreen();
         }
 
-        // Trigger app reinitialization after API key is set
-        // This will properly initialize POD folders and data loading
+        // Trigger app reinitialization after API key is set.
+        // This will properly initialize POD folders and data loading.
+
         _triggerAppReinitialization();
       }
     }
@@ -238,6 +248,7 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
             GestureDetector(
               onTap: () {
                 // Launch TMDB website to get API key.
+
                 final Uri url = Uri.parse(
                   'https://www.themoviedb.org/?language=en-AU',
                 );

@@ -26,6 +26,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
     // Create the list resource.
+
     final listResource = TurtleNamespaceManager.localNS.withAttr(listName);
     triples[listResource] = {
       TurtleNamespaceManager.rdfType: TurtleNamespaceManager.movieListType,
@@ -34,6 +35,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
     };
 
     // Add movie references to the list only if there are movies.
+
     if (movies.isNotEmpty) {
       final movieList = movies
           .map((m) => TurtleNamespaceManager.localNS.withAttr('movie${m.id}'))
@@ -41,6 +43,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
       triples[listResource]![TurtleNamespaceManager.moviesProperty] = movieList;
 
       // Add individual movie definitions.
+
       for (final movie in movies) {
         final movieResource =
             TurtleNamespaceManager.localNS.withAttr('movie${movie.id}');
@@ -87,6 +90,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
     // Create the movie resource with all movie metadata.
+
     final movieResource =
         TurtleNamespaceManager.localNS.withAttr('movie${movie.id}');
     triples[movieResource] = {
@@ -111,6 +115,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
     };
 
     // Add user's personal rating if it exists.
+
     if (rating != null) {
       final userRatingResource =
           TurtleNamespaceManager.localNS.withAttr('userRating${movie.id}');
@@ -122,11 +127,13 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
       };
 
       // Link the movie to the user rating.
+
       triples[movieResource]![TurtleNamespaceManager.localNS
           .withAttr('hasUserRating')] = userRatingResource;
     }
 
     // Add user's personal comment if it exists.
+
     if (comment != null && comment.isNotEmpty) {
       final userCommentResource =
           TurtleNamespaceManager.localNS.withAttr('userComment${movie.id}');
@@ -139,11 +146,13 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
       };
 
       // Link the movie to the user comment.
+
       triples[movieResource]![TurtleNamespaceManager.localNS
           .withAttr('hasUserComment')] = userCommentResource;
     }
 
     // Add JSON backup for compatibility.
+
     final movieJson = jsonEncode(movie.toJson());
     final userDataJson = jsonEncode({'rating': rating, 'comment': comment});
 
@@ -166,6 +175,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
     // Create the movie resource with all movie metadata.
+
     final movieResource =
         TurtleNamespaceManager.moviestarDataNS.withAttr('movie-${movie.id}');
     triples[movieResource] = {
@@ -206,6 +216,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
     };
 
     // Add user's personal rating if it exists.
+
     if (rating != null) {
       triples[movieResource]![TurtleNamespaceManager.contentRating] = Literal(
         '$rating',
@@ -214,6 +225,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
     }
 
     // Add user's personal comment if it exists.
+
     if (comment != null && comment.isNotEmpty) {
       triples[movieResource]![TurtleNamespaceManager.comment] = Literal(
         TurtleBaseSerializer.escapeAndSanitizeString(comment),
@@ -221,6 +233,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
     }
 
     // Add JSON backup for compatibility.
+
     final movieJson = jsonEncode(movie.toJson());
     final userDataJson = jsonEncode({'rating': rating, 'comment': comment});
 
@@ -239,9 +252,11 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
     final buffer = StringBuffer();
 
     // Add the proper TTL structure.
+
     buffer.writeln(moviesToTurtle(movies, listName));
 
     // Add JSON backup as comment for easy parsing and backward compatibility.
+
     buffer.writeln();
     buffer.writeln(
       '# JSON_DATA: ${jsonEncode(movies.map((m) => m.toJson()).toList())}',
@@ -254,22 +269,26 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
   static List<Movie> moviesFromTurtle(String ttlContent) {
     try {
       // First try to parse from JSON backup for backward compatibility.
+
       final jsonMovies = TurtleParsingUtils.tryParseMovieJsonBackup(ttlContent);
       if (jsonMovies != null) {
         return jsonMovies;
       }
 
       // Parse using proper RDF if no JSON backup.
+
       final triples = TurtleParsingUtils.safeParseTtl(ttlContent);
       if (triples == null) return [];
 
       final movies = <Movie>[];
 
       // Find movie resources (subjects that have movie:Movie type).
+
       for (final subject in triples.keys) {
         final predicates = triples[subject]!;
 
         // Check if this is a movie or TV show resource.
+
         final isMovie = TurtleParsingUtils.hasRdfType(predicates, [
           'Movie',
           'TVShow',
@@ -290,6 +309,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
       return movies;
     } catch (e) {
       // Fallback to empty list if parsing fails.
+
       return [];
     }
   }
@@ -298,6 +318,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
   static Map<String, dynamic>? movieWithUserDataFromTurtle(String ttlContent) {
     try {
       // First try to parse from JSON backup for compatibility.
+
       final userData =
           TurtleParsingUtils.tryParseUserDataJsonBackup(ttlContent);
       if (userData != null) {
@@ -305,6 +326,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
       }
 
       // Parse using proper RDF if no JSON backup.
+
       final triples = TurtleParsingUtils.safeParseTtl(ttlContent);
       if (triples == null) return null;
 
@@ -313,10 +335,12 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
       String? comment;
 
       // Find movie, rating, and comment resources.
+
       for (final subject in triples.keys) {
         final predicates = triples[subject]!;
 
         // Check for movie or TV show.
+
         final isMovie = TurtleParsingUtils.hasRdfType(predicates, [
           'Movie',
           'TVShow',
@@ -330,6 +354,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
           movie = TurtleParsingUtils.extractMovieFromTriples(predicates);
 
           // Also check for rating and comment in the same movie resource (new ontology format).
+
           rating ??= double.tryParse(
             TurtleParsingUtils.extractFirstValue(
               predicates,
@@ -349,6 +374,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
         }
 
         // Check for rating (old format compatibility).
+
         final isRating = TurtleParsingUtils.hasRdfType(
           predicates,
           ['Rating', '#Rating'],
@@ -361,6 +387,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
         }
 
         // Check for comment (old format compatibility).
+
         final isComment = TurtleParsingUtils.hasRdfType(
           predicates,
           ['Comment', '#Comment'],

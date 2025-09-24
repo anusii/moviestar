@@ -55,7 +55,8 @@ class MovieInfoBuilder {
     }
 
     if (sharedByWebId != null && sharedByWebId.isNotEmpty) {
-      // Extract friendly name from WebID
+      // Extract friendly name from WebID.
+
       final match = RegExp(r'://[^/]+/([^/]+)/').firstMatch(sharedByWebId);
       if (match != null) {
         return match.group(1) ?? 'someone';

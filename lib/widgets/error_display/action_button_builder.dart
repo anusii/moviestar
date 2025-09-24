@@ -21,12 +21,15 @@ class ActionButtonBuilder {
   static Widget buildActionButtons(List<ErrorAction> actions) {
     if (actions.length == 1) {
       // Single action - full width button.
+
       return _buildSingleActionButton(actions.first);
     } else if (actions.length == 2) {
       // Two actions - side by side with equal heights.
+
       return _buildTwoActionButtons(actions);
     } else {
       // Multiple actions - wrap them.
+
       return _buildMultipleActionButtons(actions);
     }
   }

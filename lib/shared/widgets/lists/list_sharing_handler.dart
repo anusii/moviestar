@@ -185,7 +185,7 @@ class ListSharingHandler {
         try {
           await _createMovieFileIfNotExists(movie);
         } catch (e) {
-          // Continue with other movies
+          // Continue with other movies.
         }
         if (!context.mounted) return;
       }
@@ -237,7 +237,7 @@ class ListSharingHandler {
           moviesToShare.addAll(podMovies);
         }
       } catch (e) {
-        // Failed to get movies from POD
+        // Failed to get movies from POD.
       }
     }
 
@@ -267,7 +267,7 @@ class ListSharingHandler {
 
           moviesToShare.add(movieWithContentType);
         } catch (e) {
-          // Failed to fetch movie details
+          // Failed to fetch movie details.
         }
       }
     }
@@ -289,7 +289,7 @@ class ListSharingHandler {
           return;
         }
       } catch (e) {
-        // File doesn't exist, we'll create it
+        // File doesn't exist, we'll create it.
       }
 
       final adapter = favoritesService as FavoritesServiceAdapter;

@@ -33,7 +33,8 @@ class ApiKeyService extends BasePodService {
 
   /// Gets the API key from cache, POD, or secure storage.
   Future<String?> getApiKey() async {
-    // Return cached value if valid
+    // Return cached value if valid.
+
     if (_cachedApiKey != null &&
         _lastCacheTime != null &&
         DateTime.now().difference(_lastCacheTime!).inHours < 1) {
@@ -52,13 +53,16 @@ class ApiKeyService extends BasePodService {
   Future<void> setApiKey(String apiKey) async {
     await executePodOperation(
       operation: () async {
-        // Save to POD first
+        // Save to POD first.
+
         await _saveApiKeyToPod(apiKey);
 
-        // Always save to local storage as backup
+        // Always save to local storage as backup.
+
         await _saveApiKeyToLocalStorage(apiKey);
 
-        // Update cache
+        // Update cache.
+
         _cachedApiKey = apiKey;
         _lastCacheTime = DateTime.now();
 
@@ -91,17 +95,21 @@ class ApiKeyService extends BasePodService {
   Future<String?> _fetchApiKey() async {
     return await executePodOperation(
       operation: () async {
-        // Check if migration needed
+        // Check if migration needed.
+
         await _handleLegacyMigration();
 
-        // Try POD first
+        // Try POD first.
+
         String? apiKey = await _getApiKeyFromPod();
         if (apiKey != null) return apiKey;
 
-        // Fallback to local storage
+        // Fallback to local storage.
+
         apiKey = await _getApiKeyFromLocalStorage();
         if (apiKey != null) {
-          // Sync to POD for future use
+          // Sync to POD for future use.
+
           await _saveApiKeyToPod(apiKey);
           return apiKey;
         }

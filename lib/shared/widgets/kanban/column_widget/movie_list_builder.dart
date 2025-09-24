@@ -95,7 +95,8 @@ class MovieListBuilder {
       ),
       child: Row(
         children: [
-          // Poster skeleton
+          // Poster skeleton.
+
           Container(
             width: 50,
             height: 70,
@@ -106,13 +107,15 @@ class MovieListBuilder {
             ),
           ),
           const Gap(8),
-          // Text content skeleton
+          // Text content skeleton.
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Title skeleton
+                // Title skeleton.
+
                 Container(
                   height: 16,
                   width: double.infinity,
@@ -122,7 +125,8 @@ class MovieListBuilder {
                   ),
                 ),
                 const Gap(4),
-                // Subtitle skeleton
+                // Subtitle skeleton.
+
                 Container(
                   height: 12,
                   width: 100,

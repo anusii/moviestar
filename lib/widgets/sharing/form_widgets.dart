@@ -58,10 +58,12 @@ class _PermissionSelectorState extends State<PermissionSelector> {
     super.initState();
     _selected = List.from(widget.selectedPermissions);
 
-    // Ensure read permission is always included if required
+    // Ensure read permission is always included if required.
+
     if (widget.requireRead && !_selected.contains('read')) {
       _selected.add('read');
-      // Notify parent of the change
+      // Notify parent of the change.
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         widget.onChanged(_selected);
       });

@@ -70,6 +70,7 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
   void didChangeDependencies() {
     super.didChangeDependencies();
     // This gets called when returning from a route.
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _refreshData();

@@ -47,7 +47,8 @@ class KanbanCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Check if this movie has pending operations
+    // Check if this movie has pending operations.
+
     final hasPendingOp =
         controller.isPendingOperation(columnType, columnId, movie.id);
     final hasError = controller.hasSyncError(columnType, columnId, movie.id);
@@ -64,7 +65,8 @@ class KanbanCardWidget extends StatelessWidget {
             favoritesService: favoritesService,
             onTap: () => _navigateToMovieDetails(context),
           ),
-          // Show sync status indicator
+          // Show sync status indicator.
+
           if (hasPendingOp || hasError)
             Positioned(
               bottom: 4,
@@ -75,7 +77,8 @@ class KanbanCardWidget extends StatelessWidget {
       ),
     );
 
-    // Wrap in context menu for copy operations
+    // Wrap in context menu for copy operations.
+
     final contextMenuCard = GestureDetector(
       onSecondaryTapUp: (details) => onShowContextMenu(
         details.globalPosition,
@@ -87,7 +90,8 @@ class KanbanCardWidget extends StatelessWidget {
       child: movieCard,
     );
 
-    // Wrap in Draggable for drag operations
+    // Wrap in Draggable for drag operations.
+
     return Draggable<MovieDragData>(
       data: MovieDragData(
         movie: movie,
@@ -165,7 +169,8 @@ class KanbanCardWidget extends StatelessWidget {
               ),
             ),
           ),
-          // Show copy indicator for Recommended movies
+          // Show copy indicator for Recommended movies.
+
           if (columnType == KanbanColumnType.recommended)
             Positioned(
               top: 4,

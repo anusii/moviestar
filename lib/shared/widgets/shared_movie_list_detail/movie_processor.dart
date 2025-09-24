@@ -15,6 +15,7 @@ class SharedListMovieProcessor {
 
     try {
       // For WebIDs like: https://pods.dev.solidcommunity.au/my-moviestar/profile/card#me.
+
       final match = RegExp(r'://[^/]+/([^/]+)/').firstMatch(webId);
       if (match != null) {
         final username = match.group(1) ?? 'Unknown';
@@ -22,6 +23,7 @@ class SharedListMovieProcessor {
       }
 
       // If it doesn't match the expected pattern, return the full WebID.
+
       return webId.length > 30 ? '${webId.substring(0, 30)}...' : webId;
     } catch (e) {
       return webId.length > 30 ? '${webId.substring(0, 30)}...' : webId;
@@ -73,6 +75,7 @@ class SharedListMovieProcessor {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Movie header.
+
               Row(
                 children: [
                   Container(
@@ -118,6 +121,7 @@ class SharedListMovieProcessor {
               ),
 
               // Movie comments.
+
               if (comments.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Container(

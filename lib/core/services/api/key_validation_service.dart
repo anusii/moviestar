@@ -73,9 +73,10 @@ class ApiKeyValidationResult {
 
   /// Whether the API key issue should be treated as the primary problem.
   bool get shouldShowApiKeyError {
-    // Show API key error if:
-    // 1. No API key is configured
-    // 2. API key is configured but invalid
+    // Show API key error if:.
+    // 1. No API key is configured.
+    // 2. API key is configured but invalid.
+
     return !isConfigured || (isValid == false);
   }
 
@@ -95,22 +96,25 @@ class ApiKeyValidationService {
       if (_apiKeyService == null) {
         return ApiKeyValidationResult.unknown('API key service not available');
       }
-      // First check if an API key is configured
+      // First check if an API key is configured.
+
       final apiKey = await _apiKeyService.getApiKey();
 
       if (apiKey == null || apiKey.trim().isEmpty) {
         return ApiKeyValidationResult.notConfigured;
       }
 
-      // Basic format validation for TMDB API key
+      // Basic format validation for TMDB API key.
+
       if (!_isValidApiKeyFormat(apiKey)) {
         return ApiKeyValidationResult.invalid(
           'API key format appears invalid. TMDB API keys are typically 32 characters long.',
         );
       }
 
-      // For now, assume the key is valid if it's properly formatted
-      // In the future, this could be enhanced with actual API validation
+      // For now, assume the key is valid if it's properly formatted.
+      // In the future, this could be enhanced with actual API validation.
+
       return ApiKeyValidationResult.valid;
     } catch (e) {
       return ApiKeyValidationResult.unknown(
@@ -132,7 +136,8 @@ class ApiKeyValidationService {
 
   /// Validates the basic format of a TMDB API key.
   bool _isValidApiKeyFormat(String apiKey) {
-    // TMDB API keys are typically 32 character hexadecimal strings
+    // TMDB API keys are typically 32 character hexadecimal strings.
+
     final apiKeyPattern = RegExp(r'^[a-fA-F0-9]{32}$');
     return apiKeyPattern.hasMatch(apiKey.trim());
   }
@@ -141,7 +146,8 @@ class ApiKeyValidationService {
   static bool isApiKeyError(Object error) {
     final errorString = error.toString().toLowerCase();
 
-    // Check for common API key error indicators
+    // Check for common API key error indicators.
+
     return errorString.contains('api key') ||
         errorString.contains('unauthorized') ||
         errorString.contains('401') ||

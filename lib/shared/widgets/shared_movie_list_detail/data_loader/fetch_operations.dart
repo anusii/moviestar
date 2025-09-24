@@ -28,6 +28,7 @@ class FetchOperations {
   ) async {
     try {
       // If we already have rating and comments, return as-is.
+
       if (movieData['rating'] != null &&
           movieData['comments'] != null &&
           movieData['comments'].isNotEmpty) {
@@ -35,15 +36,18 @@ class FetchOperations {
       }
 
       // Construct the expected individual movie file path.
+
       final movieId = movieData['movieId']?.toString() ?? '';
       if (movieId.isEmpty) {
         return movieData;
       }
 
-      // Check if we have filePath information from the movie list
+      // Check if we have filePath information from the movie list.
+
       final providedFilePath = movieData['filePath'] as String?;
 
-      // First, try to find the individual file in the shared resources
+      // First, try to find the individual file in the shared resources.
+
       String? actualSharedUrl =
           await UrlHandlers.findIndividualFileInSharedResources(
         context,
@@ -70,14 +74,16 @@ class FetchOperations {
           final isTvShow =
               UrlHandlers.isTelevisionShow(providedFilePath, actualSharedUrl);
 
-          // Parse and return the enhanced data
+          // Parse and return the enhanced data.
+
           final parsedData =
               await DataParser.parseIndividualMovieData(movieFileContent);
 
           if (parsedData != null || isTvShow) {
             final enhancedData = Map<String, dynamic>.from(movieData);
             if (parsedData != null) {
-              // Add user-specific data
+              // Add user-specific data.
+
               if (parsedData['title'] != null) {
                 enhancedData['title'] = parsedData['title'];
                 enhancedData['fileName'] = parsedData['title'];
@@ -89,7 +95,8 @@ class FetchOperations {
                 enhancedData['comments'] = parsedData['comments'];
               }
 
-              // Add TMDB metadata if available
+              // Add TMDB metadata if available.
+
               if (parsedData['posterUrl'] != null) {
                 enhancedData['posterUrl'] = parsedData['posterUrl'];
               }
@@ -116,7 +123,8 @@ class FetchOperations {
         }
       }
 
-      // Fallback: try to construct URLs manually
+      // Fallback: try to construct URLs manually.
+
       if (!context.mounted) return movieData;
       return await fetchIndividualMovieDataFallback(
         context,
@@ -141,7 +149,8 @@ class FetchOperations {
     final movieId = movieData['movieId']?.toString() ?? '';
     final providedFilePath = movieData['filePath'] as String?;
 
-    // We'll try both the owner's and sharer's PODs
+    // We'll try both the owner's and sharer's PODs.
+
     final ownerBaseUrl = UrlHandlers.extractBaseUrlFromWebId(ownerWebId);
     final sharerBaseUrl = UrlHandlers.extractBaseUrlFromWebId(sharedByWebId);
 
@@ -149,7 +158,8 @@ class FetchOperations {
       return movieData;
     }
 
-    // Generate list of URLs to try
+    // Generate list of URLs to try.
+
     final urlsToTry = UrlHandlers.generateUrlsToTry(
       ownerBaseUrl,
       sharerBaseUrl,
@@ -157,7 +167,8 @@ class FetchOperations {
       movieId,
     );
 
-    // Try to read the individual file from the generated URLs
+    // Try to read the individual file from the generated URLs.
+
     dynamic movieFileContent;
     bool isTvShow = false;
 
@@ -187,17 +198,21 @@ class FetchOperations {
     }
 
     // Parse the movie/TV show file content to extract rating and comments.
+
     final parsedData =
         await DataParser.parseIndividualMovieData(movieFileContent);
 
     if (parsedData != null || isTvShow) {
       // Merge the parsed data with the original movie data.
+
       final enhancedData = Map<String, dynamic>.from(movieData);
       if (parsedData != null) {
-        // Add user-specific data
+        // Add user-specific data.
+
         if (parsedData['title'] != null) {
           enhancedData['title'] = parsedData['title'];
-          // Also update the fileName with the actual title
+          // Also update the fileName with the actual title.
+
           enhancedData['fileName'] = parsedData['title'];
         }
         if (parsedData['rating'] != null) {
@@ -207,7 +222,8 @@ class FetchOperations {
           enhancedData['comments'] = parsedData['comments'];
         }
 
-        // Add TMDB metadata if available
+        // Add TMDB metadata if available.
+
         if (parsedData['posterUrl'] != null) {
           enhancedData['posterUrl'] = parsedData['posterUrl'];
         }
@@ -228,11 +244,13 @@ class FetchOperations {
         }
       }
 
-      // Update content type and display name based on what we found
+      // Update content type and display name based on what we found.
+
       if (isTvShow) {
         enhancedData['content_type'] = 'tv';
-        // Update the fileName to reflect it's a TV show if not already set properly
-        // But only if we don't have a real title
+        // Update the fileName to reflect it's a TV show if not already set properly.
+        // But only if we don't have a real title.
+
         if (parsedData?['title'] == null &&
             enhancedData['fileName'] == 'Movie $movieId') {
           enhancedData['fileName'] = 'TV Show $movieId';

@@ -102,7 +102,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
   void _resetPermissionsToDefaults() {
     _sharingState.resetPermissionsToDefaults();
 
-    // Show confirmation
+    // Show confirmation.
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Permissions reset to defaults'),
@@ -208,7 +209,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Collection overview
+            // Collection overview.
+
             CollectionOverview(
               listName: widget.listName,
               movieCount: widget.movies.length,
@@ -216,7 +218,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
 
             const SizedBox(height: 24),
 
-            // Recipient section
+            // Recipient section.
+
             RecipientSection(
               controller: _sharingState.webIdController,
               onValidated: _sharingState.updateWebId,
@@ -224,7 +227,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
 
             const SizedBox(height: 24),
 
-            // Files and permissions section
+            // Files and permissions section.
+
             BatchSharingPermissionsPanel(
               shareableFiles: _sharingState.shareableFiles,
               onPermissionsChanged: _sharingState.updateFilePermissions,
@@ -233,7 +237,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
 
             const SizedBox(height: 32),
 
-            // Share button
+            // Share button.
+
             _buildShareButton(),
           ],
         ),

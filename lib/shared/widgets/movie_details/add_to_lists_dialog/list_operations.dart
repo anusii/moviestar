@@ -81,14 +81,17 @@ class ListOperations {
         .contains(movie.id);
 
     // If the movie was originally in the list and is now deselected, subtract 1.
+
     if (wasOriginallyInList && !isCurrentlySelected) {
       return list.movieCount - 1;
     }
     // If the movie was not originally in the list but is now selected, add 1.
+
     else if (!wasOriginallyInList && isCurrentlySelected) {
       return list.movieCount + 1;
     }
     // Otherwise, return the original count.
+
     else {
       return list.movieCount;
     }

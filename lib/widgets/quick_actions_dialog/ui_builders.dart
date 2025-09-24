@@ -112,6 +112,7 @@ class UiBuilders {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         // Bookmark (To Watch).
+
         _buildActionButton(
           context: context,
           icon: isInToWatch ? Icons.bookmark : Icons.bookmark_border,
@@ -123,6 +124,7 @@ class UiBuilders {
         ),
 
         // Watched.
+
         _buildActionButton(
           context: context,
           icon: isInWatched ? Icons.check_circle : Icons.check_circle_outline,
@@ -134,6 +136,7 @@ class UiBuilders {
         ),
 
         // Share button (only if movie has rating/comment and POD is enabled).
+
         if (hasMovieFile &&
             favoritesService is FavoritesServiceAdapter &&
             favoritesService.isPodStorageEnabled)

@@ -76,6 +76,7 @@ class HomeWatchedSection extends ConsumerWidget {
       stream: favoritesService.watchedMovies,
       builder: (context, snapshot) {
         // Check if the service is a FavoritesServiceAdapter with caching.
+
         final isCached = favoritesService is FavoritesServiceAdapter;
         Map<String, dynamic>? cacheStats;
 
@@ -138,6 +139,7 @@ class HomeWatchedSection extends ConsumerWidget {
                     ),
                   ),
                   // Show cache indicator for user data if cached.
+
                   if (fromCache && cacheAge != null)
                     buildCacheAgeBadge(cacheAge),
                 ],
@@ -177,6 +179,7 @@ class HomeWatchedSection extends ConsumerWidget {
     }
 
     // Enhanced loading indicator for initial load and connection state.
+
     if (snapshot.connectionState == ConnectionState.waiting ||
         !snapshot.hasData) {
       return Container(
@@ -251,7 +254,8 @@ class HomeWatchedSection extends ConsumerWidget {
               favoritesService: favoritesService,
               parentWidget: parentWidget,
               onTap: () {
-                // Navigate to movie details using the provided callback
+                // Navigate to movie details using the provided callback.
+
                 onNavigate(
                   MaterialPageRoute(
                     builder: (context) => MovieDetailsScreen(
@@ -275,6 +279,7 @@ class HomeWatchedSection extends ConsumerWidget {
       stream: favoritesService.watchedMovies,
       builder: (context, snapshot) {
         // Check if the service is a FavoritesServiceAdapter with caching.
+
         final isCached = favoritesService is FavoritesServiceAdapter;
         bool fromCache = false;
 

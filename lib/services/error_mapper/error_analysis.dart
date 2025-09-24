@@ -62,7 +62,8 @@ class ErrorAnalysis {
     final errorType = analyzeErrorText(errorText);
     final actions = <ErrorAction>[];
 
-    // Add common actions based on error type
+    // Add common actions based on error type.
+
     switch (errorType) {
       case ErrorType.apiKeyError:
         if (onConfigureApiKey != null) {

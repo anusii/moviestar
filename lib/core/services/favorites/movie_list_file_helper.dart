@@ -51,7 +51,7 @@ class MovieListFileHelper with PodOperationsMixin {
         encrypted: false,
       );
     } catch (e) {
-      // Error creating movie file
+      // Error creating movie file.
     }
   }
 
@@ -68,7 +68,8 @@ class MovieListFileHelper with PodOperationsMixin {
 
       String result = '';
 
-      // For TV shows, try TVShow file first, then fall back to Movie file
+      // For TV shows, try TVShow file first, then fall back to Movie file.
+
       if (contentType == 'tv' || contentType == 'tvShow') {
         try {
           final readResult = await PodFileOperationsService.readFile(
@@ -78,7 +79,8 @@ class MovieListFileHelper with PodOperationsMixin {
           );
           result = readResult.success ? (readResult.data ?? '') : '';
         } catch (e) {
-          // Fall back to Movie file for backward compatibility
+          // Fall back to Movie file for backward compatibility.
+
           if (!isFileNotFoundError(e)) {
             rethrow;
           }
@@ -91,7 +93,8 @@ class MovieListFileHelper with PodOperationsMixin {
           result = readResult.success ? (readResult.data ?? '') : '';
         }
       } else {
-        // For movies, just try Movie file
+        // For movies, just try Movie file.
+
         final readResult = await PodFileOperationsService.readFile(
           movieFileName,
           _context,
@@ -109,7 +112,7 @@ class MovieListFileHelper with PodOperationsMixin {
       } else {}
     } catch (e) {
       if (!isFileNotFoundError(e)) {
-        // Error loading movie data
+        // Error loading movie data.
       }
     }
     return null;
@@ -126,7 +129,7 @@ class MovieListFileHelper with PodOperationsMixin {
           .toList();
     } catch (e) {
       if (!isFileNotFoundError(e) && !isPermissionError(e)) {
-        // Error scanning directory
+        // Error scanning directory.
       }
       return [];
     }
@@ -160,11 +163,11 @@ class MovieListFileHelper with PodOperationsMixin {
             }
           }
         } catch (e) {
-          // Error reading MovieList file
+          // Error reading MovieList file.
         }
       }
     } catch (e) {
-      // Error finding existing MovieList
+      // Error finding existing MovieList.
     }
     return null;
   }

@@ -22,7 +22,8 @@ class MovieLoader {
     final moviesMap = <int, Movie>{};
     final cachedMovieService = ref.read(cachedMovieServiceProvider);
 
-    // Load movies in batches for better performance
+    // Load movies in batches for better performance.
+
     const batchSize = 10;
     for (int i = 0; i < movieIds.length; i += batchSize) {
       final end =
@@ -53,20 +54,22 @@ class MovieLoader {
     final cachedMovieService = ref.read(cachedMovieServiceProvider);
     final contentService = ref.read(contentServiceProvider);
 
-    // First try as movie
+    // First try as movie.
+
     try {
       final movie = await cachedMovieService.getMovieDetails(contentId);
       return movie;
     } catch (_) {
-      // Try as TV show if movie fails
+      // Try as TV show if movie fails.
     }
 
-    // Try as TV show
+    // Try as TV show.
+
     try {
       final tvShow = await contentService.getTVDetails(contentId);
       return Movie.fromContentItem(tvShow);
     } catch (_) {
-      // Handle error
+      // Handle error.
     }
 
     throw Exception('Content not found');
@@ -81,7 +84,8 @@ class MovieLoader {
     Function(int, Movie) onMovieLoaded,
     Function(int, String) onMovieError,
   ) async {
-    // Clear any existing error
+    // Clear any existing error.
+
     movieErrors.remove(movieId);
 
     try {

@@ -38,7 +38,8 @@ import 'package:moviestar/core/services/cache/settings_service.dart';
 import 'package:moviestar/providers/cached_movie_service_provider/direct_movie_service.dart';
 import 'package:moviestar/providers/cached_movie_service_provider/state_notifiers.dart';
 
-// Re-export the extracted classes for backward compatibility
+// Re-export the extracted classes for backward compatibility.
+
 export 'package:moviestar/providers/cached_movie_service_provider/direct_movie_service.dart';
 export 'package:moviestar/providers/cached_movie_service_provider/provider_definitions.dart';
 export 'package:moviestar/providers/cached_movie_service_provider/state_notifiers.dart';
@@ -47,8 +48,9 @@ export 'package:moviestar/providers/cached_movie_service_provider/state_notifier
 /// Note: Context needs to be set manually via updateContext() for POD operations.
 
 final apiKeyServiceProvider = Provider<ApiKeyService?>((ref) {
-  // ApiKeyService requires BuildContext and Widget, so return null here
-  // Services should create their own instance with proper context
+  // ApiKeyService requires BuildContext and Widget, so return null here.
+  // Services should create their own instance with proper context.
+
   return null;
 });
 
@@ -63,10 +65,12 @@ final directApiKeyProvider = FutureProvider<String?>((ref) async {
       mOptions: MacOsOptions(synchronizable: false),
     );
 
-    // Try multiple storage keys to find the API key
+    // Try multiple storage keys to find the API key.
+
     String? apiKey;
 
-    // Try user-specific key first (current approach)
+    // Try user-specific key first (current approach).
+
     try {
       final webId = await getWebId();
       if (webId != null && webId.isNotEmpty) {
@@ -74,10 +78,11 @@ final directApiKeyProvider = FutureProvider<String?>((ref) async {
         apiKey = await storage.read(key: userKey);
       }
     } catch (e) {
-      // Failed to read API key from storage
+      // Failed to read API key from storage.
     }
 
-    // Try legacy key if user key not found
+    // Try legacy key if user key not found.
+
     if (apiKey == null || apiKey.isEmpty) {
       apiKey = await storage.read(key: 'movie_db_api_key');
     }
@@ -99,13 +104,16 @@ final apiKeyProvider = StateNotifierProvider<ApiKeyNotifier, String?>((ref) {
 
 final movieServiceProvider = Provider.autoDispose<MovieService>((ref) {
   // Watch the direct API key to trigger recreation when it changes.
+
   final apiKeyAsync = ref.watch(directApiKeyProvider);
   final apiKey = apiKeyAsync.valueOrNull;
 
-  // Create a DirectMovieService that uses the API key directly
+  // Create a DirectMovieService that uses the API key directly.
+
   final movieService = DirectMovieService(apiKey);
 
   // Ensure proper disposal.
+
   ref.onDispose(() {
     movieService.dispose();
   });
@@ -138,10 +146,12 @@ final directContentServiceProvider =
     FutureProvider<ContentService>((ref) async {
   final apiKey = await ref.watch(directApiKeyProvider.future);
 
-  // Use the new constructor that accepts API key directly
+  // Use the new constructor that accepts API key directly.
+
   final contentService = ContentService.withApiKey(apiKey);
 
   // Ensure proper disposal.
+
   ref.onDispose(() {
     contentService.dispose();
   });

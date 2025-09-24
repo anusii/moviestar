@@ -33,6 +33,7 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
     // Create the MovieList resource.
+
     final movieListResource = TurtleNamespaceManager.moviestarDataNS
         .withAttr('MovieList-$movieListId');
     triples[movieListResource] = {
@@ -54,20 +55,24 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
     };
 
     // Add sharing metadata if provided.
+
     if (sharedWith != null && sharedWith.isNotEmpty) {
       // Add shared_with as a list of WebIds.
+
       final sharedWithWebIds =
           sharedWith.keys.map((webId) => Literal(webId)).toList();
       triples[movieListResource]![TurtleNamespaceManager.moviestarOntoNS
           .withAttr('sharedWith')] = sharedWithWebIds;
 
       // Add permissions as JSON string for flexibility.
+
       final permissionsJson = jsonEncode(sharedWith);
       triples[movieListResource]![TurtleNamespaceManager.moviestarOntoNS
           .withAttr('permissions')] = Literal(permissionsJson);
     }
 
     // Add shared date if provided.
+
     if (sharedDate != null) {
       triples[movieListResource]![TurtleNamespaceManager.moviestarOntoNS
           .withAttr('sharedDate')] = Literal(
@@ -77,6 +82,7 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
     }
 
     // Add movie references (not full movie data) if provided.
+
     if (movies.isNotEmpty) {
       final movieRefs = movies
           .map(
@@ -87,10 +93,12 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
       triples[movieListResource]![TurtleNamespaceManager.hasMovie] = movieRefs;
 
       // Add individual movie reference definitions (not full data).
+
       for (final movie in movies) {
         final movieResource = TurtleNamespaceManager.moviestarDataNS
             .withAttr('movie-${movie.id}');
-        // Use content-type aware file naming
+        // Use content-type aware file naming.
+
         final contentPrefix =
             movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie';
         final filePathStr =
@@ -119,6 +127,7 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
   static Map<String, dynamic>? movieListFromTurtle(String ttlContent) {
     try {
       // Parse using proper RDF.
+
       final triples = TurtleParsingUtils.safeParseTtl(ttlContent);
       if (triples == null) return null;
 
@@ -132,10 +141,12 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
       final Map<String, ContentType> movieContentTypes = {};
 
       // Find MovieList resource and extract movie references.
+
       for (final subject in triples.keys) {
         final predicates = triples[subject]!;
 
         // Check for MovieList.
+
         final isMovieList = TurtleParsingUtils.hasRdfType(predicates, [
           'MovieList',
           'https://sii.anu.edu.au/onto/moviestar#MovieList',
@@ -143,6 +154,7 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
 
         if (isMovieList) {
           // Extract MovieList metadata.
+
           for (final predicate in predicates.keys) {
             final values = predicates[predicate]!;
             if (values.isNotEmpty) {
@@ -158,6 +170,7 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
                 filePath = value;
               } else if (predicate.contains('sharedWith')) {
                 // Extract shared WebIds.
+
                 final webIds = <String>[];
                 for (final webIdRef in values) {
                   webIds.add(webIdRef.toString());
@@ -165,6 +178,7 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
                 sharedWith = {for (final webId in webIds) webId: 'read'};
               } else if (predicate.contains('permissions')) {
                 // Parse permissions JSON.
+
                 try {
                   final permissionsMap =
                       jsonDecode(value) as Map<String, dynamic>;
@@ -172,20 +186,23 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
                     (key, value) => MapEntry(key, value.toString()),
                   );
                 } catch (e) {
-                  // Failed to parse permissions JSON
+                  // Failed to parse permissions JSON.
                 }
               } else if (predicate.contains('sharedDate')) {
                 // Parse shared date.
+
                 try {
                   sharedDate = DateTime.parse(value);
                 } catch (e) {
-                  // Failed to parse shared date
+                  // Failed to parse shared date.
                 }
               } else if (predicate.contains('hasMovie')) {
                 // Extract movie resource references.
+
                 for (final movieRef in values) {
                   final movieRefStr = movieRef.toString();
                   // Extract movie ID from resource URI like "movie-12345".
+
                   final movieIdMatch =
                       RegExp(r'movie-(\d+)').firstMatch(movieRefStr);
                   if (movieIdMatch != null) {
@@ -196,7 +213,8 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
             }
           }
         }
-        // Check for individual movie resources and their content types
+        // Check for individual movie resources and their content types.
+
         else {
           final movieIdMatch =
               RegExp(r'movie-(\d+)').firstMatch(subject.toString());
@@ -214,10 +232,12 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
       }
 
       // Create placeholder Movie objects from the movie references.
+
       final List<Movie> movies = [];
       for (final movieId in movieResourceIds) {
         try {
           // Create a minimal Movie object with just the ID.
+
           final movie = Movie(
             id: int.parse(movieId),
             title: 'Loading...', // Use a loading indicator
@@ -231,7 +251,7 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
           );
           movies.add(movie);
         } catch (e) {
-          // Failed to create movie from data
+          // Failed to create movie from data.
         }
       }
 

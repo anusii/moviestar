@@ -25,6 +25,7 @@ class ApiKeyTurtleSerializer extends TurtleBaseSerializer {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
     // Create the API key resource.
+
     final apiKeyResource =
         TurtleNamespaceManager.moviestarDataNS.withAttr('ApiKey-$apiKeyId');
     triples[apiKeyResource] = {

@@ -62,7 +62,8 @@ class PodFileOperationsService {
 
     for (int attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        // Check if user is logged in
+        // Check if user is logged in.
+
         final loggedIn = await isLoggedIn();
         if (!loggedIn) {
           return PodFileOperationResult.failure(
@@ -70,44 +71,51 @@ class PodFileOperationsService {
           );
         }
 
-        // Check if context is still mounted
+        // Check if context is still mounted.
+
         if (!context.mounted) {
           return PodFileOperationResult.failure(
             'Context no longer mounted',
           );
         }
 
-        // Attempt to read the file
+        // Attempt to read the file.
+
         final result = await solidpod.readPod(fileName, context, child);
 
         if (result.isNotEmpty) {
           return PodFileOperationResult.success(result);
         } else {
-          // Empty result might be valid for some files
+          // Empty result might be valid for some files.
+
           return PodFileOperationResult.success('');
         }
       } catch (e) {
         final errorMessage = e.toString();
 
-        // Don't retry if file doesn't exist - this is expected for new files
+        // Don't retry if file doesn't exist - this is expected for new files.
+
         if (errorMessage.contains('does not exist')) {
           return PodFileOperationResult.failure('File does not exist');
         }
 
-        // Don't retry if context issues
+        // Don't retry if context issues.
+
         if (errorMessage.contains('mounted') ||
             errorMessage.contains('context')) {
           return PodFileOperationResult.failure(errorMessage);
         }
 
-        // If this is the last attempt, return the error
+        // If this is the last attempt, return the error.
+
         if (attempt == maxAttempts) {
           return PodFileOperationResult.failure(
             'Failed to read file after $maxAttempts attempts: $errorMessage',
           );
         }
 
-        // Wait before retrying
+        // Wait before retrying.
+
         await Future.delayed(_retryDelay * attempt);
       }
     }
@@ -137,7 +145,8 @@ class PodFileOperationsService {
 
     for (int attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        // Check if user is logged in
+        // Check if user is logged in.
+
         final loggedIn = await isLoggedIn();
         if (!loggedIn) {
           return PodFileOperationResult.failure(
@@ -145,14 +154,16 @@ class PodFileOperationsService {
           );
         }
 
-        // Check if context is still mounted
+        // Check if context is still mounted.
+
         if (!context.mounted) {
           return PodFileOperationResult.failure(
             'Context no longer mounted',
           );
         }
 
-        // Attempt to write the file
+        // Attempt to write the file.
+
         final result = await solidpod.writePod(
           fileName,
           content,
@@ -169,20 +180,23 @@ class PodFileOperationsService {
       } catch (e) {
         final errorMessage = e.toString();
 
-        // Don't retry if context issues
+        // Don't retry if context issues.
+
         if (errorMessage.contains('mounted') ||
             errorMessage.contains('context')) {
           return PodFileOperationResult.failure(errorMessage);
         }
 
-        // If this is the last attempt, return the error
+        // If this is the last attempt, return the error.
+
         if (attempt == maxAttempts) {
           return PodFileOperationResult.failure(
             'Failed to write file after $maxAttempts attempts: $errorMessage',
           );
         }
 
-        // Wait before retrying
+        // Wait before retrying.
+
         await Future.delayed(_retryDelay * attempt);
       }
     }
@@ -221,7 +235,8 @@ class PodFileOperationsService {
     Widget child,
   ) async {
     try {
-      // Check if user is logged in
+      // Check if user is logged in.
+
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
         return PodFileOperationResult.failure(
@@ -229,14 +244,16 @@ class PodFileOperationsService {
         );
       }
 
-      // Check if context is still mounted
+      // Check if context is still mounted.
+
       if (!context.mounted) {
         return PodFileOperationResult.failure(
           'Context no longer mounted',
         );
       }
 
-      // Use SolidPOD's deleteFile function directly
+      // Use SolidPOD's deleteFile function directly.
+
       await solidpod.deleteFile(fileName);
 
       return PodFileOperationResult.success();
@@ -261,7 +278,8 @@ class PodFileOperationsService {
   }) async {
     final results = <String, PodFileOperationResult>{};
 
-    // Execute writes in parallel for better performance
+    // Execute writes in parallel for better performance.
+
     final futures = operations.entries.map((entry) async {
       final fileName = entry.key;
       final content = entry.value;
@@ -290,7 +308,8 @@ class PodFileOperationsService {
   ///
   /// [relativePath] - The relative path within the app's POD directory.
   static String getFullPodPath(String relativePath) {
-    // Remove leading slash if present
+    // Remove leading slash if present.
+
     final cleanPath =
         relativePath.startsWith('/') ? relativePath.substring(1) : relativePath;
 

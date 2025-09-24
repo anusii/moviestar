@@ -55,6 +55,7 @@ class HomeApiErrorOverlay extends ConsumerWidget {
         StackTrace.current,
         () {
           // Retry by refreshing all providers.
+
           ref.invalidate(recommendedMoviesWithCacheInfoProvider);
           ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
           ref.invalidate(topRatedMoviesWithCacheInfoProvider);
@@ -80,6 +81,7 @@ class HomeApiErrorOverlay extends ConsumerWidget {
         }
 
         // Fallback to basic error display.
+
         return Center(
           child: Padding(
             padding: const EdgeInsets.all(Dimensions.huge),
@@ -120,11 +122,13 @@ class HomeApiErrorOverlay extends ConsumerWidget {
     VoidCallback onRetry,
   ) async {
     // Create services for smart detection.
+
     final apiKeyService = ref.read(apiKeyServiceProvider);
     final apiKeyValidationService = ApiKeyValidationService(apiKeyService);
     final networkConnectivityService = NetworkConnectivityService.forTMDB();
 
     // Create error context with available actions and services.
+
     final errorContext = ErrorContext(
       onRetry: onRetry,
       onConfigureApiKey: null,
@@ -134,6 +138,7 @@ class HomeApiErrorOverlay extends ConsumerWidget {
 
     try {
       // Use smart error mapping.
+
       return await ErrorMapperService.mapErrorSmart(
         error,
         stackTrace,
@@ -141,6 +146,7 @@ class HomeApiErrorOverlay extends ConsumerWidget {
       );
     } catch (e) {
       // If smart mapping fails, fall back to traditional mapping.
+
       return ErrorMapperService.mapError(
         error,
         stackTrace,

@@ -24,23 +24,27 @@ class PodFavoritesFileHandler {
   Future<List<Movie>> parseMoviesFromTtl(String ttlContent) async {
     final movieListData = await _fileManager.parseMovieListData(ttlContent);
     if (movieListData != null) {
-      // Load full movie details for each placeholder movie
+      // Load full movie details for each placeholder movie.
+
       final fullMovies = <Movie>[];
       for (int i = 0; i < movieListData.length; i++) {
         final placeholderMovie = movieListData[i];
 
         try {
-          // Load full movie details from individual movie file
+          // Load full movie details from individual movie file.
+
           final fullMovie =
               await _fileManager.loadFullMovieDetails(placeholderMovie);
           if (fullMovie != null) {
             fullMovies.add(fullMovie);
           } else {
-            // Fallback to placeholder if individual file doesn't exist
+            // Fallback to placeholder if individual file doesn't exist.
+
             fullMovies.add(placeholderMovie);
           }
         } catch (e) {
-          // Fallback to placeholder on error
+          // Fallback to placeholder on error.
+
           fullMovies.add(placeholderMovie);
         }
       }

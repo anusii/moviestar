@@ -91,7 +91,8 @@ class _PreferencesPanelState extends ConsumerState<PreferencesPanel> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Appearance Section
+        // Appearance Section.
+
         widget.buildSection('Appearance', [
           Padding(
             padding: const EdgeInsets.all(16),
@@ -136,7 +137,8 @@ class _PreferencesPanelState extends ConsumerState<PreferencesPanel> {
           ),
         ]),
 
-        // Preferences Section
+        // Preferences Section.
+
         widget.buildSection('Preferences', [
           widget.buildSwitchTile(
             'Notifications',
@@ -152,7 +154,8 @@ class _PreferencesPanelState extends ConsumerState<PreferencesPanel> {
           ),
         ]),
 
-        // Playback Section
+        // Playback Section.
+
         widget.buildSection('Playback', [
           _buildDropdownTile(
             'Language',
@@ -168,7 +171,8 @@ class _PreferencesPanelState extends ConsumerState<PreferencesPanel> {
           ),
         ]),
 
-        // Account Section
+        // Account Section.
+
         widget.buildSection('Account', [
           widget.buildListTile('Help & Support', Icons.help_outline, () {
             // TODO: Navigate to Help & Support.
@@ -178,10 +182,12 @@ class _PreferencesPanelState extends ConsumerState<PreferencesPanel> {
             Icons.logout,
             () async {
               // Show logout confirmation dialog and handle logout.
+
               final prefs = ref.read(sharedPreferencesProvider);
 
-              // Create a properly configured SolidLogin widget using the same function
+              // Create a properly configured SolidLogin widget using the same function.
               // that creates the initial login screen to maintain consistent branding.
+
               final solidLoginWidget = createSolidLogin(context, prefs);
 
               await logoutPopup(context, solidLoginWidget);

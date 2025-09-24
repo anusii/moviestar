@@ -38,7 +38,8 @@ class ListHeaderWidget extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // List name and options (conditionally shown)
+        // List name and options (conditionally shown).
+
         if (showTitle || showOptions) ...[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -64,7 +65,8 @@ class ListHeaderWidget extends ConsumerWidget {
           const SizedBox(height: 8),
         ],
 
-        // List description with tooltip if it's long
+        // List description with tooltip if it's long.
+
         if (customList.description?.isNotEmpty == true) ...[
           Row(
             children: [
@@ -105,10 +107,12 @@ class ListHeaderWidget extends ConsumerWidget {
           const SizedBox(height: 12),
         ],
 
-        // Movie count and creation date
+        // Movie count and creation date.
+
         Row(
           children: [
-            // Movie count
+            // Movie count.
+
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
@@ -126,7 +130,8 @@ class ListHeaderWidget extends ConsumerWidget {
 
             const SizedBox(width: 12),
 
-            // Loading indicator if still loading
+            // Loading indicator if still loading.
+
             if (loadedMovies < totalMovies) ...[
               SizedBox(
                 width: 12,
@@ -147,7 +152,8 @@ class ListHeaderWidget extends ConsumerWidget {
 
             const Spacer(),
 
-            // Creation date
+            // Creation date.
+
             Text(
               'Created ${customList.createdAt.year}-${customList.createdAt.month.toString().padLeft(2, '0')}-${customList.createdAt.day.toString().padLeft(2, '0')}',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(

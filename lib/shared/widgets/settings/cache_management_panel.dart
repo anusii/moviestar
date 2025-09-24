@@ -78,6 +78,7 @@ class CacheManagementPanel extends ConsumerWidget {
           (value) {
             ref.read(cachingEnabledProvider.notifier).setCachingEnabled(value);
             // If disabling caching, also disable cache-only mode.
+
             if (!value && cacheOnlyMode) {
               ref.read(cacheOnlyModeProvider.notifier).setCacheOnlyMode(false);
             }
@@ -95,6 +96,7 @@ class CacheManagementPanel extends ConsumerWidget {
         ),
 
         // Cache Statistics.
+
         cacheStatsAsync.when(
           data: (stats) => CacheDisplayHelpers.buildCacheStatistics(
             context: context,
@@ -105,6 +107,7 @@ class CacheManagementPanel extends ConsumerWidget {
         ),
 
         // Cache Actions.
+
         buildListTile('Force Refresh All', Icons.refresh, () async {
           await _showForceRefreshDialog(
             context,

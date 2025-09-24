@@ -68,10 +68,12 @@ class PodFavoritesFileManager with PodOperationsMixin {
     String? comment,
     bool isWatched = false,
   }) async {
-    // Cancel any pending update for this movie
+    // Cancel any pending update for this movie.
+
     _pendingMovieUpdates[movie.id]?.cancel();
 
-    // Schedule the update with a delay to batch multiple operations
+    // Schedule the update with a delay to batch multiple operations.
+
     _pendingMovieUpdates[movie.id] = Timer(
       const Duration(milliseconds: 500),
       () async {
@@ -99,7 +101,8 @@ class PodFavoritesFileManager with PodOperationsMixin {
         return;
       }
 
-      // Read existing file to preserve data
+      // Read existing file to preserve data.
+
       Map<String, dynamic>? existingData;
       final filePath = getMovieFilePathFor(movie);
 
@@ -116,15 +119,18 @@ class PodFavoritesFileManager with PodOperationsMixin {
           );
         }
       } catch (e) {
-        // File doesn't exist yet, that's okay
+        // File doesn't exist yet, that's okay.
+
         if (!e.toString().contains('does not exist')) {}
       }
 
-      // Prepare updated data
+      // Prepare updated data.
+
       final currentRating = rating ?? existingData?['rating'];
       final currentComment = comment ?? existingData?['comment'];
 
-      // Create the TTL content
+      // Create the TTL content.
+
       final ttlContent = TurtleSerializer.movieWithUserDataToTurtle(
         movie,
         currentRating,
@@ -135,7 +141,8 @@ class PodFavoritesFileManager with PodOperationsMixin {
         return;
       }
 
-      // Write to POD
+      // Write to POD.
+
       final result = await PodFileOperationsService.writeFile(
         filePath,
         ttlContent,
@@ -148,18 +155,20 @@ class PodFavoritesFileManager with PodOperationsMixin {
         _moviesWithFiles.add(movie.id);
       } else {}
     } catch (e) {
-      // Failed to add movie file
+      // Failed to add movie file.
     }
   }
 
   /// Checks if a movie has an associated file in POD.
   Future<bool> hasMovieFile(Movie movie) async {
-    // Check cache first
+    // Check cache first.
+
     if (_moviesWithFiles.contains(movie.id)) {
       return true;
     }
 
-    // Check POD
+    // Check POD.
+
     final filePath = getMovieFilePathFor(movie);
     final fileExists = await PodFileOperationsService.fileExists(
       filePath,
@@ -225,10 +234,11 @@ class PodFavoritesFileManager with PodOperationsMixin {
 
       if (result.success && (result.data?.isNotEmpty ?? false)) {
         // TODO: Convert Map<String, dynamic> to Movie
+
         return null; // TODO: Convert Map<String, dynamic> to Movie
       }
     } catch (e) {
-      // Failed to parse movie data
+      // Failed to parse movie data.
     }
     return null;
   }
@@ -241,7 +251,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
         return movieListData['movies'] as List<Movie>? ?? [];
       }
     } catch (e) {
-      // Failed to parse movie list from turtle
+      // Failed to parse movie list from turtle.
     }
     return null;
   }
@@ -254,7 +264,8 @@ class PodFavoritesFileManager with PodOperationsMixin {
         return null;
       }
 
-      // Construct the path to the individual movie file
+      // Construct the path to the individual movie file.
+
       final contentTypeStr = placeholderMovie.contentType == ContentType.tvShow
           ? 'TVShow'
           : 'Movie';
@@ -263,7 +274,8 @@ class PodFavoritesFileManager with PodOperationsMixin {
 
       if (!_context.mounted) return null;
 
-      // Read the individual movie TTL file using POD operations
+      // Read the individual movie TTL file using POD operations.
+
       final result = await PodFileOperationsService.readFile(
         movieFilePath,
         _context,
@@ -271,7 +283,8 @@ class PodFavoritesFileManager with PodOperationsMixin {
       );
 
       if (result.success && (result.data?.isNotEmpty ?? false)) {
-        // Parse the movie details from the TTL content
+        // Parse the movie details from the TTL content.
+
         final movieList = TurtleSerializer.moviesFromTurtle(result.data!);
 
         if (movieList.isNotEmpty) {
@@ -280,7 +293,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
         } else {}
       } else {}
     } catch (e) {
-      // Failed to load full movie details
+      // Failed to load full movie details.
     }
 
     return null;

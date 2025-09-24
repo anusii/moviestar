@@ -70,7 +70,7 @@ class DropOperations {
         );
         break;
       case KanbanColumnType.recommended:
-      // Can't drop into popular
+      // Can't drop into popular.
     }
   }
 
@@ -92,7 +92,8 @@ class DropOperations {
         await favoritesService.removeMovieFromCustomList(sourceId, movie.id);
         break;
       case KanbanColumnType.recommended:
-        // Can't remove from popular
+        // Can't remove from popular.
+
         break;
     }
   }
@@ -104,17 +105,19 @@ class DropOperations {
     Movie movie,
   ) async {
     try {
-      // Check if the movie file already exists
+      // Check if the movie file already exists.
+
       final hasFile = await favoritesService.hasMovieFile(movie);
 
       if (!hasFile) {
-        // For new movies (typically from Recommended), we might need to create basic metadata
-        // The favorites service should handle this automatically when adding to lists,
-        // but we can add a small delay to ensure the movie data is properly cached
+        // For new movies (typically from Recommended), we might need to create basic metadata.
+        // The favorites service should handle this automatically when adding to lists,.
+        // but we can add a small delay to ensure the movie data is properly cached.
+
         await Future.delayed(TimingConstants.movieCardHoverHideDelay);
       }
     } catch (e) {
-      // If checking fails, continue anyway - the favorites service should handle creation
+      // If checking fails, continue anyway - the favorites service should handle creation.
     }
   }
 

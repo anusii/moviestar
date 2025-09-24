@@ -18,7 +18,8 @@ class WebIdValidator {
   static Future<bool> validateWebId(String webId) async {
     if (webId.isEmpty) return false;
 
-    // Check cache
+    // Check cache.
+
     final cacheKey = webId.toLowerCase();
     if (_webIdValidationCache.containsKey(cacheKey)) {
       final timestamp = _cacheTimestamps[cacheKey];
@@ -28,10 +29,12 @@ class WebIdValidator {
       }
     }
 
-    // Basic validation
+    // Basic validation.
+
     final isValid = _isValidWebIdFormat(webId);
 
-    // Cache result
+    // Cache result.
+
     _webIdValidationCache[cacheKey] = isValid;
     _cacheTimestamps[cacheKey] = DateTime.now();
 
@@ -40,7 +43,8 @@ class WebIdValidator {
 
   /// Check if WebID format is valid.
   static bool _isValidWebIdFormat(String webId) {
-    // Basic WebID format validation
+    // Basic WebID format validation.
+
     if (!webId.startsWith('http://') && !webId.startsWith('https://')) {
       return false;
     }

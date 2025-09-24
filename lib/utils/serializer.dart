@@ -25,7 +25,8 @@ import 'package:moviestar/shared/utils/turtle/user_profile_serializer.dart';
 /// All method signatures and behavior remain identical to ensure zero breaking changes.
 /// This class delegates operations to specialized serializers for better maintainability.
 class TurtleSerializer {
-  // Expose namespace constants for backward compatibility
+  // Expose namespace constants for backward compatibility.
+
   static final moviestarOntoNS = TurtleNamespaceManager.moviestarOntoNS;
   static final moviestarDataNS = TurtleNamespaceManager.moviestarDataNS;
   static final movieNS = TurtleNamespaceManager.movieNS;
@@ -34,7 +35,8 @@ class TurtleSerializer {
   static final owlNS = TurtleNamespaceManager.owlNS;
   static final localNS = TurtleNamespaceManager.localNS;
 
-  // Expose common predicates for backward compatibility
+  // Expose common predicates for backward compatibility.
+
   static final movieType = TurtleNamespaceManager.movieType;
   static final tvShowType = TurtleNamespaceManager.tvShowType;
   static final movieListType = TurtleNamespaceManager.movieListType;
@@ -43,18 +45,21 @@ class TurtleSerializer {
   static final commentType = TurtleNamespaceManager.commentType;
   static final apiKeyType = TurtleNamespaceManager.apiKeyType;
 
-  // User predicates
+  // User predicates.
+
   static final hasMovieList = TurtleNamespaceManager.hasMovieList;
   static final hasApiKey = TurtleNamespaceManager.hasApiKey;
   static final dob = TurtleNamespaceManager.dob;
   static final gender = TurtleNamespaceManager.gender;
   static final webId = TurtleNamespaceManager.webId;
 
-  // MovieList predicates
+  // MovieList predicates.
+
   static final hasMovie = TurtleNamespaceManager.hasMovie;
   static final filePath = TurtleNamespaceManager.filePath;
 
-  // Movie predicates
+  // Movie predicates.
+
   static final identifier = TurtleNamespaceManager.identifier;
   static final name = TurtleNamespaceManager.name;
   static final description = TurtleNamespaceManager.description;
@@ -68,22 +73,26 @@ class TurtleSerializer {
   static final keyValue = TurtleNamespaceManager.keyValue;
   static final source = TurtleNamespaceManager.source;
 
-  // List predicates
+  // List predicates.
+
   static final nameProperty = TurtleNamespaceManager.nameProperty;
   static final moviesProperty = TurtleNamespaceManager.moviesProperty;
 
-  // Rating predicates
+  // Rating predicates.
+
   static final movieId = TurtleNamespaceManager.movieId;
   static final value = TurtleNamespaceManager.value;
 
-  // Comment predicates
+  // Comment predicates.
+
   static final text = TurtleNamespaceManager.text;
 
-  // RDF predicates
+  // RDF predicates.
+
   static final rdfType = TurtleNamespaceManager.rdfType;
   static final rdfsLabel = TurtleNamespaceManager.rdfsLabel;
 
-  // ====== MOVIE SERIALIZATION METHODS ======
+  // ====== MOVIE SERIALIZATION METHODS ======.
 
   /// Converts a list of movies to TTL format using proper RDF triples.
   static String moviesToTurtle(List<Movie> movies, String listName) {
@@ -131,7 +140,7 @@ class TurtleSerializer {
     return MovieTurtleSerializer.movieWithUserDataFromTurtle(ttlContent);
   }
 
-  // ====== RATING/COMMENT SERIALIZATION METHODS ======
+  // ====== RATING/COMMENT SERIALIZATION METHODS ======.
 
   /// Converts ratings map to TTL format using proper RDF triples.
   static String ratingsToTurtle(Map<String, double> ratings) {
@@ -163,7 +172,7 @@ class TurtleSerializer {
     return RatingCommentTurtleSerializer.commentsFromTurtle(ttlContent);
   }
 
-  // ====== USER PROFILE METHODS ======
+  // ====== USER PROFILE METHODS ======.
 
   /// Creates a user profile in TTL format following the ontology structure.
   static String createUserProfile(
@@ -182,7 +191,7 @@ class TurtleSerializer {
     );
   }
 
-  // ====== MOVIE LIST METHODS ======
+  // ====== MOVIE LIST METHODS ======.
 
   /// Creates a MovieList in TTL format following the ontology structure.
   static String createMovieList(
@@ -208,7 +217,7 @@ class TurtleSerializer {
     return MovieListTurtleSerializer.movieListFromTurtle(ttlContent);
   }
 
-  // ====== API KEY METHODS ======
+  // ====== API KEY METHODS ======.
 
   /// Creates an API key file in TTL format following the ontology structure.
   static String createApiKey(
@@ -223,7 +232,7 @@ class TurtleSerializer {
     );
   }
 
-  // ====== UTILITY METHODS ======
+  // ====== UTILITY METHODS ======.
 
   /// Generates a unique ID for resources.
   static String generateId() {

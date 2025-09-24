@@ -36,20 +36,24 @@ import 'package:moviestar/models/sharing_models.dart';
 
 /// Manages the state and operations for batch sharing functionality.
 class BatchSharingState extends ChangeNotifier {
-  // Form controllers
+  // Form controllers.
+
   final formKey = GlobalKey<FormState>();
   final webIdController = TextEditingController();
   String? validatedWebId;
 
-  // List of all files to be shared
+  // List of all files to be shared.
+
   List<ShareableFile> shareableFiles = [];
 
-  // Sharing state
+  // Sharing state.
+
   bool isSharing = false;
   Map<String, String> sharingProgress = {}; // fileName -> status
   String currentOperation = '';
 
-  // Results
+  // Results.
+
   Map<String, SolidFunctionCallStatus> sharingResults = {};
 
   @override
@@ -66,7 +70,8 @@ class BatchSharingState extends ChangeNotifier {
     List<Movie> movies,
   ) {
     shareableFiles = [
-      // Movie list file
+      // Movie list file.
+
       ShareableFile(
         fileName: 'user_lists/MovieList-$listId.ttl',
         displayName: listName,
@@ -76,9 +81,11 @@ class BatchSharingState extends ChangeNotifier {
         ], // Movie lists must have read permission at minimum
       ),
       // Individual movie files with read-only permissions by default.
+
       ...movies.map(
         (movie) {
-          // Construct file name based on content type
+          // Construct file name based on content type.
+
           final isTV = movie.contentType == ContentType.tvShow;
           final filePrefix = isTV ? 'TVShow' : 'Movie';
           final fileType = isTV ? 'tv' : 'movie';
@@ -108,9 +115,11 @@ class BatchSharingState extends ChangeNotifier {
     final file = shareableFiles[index];
     if (file.fileType == 'movielist') {
       // Update movie list permissions normally.
+
       shareableFiles[index] = file.copyWith(permissions: newPermissions);
     } else {
       // Movie files always stay read-only.
+
       shareableFiles[index] = file.copyWith(permissions: ['read']);
     }
     notifyListeners();
@@ -123,9 +132,11 @@ class BatchSharingState extends ChangeNotifier {
       final file = shareableFiles[i];
       if (file.fileType == 'movielist') {
         // Movie lists: read + write permissions by default.
+
         shareableFiles[i] = file.copyWith(permissions: ['read', 'write']);
       } else {
         // Individual movies: always read-only for security.
+
         shareableFiles[i] = file.copyWith(permissions: ['read']);
       }
     }
@@ -141,7 +152,8 @@ class BatchSharingState extends ChangeNotifier {
       return BatchSharingResult.error('Please enter a valid WebID');
     }
 
-    // Store context and widget to avoid async gap issues
+    // Store context and widget to avoid async gap issues.
+
     final savedContext = context;
     final savedParentWidget = parentWidget;
 
@@ -155,11 +167,13 @@ class BatchSharingState extends ChangeNotifier {
       int completedCount = 0;
       final totalCount = shareableFiles.length;
 
-      // Share each file using PodSharingService
+      // Share each file using PodSharingService.
+
       for (int i = 0; i < shareableFiles.length; i++) {
         final file = shareableFiles[i];
 
         // Skip files with no permissions selected (except movie/TV files which always get read).
+
         if (file.permissions.isEmpty && file.fileType == 'movielist') {
           sharingProgress[file.fileName] = 'skipped';
           currentOperation =
@@ -175,12 +189,14 @@ class BatchSharingState extends ChangeNotifier {
 
         try {
           // Determine permissions: movie and TV files always get read-only.
+
           final permissionsToUse =
               (file.fileType == 'movie' || file.fileType == 'tv')
                   ? ['read']
                   : file.permissions;
 
-          // Use PodSharingService for simplified sharing
+          // Use PodSharingService for simplified sharing.
+
           final shareRequest = ShareRequest(
             fileName: file.fileName,
             displayName: file.displayName,
@@ -189,7 +205,8 @@ class BatchSharingState extends ChangeNotifier {
             recipientType: RecipientType.individual,
           );
 
-          // Check if context is still mounted before using it
+          // Check if context is still mounted before using it.
+
           if (!savedContext.mounted) {
             sharingProgress[file.fileName] = 'error';
             notifyListeners();
@@ -215,11 +232,13 @@ class BatchSharingState extends ChangeNotifier {
           notifyListeners();
         }
 
-        // Small delay between operations for UI updates
+        // Small delay between operations for UI updates.
+
         await Future.delayed(const Duration(milliseconds: 100));
       }
 
-      // Show completion message
+      // Show completion message.
+
       currentOperation = 'Completed! Shared $completedCount/$totalCount files';
       notifyListeners();
 

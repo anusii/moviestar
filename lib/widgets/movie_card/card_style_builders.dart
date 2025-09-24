@@ -157,7 +157,8 @@ class CardStyleBuilders {
   }) {
     final parts = <Widget>[];
 
-    // Add rating if enabled
+    // Add rating if enabled.
+
     if (showRating) {
       parts.add(
         Text(
@@ -167,7 +168,8 @@ class CardStyleBuilders {
       );
     }
 
-    // Add year if enabled
+    // Add year if enabled.
+
     if (showYear) {
       final year = formatMovieYear(movie.releaseDate);
       if (year.isNotEmpty) {
@@ -181,7 +183,8 @@ class CardStyleBuilders {
       }
     }
 
-    // Add content type if enabled
+    // Add content type if enabled.
+
     if (showContentType && movie.contentType != null) {
       if (parts.isNotEmpty) parts.add(const Text(' • '));
       parts.add(

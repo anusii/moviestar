@@ -34,6 +34,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/network_client.dart';
 
 //
+
 class ContentService {
   // Base URL for The Movie Database API.
 
@@ -76,8 +77,9 @@ class ContentService {
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
     _searchService = ContentSearchService(_client!);
 
-    // On Linux, add a small delay to ensure services are ready
-    // This helps with search immediately after API key is added
+    // On Linux, add a small delay to ensure services are ready.
+    // This helps with search immediately after API key is added.
+
     if (Platform.isLinux) {
       await Future.delayed(const Duration(milliseconds: 500));
     }
@@ -89,8 +91,9 @@ class ContentService {
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
     _searchService = ContentSearchService(_client!);
 
-    // On Linux, add a small delay to ensure services are ready
-    // This helps with search immediately after API key is added
+    // On Linux, add a small delay to ensure services are ready.
+    // This helps with search immediately after API key is added.
+
     if (Platform.isLinux) {
       await Future.delayed(const Duration(milliseconds: 500));
     }
@@ -114,7 +117,7 @@ class ContentService {
     }
   }
 
-  // MOVIE METHODS
+  // MOVIE METHODS.
 
   // Gets a list of recommended movies.
 
@@ -148,7 +151,7 @@ class ContentService {
     return results.map((movie) => ContentItem.fromMovieJson(movie)).toList();
   }
 
-  // TV SHOW METHODS
+  // TV SHOW METHODS.
 
   // Gets a list of recommended TV shows.
 
@@ -209,7 +212,7 @@ class ContentService {
     return results.map((tvShow) => ContentItem.fromTVJson(tvShow)).toList();
   }
 
-  // MIXED CONTENT METHODS
+  // MIXED CONTENT METHODS.
 
   // Gets a mixed list of Now Playing movies and On The Air TV shows.
 
@@ -292,7 +295,7 @@ class ContentService {
     return combined;
   }
 
-  // SEARCH METHODS
+  // SEARCH METHODS.
 
   // Searches for content (movies and TV shows) matching the given query.
 
@@ -343,7 +346,8 @@ class ContentService {
   ) async {
     await _ensureClientInitialized();
     if (_searchService == null) {
-      // Fallback: reinitialize if still null
+      // Fallback: reinitialize if still null.
+
       await _initializeClient();
     }
     return await _searchService!.searchContentComprehensive(query);
@@ -358,7 +362,7 @@ class ContentService {
     return await _searchService!.searchMoviesComprehensive(query);
   }
 
-  // DETAIL METHODS
+  // DETAIL METHODS.
 
   // Gets detailed information about a specific movie.
 

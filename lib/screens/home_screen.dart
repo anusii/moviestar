@@ -245,6 +245,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
   }
 
   // Build content based on the selected view mode.
+
   Widget _buildContentForViewMode(
     HomeViewMode viewMode,
     AsyncValue<CacheResult<List<Movie>>> recommendedMovies,

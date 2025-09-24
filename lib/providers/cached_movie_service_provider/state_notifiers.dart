@@ -63,6 +63,7 @@ class ApiKeyNotifier extends StateNotifier<String?> {
     if (_apiKeyService != null) {
       _init();
       // Listen for API key changes.
+
       _apiKeyService.addListener(_onApiKeyChanged);
     }
   }
@@ -76,7 +77,7 @@ class ApiKeyNotifier extends StateNotifier<String?> {
       if (!mounted) return;
       state = apiKey;
     } catch (e) {
-      // Failed to get API key
+      // Failed to get API key.
     }
   }
 

@@ -23,6 +23,7 @@ class TurtleParsingUtils {
   ) {
     try {
       // Try different namespace variations for predicates.
+
       final idValues = predicates['http://schema.org/identifier'] ??
           predicates['identifier'] ??
           predicates['#identifier'] ??
@@ -84,7 +85,8 @@ class TurtleParsingUtils {
               .toList()
           : <int>[];
 
-      // Determine content type from RDF type in predicates
+      // Determine content type from RDF type in predicates.
+
       ContentType? contentType;
       final typeValues =
           predicates['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] ??
@@ -121,6 +123,7 @@ class TurtleParsingUtils {
   static List<Movie>? tryParseMovieJsonBackup(String ttlContent) {
     try {
       // First try to parse from JSON backup for backward compatibility.
+
       final jsonMatch = RegExp(r'# JSON_DATA: (.+)').firstMatch(ttlContent);
       if (jsonMatch != null) {
         final jsonData = jsonMatch.group(1)!;
@@ -129,6 +132,7 @@ class TurtleParsingUtils {
       }
 
       // Try to parse individual movie JSON backup format.
+
       final movieJsonMatch =
           RegExp(r'# JSON_MOVIE_DATA: (.+)').firstMatch(ttlContent);
       if (movieJsonMatch != null) {

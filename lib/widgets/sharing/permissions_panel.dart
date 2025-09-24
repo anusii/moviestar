@@ -76,7 +76,8 @@ class BatchSharingPermissionsPanel extends StatelessWidget {
             _buildInfoBanner(context),
             const SizedBox(height: 12),
 
-            // Reset button
+            // Reset button.
+
             Align(
               alignment: Alignment.centerRight,
               child: TextButton.icon(
@@ -94,7 +95,8 @@ class BatchSharingPermissionsPanel extends StatelessWidget {
             ),
             const SizedBox(height: 8),
 
-            // Files list with permission controls
+            // Files list with permission controls.
+
             ...shareableFiles.asMap().entries.map((entry) {
               final index = entry.key;
               final file = entry.value;

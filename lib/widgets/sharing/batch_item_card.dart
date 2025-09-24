@@ -71,7 +71,8 @@ class BatchSharingItemCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // File header
+          // File header.
+
           Row(
             children: [
               Icon(
@@ -136,6 +137,7 @@ class BatchSharingItemCard extends StatelessWidget {
           const SizedBox(height: 12),
 
           // Permission checkboxes or read-only indicator.
+
           if (isIndividualFile)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -163,7 +165,8 @@ class BatchSharingItemCard extends StatelessWidget {
               ),
             )
           else
-            // Permission checkboxes for movie list only
+            // Permission checkboxes for movie list only.
+
             Wrap(
               spacing: 16,
               children: [

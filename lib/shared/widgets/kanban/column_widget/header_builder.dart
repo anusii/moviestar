@@ -46,7 +46,8 @@ class HeaderBuilder {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // First row: Title + Count Badge + Sort button
+          // First row: Title + Count Badge + Sort button.
+
           Row(
             children: [
               Expanded(
@@ -62,7 +63,8 @@ class HeaderBuilder {
               buildSortButton(context, categoryId, controller),
             ],
           ),
-          // Second row: View More button (only when needed)
+          // Second row: View More button (only when needed).
+
           if (hasMore) ...[
             const SizedBox(height: 8),
             Row(

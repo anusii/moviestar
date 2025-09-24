@@ -85,6 +85,7 @@ class _UserFriendlyErrorRendererState extends State<UserFriendlyErrorRenderer> {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Error icon and title.
+
               Row(
                 children: [
                   Icon(
@@ -109,6 +110,7 @@ class _UserFriendlyErrorRendererState extends State<UserFriendlyErrorRenderer> {
               Gap(widget.isCompact ? Gaps.m : Gaps.xl),
 
               // Error message.
+
               Text(
                 widget.error.message,
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -119,6 +121,7 @@ class _UserFriendlyErrorRendererState extends State<UserFriendlyErrorRenderer> {
               ),
 
               // Additional details.
+
               Gap(widget.isCompact ? Dimensions.ms : Gaps.m),
               Text(
                 widget.error.details,
@@ -130,12 +133,14 @@ class _UserFriendlyErrorRendererState extends State<UserFriendlyErrorRenderer> {
               ),
 
               // Action buttons.
+
               if (widget.error.actions.isNotEmpty) ...[
                 Gap(widget.isCompact ? Gaps.xl : Gaps.xxl),
                 ActionButtonBuilder.buildActionButtons(widget.error.actions),
               ],
 
               // Technical details section (expandable).
+
               if (widget.error.hasTechnicalDetails) ...[
                 Gap(widget.isCompact ? Gaps.m : Gaps.xl),
                 _buildTechnicalDetailsSection(),
@@ -154,6 +159,7 @@ class _UserFriendlyErrorRendererState extends State<UserFriendlyErrorRenderer> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Expandable header.
+
         InkWell(
           onTap: () {
             setState(() {
@@ -183,6 +189,7 @@ class _UserFriendlyErrorRendererState extends State<UserFriendlyErrorRenderer> {
         ),
 
         // Technical details content (expandable).
+
         if (_showTechnicalDetails) ...[
           Container(
             width: double.infinity,
@@ -203,6 +210,7 @@ class _UserFriendlyErrorRendererState extends State<UserFriendlyErrorRenderer> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Technical details text with scrolling.
+
                 Expanded(
                   child: SingleChildScrollView(
                     child: SelectableText(
@@ -220,10 +228,12 @@ class _UserFriendlyErrorRendererState extends State<UserFriendlyErrorRenderer> {
                 const Gap(Gaps.m),
 
                 // Copy to clipboard button with scroll hint.
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Scroll hint text
+                    // Scroll hint text.
+
                     Expanded(
                       child: Text(
                         'Scroll to view all details',
@@ -235,6 +245,7 @@ class _UserFriendlyErrorRendererState extends State<UserFriendlyErrorRenderer> {
                       ),
                     ),
                     // Copy button.
+
                     TextButton.icon(
                       onPressed: () {
                         Clipboard.setData(

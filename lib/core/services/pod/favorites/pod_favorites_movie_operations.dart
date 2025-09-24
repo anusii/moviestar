@@ -234,7 +234,8 @@ class PodFavoritesMovieOperations {
             updateStream(currentList);
           } else {}
 
-          // Update the TTL file to persist the change
+          // Update the TTL file to persist the change.
+
           await _writeTtlFile(listType, currentList);
         } else {}
         return null;
@@ -268,7 +269,8 @@ class PodFavoritesMovieOperations {
           _movieCache.remove(movieId);
           _moviesWithFiles.remove(movieId);
 
-          // Update the TTL file to persist the change
+          // Update the TTL file to persist the change.
+
           await _writeTtlFile(listType, currentList);
         }
         return null;
@@ -284,7 +286,8 @@ class PodFavoritesMovieOperations {
           listType == 'to_watch' ? 'Movies to Watch' : 'Movies Watched';
       final fileName = 'moviestar/data/user_lists/$listType.ttl';
 
-      // Generate TTL content using TurtleSerializer
+      // Generate TTL content using TurtleSerializer.
+
       final movieListId =
           await _movieListService.initializeMovieList(listType, displayName) ??
               'default';
@@ -295,11 +298,12 @@ class PodFavoritesMovieOperations {
         movies: movies,
       );
 
-      // Write to POD
+      // Write to POD.
+
       await safeWriteFile(fileName, ttlContent);
-      // File operation completed
+      // File operation completed.
     } catch (e) {
-      // Error writing TTL file
+      // Error writing TTL file.
     }
   }
 }

@@ -249,6 +249,7 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen>
       automaticallyImplyLeading: true,
       actions: [
         // Movie count indicator.
+
         Container(
           margin: const EdgeInsets.only(right: 16),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -268,8 +269,10 @@ class _MovieCategoryScreenState extends ConsumerState<MovieCategoryScreen>
       body: Column(
         children: [
           // Sort options.
+
           _buildSortOptions(),
           // Movie grid.
+
           Expanded(
             child: _buildMovieGrid(),
           ),

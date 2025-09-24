@@ -98,7 +98,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     );
     _favoritesService = FavoritesServiceAdapter(_favoritesServiceManager);
 
-    // Create API key service directly with context
+    // Create API key service directly with context.
+
     _apiKeyService = ApiKeyService(context, widget);
 
     // Listen for API key changes.
@@ -151,11 +152,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   String _extractNameFromWebId(String webId) {
     try {
-      // Extract domain from WebID for a simple display name
+      // Extract domain from WebID for a simple display name.
+
       final uri = Uri.parse(webId);
       final domain = uri.host;
 
-      // Try to extract a meaningful part
+      // Try to extract a meaningful part.
+
       if (domain.contains('.')) {
         final parts = domain.split('.');
         if (parts.isNotEmpty) {
@@ -173,18 +176,21 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     if (!mounted) return;
 
     // When API key changes, update the movie service.
+
     final movieService = ref.read(movieServiceProvider);
     await movieService.updateApiKey();
 
-    // Clear cache to force fresh data with new API key
+    // Clear cache to force fresh data with new API key.
+
     try {
       final cachedService = ref.read(configuredCachedMovieServiceProvider);
       await cachedService.clearAllCache();
     } catch (e) {
-      // Log but don't fail - provider invalidation will still work
+      // Log but don't fail - provider invalidation will still work.
     }
 
     // Invalidate all movie providers to force refresh with new API key.
+
     ref.invalidate(recommendedMoviesWithCacheInfoProvider);
     ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
     ref.invalidate(topRatedMoviesWithCacheInfoProvider);
@@ -192,6 +198,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     ref.invalidate(configuredCachedMovieServiceProvider);
 
     // Rebuild screens to ensure they have the latest data.
+
     if (mounted) {
       setState(() {
         _buildScreens();
@@ -217,38 +224,43 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     final loggedIn = await isLoggedIn();
 
     // Refresh user info based on login status.
+
     await _loadUserInfo();
 
     if (loggedIn) {
-      // Check if API key is present and show dialog immediately if missing
+      // Check if API key is present and show dialog immediately if missing.
+
       bool hasApiKey = false;
       try {
         final apiKey = await _apiKeyService.getApiKey();
         hasApiKey = apiKey != null && apiKey.trim().isNotEmpty;
 
         if (!hasApiKey) {
-          // Show API key dialog immediately but continue with POD initialization
+          // Show API key dialog immediately but continue with POD initialization.
+
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             if (mounted) {
               final apiKeySet = await showApiKeyDialog(
                 context,
                 _apiKeyService,
                 onApiKeySet: () {
-                  // Reinitialize after API key is set
+                  // Reinitialize after API key is set.
+
                   reinitializeAfterApiKey();
                 },
               );
               if (!apiKeySet) {
-                // If user dismissed without setting API key, they can still use POD features
+                // If user dismissed without setting API key, they can still use POD features.
               }
             }
           });
         }
       } catch (e) {
-        // Failed to initialize API services
+        // Failed to initialize API services.
       }
 
-      // Always initialize POD folders regardless of API key status
+      // Always initialize POD folders regardless of API key status.
+
       if (mounted) {
         setState(() {
           _isLoadingFolders = true;
@@ -277,7 +289,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                     await _favoritesServiceManager.enablePodStorage();
                 if (!enabled) {}
               } catch (e) {
-                // Failed to enable POD storage
+                // Failed to enable POD storage.
               }
             }
 
@@ -316,7 +328,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   void _handleSearch() async {
     if (mounted) {
       try {
-        // Get the content service with proper API key
+        // Get the content service with proper API key.
+
         final contentService =
             await ref.read(directContentServiceProvider.future);
         if (mounted) {
@@ -331,7 +344,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           );
         }
       } catch (e) {
-        // Show error or fallback
+        // Show error or fallback.
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -379,7 +393,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   /// Handles the settings action.
 
   void _handleSettings() {
-    // Show Settings by replacing the body content
+    // Show Settings by replacing the body content.
+
     if (mounted) {
       setState(() {
         _showSettings = true;
@@ -391,24 +406,28 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   Future<void> reinitializeAfterApiKey() async {
     if (!mounted) return;
 
-    // Invalidate all providers immediately to trigger API key refresh
+    // Invalidate all providers immediately to trigger API key refresh.
+
     ref.invalidate(directApiKeyProvider);
     ref.invalidate(apiKeyProvider);
 
-    // Allow time for core providers to refresh
+    // Allow time for core providers to refresh.
+
     await Future.delayed(const Duration(milliseconds: 50));
 
     if (!mounted) return;
 
-    // Clear cache to force fresh data with new API key
+    // Clear cache to force fresh data with new API key.
+
     try {
       final cachedService = ref.read(configuredCachedMovieServiceProvider);
       await cachedService.clearAllCache();
     } catch (e) {
-      // Log but don't fail - provider invalidation will still work
+      // Log but don't fail - provider invalidation will still work.
     }
 
-    // Invalidate all movie providers for immediate refresh
+    // Invalidate all movie providers for immediate refresh.
+
     ref.invalidate(movieServiceProvider);
     ref.invalidate(contentServiceProvider);
     ref.invalidate(recommendedMoviesWithCacheInfoProvider);
@@ -417,7 +436,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     ref.invalidate(upcomingMoviesWithCacheInfoProvider);
     ref.invalidate(configuredCachedMovieServiceProvider);
 
-    // Re-initialize app data
+    // Re-initialize app data.
+
     await _initialiseAppData();
   }
 
@@ -508,8 +528,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         securityKeyStatus: SolidSecurityKeyStatus(
           isKeySaved: true,
           onTap: () => {
-            // Handle security key tap - could show key management dialog
-            //print('Security key status tapped')
+            // Handle security key tap - could show key management dialog.
+            //print('Security key status tapped').
           },
         ),
         showOnNarrowScreens: false,
@@ -523,13 +543,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       ),
     );
 
-    // Return appropriate widget with proper loading overlay
+    // Return appropriate widget with proper loading overlay.
+
     if (_showSettings) {
       return _buildSettingsOverlay(solidScaffold);
     }
 
-    // Individual components handle their own loading states
-    // Removed full-screen loading overlay to prevent sudden loading indicator
+    // Individual components handle their own loading states.
+    // Removed full-screen loading overlay to prevent sudden loading indicator.
 
     return solidScaffold;
   }

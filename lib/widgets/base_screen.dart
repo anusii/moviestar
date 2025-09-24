@@ -138,14 +138,16 @@ class BaseScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget content = body;
 
-    // Wrap with error display if there's an error
+    // Wrap with error display if there's an error.
+
     if (error != null) {
       content = ErrorDisplayWidget(
         message: error!,
         onRetry: onErrorRetry,
       );
     } else {
-      // Wrap with RefreshIndicator if enabled
+      // Wrap with RefreshIndicator if enabled.
+
       if (enableRefresh && onRefresh != null) {
         content = RefreshIndicator(
           onRefresh: onRefresh!,
@@ -243,7 +245,8 @@ class BaseScreenFactory {
           final colorScheme = theme.colorScheme;
           final appBarTheme = theme.appBarTheme;
 
-          // Use app bar's foreground color, falling back to onSurface
+          // Use app bar's foreground color, falling back to onSurface.
+
           final textColor =
               appBarTheme.foregroundColor ?? colorScheme.onSurface;
 

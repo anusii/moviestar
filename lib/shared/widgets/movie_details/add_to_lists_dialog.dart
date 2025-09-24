@@ -23,6 +23,7 @@ export 'package:moviestar/shared/widgets/movie_details/add_to_lists_dialog/list_
 export 'package:moviestar/shared/widgets/movie_details/add_to_lists_dialog/ui_builder.dart';
 
 /// Dialog for adding a movie to custom lists.
+
 class AddToListsDialog extends StatefulWidget {
   final Movie movie;
   final FavoritesService favoritesService;

@@ -35,12 +35,15 @@ class ApiSettingsPanel extends ConsumerStatefulWidget {
 
 class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
   /// Whether the API key is visible.
+
   bool _isApiKeyVisible = false;
 
   /// Controller for the API key input field.
+
   late final TextEditingController _apiKeyController;
 
   /// Focus node for the API key input field.
+
   final FocusNode _apiKeyFocusNode = FocusNode();
 
   @override
@@ -65,6 +68,7 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
   }
 
   /// Launch a URL in the browser.
+
   Future<void> _launchUrl(Uri url) async {
     if (!await launchUrl(url)) {
       throw Exception('Could not launch $url');
@@ -72,6 +76,7 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
   }
 
   /// Triggers app reinitialization after API key is set.
+
   void _triggerAppReinitialization() {
     // The provider invalidations handle the reinitialization.
     // No additional action needed since providers are already invalidated.

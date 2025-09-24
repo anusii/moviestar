@@ -15,6 +15,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/serializer.dart';
 
 /// Handles movie-specific operations for POD favorites service.
+
 class PodFavoritesMovieOperations {
   final PodFavoritesStreamManager _streamManager;
   final PodFavoritesFileManager _fileManager;
@@ -40,6 +41,7 @@ class PodFavoritesMovieOperations {
   );
 
   /// Adds a movie to the to-watch list.
+
   Future<void> addToWatchList(Movie movie) async {
     await _addToList(
       movie,
@@ -50,6 +52,7 @@ class PodFavoritesMovieOperations {
   }
 
   /// Removes a movie from the to-watch list.
+
   Future<void> removeFromWatchList(int movieId) async {
     await _removeFromList(
       movieId,
@@ -60,6 +63,7 @@ class PodFavoritesMovieOperations {
   }
 
   /// Adds a movie to the watched list.
+
   Future<void> addToWatchedList(Movie movie) async {
     await _addToList(
       movie,
@@ -70,6 +74,7 @@ class PodFavoritesMovieOperations {
   }
 
   /// Removes a movie from the watched list.
+
   Future<void> removeFromWatchedList(int movieId) async {
     await _removeFromList(
       movieId,
@@ -80,57 +85,68 @@ class PodFavoritesMovieOperations {
   }
 
   /// Gets a movie by ID from cache or delegates to file manager.
+
   Future<Movie?> getMovie(int movieId) async {
     return _movieCache[movieId] ?? await _fileManager.loadMovieData(movieId);
   }
 
   /// Checks if a movie is in the to-watch list.
+
   bool isInToWatchList(int movieId) {
     return _streamManager.toWatch.any((movie) => movie.id == movieId);
   }
 
   /// Checks if a movie is in the watched list.
+
   bool isInWatchedList(int movieId) {
     return _streamManager.watched.any((movie) => movie.id == movieId);
   }
 
   /// Adds a movie to to-watch list with content type support.
+
   Future<void> addToWatch(Movie movie, {String contentType = 'movie'}) async {
     await addToWatchList(movie);
   }
 
   /// Adds a movie to watched list with content type support.
+
   Future<void> addToWatched(Movie movie, {String contentType = 'movie'}) async {
     await addToWatchedList(movie);
   }
 
   /// Removes a movie from to-watch list.
+
   Future<void> removeFromToWatch(Movie movie) async {
     await removeFromWatchList(movie.id);
   }
 
   /// Removes a movie from watched list.
+
   Future<void> removeFromWatched(Movie movie) async {
     await removeFromWatchedList(movie.id);
   }
 
   /// Checks if a movie is in to-watch list.
+
   Future<bool> isInToWatch(Movie movie) async {
     return isInToWatchList(movie.id);
   }
 
   /// Checks if a movie is in watched list.
+
   Future<bool> isInWatched(Movie movie) async {
     return isInWatchedList(movie.id);
   }
 
   /// Gets personal rating for a movie.
+
   Future<double?> getPersonalRating(Movie movie) async {
     final userData = await _fileManager.readMovieFile(movie);
     return userData?['rating'] as double?;
   }
 
   /// Sets personal rating for a movie.
+
   Future<void> setPersonalRating(Movie movie, double rating) async {
     final updatedMovie = Movie(
       id: movie.id,
@@ -147,6 +163,7 @@ class PodFavoritesMovieOperations {
   }
 
   /// Removes personal rating for a movie.
+
   Future<void> removePersonalRating(Movie movie) async {
     final updatedMovie = Movie(
       id: movie.id,
@@ -163,12 +180,14 @@ class PodFavoritesMovieOperations {
   }
 
   /// Gets personal comments for a movie.
+
   Future<String?> getMovieComments(Movie movie) async {
     final userData = await _fileManager.readMovieFile(movie);
     return userData?['comment'] as String?;
   }
 
   /// Sets personal comments for a movie.
+
   Future<void> setMovieComments(Movie movie, String comments) async {
     final updatedMovie = Movie(
       id: movie.id,
@@ -185,6 +204,7 @@ class PodFavoritesMovieOperations {
   }
 
   /// Removes personal comments for a movie.
+
   Future<void> removeMovieComments(Movie movie) async {
     final updatedMovie = Movie(
       id: movie.id,
@@ -201,6 +221,7 @@ class PodFavoritesMovieOperations {
   }
 
   /// Helper method for adding movies to lists.
+
   Future<void> _addToList(
     Movie movie,
     String listType,
@@ -245,6 +266,7 @@ class PodFavoritesMovieOperations {
   }
 
   /// Helper method for removing movies from lists.
+
   Future<void> _removeFromList(
     int movieId,
     String listType,
@@ -280,6 +302,7 @@ class PodFavoritesMovieOperations {
   }
 
   /// Writes a movie list to the appropriate TTL file.
+
   Future<void> _writeTtlFile(String listType, List<Movie> movies) async {
     try {
       final displayName =

@@ -23,23 +23,30 @@ import 'package:moviestar/shared/widgets/home/custom_list_states.dart';
 
 /// A widget that displays a custom list as a horizontal scrollable row.
 /// Used in grid view layouts of the home screen.
+
 class CustomListRow extends ConsumerWidget {
   /// The custom list to display.
+
   final CustomList customList;
 
   /// Service for managing favorites.
+
   final FavoritesService favoritesService;
 
   /// Parent widget for navigation context.
+
   final StatefulWidget parentWidget;
 
   /// Callback for navigation.
+
   final void Function(Route<dynamic> route) onNavigate;
 
   /// Scroll controller for this specific list.
+
   final ScrollController? scrollController;
 
   /// Creates a new [CustomListRow].
+
   const CustomListRow({
     super.key,
     required this.customList,
@@ -64,6 +71,7 @@ class CustomListRow extends ConsumerWidget {
   }
 
   /// Builds the row header with title, count badge, and "View More" button.
+
   Widget _buildRowHeader(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -119,6 +127,7 @@ class CustomListRow extends ConsumerWidget {
   }
 
   /// Builds the scrollable content for the custom list.
+
   Widget _buildContent(BuildContext context, WidgetRef ref) {
     final movieIds = customList.movieIds;
 
@@ -156,6 +165,7 @@ class CustomListRow extends ConsumerWidget {
   }
 
   /// Builds horizontal scrollable movie cards from movie objects.
+
   Widget _buildMovieCardsFromMovies(List<Movie> movies) {
     return Scrollbar(
       controller: scrollController ?? ScrollController(),
@@ -184,6 +194,7 @@ class CustomListRow extends ConsumerWidget {
   }
 
   /// Builds horizontal scrollable movie cards from movie IDs.
+
   Widget _buildMovieCardsFromIds(List<int> movieIds) {
     return Scrollbar(
       controller: scrollController ?? ScrollController(),
@@ -214,6 +225,7 @@ class CustomListRow extends ConsumerWidget {
   }
 
   /// Navigate to custom list detail screen.
+
   void _navigateToCustomListDetail() {
     onNavigate(
       MaterialPageRoute(

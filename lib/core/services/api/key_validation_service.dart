@@ -26,14 +26,18 @@ library;
 import 'package:moviestar/core/services/api/key_service.dart';
 
 /// Result of API key validation.
+
 class ApiKeyValidationResult {
   /// Whether an API key is configured.
+
   final bool isConfigured;
 
   /// Whether the configured API key is valid (if configured).
+
   final bool? isValid;
 
   /// Any error message from validation.
+
   final String? errorMessage;
 
   const ApiKeyValidationResult({
@@ -43,17 +47,20 @@ class ApiKeyValidationResult {
   });
 
   /// Creates a result for when no API key is configured.
+
   static const ApiKeyValidationResult notConfigured = ApiKeyValidationResult(
     isConfigured: false,
   );
 
   /// Creates a result for a valid API key.
+
   static const ApiKeyValidationResult valid = ApiKeyValidationResult(
     isConfigured: true,
     isValid: true,
   );
 
   /// Creates a result for an invalid API key.
+
   static ApiKeyValidationResult invalid(String errorMessage) {
     return ApiKeyValidationResult(
       isConfigured: true,
@@ -63,6 +70,7 @@ class ApiKeyValidationResult {
   }
 
   /// Creates a result for when validation couldn't be performed.
+
   static ApiKeyValidationResult unknown(String errorMessage) {
     return ApiKeyValidationResult(
       isConfigured: true,
@@ -72,6 +80,7 @@ class ApiKeyValidationResult {
   }
 
   /// Whether the API key issue should be treated as the primary problem.
+
   bool get shouldShowApiKeyError {
     // Show API key error if:.
     // 1. No API key is configured.
@@ -81,16 +90,19 @@ class ApiKeyValidationResult {
   }
 
   /// Whether the API key status is unknown (couldn't validate).
+
   bool get isValidationUnknown => isConfigured && isValid == null;
 }
 
 /// Service for validating API key configuration and status.
+
 class ApiKeyValidationService {
   final ApiKeyService? _apiKeyService;
 
   const ApiKeyValidationService(this._apiKeyService);
 
   /// Checks the current API key configuration and validity.
+
   Future<ApiKeyValidationResult> validateApiKey() async {
     try {
       if (_apiKeyService == null) {
@@ -124,6 +136,7 @@ class ApiKeyValidationService {
   }
 
   /// Quick check if API key is configured (no validation).
+
   Future<bool> hasApiKey() async {
     try {
       if (_apiKeyService == null) return false;
@@ -135,6 +148,7 @@ class ApiKeyValidationService {
   }
 
   /// Validates the basic format of a TMDB API key.
+
   bool _isValidApiKeyFormat(String apiKey) {
     // TMDB API keys are typically 32 character hexadecimal strings.
 
@@ -143,6 +157,7 @@ class ApiKeyValidationService {
   }
 
   /// Checks if the given error indicates an API key problem.
+
   static bool isApiKeyError(Object error) {
     final errorString = error.toString().toLowerCase();
 
@@ -159,6 +174,7 @@ class ApiKeyValidationService {
   }
 
   /// Provides user-friendly API key error messages.
+
   static String getApiKeyErrorMessage(Object error) {
     final errorString = error.toString().toLowerCase();
 

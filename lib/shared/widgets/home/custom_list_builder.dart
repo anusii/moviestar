@@ -20,23 +20,30 @@ import 'package:moviestar/shared/widgets/home/custom_list_states.dart';
 
 /// A widget that builds custom list sections for the home screen.
 /// This component handles both grid view (horizontal scroll) and list view layouts.
+
 class HomeCustomListBuilder extends ConsumerWidget {
   /// Service for managing favorite movies.
+
   final FavoritesService favoritesService;
 
   /// Parent widget for navigation context.
+
   final StatefulWidget parentWidget;
 
   /// Callback for safe navigation.
+
   final void Function(Route<dynamic> route) onNavigate;
 
   /// Map of scroll controllers for each custom list.
+
   final Map<String, ScrollController> scrollControllers;
 
   /// Whether to show as list sections (for list view) or movie rows (for grid view).
+
   final bool showAsListSections;
 
   /// Creates a new [HomeCustomListBuilder] widget.
+
   const HomeCustomListBuilder({
     super.key,
     required this.favoritesService,

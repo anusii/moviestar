@@ -16,8 +16,10 @@ import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Utilities for parsing Turtle content and extracting structured data.
+
 class TurtleParsingUtils {
   /// Extracts Movie object from RDF triples.
+
   static Movie? extractMovieFromTriples(
     Map<String, List<dynamic>> predicates,
   ) {
@@ -120,6 +122,7 @@ class TurtleParsingUtils {
   }
 
   /// Tries to parse JSON backup data from TTL content.
+
   static List<Movie>? tryParseMovieJsonBackup(String ttlContent) {
     try {
       // First try to parse from JSON backup for backward compatibility.
@@ -148,6 +151,7 @@ class TurtleParsingUtils {
   }
 
   /// Tries to parse user data JSON backup from TTL content.
+
   static Map<String, dynamic>? tryParseUserDataJsonBackup(String ttlContent) {
     try {
       final movieJsonMatch = RegExp(
@@ -178,6 +182,7 @@ class TurtleParsingUtils {
   }
 
   /// Safely parses TTL content to triple map.
+
   static Map<String, Map<String, List<dynamic>>>? safeParseTtl(
     String ttlContent,
   ) {
@@ -189,6 +194,7 @@ class TurtleParsingUtils {
   }
 
   /// Checks if a subject has a specific RDF type.
+
   static bool hasRdfType(
     Map<String, List<dynamic>> predicates,
     List<String> typeMatches,
@@ -203,6 +209,7 @@ class TurtleParsingUtils {
   }
 
   /// Extracts first value from predicate variations.
+
   static String extractFirstValue(
     Map<String, List<dynamic>> predicates,
     List<String> predicateVariations,

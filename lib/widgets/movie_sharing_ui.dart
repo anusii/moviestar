@@ -21,6 +21,7 @@ import 'package:moviestar/widgets/common_sharing_ui.dart'
     show SharingStatusIndicator, WebIdInput, ShareStatus;
 
 /// Custom single movie sharing UI with integrated design.
+
 class MovieSharingUI extends StatefulWidget {
   final Movie movie;
   final VoidCallback onSharingComplete;

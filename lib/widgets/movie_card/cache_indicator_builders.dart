@@ -17,8 +17,10 @@ import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
 
 /// Static helper class for building cache status indicators.
+
 class CacheIndicatorBuilders {
   /// Builds cache status indicator overlay.
+
   static Widget buildCacheIndicator({
     required bool? fromCache,
   }) {
@@ -45,6 +47,7 @@ class CacheIndicatorBuilders {
   }
 
   /// Builds offline mode indicator for poster cards.
+
   static Widget buildOfflineModeIndicator() {
     return Positioned(
       top: 4,
@@ -78,6 +81,7 @@ class CacheIndicatorBuilders {
   }
 
   /// Builds content type indicator for poster style.
+
   static Widget buildContentTypeIndicator(ContentType? contentType) {
     if (contentType == null) return const SizedBox.shrink();
 
@@ -126,6 +130,7 @@ class CacheIndicatorBuilders {
   }
 
   /// Builds offline mode icon for list items.
+
   static Widget buildOfflineModeIcon() {
     return Container(
       padding: const EdgeInsets.all(Dimensions.xs),
@@ -138,6 +143,7 @@ class CacheIndicatorBuilders {
   }
 
   /// Builds cache age information for list items.
+
   static Widget buildCacheAgeInfo(Duration cacheAge) {
     return Builder(
       builder: (context) => Container(

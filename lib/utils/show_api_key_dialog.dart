@@ -32,6 +32,7 @@ import 'package:moviestar/core/services/api/key_service.dart';
 
 /// Shows the API key setup dialog.
 /// Returns true if API key was successfully set, false otherwise.
+
 Future<bool> showApiKeyDialog(
   BuildContext context,
   ApiKeyService apiKeyService, {

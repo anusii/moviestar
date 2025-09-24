@@ -18,6 +18,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/widgets/quick_actions_dialog.dart';
 
 /// Handles mouse hover interactions and quick actions overlay for movie cards.
+
 class HoverInteractionHandler {
   final BuildContext context;
   final Movie movie;
@@ -48,6 +49,7 @@ class HoverInteractionHandler {
   });
 
   /// Dispose of timers and overlay.
+
   void dispose() {
     _removeOverlay();
     _hideTimer?.cancel();
@@ -55,6 +57,7 @@ class HoverInteractionHandler {
   }
 
   /// Called when mouse enters the card area.
+
   void onCardMouseEnter() {
     _hideTimer?.cancel();
 
@@ -68,6 +71,7 @@ class HoverInteractionHandler {
   }
 
   /// Called when mouse exits the card area.
+
   void onCardMouseExit() {
     // Cancel the show timer if mouse exits before delay completes.
 
@@ -85,6 +89,7 @@ class HoverInteractionHandler {
   }
 
   /// Called when mouse enters the dialog area.
+
   void onDialogMouseEnter() {
     // Cancel both timers since mouse is over the dialog.
 
@@ -93,6 +98,7 @@ class HoverInteractionHandler {
   }
 
   /// Called when mouse exits the dialog area.
+
   void onDialogMouseExit() {
     // Start a timer to hide the dialog.
 
@@ -103,6 +109,7 @@ class HoverInteractionHandler {
   }
 
   /// Shows the quick actions dialog if favoritesService is available.
+
   void _showQuickActions() {
     if (favoritesService == null || _isDialogShown) return;
 
@@ -135,6 +142,7 @@ class HoverInteractionHandler {
   }
 
   /// Hides the quick actions dialog.
+
   void _hideQuickActions() {
     if (!_isDialogShown) return;
 
@@ -144,6 +152,7 @@ class HoverInteractionHandler {
   }
 
   /// Removes the overlay entry.
+
   void _removeOverlay() {
     _overlayEntry?.remove();
     _overlayEntry = null;

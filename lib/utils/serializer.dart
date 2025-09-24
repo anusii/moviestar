@@ -24,6 +24,7 @@ import 'package:moviestar/shared/utils/turtle/user_profile_serializer.dart';
 ///
 /// All method signatures and behavior remain identical to ensure zero breaking changes.
 /// This class delegates operations to specialized serializers for better maintainability.
+
 class TurtleSerializer {
   // Expose namespace constants for backward compatibility.
 
@@ -95,11 +96,13 @@ class TurtleSerializer {
   // ====== MOVIE SERIALIZATION METHODS ======.
 
   /// Converts a list of movies to TTL format using proper RDF triples.
+
   static String moviesToTurtle(List<Movie> movies, String listName) {
     return MovieTurtleSerializer.moviesToTurtle(movies, listName);
   }
 
   /// Converts a single movie with user's personal rating and comment to TTL format.
+
   static String movieWithUserDataToTurtle(
     Movie movie,
     double? rating,
@@ -113,6 +116,7 @@ class TurtleSerializer {
   }
 
   /// Movie with user data using ontology structure.
+
   static String movieWithUserDataToTurtleOntology(
     Movie movie,
     double? rating,
@@ -126,16 +130,19 @@ class TurtleSerializer {
   }
 
   /// Enhanced serialization with JSON backup for compatibility.
+
   static String moviesToTurtleWithJson(List<Movie> movies, String listName) {
     return MovieTurtleSerializer.moviesToTurtleWithJson(movies, listName);
   }
 
   /// Parses movies from TTL content using proper RDF parsing.
+
   static List<Movie> moviesFromTurtle(String ttlContent) {
     return MovieTurtleSerializer.moviesFromTurtle(ttlContent);
   }
 
   /// Parses a single movie with user data from TTL content.
+
   static Map<String, dynamic>? movieWithUserDataFromTurtle(String ttlContent) {
     return MovieTurtleSerializer.movieWithUserDataFromTurtle(ttlContent);
   }
@@ -143,31 +150,37 @@ class TurtleSerializer {
   // ====== RATING/COMMENT SERIALIZATION METHODS ======.
 
   /// Converts ratings map to TTL format using proper RDF triples.
+
   static String ratingsToTurtle(Map<String, double> ratings) {
     return RatingCommentTurtleSerializer.ratingsToTurtle(ratings);
   }
 
   /// Converts movie comments to TTL format using proper RDF triples.
+
   static String commentsToTurtle(Map<String, String> comments) {
     return RatingCommentTurtleSerializer.commentsToTurtle(comments);
   }
 
   /// Enhanced ratings serialization with JSON backup.
+
   static String ratingsToTurtleWithJson(Map<String, double> ratings) {
     return RatingCommentTurtleSerializer.ratingsToTurtleWithJson(ratings);
   }
 
   /// Enhanced comments serialization with JSON backup.
+
   static String commentsToTurtleWithJson(Map<String, String> comments) {
     return RatingCommentTurtleSerializer.commentsToTurtleWithJson(comments);
   }
 
   /// Parses ratings from TTL content using proper RDF parsing.
+
   static Map<String, double> ratingsFromTurtle(String ttlContent) {
     return RatingCommentTurtleSerializer.ratingsFromTurtle(ttlContent);
   }
 
   /// Parses comments from TTL content using proper RDF parsing.
+
   static Map<String, String> commentsFromTurtle(String ttlContent) {
     return RatingCommentTurtleSerializer.commentsFromTurtle(ttlContent);
   }
@@ -175,6 +188,7 @@ class TurtleSerializer {
   // ====== USER PROFILE METHODS ======.
 
   /// Creates a user profile in TTL format following the ontology structure.
+
   static String createUserProfile(
     String userWebId, {
     String? apiKey,
@@ -194,6 +208,7 @@ class TurtleSerializer {
   // ====== MOVIE LIST METHODS ======.
 
   /// Creates a MovieList in TTL format following the ontology structure.
+
   static String createMovieList(
     String movieListId,
     String listName, {
@@ -213,6 +228,7 @@ class TurtleSerializer {
   }
 
   /// Parses a MovieList from TTL content and extracts movies.
+
   static Map<String, dynamic>? movieListFromTurtle(String ttlContent) {
     return MovieListTurtleSerializer.movieListFromTurtle(ttlContent);
   }
@@ -220,6 +236,7 @@ class TurtleSerializer {
   // ====== API KEY METHODS ======.
 
   /// Creates an API key file in TTL format following the ontology structure.
+
   static String createApiKey(
     String apiKeyId,
     String apiKeyValue, {
@@ -235,6 +252,7 @@ class TurtleSerializer {
   // ====== UTILITY METHODS ======.
 
   /// Generates a unique ID for resources.
+
   static String generateId() {
     return TurtleBaseSerializer.generateId();
   }

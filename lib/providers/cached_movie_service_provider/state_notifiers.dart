@@ -14,6 +14,7 @@ import 'package:moviestar/core/services/api/key_service.dart';
 import 'package:moviestar/core/services/cache/settings_service.dart';
 
 /// StateNotifier for managing caching enabled setting with persistence.
+
 class CachingEnabledNotifier extends StateNotifier<bool> {
   final CacheSettingsService _settingsService;
 
@@ -35,6 +36,7 @@ class CachingEnabledNotifier extends StateNotifier<bool> {
 }
 
 /// StateNotifier for managing offline mode setting with persistence.
+
 class CacheOnlyModeNotifier extends StateNotifier<bool> {
   final CacheSettingsService _settingsService;
 
@@ -56,6 +58,7 @@ class CacheOnlyModeNotifier extends StateNotifier<bool> {
 }
 
 /// StateNotifier for managing API key state and changes.
+
 class ApiKeyNotifier extends StateNotifier<String?> {
   final ApiKeyService? _apiKeyService;
 
@@ -100,6 +103,7 @@ class ApiKeyNotifier extends StateNotifier<String?> {
 }
 
 /// StateNotifier for managing local API key caching setting with persistence.
+
 class LocalApiKeyCachingNotifier extends StateNotifier<bool> {
   final CacheSettingsService _settingsService;
 

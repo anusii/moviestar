@@ -12,8 +12,10 @@ import 'package:solidpod/solidpod.dart';
 import 'package:moviestar/screens/shared_movies/data_parser.dart';
 
 /// Handles data fetching for shared movies screen.
+
 class SharedMoviesDataFetcher {
   /// Fetch movies and movie lists that others have shared with me.
+
   static Future<Map<String, dynamic>?> getMoviesSharedWithMe(
     BuildContext context,
     StatefulWidget widget,

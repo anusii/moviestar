@@ -15,8 +15,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 
 /// Static helper class for building cache-related dialogs.
+
 class CacheDialogBuilders {
   /// Shows smart confirmation dialog for clearing cache based on current settings.
+
   static Future<bool?> showClearCacheDialog({
     required BuildContext context,
     required WidgetRef ref,
@@ -101,6 +103,7 @@ This will remove all cached movie data. Fresh data will be downloaded from the n
   }
 
   /// Shows dialog for force refresh with offline mode handling.
+
   static Future<bool?> showForceRefreshDialog({
     required BuildContext context,
     required WidgetRef ref,

@@ -15,6 +15,7 @@ import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Search and filter controller for kanban board.
+
 class KanbanSearchController extends ChangeNotifier {
   String _searchQuery = '';
   final Set<String> _selectedGenres = {};
@@ -38,6 +39,7 @@ class KanbanSearchController extends ChangeNotifier {
   bool get hasActiveFilters => _isSearchActive || _hasAnyFilters();
 
   /// Update search query.
+
   void updateSearchQuery(String query) {
     _searchQuery = query.trim();
     _isSearchActive = _searchQuery.isNotEmpty;
@@ -45,6 +47,7 @@ class KanbanSearchController extends ChangeNotifier {
   }
 
   /// Toggle genre filter.
+
   void toggleGenre(String genre) {
     if (_selectedGenres.contains(genre)) {
       _selectedGenres.remove(genre);
@@ -55,6 +58,7 @@ class KanbanSearchController extends ChangeNotifier {
   }
 
   /// Set rating range filter.
+
   void setRatingRange(double? min, double? max) {
     _minRating = min;
     _maxRating = max;
@@ -62,6 +66,7 @@ class KanbanSearchController extends ChangeNotifier {
   }
 
   /// Set year range filter.
+
   void setYearRange(int? start, int? end) {
     _startYear = start;
     _endYear = end;
@@ -69,12 +74,14 @@ class KanbanSearchController extends ChangeNotifier {
   }
 
   /// Set content type filter.
+
   void setContentTypeFilter(ContentType? contentType) {
     _contentTypeFilter = contentType;
     notifyListeners();
   }
 
   /// Clear all filters.
+
   void clearAllFilters() {
     _searchQuery = '';
     _selectedGenres.clear();
@@ -88,6 +95,7 @@ class KanbanSearchController extends ChangeNotifier {
   }
 
   /// Clear only search query.
+
   void clearSearch() {
     _searchQuery = '';
     _isSearchActive = false;
@@ -95,6 +103,7 @@ class KanbanSearchController extends ChangeNotifier {
   }
 
   /// Check if any filters are active (excluding search).
+
   bool _hasAnyFilters() {
     return _selectedGenres.isNotEmpty ||
         _minRating != null ||
@@ -105,6 +114,7 @@ class KanbanSearchController extends ChangeNotifier {
   }
 
   /// Filter movies based on current criteria.
+
   List<Movie> filterMovies(List<Movie> movies) {
     if (!hasActiveFilters) return movies;
 
@@ -169,6 +179,7 @@ class KanbanSearchController extends ChangeNotifier {
 }
 
 /// Search bar widget for kanban board.
+
 class KanbanSearchBar extends StatefulWidget {
   final KanbanSearchController controller;
   final String hintText;

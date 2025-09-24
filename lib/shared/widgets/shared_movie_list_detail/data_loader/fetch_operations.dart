@@ -16,9 +16,11 @@ import 'data_parser.dart';
 import 'url_handlers.dart';
 
 /// Static helper class for fetch operations.
+
 class FetchOperations {
   /// Attempts to fetch individual movie file data to get ratings and comments.
   /// First tries to find the file in shared resources, then falls back to constructing URLs.
+
   static Future<Map<String, dynamic>> fetchIndividualMovieData(
     BuildContext context,
     StatefulWidget widget,
@@ -139,6 +141,7 @@ class FetchOperations {
   }
 
   /// Fallback method for fetching individual movie data using manual URL construction.
+
   static Future<Map<String, dynamic>> fetchIndividualMovieDataFallback(
     BuildContext context,
     StatefulWidget widget,

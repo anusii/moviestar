@@ -12,8 +12,10 @@ import 'package:gap/gap.dart';
 import 'package:moviestar/constants/dimensions.dart';
 
 /// Builds the rating section for movie details.
+
 class RatingSection {
   /// Build the rating row with content type and TMDB rating.
+
   static Widget buildRatingRow(
     BuildContext context, {
     required String contentType,
@@ -89,6 +91,7 @@ class RatingSection {
   }
 
   /// Build the personal rating section.
+
   static Widget buildPersonalRatingSection(
     BuildContext context, {
     required bool isSharedMovie,
@@ -144,6 +147,7 @@ class RatingSection {
   }
 
   /// Build the rating widget with 0-10 scale and 0.1 increments.
+
   static Widget _buildStarRating(
     BuildContext context, {
     required double? rating,
@@ -247,6 +251,7 @@ class RatingSection {
   }
 
   /// Get a descriptive text for the rating value.
+
   static String _getRatingDescription(double rating) {
     if (rating >= 9.0) return 'Masterpiece';
     if (rating >= 8.0) return 'Excellent';
@@ -261,6 +266,7 @@ class RatingSection {
   }
 
   /// Build the shared movie indicator.
+
   static Widget buildSharedIndicator(
     BuildContext context, {
     required String sharedByText,

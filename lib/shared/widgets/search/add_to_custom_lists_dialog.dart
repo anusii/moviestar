@@ -25,6 +25,7 @@ export 'package:moviestar/shared/widgets/search/add_to_custom_lists_dialog/list_
 export 'package:moviestar/shared/widgets/search/add_to_custom_lists_dialog/ui_builders.dart';
 
 /// Dialog for adding a movie to custom lists.
+
 class AddToCustomListsDialog extends StatefulWidget {
   final Movie movie;
   final ContentItem originalContentItem;

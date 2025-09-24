@@ -15,8 +15,10 @@ import 'package:moviestar/shared/utils/turtle/base_serializer.dart';
 import 'package:moviestar/shared/utils/turtle/namespace_manager.dart';
 
 /// Handles API key ↔ Turtle serialization operations.
+
 class ApiKeyTurtleSerializer extends TurtleBaseSerializer {
   /// Creates an API key file in TTL format following the ontology structure.
+
   static String createApiKey(
     String apiKeyId,
     String apiKeyValue, {

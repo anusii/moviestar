@@ -35,6 +35,7 @@ import 'package:moviestar/models/movie.dart';
 
 class CachedMovieService {
   /// The underlying movie service for API calls.
+
   final MovieService _movieService;
 
   /// Service for managing cached movie data.
@@ -42,6 +43,7 @@ class CachedMovieService {
   final HiveMovieCacheService _cacheService;
 
   /// Whether caching is enabled.
+
   bool _cachingEnabled;
 
   /// Whether to use offline mode (no network calls).
@@ -416,6 +418,7 @@ class CachedMovieService {
   }
 
   /// Updates the API key in the underlying service.
+
   Future<void> updateApiKey() async {
     await _movieService.updateApiKey();
     developer.log(

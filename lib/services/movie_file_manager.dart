@@ -19,8 +19,10 @@ import 'package:moviestar/services/webid_validator.dart';
 import 'package:moviestar/utils/serializer.dart';
 
 /// Handles movie file operations for POD sharing.
+
 class MovieFileManager {
   /// Generate movie file name based on content type.
+
   static String getMovieFileName(Movie movie) {
     final contentPrefix =
         movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie';
@@ -28,6 +30,7 @@ class MovieFileManager {
   }
 
   /// Check if a movie file exists in POD.
+
   static Future<bool> movieFileExists(
     Movie movie,
     BuildContext context,
@@ -38,6 +41,7 @@ class MovieFileManager {
   }
 
   /// Read movie data from POD.
+
   static Future<Map<String, dynamic>?> readMovieData(
     Movie movie,
     BuildContext context,
@@ -59,6 +63,7 @@ class MovieFileManager {
   }
 
   /// Write movie data to POD.
+
   static Future<bool> writeMovieData(
     Movie movie,
     BuildContext context,
@@ -85,6 +90,7 @@ class MovieFileManager {
   }
 
   /// Share a movie file with enhanced error handling.
+
   static Future<ShareResult> shareMovieFile(
     Movie movie,
     String recipientWebId,
@@ -142,6 +148,7 @@ class MovieFileManager {
   }
 
   /// Batch share multiple movie files.
+
   static Future<BatchShareResult> shareMultipleMovieFiles(
     List<Movie> movies,
     String recipientWebId,
@@ -180,6 +187,7 @@ class MovieFileManager {
   }
 
   /// Create or update a movie file with user data.
+
   static Future<bool> createOrUpdateMovieFile(
     Movie movie,
     BuildContext context,

@@ -17,8 +17,10 @@ import 'package:moviestar/shared/widgets/kanban/board_controller.dart';
 import 'context_menu_builder.dart';
 
 /// Static helper class for handling context menu operations.
+
 class ContextMenuHandler {
   /// Show context menu for movie copy operations.
+
   static void showMovieContextMenu(
     BuildContext context,
     Offset position,

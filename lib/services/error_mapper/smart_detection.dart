@@ -12,26 +12,34 @@ import 'package:moviestar/core/services/network/connectivity_service.dart';
 import 'package:moviestar/models/app_error.dart';
 
 /// Context for error mapping operations.
+
 class ErrorContext {
   /// Optional retry callback.
+
   final VoidCallback? onRetry;
 
   /// Optional callback to navigate to API key configuration.
+
   final VoidCallback? onConfigureApiKey;
 
   /// Optional callback to navigate to network settings.
+
   final VoidCallback? onNetworkSettings;
 
   /// Optional callback to contact support.
+
   final VoidCallback? onContactSupport;
 
   /// Optional callback to dismiss the error.
+
   final VoidCallback? onDismiss;
 
   /// API key validation service for smart detection.
+
   final ApiKeyValidationService? apiKeyValidationService;
 
   /// Network connectivity service for smart detection.
+
   final NetworkConnectivityService? networkConnectivityService;
 
   const ErrorContext({
@@ -46,9 +54,11 @@ class ErrorContext {
 }
 
 /// Handles smart error detection and validation.
+
 class SmartErrorDetection {
   /// Maps a technical error to a user-friendly error with smart detection.
   /// This version performs async API key and network validation for better accuracy.
+
   static Future<UserFriendlyError> mapErrorSmart(
     Object error,
     StackTrace stackTrace, {
@@ -126,6 +136,7 @@ class SmartErrorDetection {
   }
 
   /// Checks if an error could potentially be an API key issue.
+
   static bool _couldBeApiKeyIssue(Object error) {
     final errorString = error.toString().toLowerCase();
     return errorString.contains('401') ||
@@ -136,6 +147,7 @@ class SmartErrorDetection {
   }
 
   /// Creates an API key error with enhanced context.
+
   static UserFriendlyError _createApiKeyError(
     Object error,
     StackTrace stackTrace,
@@ -183,6 +195,7 @@ class SmartErrorDetection {
   }
 
   /// Creates a network error with enhanced context.
+
   static UserFriendlyError _createNetworkError(
     Object error,
     StackTrace stackTrace,
@@ -220,6 +233,7 @@ class SmartErrorDetection {
   }
 
   /// Maps a possible network error when connectivity check is inconclusive.
+
   static UserFriendlyError _mapPossibleNetworkError(
     Object error,
     StackTrace stackTrace,
@@ -248,6 +262,7 @@ class SmartErrorDetection {
   }
 
   /// Maps errors that are likely API key issues (fallback method).
+
   static UserFriendlyError _mapApiKeyError(
     Object error,
     StackTrace stackTrace,

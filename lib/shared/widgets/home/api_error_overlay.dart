@@ -24,17 +24,22 @@ import 'package:moviestar/widgets/error_display_widget.dart';
 
 /// A widget that displays an API key error overlay for the home screen.
 /// This overlay appears when there's an API key configuration issue.
+
 class HomeApiErrorOverlay extends ConsumerWidget {
   /// Whether there's an API key error.
+
   final bool hasApiKeyError;
 
   /// The API key error message.
+
   final String? apiKeyErrorMessage;
 
   /// Callback to handle error state reset.
+
   final VoidCallback onRetry;
 
   /// Creates a new [HomeApiErrorOverlay] widget.
+
   const HomeApiErrorOverlay({
     super.key,
     required this.hasApiKeyError,
@@ -115,6 +120,7 @@ class HomeApiErrorOverlay extends ConsumerWidget {
   }
 
   /// Creates a user-friendly error with smart detection services.
+
   Future<UserFriendlyError> _createUserFriendlyError(
     WidgetRef ref,
     Object error,

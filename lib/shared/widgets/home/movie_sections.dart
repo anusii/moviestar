@@ -24,6 +24,7 @@ import 'package:moviestar/shared/widgets/home/cache_badges.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
 /// Widget that displays recommended, now playing, top rated, and upcoming movie sections.
+
 class HomeMovieSections extends ConsumerWidget {
   final FavoritesService favoritesService;
   final StatefulWidget parentWidget;

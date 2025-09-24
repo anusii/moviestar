@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:moviestar/core/services/pod/sharing_service.dart';
 
 /// Permission selector widget for choosing access levels.
+
 class PermissionSelector extends StatefulWidget {
   final List<String> availablePermissions;
   final List<String> selectedPermissions;
@@ -208,6 +209,7 @@ class _PermissionSelectorState extends State<PermissionSelector> {
 }
 
 /// WebID input field with validation.
+
 class WebIdInput extends StatefulWidget {
   final TextEditingController controller;
   final Function(String?) onValidated;

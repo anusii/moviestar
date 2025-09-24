@@ -32,17 +32,22 @@ import 'package:moviestar/utils/movie_display_utils.dart';
 
 /// A widget that displays the progress of batch sharing operations.
 /// Shows current operation status and progress for each file.
+
 class BatchSharingProgressTracker extends StatelessWidget {
   /// Current operation being performed.
+
   final String currentOperation;
 
   /// List of files being shared.
+
   final List<ShareableFile> shareableFiles;
 
   /// Progress status for each file (fileName -> status).
+
   final Map<String, String> sharingProgress;
 
   /// Creates a new [BatchSharingProgressTracker].
+
   const BatchSharingProgressTracker({
     super.key,
     required this.currentOperation,
@@ -116,6 +121,7 @@ class BatchSharingProgressTracker extends StatelessWidget {
   }
 
   /// Build a single progress item for a file.
+
   Widget _buildProgressItem(
     BuildContext context,
     ShareableFile file,
@@ -164,6 +170,7 @@ class BatchSharingProgressTracker extends StatelessWidget {
   }
 
   /// Get the appropriate icon and color for a progress status.
+
   (IconData, Color) _getProgressIcon(String progress) {
     switch (progress) {
       case 'success':

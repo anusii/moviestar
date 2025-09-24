@@ -13,8 +13,10 @@ import 'package:flutter/material.dart';
 import 'package:solidpod/solidpod.dart';
 
 /// Static helper class for URL handling operations.
+
 class UrlHandlers {
   /// Extracts base URL from WebID for constructing resource URLs.
+
   static String? extractBaseUrlFromWebId(String webIdOrUsername) {
     if (webIdOrUsername.isEmpty) return null;
 
@@ -40,6 +42,7 @@ class UrlHandlers {
   }
 
   /// Find individual file in shared resources by movie ID or filePath.
+
   static Future<String?> findIndividualFileInSharedResources(
     BuildContext context,
     StatefulWidget widget,
@@ -90,6 +93,7 @@ class UrlHandlers {
   }
 
   /// Generate list of URLs to try for fetching movie data.
+
   static List<String> generateUrlsToTry(
     String? ownerBaseUrl,
     String? sharerBaseUrl,
@@ -134,6 +138,7 @@ class UrlHandlers {
   }
 
   /// Check if the provided file path indicates a TV show.
+
   static bool isTelevisionShow(String? providedFilePath, String resourceUrl) {
     return (providedFilePath?.startsWith('TVShow-') ?? false) ||
         resourceUrl.contains('TVShow-');

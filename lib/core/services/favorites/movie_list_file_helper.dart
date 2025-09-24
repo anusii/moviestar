@@ -21,6 +21,7 @@ import 'package:moviestar/utils/serializer.dart';
 
 /// Helper class for MovieList file operations.
 /// Extracted to reduce MovieListService file size.
+
 class MovieListFileHelper with PodOperationsMixin {
   final BuildContext _context;
   final Widget _child;
@@ -28,6 +29,7 @@ class MovieListFileHelper with PodOperationsMixin {
   MovieListFileHelper(this._context, this._child);
 
   /// Creates a movie file in POD for a specific movie.
+
   Future<void> createMovieFile(
     Movie movie, {
     String contentType = 'movie',
@@ -56,6 +58,7 @@ class MovieListFileHelper with PodOperationsMixin {
   }
 
   /// Loads full movie data from individual movie file.
+
   Future<Movie?> loadFullMovieData(
     int movieId, {
     String contentType = 'movie',
@@ -119,6 +122,7 @@ class MovieListFileHelper with PodOperationsMixin {
   }
 
   /// Scans the user_lists directory for MovieLists.
+
   Future<List<String>> scanMovieListDirectory() async {
     try {
       final dirUrl = await getDirUrl('moviestar/data/user_lists');
@@ -136,6 +140,7 @@ class MovieListFileHelper with PodOperationsMixin {
   }
 
   /// Finds an existing MovieList by type and name.
+
   Future<String?> findExistingMovieList(
     String listType,
     String displayName,
@@ -173,6 +178,7 @@ class MovieListFileHelper with PodOperationsMixin {
   }
 
   /// Gets the file path for a movie file.
+
   @override
   String getMovieFilePath(int movieId, {String contentType = 'movie'}) {
     final prefix =
@@ -181,6 +187,7 @@ class MovieListFileHelper with PodOperationsMixin {
   }
 
   /// Gets the file path for a MovieList file.
+
   @override
   String getMovieListFilePath(String movieListId) {
     return 'user_lists/MovieList-$movieListId.ttl';

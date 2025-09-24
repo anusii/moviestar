@@ -25,29 +25,38 @@ import 'package:moviestar/widgets/movie_card.dart';
 
 /// A widget that displays the To Watch section for the home screen.
 /// This section shows movies from the user's to-watch list.
+
 class HomeToWatchSection extends ConsumerWidget {
   /// Service for managing favorite movies.
+
   final FavoritesService favoritesService;
 
   /// Parent widget for navigation context.
+
   final StatefulWidget parentWidget;
 
   /// Callback for safe navigation.
+
   final void Function(Route<dynamic> route) onNavigate;
 
   /// Scroll controller for the to-watch section.
+
   final ScrollController scrollController;
 
   /// Callback to build cache age badge.
+
   final Widget Function(Duration cacheAge) buildCacheAgeBadge;
 
   /// Callback to build movie list items for list view.
+
   final Widget Function(List<Movie> movies, bool fromCache) buildMovieListItems;
 
   /// Whether to show as list items (for list view) or movie row (for grid view).
+
   final bool showAsListItems;
 
   /// Creates a new [HomeToWatchSection] widget.
+
   const HomeToWatchSection({
     super.key,
     required this.favoritesService,
@@ -69,6 +78,7 @@ class HomeToWatchSection extends ConsumerWidget {
   }
 
   /// Builds the to-watch movies row for grid view.
+
   Widget _buildToWatchMovieRow(BuildContext context, WidgetRef ref) {
     final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
 
@@ -162,6 +172,7 @@ class HomeToWatchSection extends ConsumerWidget {
   }
 
   /// Builds the content for to-watch movies based on stream state.
+
   Widget _buildToWatchMovieContent(
     BuildContext context,
     WidgetRef ref,
@@ -274,6 +285,7 @@ class HomeToWatchSection extends ConsumerWidget {
   }
 
   /// Builds the to-watch list items for list view.
+
   Widget _buildToWatchListItems(BuildContext context, WidgetRef ref) {
     return StreamBuilder<List<Movie>>(
       stream: favoritesService.toWatchMovies,

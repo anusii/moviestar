@@ -20,6 +20,7 @@ import 'package:moviestar/widgets/movie_card.dart';
 import 'board_controller.dart';
 
 /// Kanban card widget with drag functionality and status indicators.
+
 class KanbanCardWidget extends StatelessWidget {
   final Movie movie;
   final String category;

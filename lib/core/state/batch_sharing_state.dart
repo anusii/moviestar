@@ -35,6 +35,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/models/sharing_models.dart';
 
 /// Manages the state and operations for batch sharing functionality.
+
 class BatchSharingState extends ChangeNotifier {
   // Form controllers.
 
@@ -64,6 +65,7 @@ class BatchSharingState extends ChangeNotifier {
 
   /// Initialize the list of files to be shared.
   /// Movie files are automatically set to read-only permissions.
+
   void initializeShareableFiles(
     String listId,
     String listName,
@@ -104,6 +106,7 @@ class BatchSharingState extends ChangeNotifier {
   }
 
   /// Update WebID validation status.
+
   void updateWebId(String? webId) {
     validatedWebId = webId;
     notifyListeners();
@@ -111,6 +114,7 @@ class BatchSharingState extends ChangeNotifier {
 
   /// Update permissions for a specific file.
   /// When updating movie list permissions, movie files stay read-only.
+
   void updateFilePermissions(int index, List<String> newPermissions) {
     final file = shareableFiles[index];
     if (file.fileType == 'movielist') {
@@ -127,6 +131,7 @@ class BatchSharingState extends ChangeNotifier {
 
   /// Reset all file permissions to their defaults.
   /// Movie lists get the selected permissions, movie files stay read-only.
+
   void resetPermissionsToDefaults() {
     for (int i = 0; i < shareableFiles.length; i++) {
       final file = shareableFiles[i];
@@ -144,6 +149,7 @@ class BatchSharingState extends ChangeNotifier {
   }
 
   /// Start the batch sharing process using PodSharingService.
+
   Future<BatchSharingResult> startBatchSharing(
     BuildContext context,
     Widget parentWidget,
@@ -254,6 +260,7 @@ class BatchSharingState extends ChangeNotifier {
   }
 
   /// Check if sharing is ready (valid recipient and permissions).
+
   bool get isReadyToShare {
     final hasValidRecipient = validatedWebId != null;
     final hasAnyPermissions =
@@ -263,6 +270,7 @@ class BatchSharingState extends ChangeNotifier {
 }
 
 /// Result of a batch sharing operation.
+
 class BatchSharingResult {
   final bool success;
   final String? errorMessage;

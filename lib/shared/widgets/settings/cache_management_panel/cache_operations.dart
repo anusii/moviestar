@@ -17,8 +17,10 @@ import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 
 /// Static helper class for cache operations.
+
 class CacheOperations {
   /// Clears all cached movie data.
+
   static Future<void> clearAllCache({
     required WidgetRef ref,
     required void Function(String) showSuccessSnackBar,
@@ -44,6 +46,7 @@ class CacheOperations {
   }
 
   /// Forces refresh of all movie categories.
+
   static Future<void> forceRefreshAll({
     required BuildContext context,
     required WidgetRef ref,

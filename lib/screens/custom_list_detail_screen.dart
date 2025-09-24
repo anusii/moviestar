@@ -310,6 +310,7 @@ Recipients will be able to:
   }
 
   /// Retry loading a specific movie.
+
   Future<void> _retryLoadMovie(int movieId) async {
     await MovieLoader.retryLoadMovie(
       ref,

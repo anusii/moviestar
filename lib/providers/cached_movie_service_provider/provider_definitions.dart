@@ -20,7 +20,8 @@ import 'package:moviestar/providers/cached_movie_service_provider.dart'
         cachingEnabledProvider,
         cacheOnlyModeProvider;
 
-/// Direct API key provider that accesses secure storage without service dependency
+/// Direct API key provider that accesses secure storage without service dependency.
+
 final directApiKeyProvider = FutureProvider<String?>((ref) async {
   try {
     const storage = FlutterSecureStorage(
@@ -60,6 +61,7 @@ final directApiKeyProvider = FutureProvider<String?>((ref) async {
 });
 
 /// Provider for recommended movies with caching information.
+
 final recommendedMoviesWithCacheInfoProvider =
     FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
@@ -89,6 +91,7 @@ final recommendedMoviesWithCacheInfoProvider =
 });
 
 /// Provider for now playing movies with caching information.
+
 final nowPlayingMoviesWithCacheInfoProvider =
     FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
@@ -113,6 +116,7 @@ final nowPlayingMoviesWithCacheInfoProvider =
 });
 
 /// Provider for top rated movies with caching information.
+
 final topRatedMoviesWithCacheInfoProvider =
     FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
@@ -137,6 +141,7 @@ final topRatedMoviesWithCacheInfoProvider =
 });
 
 /// Provider for upcoming movies with caching information.
+
 final upcomingMoviesWithCacheInfoProvider =
     FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
@@ -161,12 +166,13 @@ final upcomingMoviesWithCacheInfoProvider =
 });
 
 /// Provider for cache statistics.
+
 final cacheStatsProvider =
     FutureProvider<Map<CacheCategory, Map<String, dynamic>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
   return await cachedService.getCacheStats();
 });
 
-/// These providers are imported from the main file
-/// They are used by the movie providers but defined in the main cached_movie_service_provider.dart
+/// These providers are imported from the main file.
+/// They are used by the movie providers but defined in the main cached_movie_service_provider.dart.
 /// to avoid circular dependencies.

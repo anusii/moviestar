@@ -102,6 +102,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
   }
 
   /// Checks all movie providers for API key errors and updates state.
+
   void _checkForApiKeyErrors(
     AsyncValue<CacheResult<List<Movie>>> recommendedMovies,
     AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,

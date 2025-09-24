@@ -30,17 +30,22 @@ import 'package:moviestar/widgets/sharing/batch_item_card.dart';
 
 /// A panel that displays and manages file permissions for batch sharing.
 /// Shows files with configurable permissions and reset functionality.
+
 class BatchSharingPermissionsPanel extends StatelessWidget {
   /// List of files to be shared with their permissions.
+
   final List<ShareableFile> shareableFiles;
 
   /// Callback when file permissions are updated.
+
   final void Function(int index, List<String> permissions) onPermissionsChanged;
 
   /// Callback when permissions should be reset to defaults.
+
   final VoidCallback onResetPermissions;
 
   /// Creates a new [BatchSharingPermissionsPanel].
+
   const BatchSharingPermissionsPanel({
     super.key,
     required this.shareableFiles,
@@ -117,6 +122,7 @@ class BatchSharingPermissionsPanel extends StatelessWidget {
   }
 
   /// Build the informational banner about movie file permissions.
+
   Widget _buildInfoBanner(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(8),

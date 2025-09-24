@@ -24,26 +24,34 @@ import 'package:moviestar/widgets/movie_card.dart';
 
 /// A widget that builds movie cards for custom lists from movie IDs.
 /// Handles loading movie data on demand and displaying appropriate states.
+
 class CustomListMovieCard extends ConsumerWidget {
   /// ID of the movie to display.
+
   final int movieId;
 
   /// Content type (movie or tv).
+
   final String contentType;
 
   /// Service for managing favorites.
+
   final FavoritesService favoritesService;
 
   /// Parent widget for navigation context.
+
   final StatefulWidget parentWidget;
 
   /// Callback for navigation.
+
   final void Function(Route<dynamic> route) onNavigate;
 
   /// Whether to display as a list item instead of poster.
+
   final bool isListItem;
 
   /// Creates a new [CustomListMovieCard].
+
   const CustomListMovieCard({
     super.key,
     required this.movieId,
@@ -91,6 +99,7 @@ class CustomListMovieCard extends ConsumerWidget {
   }
 
   /// Builds the appropriate movie card based on layout type.
+
   Widget _buildMovieCard(BuildContext context, Movie movie) {
     void onTap() {
       onNavigate(
@@ -127,6 +136,7 @@ class CustomListMovieCard extends ConsumerWidget {
   }
 
   /// Helper method to get content as Movie based on known content type.
+
   Future<Movie> _getContentAsMovieWithType(
     int contentId,
     String contentType,
@@ -144,23 +154,30 @@ class CustomListMovieCard extends ConsumerWidget {
 
 /// A widget that displays a movie card directly from a Movie object.
 /// Used when we have full movie data available (e.g., from POD storage).
+
 class CustomListDirectMovieCard extends StatelessWidget {
   /// The movie to display.
+
   final Movie movie;
 
   /// Service for managing favorites.
+
   final FavoritesService favoritesService;
 
   /// Parent widget for navigation context.
+
   final StatefulWidget parentWidget;
 
   /// Callback for navigation.
+
   final void Function(Route<dynamic> route) onNavigate;
 
   /// Whether to display as a list item instead of poster.
+
   final bool isListItem;
 
   /// Creates a new [CustomListDirectMovieCard].
+
   const CustomListDirectMovieCard({
     super.key,
     required this.movie,

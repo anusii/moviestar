@@ -16,8 +16,10 @@ import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Static helper class for list operations.
+
 class ListOperations {
   /// Load which lists the movie is currently in.
+
   static Future<Set<String>> loadMovieListStatus(
     FavoritesService favoritesService,
     List<CustomList> customLists,
@@ -37,6 +39,7 @@ class ListOperations {
   }
 
   /// Toggle a movie in a custom list (add or remove).
+
   static Future<void> toggleMovieInList(
     BuildContext context,
     FavoritesService favoritesService,
@@ -68,6 +71,7 @@ class ListOperations {
   }
 
   /// Calculate the updated movie count for a list, accounting for current selections.
+
   static int getUpdatedMovieCount(
     CustomList list,
     Movie movie,

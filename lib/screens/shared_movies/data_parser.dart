@@ -8,8 +8,10 @@ library;
 import 'dart:convert';
 
 /// Handles parsing of movie and movie list data from TTL content.
+
 class SharedMoviesDataParser {
   /// Parse movie data from TTL content.
+
   static Future<Map<String, dynamic>?> parseMovieData(
     String ttlContent,
     String resourceUrl,
@@ -189,6 +191,7 @@ class SharedMoviesDataParser {
   }
 
   /// Parse movie list data from TTL content.
+
   static Future<Map<String, dynamic>?> parseMovieListData(
     String ttlContent,
     String resourceUrl,

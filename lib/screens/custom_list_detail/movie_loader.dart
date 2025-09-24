@@ -11,8 +11,10 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 
 /// Handles movie loading functionality for custom lists.
+
 class MovieLoader {
   /// Load movies from API for a custom list.
+
   static Future<Map<int, Movie>> loadMoviesFromAPI(
     WidgetRef ref,
     List<int> movieIds,
@@ -47,6 +49,7 @@ class MovieLoader {
   }
 
   /// Get content as Movie with type.
+
   static Future<Movie> getContentAsMovieWithType(
     WidgetRef ref,
     int contentId,
@@ -76,6 +79,7 @@ class MovieLoader {
   }
 
   /// Retry loading a specific movie.
+
   static Future<void> retryLoadMovie(
     WidgetRef ref,
     int movieId,

@@ -11,8 +11,10 @@ library;
 import 'dart:convert';
 
 /// Static helper class for data parsing operations.
+
 class DataParser {
   /// Extract title from enhanced movie data.
+
   static String? extractTitleFromEnhancedData(
     Map<String, dynamic> enhancedData,
   ) {
@@ -26,6 +28,7 @@ class DataParser {
   }
 
   /// Parses individual movie file content to extract title, rating and comments.
+
   static Future<Map<String, dynamic>?> parseIndividualMovieData(
     String ttlContent,
   ) async {

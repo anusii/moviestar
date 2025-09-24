@@ -15,8 +15,10 @@ import 'package:moviestar/shared/utils/turtle/base_serializer.dart';
 import 'package:moviestar/shared/utils/turtle/namespace_manager.dart';
 
 /// Handles User profile ↔ Turtle serialization operations.
+
 class UserProfileTurtleSerializer extends TurtleBaseSerializer {
   /// Creates a user profile in TTL format following the ontology structure.
+
   static String createUserProfile(
     String userWebId, {
     String? apiKey,

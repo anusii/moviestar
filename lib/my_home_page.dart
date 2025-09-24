@@ -86,6 +86,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   bool _showSettings = false;
 
   /// API key service reference for cleanup.
+
   late final ApiKeyService _apiKeyService;
 
   @override
@@ -403,6 +404,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   }
 
   /// Reinitializes the app after API key is set.
+
   Future<void> reinitializeAfterApiKey() async {
     if (!mounted) return;
 
@@ -556,6 +558,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   }
 
   /// Builds the Settings screen as an overlay on top of the SolidScaffold.
+
   Widget _buildSettingsOverlay(Widget solidScaffold) {
     return Stack(
       children: [

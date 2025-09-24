@@ -17,6 +17,7 @@ import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Loading coordination data for kanban board.
+
 class KanbanLoadingData {
   final bool isInitialLoading;
   final bool showSkeletonColumns;
@@ -32,6 +33,7 @@ class KanbanLoadingData {
 }
 
 /// Helper class for concurrent stream loading in kanban board.
+
 class KanbanStreamBuilder extends StatelessWidget {
   final FavoritesService favoritesService;
   final dynamic recommendedCacheResult;

@@ -24,6 +24,7 @@ export 'package:moviestar/shared/widgets/shared_movie_list_detail/data_loader/fe
 export 'package:moviestar/shared/widgets/shared_movie_list_detail/data_loader/url_handlers.dart';
 
 /// Handles data loading operations for shared movie list detail screen.
+
 class SharedListDataLoader {
   final WidgetRef ref;
   final BuildContext context;
@@ -41,6 +42,7 @@ class SharedListDataLoader {
 
   /// Load movie titles from TMDB API for all movies in the list.
   /// This will also detect and update content types.
+
   Future<Map<String, String>> loadMovieTitles(
     List<Map<String, dynamic>> movies,
   ) async {

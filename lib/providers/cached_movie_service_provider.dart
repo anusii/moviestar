@@ -54,7 +54,8 @@ final apiKeyServiceProvider = Provider<ApiKeyService?>((ref) {
   return null;
 });
 
-/// Direct API key provider that accesses secure storage without service dependency
+/// Direct API key provider that accesses secure storage without service dependency.
+
 final directApiKeyProvider = FutureProvider<String?>((ref) async {
   try {
     const storage = FlutterSecureStorage(

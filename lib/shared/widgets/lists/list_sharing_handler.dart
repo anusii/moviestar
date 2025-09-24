@@ -27,6 +27,7 @@ import 'package:moviestar/utils/serializer.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 
 /// Handler for custom list sharing functionality.
+
 class ListSharingHandler {
   final BuildContext context;
   final ConsumerStatefulWidget widget;
@@ -43,6 +44,7 @@ class ListSharingHandler {
   });
 
   /// Shows options for a custom list (edit, share, delete).
+
   Future<void> showListOptions(
     CustomList list,
     VoidCallback onEdit,
@@ -107,6 +109,7 @@ class ListSharingHandler {
   }
 
   /// Shows a loading dialog during sharing process.
+
   void _showSharingDialog() {
     showDialog(
       context: context,
@@ -140,6 +143,7 @@ class ListSharingHandler {
   }
 
   /// Shares the custom list and all movies using batch sharing UI.
+
   Future<void> shareCustomList(CustomList list) async {
     if (list.movieIds.isEmpty) {
       screenState.showInfoSnackBar('No movies to share');
@@ -217,6 +221,7 @@ class ListSharingHandler {
   }
 
   /// Loads movies for sharing from POD or API.
+
   Future<List<Movie>> _loadMoviesForSharing(CustomList list) async {
     final moviesToShare = <Movie>[];
 
@@ -276,6 +281,7 @@ class ListSharingHandler {
   }
 
   /// Creates a movie file if it doesn't exist (needed before sharing).
+
   Future<void> _createMovieFileIfNotExists(Movie movie) async {
     try {
       final isTV = movie.contentType == ContentType.tvShow;

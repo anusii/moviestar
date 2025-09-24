@@ -13,6 +13,7 @@ import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Handles custom list operations for POD favorites service.
+
 class PodFavoritesListOperations {
   final PodFavoritesStreamManager _streamManager;
   final MovieListService _movieListService;
@@ -23,6 +24,7 @@ class PodFavoritesListOperations {
   );
 
   /// Loads custom lists from POD.
+
   Future<void> loadCustomLists() async {
     final allLists = await _movieListService.getAllMovieLists();
 
@@ -81,6 +83,7 @@ class PodFavoritesListOperations {
   }
 
   /// Deletes a custom list using MovieListService.
+
   Future<void> deleteCustomList(String listId) async {
     // Clear any cache related to this list.
 
@@ -106,11 +109,13 @@ class PodFavoritesListOperations {
   }
 
   /// Gets all custom lists.
+
   Future<List<CustomList>> getCustomLists() async {
     return _streamManager.customLists;
   }
 
   /// Creates a custom list.
+
   Future<CustomList> createCustomList(
     String name, {
     String? description,
@@ -136,6 +141,7 @@ class PodFavoritesListOperations {
   }
 
   /// Updates a custom list.
+
   Future<void> updateCustomList(CustomList updatedList) async {
     // Fire-and-forget POD operation for immediate UI responsiveness.
 
@@ -154,6 +160,7 @@ class PodFavoritesListOperations {
   }
 
   /// Adds a movie to a custom list.
+
   Future<void> addMovieToCustomList(
     String listId,
     Movie movie, {
@@ -179,6 +186,7 @@ class PodFavoritesListOperations {
   }
 
   /// Removes a movie from a custom list.
+
   Future<void> removeMovieFromCustomList(String listId, int movieId) async {
     // Fire-and-forget POD operation for immediate UI responsiveness.
 
@@ -194,17 +202,20 @@ class PodFavoritesListOperations {
   }
 
   /// Checks if a movie is in a custom list.
+
   Future<bool> isMovieInCustomList(String listId, int movieId) async {
     return await _movieListService.isMovieInList(listId, movieId);
   }
 
   /// Gets custom lists containing a movie.
+
   Future<List<CustomList>> getCustomListsContainingMovie(int movieId) async {
     final allLists = _streamManager.customLists;
     return allLists.where((list) => list.movieIds.contains(movieId)).toList();
   }
 
   /// Gets movies in a custom list.
+
   Future<List<Movie>> getMoviesInCustomList(String listId) async {
     final movieList = await _movieListService.getMovieList(listId);
     if (movieList != null) {

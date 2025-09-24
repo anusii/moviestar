@@ -1,5 +1,5 @@
 #!/bin/bash
-# Comment Auto-Fix Script for MovieStar Project
+# Performance-Optimized Comment Auto-Fix Script for MovieStar Project
 #
 # Automatically fixes comment style violations:
 # 1. Adds periods to comments missing them
@@ -9,24 +9,30 @@ target="${1:-lib/}"
 dry_run=false
 [[ "$2" == "--dry-run" || "$1" == "--dry-run" ]] && dry_run=true
 
-echo "MovieStar Comment Auto-Fix"
-echo "=========================="
+echo "MovieStar Comment Auto-Fix (Optimized)"
+echo "======================================"
 echo "Target: $target"
 [[ "$dry_run" == true ]] && echo "Mode: DRY-RUN (no changes)" || echo "Mode: LIVE (files will be modified)"
 echo ""
 
 should_ignore_line() {
     local line="$1"
-    [[ "$line" =~ (TODO|FIXME|NOTE|Time-stamp|https?://) ]] && return 0
-    [[ "$line" =~ "This program is free software" ]] && return 0
-    [[ "$line" =~ "the terms of the GNU General Public License" ]] && return 0
-    [[ "$line" =~ "Foundation, either version" ]] && return 0
-    [[ "$line" =~ "This program is distributed in the hope" ]] && return 0
-    [[ "$line" =~ "ANY WARRANTY; without even the implied warranty" ]] && return 0
-    [[ "$line" =~ "FOR A PARTICULAR PURPOSE" ]] && return 0
-    [[ "$line" =~ "You should have received a copy of the GNU General Public License" ]] && return 0
-    [[ "$line" =~ "version\." ]] && return 0
-    [[ "$line" =~ "details\." ]] && return 0
+
+    # Skip empty comments (/// or // with no content)
+    [[ "$line" =~ ^[[:space:]]*///[[:space:]]*$ ]] && return 0
+    [[ "$line" =~ ^[[:space:]]*//[[:space:]]*$ ]] && return 0
+
+    case "$line" in
+        *"// ignore:"*) return 0 ;;  # Skip Dart analyzer ignore directives
+        *"TODO:"*|*"FIXME:"*|*"NOTE:"*|*"Time-stamp:"*|*"https://"*|*"http://"*) return 0 ;;
+        *"This program is free software"*|*"the terms of the GNU General Public License"*) return 0 ;;
+        *"Foundation, either version"*|*"This program is distributed in the hope"*) return 0 ;;
+        *"ANY WARRANTY; without even the implied warranty"*|*"FOR A PARTICULAR PURPOSE"*) return 0 ;;
+        *"You should have received a copy of the GNU General Public License"*) return 0 ;;
+        *"version."*|*"details."*) return 0 ;;
+        *"Copyright (C)"*|*"Licensed under the GNU General Public License"*|*"Authors:"*) return 0 ;;
+        *"License:"*|*"this program"*|*"see <https://www.gnu.org/licenses/"*) return 0 ;;
+    esac
     return 1
 }
 
@@ -37,63 +43,82 @@ fix_file() {
 
     echo "Processing: $file_path"
 
-    local temp1="${file_path}.tmp1"
-    local temp2="${file_path}.tmp2"
     local fixes=0
-
-    # Step 1: Fix missing periods
-    while IFS= read -r line; do
-        if [[ "$line" =~ ^[[:space:]]*//[^/] ]] && ! should_ignore_line "$line"; then
-            local comment_content=$(echo "$line" | sed 's/^[[:space:]]*\/\/[[:space:]]*//')
-            if [[ ! "$comment_content" =~ [.!?]$ ]] && [[ -n "$comment_content" ]]; then
-                local prefix=$(echo "$line" | sed 's/\(^[[:space:]]*\/\/[[:space:]]*\).*/\1/')
-                line="${prefix}${comment_content}."
-                ((fixes++))
-                [[ "$dry_run" == true ]] && echo "  Would add period to comment"
-            fi
-        fi
-        echo "$line"
-    done < "$file_path" > "$temp1"
-
-    # Step 2: Fix missing blank lines
-    local line_num=0
     local prev_line=""
     local prev_was_comment=false
+    local prev_was_ignore=false
+    local output=""
 
+    # Single-pass processing: fix periods AND blank lines in one read
     while IFS= read -r line; do
-        ((line_num++))
         local current_is_comment=false
-        [[ "$line" =~ ^[[:space:]]*//[^/] ]] && current_is_comment=true
+        local processed_line="$line"
 
-        # Add blank line if needed
-        if [[ "$prev_was_comment" == true ]] && [[ "$current_is_comment" == false ]] &&
-           [[ -n "$line" ]] && [[ ! "$line" =~ ^[[:space:]]*$ ]] && [[ ! "$line" =~ ^[[:space:]]*// ]]; then
+        # Check if current line is a comment and fix period if needed
+        if [[ "$line" =~ ^[[:space:]]*// ]]; then
+            current_is_comment=true
+
+            # Check if this is an ignore directive
+            local current_is_ignore=false
+            if [[ "$line" =~ "// ignore:" ]]; then
+                current_is_ignore=true
+            fi
+
+            if ! should_ignore_line "$line"; then
+                # Fast content extraction using parameter expansion
+                local content="${line#*//}"
+                [[ "$content" =~ ^/ ]] && content="${content#/}"
+                content="${content# }"
+
+                # Strip Windows line endings
+                content="${content%$'\r'}"
+
+                # Add period if missing
+                if [[ -n "$content" ]] && [[ ! "$content" =~ [.!?]$ ]]; then
+                    # Handle Windows line endings: content is clean but line may have \r\n
+                    local original_content="${line#*//}"
+                    [[ "$original_content" =~ ^/ ]] && original_content="${original_content#/}"
+                    original_content="${original_content# }"
+                    local prefix="${line%"$original_content"}"
+                    processed_line="${prefix}${content}."
+                    ((fixes++))
+                    [[ "$dry_run" == true ]] && echo "  Would add period to comment" >&2
+                fi
+            fi
+        fi
+
+        # Add blank line if needed (between previous comment and current non-comment)
+        # BUT NOT after ignore directives
+        if [[ "$prev_was_comment" == true ]] && [[ "$prev_was_ignore" == false ]] &&
+           [[ "$current_is_comment" == false ]] &&
+           [[ -n "$processed_line" ]] && [[ ! "$processed_line" =~ ^[[:space:]]*$ ]] &&
+           [[ ! "$processed_line" =~ ^[[:space:]]*// ]]; then
             if [[ -n "$prev_line" ]] && [[ ! "$prev_line" =~ ^[[:space:]]*$ ]]; then
-                echo ""
+                output+=$'\n'
                 ((fixes++))
                 [[ "$dry_run" == true ]] && echo "  Would add blank line before code" >&2
             fi
         fi
 
-        echo "$line"
-        prev_line="$line"
+        output+="$processed_line"$'\n'
+        prev_line="$processed_line"
         prev_was_comment=$current_is_comment
-    done < "$temp1" > "$temp2"
+        prev_was_ignore=$current_is_ignore
+    done < "$file_path"
 
     # Apply changes
     if [[ "$dry_run" == true ]]; then
         echo "  Would apply $fixes fix(es)"
-        rm -f "$temp1" "$temp2"
     else
-        mv "$temp2" "$file_path"
-        rm -f "$temp1"
+        # Write directly to file in one operation
+        echo -n "$output" > "$file_path"
         echo "  Applied $fixes fix(es)"
     fi
 
     return $fixes
 }
 
-# Main execution
+# Main execution - use faster for loop instead of pipeline
 total_fixes=0
 files_processed=0
 

@@ -40,71 +40,94 @@ import 'package:moviestar/widgets/sort_controls.dart';
 ///
 /// This widget provides a consistent way to display movies in a vertical list.
 /// with optional sorting, loading states, empty states, and error handling.
+
 class MovieListWidget extends StatefulWidget {
   /// The list of movies to display.
+
   final List<Movie> movies;
 
   /// The favorites service for quick actions and navigation.
+
   final FavoritesService favoritesService;
 
   /// Whether the list is currently loading.
+
   final bool isLoading;
 
   /// Error message to display, if any.
+
   final String? errorMessage;
 
   /// Custom empty state widget.
+
   final Widget? emptyWidget;
 
   /// Title to display above the list.
+
   final String? title;
 
   /// Whether to show sorting controls.
+
   final bool showSorting;
 
   /// Initial sort criteria.
+
   final MovieSortCriteria initialSortCriteria;
 
   /// Callback when sort criteria changes.
+
   final ValueChanged<MovieSortCriteria>? onSortChanged;
 
   /// Whether to show rating in list items.
+
   final bool showRating;
 
   /// Whether to show content type indicator.
+
   final bool showContentType;
 
   /// Whether to show release year.
+
   final bool showYear;
 
   /// Custom trailing widget builder for list items.
+
   final Widget Function(Movie movie)? trailingBuilder;
 
   /// Custom subtitle widget builder for list items.
+
   final Widget Function(Movie movie)? subtitleBuilder;
 
   /// Callback when a movie is tapped.
+
   final void Function(Movie movie)? onMovieTap;
 
   /// Whether to enable quick actions on hover.
+
   final bool enableQuickActions;
 
   /// Whether the data is from cache.
+
   final bool? fromCache;
 
   /// Age of cached data.
+
   final Duration? cacheAge;
 
   /// Whether the app is in offline mode.
+
   final bool? cacheOnlyMode;
 
   /// Padding around the list.
+
   final EdgeInsetsGeometry? padding;
 
   /// Whether to use a sliver list (for CustomScrollView).
+
   final bool sliver;
 
   /// Creates a movie list widget.
+
   const MovieListWidget({
     super.key,
     required this.movies,

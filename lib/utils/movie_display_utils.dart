@@ -31,6 +31,7 @@ import 'package:moviestar/models/content_item.dart';
 ///
 /// Returns a string with a star emoji followed by the rating to 1 decimal place.
 /// Example: "⭐ 7.5".
+
 String formatMovieRating(double rating) {
   return '⭐ ${rating.toStringAsFixed(1)}';
 }
@@ -39,6 +40,7 @@ String formatMovieRating(double rating) {
 ///
 /// Accepts either a DateTime or String and returns the year.
 /// Example: DateTime(2024, 12, 25) -> "2024".
+
 String formatMovieYear(dynamic releaseDate) {
   if (releaseDate == null) {
     return '';
@@ -66,6 +68,7 @@ String formatMovieYear(dynamic releaseDate) {
 /// Returns just the content type icon without label.
 ///
 /// Returns "🎬" for movies and "📺" for TV shows.
+
 String getContentTypeIcon(ContentType? contentType) {
   if (contentType == null) return '';
   return contentType == ContentType.movie ? '🎬' : '📺';
@@ -74,6 +77,7 @@ String getContentTypeIcon(ContentType? contentType) {
 /// Returns just the content type label without icon.
 ///
 /// Returns "Movie" for movies and "TV Show" for TV shows.
+
 String getContentTypeLabel(ContentType? contentType) {
   if (contentType == null) return '';
   return contentType == ContentType.movie ? 'Movie' : 'TV Show';
@@ -82,6 +86,7 @@ String getContentTypeLabel(ContentType? contentType) {
 /// Validates if an image URL is valid and not empty.
 ///
 /// Returns true if the URL starts with http:// or https://.
+
 bool isValidImageUrl(String url) {
   if (url.trim().isEmpty) {
     return false;
@@ -94,6 +99,7 @@ bool isValidImageUrl(String url) {
 /// Formats cache age into a human-readable string.
 ///
 /// Example: Duration(hours: 2) -> "2h ago".
+
 String formatCacheAge(Duration age) {
   if (age.inDays > 0) {
     return '${age.inDays}d ago';

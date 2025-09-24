@@ -18,8 +18,10 @@ import 'drop_operations.dart';
 import 'message_helpers.dart';
 
 /// Static helper class for background sync operations.
+
 class SyncOperations {
   /// Background sync operation for drop actions.
+
   static Future<void> syncDropOperation(
     FavoritesService favoritesService,
     KanbanBoardController controller,
@@ -83,6 +85,7 @@ class SyncOperations {
   }
 
   /// Background sync for context menu actions.
+
   static Future<void> syncContextMenuAction(
     BuildContext context,
     FavoritesService favoritesService,

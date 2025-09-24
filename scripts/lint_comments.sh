@@ -30,6 +30,11 @@ should_ignore_line() {
     [[ "$line" =~ "version\." ]] && return 0
     [[ "$line" =~ "details\." ]] && return 0
 
+    # Skip common license/copyright doc comments
+    [[ "$line" =~ "Copyright (C)" ]] && return 0
+    [[ "$line" =~ "Licensed under the GNU General Public License" ]] && return 0
+    [[ "$line" =~ "Authors:" ]] && return 0
+
     return 1
 }
 
@@ -48,10 +53,10 @@ lint_single_file() {
 
     exec 3< "$file_path"
     while IFS= read -r line <&3; do
-        if [[ "$line" =~ ^[[:space:]]*//[^/] ]]; then
+        if [[ "$line" =~ ^[[:space:]]*//[^/] ]] || [[ "$line" =~ ^[[:space:]]*///[[:space:]] ]]; then
             if ! should_ignore_line "$line"; then
                 local comment_content
-                comment_content=$(echo "$line" | sed 's/^[[:space:]]*\/\/[[:space:]]*//')
+                comment_content=$(echo "$line" | sed 's/^[[:space:]]*\/\/\/\?[[:space:]]*//')
                 if [[ ! "$comment_content" =~ [.!?]$ ]] && [[ -n "$comment_content" ]]; then
                     echo "  Line $line_number: Comment missing period: $line"
                     ((file_violations++))
@@ -59,7 +64,7 @@ lint_single_file() {
             fi
             prev_was_comment=true
         else
-            if [[ "$prev_was_comment" == true ]] && [[ -n "$line" ]] && [[ ! "$line" =~ ^[[:space:]]*$ ]] && [[ ! "$line" =~ ^[[:space:]]*// ]]; then
+            if [[ "$prev_was_comment" == true ]] && [[ -n "$line" ]] && [[ ! "$line" =~ ^[[:space:]]*$ ]] && [[ ! "$line" =~ ^[[:space:]]*//[/]? ]]; then
                 if [[ -n "$prev_line" ]] && [[ ! "$prev_line" =~ ^[[:space:]]*$ ]]; then
                     echo "  Line $line_number: Missing blank line after comment"
                     ((file_violations++))

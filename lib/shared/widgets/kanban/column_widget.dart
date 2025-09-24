@@ -28,6 +28,7 @@ export 'package:moviestar/shared/widgets/kanban/column_widget/header_builder.dar
 export 'package:moviestar/shared/widgets/kanban/column_widget/movie_list_builder.dart';
 
 /// Column data for building kanban columns.
+
 class KanbanColumnData {
   final String title;
   final List<Movie> movies;
@@ -49,6 +50,7 @@ class KanbanColumnData {
 }
 
 /// Kanban column widget with drag target support.
+
 class KanbanColumnWidget extends StatelessWidget {
   final KanbanColumnData columnData;
   final KanbanBoardController controller;

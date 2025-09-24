@@ -32,6 +32,7 @@ import 'package:moviestar/widgets/sharing/components.dart';
 import 'package:moviestar/widgets/sharing/form_widgets.dart';
 
 /// Sharing status indicator.
+
 class SharingStatusIndicator extends StatelessWidget {
   final ShareStatus status;
   final String? message;
@@ -112,6 +113,7 @@ class SharingStatusIndicator extends StatelessWidget {
 }
 
 /// Batch sharing item tile.
+
 class ShareableItemTile extends StatelessWidget {
   final ShareableFile file;
   final ValueChanged<List<String>> onPermissionsChanged;
@@ -255,6 +257,7 @@ class ShareableItemTile extends StatelessWidget {
 }
 
 /// Navigate to GrantPermissionUi with consistent theming.
+
 Future<bool?> navigateToGrantPermissionUi({
   required BuildContext context,
   required String fileName,

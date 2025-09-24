@@ -22,8 +22,10 @@ import 'package:moviestar/models/sharing_models.dart';
 import 'package:moviestar/services/webid_validator.dart';
 
 /// Handles sharing operations and permission management for POD files.
+
 class ShareOperationHandler {
   /// Get the current user's WebID.
+
   static Future<String?> getCurrentWebId() async {
     try {
       final webId = await getWebId();
@@ -34,6 +36,7 @@ class ShareOperationHandler {
   }
 
   /// Share a single file using real POD permission granting.
+
   static Future<ShareResult> shareFile(
     ShareRequest request,
     BuildContext context,
@@ -112,6 +115,7 @@ class ShareOperationHandler {
   }
 
   /// Share multiple files.
+
   static Future<BatchShareResult> shareMultipleFiles(
     List<ShareRequest> requests,
     BuildContext context,
@@ -133,6 +137,7 @@ class ShareOperationHandler {
   }
 
   /// Grant permissions for a file using real POD calls.
+
   static Future<PermissionResult> grantPermissions(
     PermissionRequest request,
     BuildContext context,
@@ -213,6 +218,7 @@ class ShareOperationHandler {
   }
 
   /// Perform batch sharing with progress callback.
+
   static Future<BatchShareResult> performBatchShare(
     BatchShareRequest request,
     BuildContext context,
@@ -250,6 +256,7 @@ class ShareOperationHandler {
   }
 
   /// Get sharing status message.
+
   static String getStatusMessage(SolidFunctionCallStatus status) {
     switch (status) {
       case SolidFunctionCallStatus.success:

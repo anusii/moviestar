@@ -20,8 +20,10 @@ import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Static helper class for building UI components in quick actions dialog.
+
 class UiBuilders {
   /// Builds the main content container for the dialog.
+
   static Widget buildDialogContainer({
     required BuildContext context,
     required Widget child,
@@ -48,6 +50,7 @@ class UiBuilders {
   }
 
   /// Builds the title section with content type indicator.
+
   static Widget buildTitleSection({
     required BuildContext context,
     required Movie movie,
@@ -98,6 +101,7 @@ class UiBuilders {
   }
 
   /// Builds the quick action buttons row.
+
   static Widget buildActionButtons({
     required BuildContext context,
     required bool isInToWatch,
@@ -162,6 +166,7 @@ Your shared movies will appear in their "Shared with Me" tab.
   }
 
   /// Builds the rating section with slider and controls.
+
   static Widget buildRatingSection({
     required BuildContext context,
     required double? personalRating,
@@ -236,6 +241,7 @@ Your shared movies will appear in their "Shared with Me" tab.
   }
 
   /// Builds a loading indicator.
+
   static Widget buildLoadingIndicator() {
     return const Center(
       child: SizedBox(
@@ -247,6 +253,7 @@ Your shared movies will appear in their "Shared with Me" tab.
   }
 
   /// Builds an action button with consistent styling.
+
   static Widget _buildActionButton({
     required BuildContext context,
     required IconData icon,

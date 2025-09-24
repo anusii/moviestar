@@ -20,8 +20,10 @@ import 'package:moviestar/shared/utils/turtle/namespace_manager.dart';
 import 'package:moviestar/shared/utils/turtle/parsing_utils.dart';
 
 /// Handles MovieList ↔ Turtle serialization operations.
+
 class MovieListTurtleSerializer extends TurtleBaseSerializer {
   /// Creates a MovieList in TTL format following the ontology structure.
+
   static String createMovieList(
     String movieListId,
     String listName, {
@@ -124,6 +126,7 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
   }
 
   /// Parses a MovieList from TTL content and extracts movies.
+
   static Map<String, dynamic>? movieListFromTurtle(String ttlContent) {
     try {
       // Parse using proper RDF.

@@ -14,8 +14,10 @@ import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Static helper class for UI building.
+
 class UiBuilder {
   /// Build the dialog header with movie title and close button.
+
   static Widget buildHeader(BuildContext context, Movie movie) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -82,6 +84,7 @@ class UiBuilder {
   }
 
   /// Build a list item widget for a custom list.
+
   static Widget buildListItem(
     BuildContext context,
     CustomList list,
@@ -172,6 +175,7 @@ class UiBuilder {
   }
 
   /// Build empty state widget when no custom lists exist.
+
   static Widget buildEmptyListsState(BuildContext context) {
     return Center(
       child: Padding(
@@ -211,6 +215,7 @@ class UiBuilder {
   }
 
   /// Build create new list button.
+
   static Widget buildCreateListButton(
     BuildContext context,
     bool isLoading,
@@ -248,6 +253,7 @@ class UiBuilder {
   }
 
   /// Show create new list dialog.
+
   static void showCreateNewListDialog(
     BuildContext context,
     TextEditingController controller,

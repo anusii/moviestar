@@ -52,6 +52,7 @@ class _PodSettingsPanelState extends ConsumerState<PodSettingsPanel> {
   }
 
   /// Enable POD storage and migrate data.
+
   Future<void> _enablePodStorage() async {
     // Show loading indicator.
 
@@ -98,6 +99,7 @@ class _PodSettingsPanelState extends ConsumerState<PodSettingsPanel> {
   }
 
   /// Disable POD storage and revert to local storage.
+
   Future<void> _disablePodStorage() async {
     try {
       await widget.favoritesServiceManager.disablePodStorage();
@@ -125,6 +127,7 @@ class _PodSettingsPanelState extends ConsumerState<PodSettingsPanel> {
   }
 
   /// Initialises POD storage state, enabling by default for logged-in users.
+
   Future<void> _initializePodStorageState() async {
     // Check if user is logged in.
 

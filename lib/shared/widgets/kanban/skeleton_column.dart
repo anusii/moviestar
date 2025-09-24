@@ -16,14 +16,18 @@ import 'package:moviestar/constants/dimensions.dart';
 
 /// A skeleton placeholder for kanban columns during loading.
 /// Provides visual feedback that a column will appear while maintaining layout.
+
 class KanbanColumnSkeleton extends StatefulWidget {
   /// Optional skeleton title text.
+
   final String? title;
 
   /// Number of skeleton items to show in the column.
+
   final int itemCount;
 
   /// Width of the skeleton column.
+
   final double width;
 
   const KanbanColumnSkeleton({
@@ -170,6 +174,7 @@ class _KanbanColumnSkeletonState extends State<KanbanColumnSkeleton>
   }
 
   /// Build a skeleton movie item placeholder.
+
   Widget _buildSkeletonMovieItem(ThemeData theme) {
     return Container(
       height: 80,

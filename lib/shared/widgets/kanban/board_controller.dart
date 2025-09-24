@@ -15,6 +15,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
 
 /// Enum for different column types in the kanban board.
+
 enum KanbanColumnType {
   recommended,
   toWatch,
@@ -23,6 +24,7 @@ enum KanbanColumnType {
 }
 
 /// Data structure for drag and drop operations.
+
 class MovieDragData {
   final Movie movie;
   final KanbanColumnType sourceType;
@@ -38,6 +40,7 @@ class MovieDragData {
 }
 
 /// Queue item for tracking pending operations.
+
 class OperationQueueItem {
   final int id;
   final String description;
@@ -74,6 +77,7 @@ enum OperationStatus {
 }
 
 /// Controller for managing kanban board state, optimistic updates, and operations.
+
 class KanbanBoardController extends ChangeNotifier {
   // Optimistic UI state tracking.
 
@@ -102,17 +106,20 @@ class KanbanBoardController extends ChangeNotifier {
       Map.unmodifiable(_columnSortCriteria);
 
   /// Get the key for tracking operations.
+
   String _getOperationKey(KanbanColumnType type, String id) {
     return '${type.name}_$id';
   }
 
   /// Handle sort change for a column.
+
   void onSortChanged(String columnId, MovieSortCriteria criteria) {
     _columnSortCriteria[columnId] = criteria;
     notifyListeners();
   }
 
   /// Add operation to queue and return operation ID.
+
   int addToQueue(String description) {
     final id = _nextOperationId++;
     _operationQueue.add(
@@ -128,6 +135,7 @@ class KanbanBoardController extends ChangeNotifier {
   }
 
   /// Update operation status in queue.
+
   void updateQueueStatus(int operationId, OperationStatus status) {
     final index = _operationQueue.indexWhere((op) => op.id == operationId);
     if (index != -1) {
@@ -147,6 +155,7 @@ class KanbanBoardController extends ChangeNotifier {
   }
 
   /// Add movie optimistically to UI state.
+
   void addOptimisticMovie(
     KanbanColumnType targetType,
     String targetId,
@@ -160,6 +169,7 @@ class KanbanBoardController extends ChangeNotifier {
   }
 
   /// Remove movie optimistically from UI state.
+
   void removeOptimisticMovie(
     KanbanColumnType sourceType,
     String sourceId,
@@ -172,6 +182,7 @@ class KanbanBoardController extends ChangeNotifier {
   }
 
   /// Clear optimistic state after backend sync.
+
   void clearOptimisticState(KanbanColumnType type, String id, int movieId) {
     final key = _getOperationKey(type, id);
     _pendingOperations[key]?.remove(movieId);
@@ -185,6 +196,7 @@ class KanbanBoardController extends ChangeNotifier {
   }
 
   /// Mark sync error and revert optimistic state.
+
   void markSyncError(KanbanColumnType type, String id, int movieId) {
     final key = _getOperationKey(type, id);
     _syncErrors.add('${movieId}_$key');
@@ -194,6 +206,7 @@ class KanbanBoardController extends ChangeNotifier {
   }
 
   /// Get movies with optimistic updates applied.
+
   List<Movie> getMoviesWithOptimisticUpdates(
     List<Movie> originalMovies,
     KanbanColumnType type,
@@ -231,12 +244,14 @@ class KanbanBoardController extends ChangeNotifier {
   }
 
   /// Check if operation has sync error.
+
   bool hasSyncError(KanbanColumnType type, String id, int movieId) {
     final key = _getOperationKey(type, id);
     return _syncErrors.contains('${movieId}_$key');
   }
 
   /// Check if movie is pending operation.
+
   bool isPendingOperation(KanbanColumnType type, String id, int movieId) {
     final key = _getOperationKey(type, id);
     final pendingOps = _pendingOperations[key];
@@ -245,6 +260,7 @@ class KanbanBoardController extends ChangeNotifier {
   }
 
   /// Clear all state (for cleanup).
+
   void clearAll() {
     _pendingOperations.clear();
     _optimisticMovies.clear();

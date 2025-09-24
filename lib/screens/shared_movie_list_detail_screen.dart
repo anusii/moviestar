@@ -63,6 +63,7 @@ class _SharedMovieListDetailScreenState
   }
 
   /// Initialize decomposed components.
+
   void _initializeComponents() {
     _dataLoader = SharedListDataLoader(
       ref: ref,
@@ -82,6 +83,7 @@ class _SharedMovieListDetailScreenState
   }
 
   /// Load movie titles using data loader.
+
   Future<void> _loadMovieTitles() async {
     try {
       final titles = await _dataLoader.loadMovieTitles(widget.movies);

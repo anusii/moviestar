@@ -46,15 +46,19 @@ class PreferencesPanel extends ConsumerStatefulWidget {
 
 class _PreferencesPanelState extends ConsumerState<PreferencesPanel> {
   /// Whether notifications are enabled.
+
   bool _notificationsEnabled = true;
 
   /// Whether auto-play is enabled.
+
   bool _autoPlayEnabled = true;
 
   /// Selected language for the app.
+
   String _selectedLanguage = 'English';
 
   /// Selected video quality.
+
   String _selectedQuality = 'High';
 
   Widget _buildDropdownTile(

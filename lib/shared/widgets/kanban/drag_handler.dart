@@ -29,6 +29,7 @@ export 'package:moviestar/shared/widgets/kanban/drag_handler/message_helpers.dar
 export 'package:moviestar/shared/widgets/kanban/drag_handler/sync_operations.dart';
 
 /// Handler for all drag and drop operations in the kanban board.
+
 class KanbanDragHandler {
   final FavoritesService favoritesService;
   final KanbanBoardController controller;
@@ -41,6 +42,7 @@ class KanbanDragHandler {
   });
 
   /// Handle drop operation with optimistic UI updates.
+
   Future<void> handleDrop(
     MovieDragData dragData,
     KanbanColumnType targetType,
@@ -90,6 +92,7 @@ class KanbanDragHandler {
   }
 
   /// Show context menu for movie copy operations.
+
   void showMovieContextMenu(
     Offset position,
     Movie movie,
@@ -110,6 +113,7 @@ class KanbanDragHandler {
   }
 
   /// Handle context menu action with optimistic UI updates.
+
   Future<void> _handleContextMenuAction(
     String action,
     Movie movie,

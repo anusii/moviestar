@@ -25,20 +25,26 @@ import 'package:moviestar/shared/widgets/movie_details/info_builders/rating_sect
 
 /// A widget that displays the movie info section without the title.
 /// Used when the title is displayed separately with action buttons.
+
 class MovieInfoSectionWithoutTitle extends StatefulWidget {
   /// The movie to display.
+
   final Movie movie;
 
   /// Service for managing favorite movies.
+
   final FavoritesService favoritesService;
 
   /// Whether this is a shared movie.
+
   final bool isSharedMovie;
 
   /// Shared movie data if applicable.
+
   final Map<String, dynamic>? sharedMovieData;
 
   /// Creates a new [MovieInfoSectionWithoutTitle] widget.
+
   const MovieInfoSectionWithoutTitle({
     super.key,
     required this.movie,

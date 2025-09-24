@@ -36,19 +36,23 @@ import 'package:moviestar/utils/serializer.dart';
 
 /// Manages movie file operations for PodFavoritesService.
 /// Extracted to reduce main service file size while preserving exact behavior.
+
 class PodFavoritesFileManager with PodOperationsMixin {
   final BuildContext _context;
   final Widget _child;
 
   /// Track which movies have files to avoid unnecessary reads.
+
   final Set<int> _moviesWithFiles = {};
 
   /// Track pending movie file updates to batch them.
+
   final Map<int, Timer> _pendingMovieUpdates = {};
 
   PodFavoritesFileManager(this._context, this._child);
 
   /// Gets the file path for a movie.
+
   String getMovieFilePathFor(Movie movie) {
     final contentType =
         movie.contentType == ContentType.tvShow ? 'tvShow' : 'movie';
@@ -56,12 +60,14 @@ class PodFavoritesFileManager with PodOperationsMixin {
   }
 
   /// Gets the file path for a movie by movie object (compatibility method).
+
   String? getMovieFilePathByMovie(Movie movie) {
     return getMovieFilePathFor(movie);
   }
 
   /// Creates or updates a movie file with user data.
   /// Uses batching to avoid race conditions.
+
   Future<void> createOrUpdateMovieFile(
     Movie movie, {
     double? rating,
@@ -89,6 +95,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
   }
 
   /// Performs the actual movie file update.
+
   Future<void> performMovieFileUpdate(
     Movie movie, {
     double? rating,
@@ -160,6 +167,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
   }
 
   /// Checks if a movie has an associated file in POD.
+
   Future<bool> hasMovieFile(Movie movie) async {
     // Check cache first.
 
@@ -184,6 +192,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
   }
 
   /// Reads movie file data.
+
   Future<Map<String, dynamic>?> readMovieFile(Movie movie) async {
     try {
       final loggedIn = await isLoggedIn();
@@ -210,6 +219,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
   }
 
   /// Cancels all pending movie file updates.
+
   void cancelPendingUpdates() {
     for (final timer in _pendingMovieUpdates.values) {
       timer.cancel();
@@ -218,6 +228,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
   }
 
   /// Loads full movie data from POD file.
+
   Future<Movie?> loadMovieData(int movieId) async {
     try {
       final loggedIn = await isLoggedIn();
@@ -244,6 +255,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
   }
 
   /// Parses movie list data from TTL content.
+
   Future<List<Movie>?> parseMovieListData(String ttlContent) async {
     try {
       final movieListData = TurtleSerializer.movieListFromTurtle(ttlContent);
@@ -257,6 +269,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
   }
 
   /// Loads full movie details from individual movie file for a placeholder movie.
+
   Future<Movie?> loadFullMovieDetails(Movie placeholderMovie) async {
     try {
       final loggedIn = await isLoggedIn();
@@ -300,6 +313,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
   }
 
   /// Disposes resources.
+
   void dispose() {
     cancelPendingUpdates();
   }

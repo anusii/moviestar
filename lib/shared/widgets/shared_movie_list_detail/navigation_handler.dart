@@ -19,6 +19,7 @@ import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/shared/widgets/shared_movie_list_detail/data_loader.dart';
 
 /// Handles navigation operations for shared movie list detail screen.
+
 class SharedListNavigationHandler {
   final WidgetRef ref;
   final BuildContext context;
@@ -39,6 +40,7 @@ class SharedListNavigationHandler {
   /// Navigate to movie details screen with enhanced data.
   /// Uses direct Movie creation approach (similar to working Shared tab logic).
   /// instead of TMDB API calls to avoid API key and network issues.
+
   Future<void> navigateToMovieDetails(Map<String, dynamic> movieData) async {
     try {
       final movieId =
@@ -146,6 +148,7 @@ class SharedListNavigationHandler {
   }
 
   /// Handle navigation errors with appropriate user feedback.
+
   Future<void> _handleNavigationError(dynamic error) async {
     // Dismiss loading indicator if it's showing.
 
@@ -167,6 +170,7 @@ class SharedListNavigationHandler {
   }
 
   /// Show loading dialog during navigation.
+
   void showLoadingDialog() {
     if (context.mounted) {
       showDialog(
@@ -178,6 +182,7 @@ class SharedListNavigationHandler {
   }
 
   /// Dismiss loading dialog.
+
   void dismissLoadingDialog() {
     if (context.mounted) {
       Navigator.pop(context);
@@ -185,6 +190,7 @@ class SharedListNavigationHandler {
   }
 
   /// Show error message to user.
+
   void showErrorMessage(String message) {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -197,6 +203,7 @@ class SharedListNavigationHandler {
   }
 
   /// Show success message to user.
+
   void showSuccessMessage(String message) {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

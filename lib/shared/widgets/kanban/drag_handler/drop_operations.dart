@@ -15,13 +15,16 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/shared/widgets/kanban/board_controller.dart';
 
 /// Static helper class for handling drop operations.
+
 class DropOperations {
   /// Determine if the drop operation is a copy (from Recommended) or move.
+
   static bool isCopyOperation(KanbanColumnType sourceType) {
     return sourceType == KanbanColumnType.recommended;
   }
 
   /// Apply optimistic UI updates for drop operation.
+
   static void applyOptimisticUpdates(
     KanbanBoardController controller,
     MovieDragData dragData,
@@ -40,6 +43,7 @@ class DropOperations {
   }
 
   /// Add movie to target list based on column type.
+
   static Future<void> addToTargetList(
     FavoritesService favoritesService,
     Movie movie,
@@ -75,6 +79,7 @@ class DropOperations {
   }
 
   /// Remove movie from source list for move operations.
+
   static Future<void> removeFromSourceList(
     FavoritesService favoritesService,
     Movie movie,
@@ -100,6 +105,7 @@ class DropOperations {
 
   /// Ensure a movie file exists for the given movie.
   /// This is important for movies from the Recommended list that might not have local files yet.
+
   static Future<void> ensureMovieFileExists(
     FavoritesService favoritesService,
     Movie movie,
@@ -122,6 +128,7 @@ class DropOperations {
   }
 
   /// Clear optimistic state after successful operation.
+
   static void clearOptimisticState(
     KanbanBoardController controller,
     MovieDragData dragData,
@@ -140,6 +147,7 @@ class DropOperations {
   }
 
   /// Mark sync errors for failed operations.
+
   static void markSyncErrors(
     KanbanBoardController controller,
     MovieDragData dragData,

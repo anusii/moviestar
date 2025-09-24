@@ -63,6 +63,7 @@ class WatchedScreen extends StatefulWidget {
 
 class _WatchedScreenState extends State<WatchedScreen> with ScreenStateMixin {
   /// Currently selected sort criteria.
+
   MovieSortCriteria _sortCriteria = MovieSortCriteria.nameAsc;
 
   @override

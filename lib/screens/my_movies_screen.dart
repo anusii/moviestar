@@ -63,9 +63,11 @@ class MyMoviesScreen extends StatefulWidget {
 
 class _MyMoviesScreenState extends State<MyMoviesScreen> with ScreenStateMixin {
   /// Currently selected sort criteria.
+
   MovieSortCriteria _sortCriteria = MovieSortCriteria.nameAsc;
 
   /// Gets movies that the user has rated (combines both to watch and watched movies with ratings).
+
   Stream<List<Movie>> get _ratedMovies async* {
     await for (final toWatch in widget.favoritesService.toWatchMovies) {
       await for (final watched in widget.favoritesService.watchedMovies) {

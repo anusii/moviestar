@@ -11,6 +11,7 @@ import 'package:moviestar/core/services/pod/favorites_file_manager.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Handles file operations for POD favorites service.
+
 class PodFavoritesFileHandler {
   final PodFavoritesFileManager _fileManager;
   final Function(String fileName) safeReadFile;
@@ -21,6 +22,7 @@ class PodFavoritesFileHandler {
   );
 
   /// Parses movies from TTL content.
+
   Future<List<Movie>> parseMoviesFromTtl(String ttlContent) async {
     final movieListData = await _fileManager.parseMovieListData(ttlContent);
     if (movieListData != null) {
@@ -56,6 +58,7 @@ class PodFavoritesFileHandler {
   }
 
   /// Loads favorites data from POD files.
+
   Future<Map<String, List<Movie>>> loadFavoritesData() async {
     final toWatchData =
         await safeReadFile('moviestar/data/user_lists/to_watch.ttl');
@@ -82,6 +85,7 @@ class PodFavoritesFileHandler {
   }
 
   /// Gets a movie by ID from cache or file manager.
+
   Future<Movie?> getMovie(int movieId) async {
     return await _fileManager.loadMovieData(movieId);
   }

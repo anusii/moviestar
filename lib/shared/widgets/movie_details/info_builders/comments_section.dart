@@ -12,8 +12,10 @@ import 'package:gap/gap.dart';
 import 'package:moviestar/constants/dimensions.dart';
 
 /// Builds the comments section for movie details.
+
 class CommentsSection {
   /// Build the comments section with text field and controls.
+
   static Widget buildCommentsSection(
     BuildContext context, {
     required bool isSharedMovie,

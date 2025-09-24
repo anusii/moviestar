@@ -19,6 +19,7 @@ import 'package:moviestar/models/app_error.dart';
 import 'action_button_builder.dart';
 
 /// Renders UserFriendlyError with full functionality.
+
 class UserFriendlyErrorRenderer extends StatefulWidget {
   final UserFriendlyError error;
   final double iconSize;

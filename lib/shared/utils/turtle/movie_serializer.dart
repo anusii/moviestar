@@ -20,8 +20,10 @@ import 'package:moviestar/shared/utils/turtle/namespace_manager.dart';
 import 'package:moviestar/shared/utils/turtle/parsing_utils.dart';
 
 /// Handles Movie ↔ Turtle serialization operations.
+
 class MovieTurtleSerializer extends TurtleBaseSerializer {
   /// Converts a list of movies to TTL format using proper RDF triples.
+
   static String moviesToTurtle(List<Movie> movies, String listName) {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
@@ -82,6 +84,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
   }
 
   /// Converts a single movie with user's personal rating and comment to TTL format.
+
   static String movieWithUserDataToTurtle(
     Movie movie,
     double? rating,
@@ -167,6 +170,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
   }
 
   /// Movie with user data using ontology structure.
+
   static String movieWithUserDataToTurtleOntology(
     Movie movie,
     double? rating,
@@ -248,6 +252,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
   }
 
   /// Enhanced serialization with JSON backup for compatibility.
+
   static String moviesToTurtleWithJson(List<Movie> movies, String listName) {
     final buffer = StringBuffer();
 
@@ -266,6 +271,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
   }
 
   /// Parses movies from TTL content using proper RDF parsing.
+
   static List<Movie> moviesFromTurtle(String ttlContent) {
     try {
       // First try to parse from JSON backup for backward compatibility.
@@ -315,6 +321,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
   }
 
   /// Parses a single movie with user data from TTL content.
+
   static Map<String, dynamic>? movieWithUserDataFromTurtle(String ttlContent) {
     try {
       // First try to parse from JSON backup for compatibility.

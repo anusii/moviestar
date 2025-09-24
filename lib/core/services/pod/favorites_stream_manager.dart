@@ -30,62 +30,79 @@ import 'package:moviestar/models/movie.dart';
 
 /// Manages stream controllers for PodFavoritesService.
 /// Extracted to reduce main service file size while preserving exact behavior.
+
 class PodFavoritesStreamManager {
   /// Stream controller for to-watch movies.
+
   final _toWatchController = BehaviorSubject<List<Movie>>();
 
   /// Stream controller for watched movies.
+
   final _watchedController = BehaviorSubject<List<Movie>>();
 
   /// Stream controller for custom lists.
+
   final _customListsController = BehaviorSubject<List<CustomList>>();
 
   /// Stream of to-watch movies.
+
   Stream<List<Movie>> get toWatchStream => _toWatchController.stream;
   Stream<List<Movie>> get toWatchMovies => _toWatchController.stream;
 
   /// Stream of watched movies.
+
   Stream<List<Movie>> get watchedStream => _watchedController.stream;
   Stream<List<Movie>> get watchedMovies => _watchedController.stream;
 
   /// Stream of custom lists.
+
   Stream<List<CustomList>> get customListsStream =>
       _customListsController.stream;
 
   /// Current to-watch list.
+
   List<Movie> get toWatch => _toWatchController.valueOrNull ?? [];
 
   /// Current watched list.
+
   List<Movie> get watched => _watchedController.valueOrNull ?? [];
 
   /// Current custom lists.
+
   List<CustomList> get customLists => _customListsController.valueOrNull ?? [];
 
   /// Updates the to-watch stream with new data.
+
   void updateToWatch(List<Movie> movies) {
     _toWatchController.add(movies);
   }
 
   /// Updates the watched stream with new data.
+
   void updateWatched(List<Movie> movies) {
     _watchedController.add(movies);
   }
 
   /// Updates the custom lists stream with new data.
+
   void updateCustomLists(List<CustomList> lists) {
     _customListsController.add(lists);
   }
 
   /// Checks if to-watch stream has listeners.
+
   bool get hasToWatchListeners => _toWatchController.hasListener;
 
   /// Checks if watched stream has listeners.
+
   bool get hasWatchedListeners => _watchedController.hasListener;
 
   /// Checks if custom lists stream has listeners.
+
   bool get hasCustomListsListeners => _customListsController.hasListener;
 
   /// Clears all data in streams.
+
   void clearAll() {
     _toWatchController.add([]);
     _watchedController.add([]);
@@ -93,6 +110,7 @@ class PodFavoritesStreamManager {
   }
 
   /// Disposes all stream controllers.
+
   void dispose() {
     _toWatchController.close();
     _watchedController.close();

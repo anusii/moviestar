@@ -19,8 +19,10 @@ import 'package:moviestar/shared/widgets/settings/cache_management_panel/cache_o
 import 'package:moviestar/shared/widgets/settings/cache_management_panel/cache_tile_builders.dart';
 
 /// A widget that displays cache management settings and statistics.
+
 class CacheManagementPanel extends ConsumerWidget {
   /// Function to build a switch tile widget.
+
   final Widget Function(
     String title,
     String subtitle,
@@ -29,6 +31,7 @@ class CacheManagementPanel extends ConsumerWidget {
   ) buildSwitchTile;
 
   /// Function to build a list tile widget.
+
   final Widget Function(
     String title,
     IconData icon,
@@ -37,12 +40,15 @@ class CacheManagementPanel extends ConsumerWidget {
   }) buildListTile;
 
   /// Function to show success snackbar.
+
   final void Function(String message) showSuccessSnackBar;
 
   /// Function to show error snackbar.
+
   final void Function(String message) showErrorSnackBar;
 
   /// Creates a new [CacheManagementPanel] widget.
+
   const CacheManagementPanel({
     super.key,
     required this.buildSwitchTile,
@@ -135,6 +141,7 @@ class CacheManagementPanel extends ConsumerWidget {
   }
 
   /// Clears all cached movie data.
+
   Future<void> _clearAllCache(WidgetRef ref) async {
     await CacheOperations.clearAllCache(
       ref: ref,
@@ -144,6 +151,7 @@ class CacheManagementPanel extends ConsumerWidget {
   }
 
   /// Shows smart confirmation dialog for clearing cache based on current settings.
+
   Future<void> _showClearCacheDialog(
     BuildContext context,
     WidgetRef ref,
@@ -163,6 +171,7 @@ class CacheManagementPanel extends ConsumerWidget {
   }
 
   /// Shows dialog for force refresh with offline mode handling.
+
   Future<void> _showForceRefreshDialog(
     BuildContext context,
     WidgetRef ref,
@@ -183,6 +192,7 @@ class CacheManagementPanel extends ConsumerWidget {
   }
 
   /// Forces refresh of all movie categories.
+
   Future<void> _forceRefreshAll(BuildContext context, WidgetRef ref) async {
     await CacheOperations.forceRefreshAll(
       context: context,

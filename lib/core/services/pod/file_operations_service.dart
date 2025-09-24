@@ -18,6 +18,7 @@ import 'package:solidpod/solidpod.dart' as solidpod
 import 'package:moviestar/utils/is_logged_in.dart';
 
 /// Result of a POD file operation.
+
 class PodFileOperationResult {
   final bool success;
   final String? data;
@@ -39,11 +40,14 @@ class PodFileOperationResult {
 }
 
 /// Standardized service for POD file operations with error handling and retry logic.
+
 class PodFileOperationsService {
   /// Maximum number of retry attempts for failed operations.
+
   static const int _maxRetries = 3;
 
   /// Delay between retry attempts.
+
   static const Duration _retryDelay = Duration(milliseconds: 500);
 
   /// Reads a file from POD storage with automatic retry on failure.
@@ -52,6 +56,7 @@ class PodFileOperationsService {
   /// [context] - Flutter build context for POD operations.
   /// [child] - Widget for navigation context.
   /// [retries] - Number of retry attempts (defaults to _maxRetries).
+
   static Future<PodFileOperationResult> readFile(
     String fileName,
     BuildContext context,
@@ -133,6 +138,7 @@ class PodFileOperationsService {
   /// [child] - Widget for navigation context.
   /// [encrypted] - Whether to encrypt the file (defaults to false).
   /// [retries] - Number of retry attempts (defaults to _maxRetries).
+
   static Future<PodFileOperationResult> writeFile(
     String fileName,
     String content,
@@ -211,6 +217,7 @@ class PodFileOperationsService {
   /// [fileName] - The path to the file in POD storage.
   /// [context] - Flutter build context for POD operations.
   /// [child] - Widget for navigation context.
+
   static Future<bool> fileExists(
     String fileName,
     BuildContext context,
@@ -229,6 +236,7 @@ class PodFileOperationsService {
   /// [fileName] - The path to the file in POD storage.
   /// [context] - Flutter build context for POD operations.
   /// [child] - Widget for navigation context.
+
   static Future<PodFileOperationResult> deleteFile(
     String fileName,
     BuildContext context,
@@ -270,6 +278,7 @@ class PodFileOperationsService {
   /// [context] - Flutter build context for POD operations.
   /// [child] - Widget for navigation context.
   /// [encrypted] - Whether to encrypt the files (defaults to false).
+
   static Future<Map<String, PodFileOperationResult>> batchWrite(
     Map<String, String> operations,
     BuildContext context,
@@ -307,6 +316,7 @@ class PodFileOperationsService {
   /// Gets the full POD path for a relative file path.
   ///
   /// [relativePath] - The relative path within the app's POD directory.
+
   static String getFullPodPath(String relativePath) {
     // Remove leading slash if present.
 

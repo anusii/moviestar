@@ -100,6 +100,7 @@ Widget _buildNormalLogin(String serverUrl, SharedPreferences prefs) {
 }
 
 /// A wrapper widget that checks if the API key is set and shows a dialog if not.
+
 class ApiKeyCheckWrapper extends StatefulWidget {
   final Widget child;
   final SharedPreferences prefs;

@@ -11,8 +11,10 @@ import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/models/custom_list.dart';
 
 /// Builds dialog widgets for custom list operations.
+
 class CustomListDialogBuilders {
   /// Show edit list dialog.
+
   static Future<void> showEditListDialog(
     BuildContext context,
     CustomList customList,
@@ -95,6 +97,7 @@ class CustomListDialogBuilders {
   }
 
   /// Show delete confirmation dialog.
+
   static Future<void> showDeleteConfirmation(
     BuildContext context,
     CustomList customList,
@@ -142,6 +145,7 @@ class CustomListDialogBuilders {
   }
 
   /// Show list options bottom sheet.
+
   static Future<void> showListOptions(
     BuildContext context,
     CustomList customList, {
@@ -213,6 +217,7 @@ class CustomListDialogBuilders {
   }
 
   /// Show remove movie confirmation dialog.
+
   static Future<bool> showRemoveMovieDialog(
     BuildContext context,
     String movieTitle,

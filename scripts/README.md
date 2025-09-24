@@ -8,7 +8,8 @@ This directory contains scripts for enforcing comment style guidelines in the Mo
 
 **Purpose**: Detects comment style violations:
 1. All single-line comments (`//`) must end with a period (`.`), question mark (`?`), or exclamation mark (`!`)
-2. Comments must have a blank line between the comment and the following code
+2. All doc comments (`///`) must end with a period (`.`), question mark (`?`), or exclamation mark (`!`)
+3. Comments must have a blank line between the comment and the following code
 
 **Usage**:
 ```bash
@@ -23,24 +24,28 @@ This directory contains scripts for enforcing comment style guidelines in the Mo
 ```
 
 **Features**:
-- ✅ Detects comments missing punctuation
+- ✅ Detects single-line comments (`//`) missing punctuation
+- ✅ Detects doc comments (`///`) missing punctuation
 - ✅ Detects missing blank lines after comments
 - ✅ Ignores TODO/FIXME/NOTE comments
+- ✅ Ignores GPL license headers and copyright statements
 - ✅ Ignores timestamp and URL comments
 - ✅ Skips generated files (*.g.dart)
 - ✅ Works on Windows/MinGW environments
 - ✅ Provides detailed line-by-line reporting
 
 **Current Status**:
-- **1,387 violations** found across **194 files** in the `lib/` directory
-- GPL license headers are now properly ignored
+- **Enhanced detection** now includes doc comments (`///`) in addition to single-line comments (`//`)
+- GPL license headers and copyright statements properly ignored
 - Script exits with code 1 if violations found, 0 if clean
+- Ready to detect additional violations with doc comment support
 
 ### `fix_comments.sh` - Comment Auto-Fix (Repair)
 
 **Purpose**: Automatically fixes comment style violations:
-1. Adds periods to comments missing them
-2. Adds blank lines between comments and code
+1. Adds periods to single-line comments (`//`) missing them
+2. Adds periods to doc comments (`///`) missing them
+3. Adds blank lines between comments and code
 
 **Usage**:
 ```bash
@@ -58,8 +63,9 @@ This directory contains scripts for enforcing comment style guidelines in the Mo
 ```
 
 **Features**:
-- ✅ Automatically adds missing periods to comments
-- ✅ Automatically adds missing blank lines
+- ✅ Automatically adds missing periods to single-line comments (`//`)
+- ✅ Automatically adds missing periods to doc comments (`///`)
+- ✅ Automatically adds missing blank lines after comments
 - ✅ Dry-run mode for safe preview
 - ✅ Same ignore rules as linter (TODO/GPL/URLs/etc)
 - ✅ Preserves original indentation and formatting

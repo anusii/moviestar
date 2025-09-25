@@ -17,8 +17,10 @@ import 'package:moviestar/shared/widgets/kanban/board_controller.dart';
 import 'context_menu_builder.dart';
 
 /// Static helper class for handling context menu operations.
+
 class ContextMenuHandler {
   /// Show context menu for movie copy operations.
+
   static void showMovieContextMenu(
     BuildContext context,
     Offset position,
@@ -29,7 +31,8 @@ class ContextMenuHandler {
     FavoritesService favoritesService,
     Function(String, Movie, KanbanColumnType, String) onContextMenuAction,
   ) {
-    // Get current custom lists for dynamic menu
+    // Get current custom lists for dynamic menu.
+
     favoritesService.customLists.first.then((customLists) {
       if (!context.mounted) return;
       showMenu<String>(
@@ -53,7 +56,8 @@ class ContextMenuHandler {
         }
       });
     }).catchError((e) {
-      // Fallback to basic menu if custom lists can't be loaded
+      // Fallback to basic menu if custom lists can't be loaded.
+
       if (!context.mounted) return;
       showMenu<String>(
         context: context,

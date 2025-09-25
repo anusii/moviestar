@@ -15,6 +15,7 @@ import 'package:gap/gap.dart';
 import 'package:moviestar/constants/dimensions.dart';
 
 /// Widget that displays an empty state for search functionality.
+
 class SearchEmptyState extends StatelessWidget {
   final TextEditingController searchController;
 

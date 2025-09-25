@@ -30,6 +30,7 @@ import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
 import 'package:moviestar/models/movie.dart';
 
 /// Represents a file that can be shared with permissions.
+
 class ShareableFile {
   final String fileName;
   final String displayName;
@@ -63,6 +64,7 @@ class ShareableFile {
 }
 
 /// Request model for sharing a file.
+
 class ShareRequest {
   final String fileName;
   final String displayName;
@@ -82,6 +84,7 @@ class ShareRequest {
 }
 
 /// Result model for sharing operations.
+
 class ShareResult {
   final bool success;
   final String? error;
@@ -116,6 +119,7 @@ class ShareResult {
 }
 
 /// Request model for batch sharing.
+
 class BatchShareRequest {
   final List<ShareRequest> requests;
   final String recipientWebId;
@@ -129,6 +133,7 @@ class BatchShareRequest {
 }
 
 /// Result model for batch sharing operations.
+
 class BatchShareResult {
   final List<ShareResult> results;
   final int successCount;
@@ -143,6 +148,7 @@ class BatchShareResult {
 }
 
 /// Permission request model.
+
 class PermissionRequest {
   final String fileName;
   final String webId;
@@ -158,6 +164,7 @@ class PermissionRequest {
 }
 
 /// Permission result model.
+
 class PermissionResult {
   final bool granted;
   final String? error;

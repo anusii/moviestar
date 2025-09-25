@@ -12,8 +12,10 @@ import 'package:gap/gap.dart';
 import 'package:moviestar/constants/dimensions.dart';
 
 /// Builds the rating section for movie details.
+
 class RatingSection {
   /// Build the rating row with content type and TMDB rating.
+
   static Widget buildRatingRow(
     BuildContext context, {
     required String contentType,
@@ -23,7 +25,8 @@ class RatingSection {
   }) {
     return Row(
       children: [
-        // Content type indicator
+        // Content type indicator.
+
         Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 8,
@@ -47,7 +50,8 @@ class RatingSection {
         ),
         const Gap(Gaps.m),
 
-        // TMDB Rating
+        // TMDB Rating.
+
         Row(
           children: [
             const Icon(
@@ -66,7 +70,8 @@ class RatingSection {
         ),
         const Gap(Gaps.m),
 
-        // Release Date
+        // Release Date.
+
         if (releaseDate.isNotEmpty) ...[
           const Icon(
             Icons.calendar_today,
@@ -86,6 +91,7 @@ class RatingSection {
   }
 
   /// Build the personal rating section.
+
   static Widget buildPersonalRatingSection(
     BuildContext context, {
     required bool isSharedMovie,
@@ -141,6 +147,7 @@ class RatingSection {
   }
 
   /// Build the rating widget with 0-10 scale and 0.1 increments.
+
   static Widget _buildStarRating(
     BuildContext context, {
     required double? rating,
@@ -151,7 +158,8 @@ class RatingSection {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (!isSharedMovie) ...[
-          // Slider for interactive rating
+          // Slider for interactive rating.
+
           Row(
             children: [
               Expanded(
@@ -185,10 +193,12 @@ class RatingSection {
             ],
           ),
         ] else ...[
-          // Display-only for shared movies
+          // Display-only for shared movies.
+
           Row(
             children: [
-              // Star icons for visual representation
+              // Star icons for visual representation.
+
               for (int i = 1; i <= 5; i++)
                 Icon(
                   rating != null && i <= (rating / 2)
@@ -218,7 +228,8 @@ class RatingSection {
           ),
         ],
         const Gap(Gaps.xs),
-        // Rating description
+        // Rating description.
+
         if (rating != null)
           Text(
             _getRatingDescription(rating),
@@ -240,6 +251,7 @@ class RatingSection {
   }
 
   /// Get a descriptive text for the rating value.
+
   static String _getRatingDescription(double rating) {
     if (rating >= 9.0) return 'Masterpiece';
     if (rating >= 8.0) return 'Excellent';
@@ -254,6 +266,7 @@ class RatingSection {
   }
 
   /// Build the shared movie indicator.
+
   static Widget buildSharedIndicator(
     BuildContext context, {
     required String sharedByText,

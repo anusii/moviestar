@@ -15,6 +15,7 @@ import 'package:gap/gap.dart';
 import 'package:moviestar/constants/dimensions.dart';
 
 /// Legacy error widget for backward compatibility.
+
 class LegacyErrorRenderer extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;

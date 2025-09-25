@@ -22,20 +22,26 @@ import 'package:moviestar/shared/widgets/home/custom_list_movie_card.dart';
 
 /// A widget that displays a custom list as a vertical section with movie items.
 /// Used in list view layouts of the home screen.
+
 class CustomListSection extends ConsumerWidget {
   /// The custom list to display.
+
   final CustomList customList;
 
   /// Service for managing favorites.
+
   final FavoritesService favoritesService;
 
   /// Parent widget for navigation context.
+
   final StatefulWidget parentWidget;
 
   /// Callback for navigation.
+
   final void Function(Route<dynamic> route) onNavigate;
 
   /// Creates a new [CustomListSection].
+
   const CustomListSection({
     super.key,
     required this.customList,
@@ -57,6 +63,7 @@ class CustomListSection extends ConsumerWidget {
   }
 
   /// Builds the section header with title and "View More" button.
+
   Widget _buildSectionHeader(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -95,6 +102,7 @@ class CustomListSection extends ConsumerWidget {
   }
 
   /// Builds the list of movie items for this custom list.
+
   Widget _buildListItems(BuildContext context, WidgetRef ref) {
     final movieIds = customList.movieIds;
 
@@ -105,7 +113,8 @@ class CustomListSection extends ConsumerWidget {
       );
     }
 
-    // Check if we have POD data available
+    // Check if we have POD data available.
+
     if (favoritesService is FavoritesServiceAdapter) {
       final adapter = favoritesService as FavoritesServiceAdapter;
 
@@ -114,7 +123,8 @@ class CustomListSection extends ConsumerWidget {
           future: favoritesService.getMoviesInCustomList(customList.id),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              // Fallback to ID-based loading
+              // Fallback to ID-based loading.
+
               return _buildItemsFromIds(movieIds);
             }
 
@@ -133,6 +143,7 @@ class CustomListSection extends ConsumerWidget {
   }
 
   /// Builds list items from movie objects (when we have full data from PODs).
+
   Widget _buildItemsFromMovies(List<Movie> movies) {
     final displayMovies = movies.take(5).toList();
 
@@ -150,6 +161,7 @@ class CustomListSection extends ConsumerWidget {
   }
 
   /// Builds list items from IDs (fallback when POD data not available).
+
   Widget _buildItemsFromIds(List<int> movieIds) {
     final displayMovieIds = movieIds.take(5).toList();
 
@@ -172,6 +184,7 @@ class CustomListSection extends ConsumerWidget {
   }
 
   /// Navigate to custom list detail screen.
+
   void _navigateToCustomListDetail() {
     onNavigate(
       MaterialPageRoute(

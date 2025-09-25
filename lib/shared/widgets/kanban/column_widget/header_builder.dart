@@ -19,8 +19,10 @@ import 'package:moviestar/shared/widgets/kanban/board_controller.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
 
 /// Static helper class for building column headers.
+
 class HeaderBuilder {
   /// Build the complete column header.
+
   static Widget buildColumnHeader(
     BuildContext context,
     String title,
@@ -46,7 +48,8 @@ class HeaderBuilder {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // First row: Title + Count Badge + Sort button
+          // First row: Title + Count Badge + Sort button.
+
           Row(
             children: [
               Expanded(
@@ -62,7 +65,8 @@ class HeaderBuilder {
               buildSortButton(context, categoryId, controller),
             ],
           ),
-          // Second row: View More button (only when needed)
+          // Second row: View More button (only when needed).
+
           if (hasMore) ...[
             const SizedBox(height: 8),
             Row(
@@ -84,6 +88,7 @@ class HeaderBuilder {
   }
 
   /// Build the column title widget.
+
   static Widget buildColumnTitle(
     BuildContext context,
     String title,
@@ -115,6 +120,7 @@ class HeaderBuilder {
   }
 
   /// Build the count badge with optional pending operations indicator.
+
   static Widget buildCountBadge(
     BuildContext context,
     List<Movie> sortedMovies,
@@ -159,6 +165,7 @@ class HeaderBuilder {
   }
 
   /// Build the sort button with dropdown menu.
+
   static Widget buildSortButton(
     BuildContext context,
     String categoryId,
@@ -223,6 +230,7 @@ class HeaderBuilder {
   }
 
   /// Build a single sort menu item.
+
   static PopupMenuItem<MovieSortCriteria> buildSortMenuItem(
     BuildContext context,
     MovieSortCriteria currentSort,
@@ -247,6 +255,7 @@ class HeaderBuilder {
   }
 
   /// Build the "View More" button.
+
   static Widget buildViewMoreButton(
     BuildContext context,
     String title,

@@ -11,6 +11,7 @@ import 'package:moviestar/core/services/pod/favorites_file_manager.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Handles file operations for POD favorites service.
+
 class PodFavoritesFileHandler {
   final PodFavoritesFileManager _fileManager;
   final Function(String fileName) safeReadFile;
@@ -21,26 +22,31 @@ class PodFavoritesFileHandler {
   );
 
   /// Parses movies from TTL content.
+
   Future<List<Movie>> parseMoviesFromTtl(String ttlContent) async {
     final movieListData = await _fileManager.parseMovieListData(ttlContent);
     if (movieListData != null) {
-      // Load full movie details for each placeholder movie
+      // Load full movie details for each placeholder movie.
+
       final fullMovies = <Movie>[];
       for (int i = 0; i < movieListData.length; i++) {
         final placeholderMovie = movieListData[i];
 
         try {
-          // Load full movie details from individual movie file
+          // Load full movie details from individual movie file.
+
           final fullMovie =
               await _fileManager.loadFullMovieDetails(placeholderMovie);
           if (fullMovie != null) {
             fullMovies.add(fullMovie);
           } else {
-            // Fallback to placeholder if individual file doesn't exist
+            // Fallback to placeholder if individual file doesn't exist.
+
             fullMovies.add(placeholderMovie);
           }
         } catch (e) {
-          // Fallback to placeholder on error
+          // Fallback to placeholder on error.
+
           fullMovies.add(placeholderMovie);
         }
       }
@@ -52,6 +58,7 @@ class PodFavoritesFileHandler {
   }
 
   /// Loads favorites data from POD files.
+
   Future<Map<String, List<Movie>>> loadFavoritesData() async {
     final toWatchData =
         await safeReadFile('moviestar/data/user_lists/to_watch.ttl');
@@ -78,6 +85,7 @@ class PodFavoritesFileHandler {
   }
 
   /// Gets a movie by ID from cache or file manager.
+
   Future<Movie?> getMovie(int movieId) async {
     return await _fileManager.loadMovieData(movieId);
   }

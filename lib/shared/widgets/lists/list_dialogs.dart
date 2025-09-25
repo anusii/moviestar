@@ -15,8 +15,10 @@ import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/models/custom_list.dart';
 
 /// Utility class for showing list management dialogs.
+
 class ListDialogs {
   /// Shows a dialog to create a new custom list.
+
   static Future<void> showCreateListDialog(
     BuildContext context,
     FavoritesService favoritesService,
@@ -89,6 +91,7 @@ class ListDialogs {
   }
 
   /// Shows a dialog to edit an existing custom list.
+
   static Future<void> showEditListDialog(
     BuildContext context,
     CustomList list,
@@ -187,6 +190,7 @@ class ListDialogs {
   }
 
   /// Shows a confirmation dialog before deleting a list.
+
   static Future<void> showDeleteConfirmation(
     BuildContext context,
     CustomList list,

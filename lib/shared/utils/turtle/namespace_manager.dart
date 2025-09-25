@@ -11,6 +11,7 @@ library;
 import 'package:rdflib/rdflib.dart';
 
 /// Manages all RDF/TTL namespaces and predicates used in MovieStar ontology.
+
 class TurtleNamespaceManager {
   // Define namespaces based on the ontology design.
 
@@ -90,6 +91,7 @@ class TurtleNamespaceManager {
 
   /// Static namespace bindings to match ontology structure exactly.
   /// Only define custom namespaces - let the RDF library handle standard prefixes.
+
   static Map<String, Namespace> getOntologyNamespaces() {
     return {
       'moviestar-onto': moviestarOntoNS,
@@ -99,6 +101,7 @@ class TurtleNamespaceManager {
   }
 
   /// Get basic namespace bindings for simple operations.
+
   static Map<String, Namespace> getBasicNamespaces() {
     return {
       '': localNS,

@@ -36,9 +36,11 @@ import 'package:moviestar/widgets/movie_card/hover_interaction_handler.dart';
 
 enum MovieCardStyle {
   /// Poster-style card (used in horizontal lists).
+
   poster,
 
   /// List item style card (used in vertical lists).
+
   listItem,
 }
 

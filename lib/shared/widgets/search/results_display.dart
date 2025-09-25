@@ -21,6 +21,7 @@ import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
 
 /// Widget that displays search results organized by category.
+
 class SearchResultsDisplay extends StatelessWidget {
   final Map<String, List<ContentItem>> searchResults;
   final FavoritesService favoritesService;
@@ -255,6 +256,7 @@ class SearchResultsDisplay extends StatelessWidget {
   }
 
   /// Check if all search result categories are empty.
+
   static bool hasNoResults(Map<String, List<ContentItem>> searchResults) {
     return (searchResults['title']?.isEmpty ?? true) &&
         (searchResults['actor']?.isEmpty ?? true) &&

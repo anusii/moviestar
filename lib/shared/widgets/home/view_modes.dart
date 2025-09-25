@@ -28,13 +28,14 @@ import 'package:moviestar/shared/widgets/home/watched_section.dart';
 import 'package:moviestar/widgets/movie_kanban_board.dart';
 
 /// Widget that builds different view modes for the home screen.
+
 class HomeViewModes extends ConsumerWidget {
   final HomeViewMode viewMode;
   final FavoritesService favoritesService;
   final StatefulWidget parentWidget;
   final Function(Route<dynamic>) onNavigate;
   final Map<String, ScrollController> scrollControllers;
-  final AsyncValue<CacheResult<List<Movie>>> popularMovies;
+  final AsyncValue<CacheResult<List<Movie>>> recommendedMovies;
   final AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies;
   final AsyncValue<CacheResult<List<Movie>>> topRatedMovies;
   final AsyncValue<CacheResult<List<Movie>>> upcomingMovies;
@@ -46,7 +47,7 @@ class HomeViewModes extends ConsumerWidget {
     required this.parentWidget,
     required this.onNavigate,
     required this.scrollControllers,
-    required this.popularMovies,
+    required this.recommendedMovies,
     required this.nowPlayingMovies,
     required this.topRatedMovies,
     required this.upcomingMovies,
@@ -178,8 +179,8 @@ class HomeViewModes extends ConsumerWidget {
           _buildAsyncListSection(
             context,
             ref,
-            'Popular on Movie Star',
-            popularMovies,
+            'Recommended on Movie Star',
+            recommendedMovies,
           ),
           _buildAsyncListSection(context, ref, 'Now Playing', nowPlayingMovies),
           _buildAsyncListSection(context, ref, 'Top Rated', topRatedMovies),

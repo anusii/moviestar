@@ -21,6 +21,7 @@ import 'package:moviestar/utils/serializer.dart';
 
 /// Helper class for MovieList file operations.
 /// Extracted to reduce MovieListService file size.
+
 class MovieListFileHelper with PodOperationsMixin {
   final BuildContext _context;
   final Widget _child;
@@ -28,6 +29,7 @@ class MovieListFileHelper with PodOperationsMixin {
   MovieListFileHelper(this._context, this._child);
 
   /// Creates a movie file in POD for a specific movie.
+
   Future<void> createMovieFile(
     Movie movie, {
     String contentType = 'movie',
@@ -51,11 +53,12 @@ class MovieListFileHelper with PodOperationsMixin {
         encrypted: false,
       );
     } catch (e) {
-      // Error creating movie file
+      // Error creating movie file.
     }
   }
 
   /// Loads full movie data from individual movie file.
+
   Future<Movie?> loadFullMovieData(
     int movieId, {
     String contentType = 'movie',
@@ -68,7 +71,8 @@ class MovieListFileHelper with PodOperationsMixin {
 
       String result = '';
 
-      // For TV shows, try TVShow file first, then fall back to Movie file
+      // For TV shows, try TVShow file first, then fall back to Movie file.
+
       if (contentType == 'tv' || contentType == 'tvShow') {
         try {
           final readResult = await PodFileOperationsService.readFile(
@@ -78,7 +82,8 @@ class MovieListFileHelper with PodOperationsMixin {
           );
           result = readResult.success ? (readResult.data ?? '') : '';
         } catch (e) {
-          // Fall back to Movie file for backward compatibility
+          // Fall back to Movie file for backward compatibility.
+
           if (!isFileNotFoundError(e)) {
             rethrow;
           }
@@ -91,7 +96,8 @@ class MovieListFileHelper with PodOperationsMixin {
           result = readResult.success ? (readResult.data ?? '') : '';
         }
       } else {
-        // For movies, just try Movie file
+        // For movies, just try Movie file.
+
         final readResult = await PodFileOperationsService.readFile(
           movieFileName,
           _context,
@@ -109,13 +115,14 @@ class MovieListFileHelper with PodOperationsMixin {
       } else {}
     } catch (e) {
       if (!isFileNotFoundError(e)) {
-        // Error loading movie data
+        // Error loading movie data.
       }
     }
     return null;
   }
 
   /// Scans the user_lists directory for MovieLists.
+
   Future<List<String>> scanMovieListDirectory() async {
     try {
       final dirUrl = await getDirUrl('moviestar/data/user_lists');
@@ -126,13 +133,14 @@ class MovieListFileHelper with PodOperationsMixin {
           .toList();
     } catch (e) {
       if (!isFileNotFoundError(e) && !isPermissionError(e)) {
-        // Error scanning directory
+        // Error scanning directory.
       }
       return [];
     }
   }
 
   /// Finds an existing MovieList by type and name.
+
   Future<String?> findExistingMovieList(
     String listType,
     String displayName,
@@ -160,16 +168,17 @@ class MovieListFileHelper with PodOperationsMixin {
             }
           }
         } catch (e) {
-          // Error reading MovieList file
+          // Error reading MovieList file.
         }
       }
     } catch (e) {
-      // Error finding existing MovieList
+      // Error finding existing MovieList.
     }
     return null;
   }
 
   /// Gets the file path for a movie file.
+
   @override
   String getMovieFilePath(int movieId, {String contentType = 'movie'}) {
     final prefix =
@@ -178,6 +187,7 @@ class MovieListFileHelper with PodOperationsMixin {
   }
 
   /// Gets the file path for a MovieList file.
+
   @override
   String getMovieListFilePath(String movieListId) {
     return 'user_lists/MovieList-$movieListId.ttl';

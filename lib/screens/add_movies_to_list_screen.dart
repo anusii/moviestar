@@ -89,7 +89,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
 
   Map<String, List<ContentItem>> _searchResults = {};
 
-  // Suggested content (popular movies and TV shows)
+  // Suggested content (popular movies and TV shows).
 
   List<ContentItem> _suggestedContent = [];
 
@@ -146,10 +146,12 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     try {
       final contentService =
           await ref.read(directContentServiceProvider.future);
-      final popularMixedContent = await contentService.getPopularMixedContent();
+      final recommendedMixedContent =
+          await contentService.getRecommendedMixedContent();
 
       // Remove content already in the list.
-      final filteredSuggestions = popularMixedContent
+
+      final filteredSuggestions = recommendedMixedContent
           .where((content) => !_moviesInList.contains(content.id))
           .take(20)
           .toList();
@@ -202,6 +204,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
       final results = await contentService.searchContentComprehensive(query);
 
       // Filter out content already in the list.
+
       final filteredResults = <String, List<ContentItem>>{};
       for (final entry in results.entries) {
         filteredResults[entry.key] = entry.value
@@ -251,6 +254,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
   }
 
   // Builds a content item card (for search results).
+
   Widget _buildContentCard(ContentItem contentItem) {
     return ContentBuilders.buildContentCard(
       context,
@@ -331,7 +335,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
               ),
               const SizedBox(width: 8),
               Text(
-                'Popular Content',
+                'Recommended Content',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 16,
@@ -376,6 +380,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
       body: Column(
         children: [
           // Search bar (only shown in search tab).
+
           AnimatedBuilder(
             animation: _tabController,
             builder: (context, child) {
@@ -426,6 +431,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
           ),
 
           // Tab content.
+
           Expanded(
             child: TabBarView(
               controller: _tabController,

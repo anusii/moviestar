@@ -16,6 +16,7 @@ import 'package:moviestar/utils/serializer.dart';
 
 /// Compact MovieListService using helper composition pattern.
 /// Functionality preserved while dramatically reducing file size.
+
 class MovieListService extends BasePodService with PodOperationsMixin {
   final UserProfileService _userProfileService;
   final Map<String, Map<String, dynamic>> _cache = {};
@@ -35,6 +36,7 @@ class MovieListService extends BasePodService with PodOperationsMixin {
   }
 
   /// Creates a new MovieList with the given name and movies.
+
   Future<String?> createMovieList(
     String listName, {
     List<Movie> movies = const [],
@@ -42,7 +44,8 @@ class MovieListService extends BasePodService with PodOperationsMixin {
   }) async {
     return await executePodOperation(
       operation: () async {
-        // Check if a custom list with this name already exists
+        // Check if a custom list with this name already exists.
+
         final existingListId = await _fileHelper.findExistingMovieList(
           'custom', // Use 'custom' as list type for user-created lists
           listName,
@@ -88,6 +91,7 @@ class MovieListService extends BasePodService with PodOperationsMixin {
   }
 
   /// Gets a MovieList by ID, optionally forcing a refresh from POD.
+
   Future<Map<String, dynamic>?> getMovieList(
     String movieListId, {
     bool forceRefresh = false,
@@ -96,7 +100,8 @@ class MovieListService extends BasePodService with PodOperationsMixin {
       final cached = _cache[movieListId];
       final movies = cached?['movies'] as List<Movie>? ?? [];
 
-      // Check if cached data contains placeholder movies
+      // Check if cached data contains placeholder movies.
+
       final hasPlaceholders =
           movies.any((movie) => movie.title == 'Loading...');
       if (hasPlaceholders) {
@@ -117,7 +122,8 @@ class MovieListService extends BasePodService with PodOperationsMixin {
           if (movieListData != null) {
             movieListData['id'] = movieListId;
 
-            // Load full movie data
+            // Load full movie data.
+
             final placeholderMovies =
                 movieListData['movies'] as List<Movie>? ?? [];
             final fullMovies = <Movie>[];
@@ -146,11 +152,13 @@ class MovieListService extends BasePodService with PodOperationsMixin {
   }
 
   /// Forces a refresh of a specific MovieList from POD.
+
   Future<Map<String, dynamic>?> refreshMovieList(String movieListId) async {
     return await getMovieList(movieListId, forceRefresh: true);
   }
 
   /// Adds a movie to a MovieList.
+
   Future<bool> addMovieToList(
     String movieListId,
     Movie movie, {
@@ -170,6 +178,7 @@ class MovieListService extends BasePodService with PodOperationsMixin {
   }
 
   /// Removes a movie from a MovieList.
+
   Future<bool> removeMovieFromList(String movieListId, int movieId) async {
     final success =
         await _operationsHelper.removeMovieFromList(movieListId, movieId);
@@ -182,16 +191,19 @@ class MovieListService extends BasePodService with PodOperationsMixin {
   }
 
   /// Deletes a MovieList.
+
   Future<bool> deleteMovieList(String movieListId) async {
     return await _operationsHelper.deleteMovieList(movieListId);
   }
 
   /// Gets all MovieLists for the current user.
+
   Future<List<Map<String, dynamic>>> getAllMovieLists() async {
     return await _operationsHelper.getAllMovieLists();
   }
 
   /// Initializes a MovieList for a specific type (to_watch, watched, favorites).
+
   Future<String?> initializeMovieList(
     String listType,
     String displayName, {
@@ -221,6 +233,7 @@ class MovieListService extends BasePodService with PodOperationsMixin {
   }
 
   /// Updates the name of a MovieList.
+
   Future<bool> updateMovieListName(String movieListId, String newName) async {
     final success =
         await _operationsHelper.updateMovieListName(movieListId, newName);
@@ -233,11 +246,13 @@ class MovieListService extends BasePodService with PodOperationsMixin {
   }
 
   /// Gets MovieLists containing a specific movie.
+
   Future<List<String>> getMovieListsContainingMovie(int movieId) async {
     return await _operationsHelper.getMovieListsContainingMovie(movieId);
   }
 
   /// Batch adds multiple movies to a MovieList.
+
   Future<bool> batchAddMoviesToList(
     String movieListId,
     List<Movie> movies,
@@ -253,17 +268,20 @@ class MovieListService extends BasePodService with PodOperationsMixin {
   }
 
   /// Clears the cache for all MovieLists.
+
   void clearCache() {
     _cache.clear();
   }
 
   /// Gets the count of movies in a MovieList without loading full data.
+
   Future<int> getMovieCount(String movieListId) async {
     final movieList = await getMovieList(movieListId);
     return (movieList?['movies'] as List?)?.length ?? 0;
   }
 
   /// Checks if a movie is in a MovieList.
+
   Future<bool> isMovieInList(String movieListId, int movieId) async {
     final movieList = await getMovieList(movieListId);
     final movies = movieList?['movies'] as List<Movie>? ?? [];

@@ -14,6 +14,7 @@ import 'package:moviestar/utils/serializer.dart';
 
 /// Compact service for managing API keys with POD and secure storage.
 /// Uses BasePodService infrastructure for common POD operations.
+
 class ApiKeyService extends BasePodService {
   static const String _legacyApiKeySecureKey = 'movie_db_api_key';
   static const String _userApiKeyPrefix = 'user_api_key_';
@@ -32,8 +33,10 @@ class ApiKeyService extends BasePodService {
   ApiKeyService(super.context, super.child);
 
   /// Gets the API key from cache, POD, or secure storage.
+
   Future<String?> getApiKey() async {
-    // Return cached value if valid
+    // Return cached value if valid.
+
     if (_cachedApiKey != null &&
         _lastCacheTime != null &&
         DateTime.now().difference(_lastCacheTime!).inHours < 1) {
@@ -49,16 +52,20 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Sets the API key in both POD and secure storage.
+
   Future<void> setApiKey(String apiKey) async {
     await executePodOperation(
       operation: () async {
-        // Save to POD first
+        // Save to POD first.
+
         await _saveApiKeyToPod(apiKey);
 
-        // Always save to local storage as backup
+        // Always save to local storage as backup.
+
         await _saveApiKeyToLocalStorage(apiKey);
 
-        // Update cache
+        // Update cache.
+
         _cachedApiKey = apiKey;
         _lastCacheTime = DateTime.now();
 
@@ -70,6 +77,7 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Clears the API key from all storages.
+
   Future<void> clearApiKey() async {
     await executePodOperation(
       operation: () async {
@@ -88,20 +96,25 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Fetches API key from multiple sources with fallback.
+
   Future<String?> _fetchApiKey() async {
     return await executePodOperation(
       operation: () async {
-        // Check if migration needed
+        // Check if migration needed.
+
         await _handleLegacyMigration();
 
-        // Try POD first
+        // Try POD first.
+
         String? apiKey = await _getApiKeyFromPod();
         if (apiKey != null) return apiKey;
 
-        // Fallback to local storage
+        // Fallback to local storage.
+
         apiKey = await _getApiKeyFromLocalStorage();
         if (apiKey != null) {
-          // Sync to POD for future use
+          // Sync to POD for future use.
+
           await _saveApiKeyToPod(apiKey);
           return apiKey;
         }
@@ -114,6 +127,7 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Gets current user's web ID for POD operations.
+
   Future<String?> _getCurrentUserWebId() async {
     return await executePodOperation(
       operation: () async {
@@ -129,6 +143,7 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Retrieves API key from POD storage.
+
   Future<String?> _getApiKeyFromPod() async {
     final webId = await _getCurrentUserWebId();
     if (webId == null) return null;
@@ -143,6 +158,7 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Saves API key to POD storage.
+
   Future<bool> _saveApiKeyToPod(String apiKey) async {
     final webId = await _getCurrentUserWebId();
     if (webId == null) return false;
@@ -158,6 +174,7 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Retrieves API key from secure local storage.
+
   Future<String?> _getApiKeyFromLocalStorage() async {
     final webId = await _getCurrentUserWebId();
     if (webId != null) {
@@ -168,6 +185,7 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Saves API key to secure local storage.
+
   Future<void> _saveApiKeyToLocalStorage(String apiKey) async {
     final webId = await _getCurrentUserWebId();
     if (webId != null) {
@@ -177,6 +195,7 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Clears API key from POD storage.
+
   Future<void> _clearApiKeyFromPod() async {
     final webId = await _getCurrentUserWebId();
     if (webId != null) {
@@ -186,6 +205,7 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Clears API key from secure local storage.
+
   Future<void> _clearApiKeyFromLocalStorage() async {
     final webId = await _getCurrentUserWebId();
     if (webId != null) {
@@ -195,6 +215,7 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Handles migration from legacy API key storage.
+
   Future<void> _handleLegacyMigration() async {
     final migrationComplete =
         await _secureStorage.read(key: _migrationCompleteKey);
@@ -208,6 +229,7 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Migrates legacy API key to new user-specific storage.
+
   Future<void> _migrateLegacyApiKey(String apiKey) async {
     await _saveApiKeyToLocalStorage(apiKey);
     await _saveApiKeyToPod(apiKey);
@@ -216,6 +238,7 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Extracts API key value from TTL content.
+
   String? _extractApiKeyFromTtl(String ttlContent) {
     final keyValuePattern = RegExp(r'moviestar-onto:keyValue\s+"([^"]+)"');
     final match = keyValuePattern.firstMatch(ttlContent);
@@ -223,18 +246,21 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Checks if user has an API key configured.
+
   Future<bool> hasApiKey() async {
     final apiKey = await getApiKey();
     return apiKey != null && apiKey.isNotEmpty;
   }
 
   /// Clears cached API key to force refresh.
+
   void clearCache() {
     _cachedApiKey = null;
     _lastCacheTime = null;
   }
 
   /// Debug method to check API key state across all storages.
+
   Future<void> debugApiKeyState() async {
     logDebug('=== API Key Debug State ===');
     logDebug('Cached: ${_cachedApiKey != null ? 'Yes' : 'No'}');
@@ -246,6 +272,7 @@ class ApiKeyService extends BasePodService {
   }
 
   /// Creates a filename for API key storage based on web ID.
+
   String createApiKeyFileName(String webId) {
     final hash = webId.hashCode.abs().toString();
     return 'api-key-$hash.ttl';

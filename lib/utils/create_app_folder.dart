@@ -52,6 +52,7 @@ Future<SolidFunctionCallStatus> createAppFolder({
     late List<String> existingFiles;
 
     // Try multiple times with increasing delays to handle transient encryption issues.
+
     for (int attempt = 1; attempt <= 3; attempt++) {
       try {
         final resources = await getResourcesInContainer(dirUrl);
@@ -64,17 +65,21 @@ Future<SolidFunctionCallStatus> createAppFolder({
             e.toString().contains('enc-keys.ttl')) {
           if (attempt < 3) {
             // Wait with exponential backoff before retrying.
+
             await Future.delayed(Duration(milliseconds: 500 * attempt));
-            // Retrying silently
+            // Retrying silently.
+
             continue;
           } else {
             // Continue with empty lists - we'll try to create the folder anyway.
+
             existingFolders = [];
             existingFiles = [];
             break;
           }
         } else {
           // Re-throw other errors.
+
           rethrow;
         }
       }
@@ -149,6 +154,7 @@ Future<SolidFunctionCallStatus> createAppFolder({
       if (!context.mounted) return result;
 
       // Create initialization file with retry logic for encryption issues.
+
       SolidFunctionCallStatus initResult = SolidFunctionCallStatus.fail;
       for (int attempt = 1; attempt <= 3; attempt++) {
         try {
@@ -169,7 +175,8 @@ Future<SolidFunctionCallStatus> createAppFolder({
               await Future.delayed(Duration(milliseconds: 500 * attempt));
               continue;
             }
-            // For the final attempt, try creating without encryption as fallback
+            // For the final attempt, try creating without encryption as fallback.
+
             if (attempt == 3) {
               if (!context.mounted) throw Exception('Context not mounted');
               initResult = await writePod(

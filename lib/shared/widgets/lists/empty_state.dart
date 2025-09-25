@@ -11,6 +11,7 @@ library;
 import 'package:flutter/material.dart';
 
 /// Widget that displays an empty state when no custom lists exist.
+
 class ListsEmptyState extends StatelessWidget {
   final VoidCallback onCreateList;
 

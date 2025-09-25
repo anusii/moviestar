@@ -11,8 +11,10 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 
 /// Handles movie loading functionality for custom lists.
+
 class MovieLoader {
   /// Load movies from API for a custom list.
+
   static Future<Map<int, Movie>> loadMoviesFromAPI(
     WidgetRef ref,
     List<int> movieIds,
@@ -22,7 +24,8 @@ class MovieLoader {
     final moviesMap = <int, Movie>{};
     final cachedMovieService = ref.read(cachedMovieServiceProvider);
 
-    // Load movies in batches for better performance
+    // Load movies in batches for better performance.
+
     const batchSize = 10;
     for (int i = 0; i < movieIds.length; i += batchSize) {
       final end =
@@ -46,6 +49,7 @@ class MovieLoader {
   }
 
   /// Get content as Movie with type.
+
   static Future<Movie> getContentAsMovieWithType(
     WidgetRef ref,
     int contentId,
@@ -53,26 +57,29 @@ class MovieLoader {
     final cachedMovieService = ref.read(cachedMovieServiceProvider);
     final contentService = ref.read(contentServiceProvider);
 
-    // First try as movie
+    // First try as movie.
+
     try {
       final movie = await cachedMovieService.getMovieDetails(contentId);
       return movie;
     } catch (_) {
-      // Try as TV show if movie fails
+      // Try as TV show if movie fails.
     }
 
-    // Try as TV show
+    // Try as TV show.
+
     try {
       final tvShow = await contentService.getTVDetails(contentId);
       return Movie.fromContentItem(tvShow);
     } catch (_) {
-      // Handle error
+      // Handle error.
     }
 
     throw Exception('Content not found');
   }
 
   /// Retry loading a specific movie.
+
   static Future<void> retryLoadMovie(
     WidgetRef ref,
     int movieId,
@@ -81,7 +88,8 @@ class MovieLoader {
     Function(int, Movie) onMovieLoaded,
     Function(int, String) onMovieError,
   ) async {
-    // Clear any existing error
+    // Clear any existing error.
+
     movieErrors.remove(movieId);
 
     try {

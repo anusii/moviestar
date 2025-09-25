@@ -31,9 +31,11 @@ import 'package:moviestar/utils/is_logged_in.dart';
 
 /// Mixin that provides common POD operation patterns.
 /// Preserves exact retry logic and validation patterns from existing services.
+
 mixin PodOperationsMixin {
   /// Retries an operation with exponential backoff.
   /// Matches exact retry behavior from existing services.
+
   Future<T?> retryOperation<T>({
     required Future<T?> Function() operation,
     required String operationName,
@@ -52,7 +54,8 @@ mixin PodOperationsMixin {
           return null;
         }
 
-        // Calculate delay with exponential backoff if enabled
+        // Calculate delay with exponential backoff if enabled.
+
         final delay =
             exponentialBackoff ? initialDelay * attempt : initialDelay;
 
@@ -64,6 +67,7 @@ mixin PodOperationsMixin {
 
   /// Validates that the context is still mounted.
   /// Returns true if valid, false otherwise.
+
   bool validateContext(BuildContext context) {
     if (!context.mounted) {
       return false;
@@ -73,6 +77,7 @@ mixin PodOperationsMixin {
 
   /// Validates that the user is logged in.
   /// Returns true if logged in, false otherwise.
+
   Future<bool> validateLogin() async {
     final loggedIn = await isLoggedIn();
     if (!loggedIn) {
@@ -83,6 +88,7 @@ mixin PodOperationsMixin {
 
   /// Validates both context and login status.
   /// Returns true if both are valid, false otherwise.
+
   Future<bool> validateContextAndLogin(BuildContext context) async {
     if (!validateContext(context)) return false;
     if (!await validateLogin()) return false;
@@ -91,12 +97,14 @@ mixin PodOperationsMixin {
 
   /// Generates a standard file path for MovieList files.
   /// Follows ontology naming convention.
+
   String getMovieListFilePath(String movieListId) {
     return 'user_lists/MovieList-$movieListId.ttl';
   }
 
   /// Generates a standard file path for Movie files.
   /// Follows ontology naming convention.
+
   String getMovieFilePath(int movieId, {String contentType = 'movie'}) {
     if (contentType == 'tv' || contentType == 'tvShow') {
       return 'moviestar/data/movies/TVShow-$movieId.ttl';
@@ -105,6 +113,7 @@ mixin PodOperationsMixin {
   }
 
   /// Checks if an error indicates a file doesn't exist.
+
   bool isFileNotFoundError(Object error) {
     final errorStr = error.toString().toLowerCase();
     return errorStr.contains('does not exist') ||
@@ -113,6 +122,7 @@ mixin PodOperationsMixin {
   }
 
   /// Checks if an error is related to permissions.
+
   bool isPermissionError(Object error) {
     final errorStr = error.toString().toLowerCase();
     return errorStr.contains('permission') ||
@@ -123,6 +133,7 @@ mixin PodOperationsMixin {
   }
 
   /// Checks if an error is related to network issues.
+
   bool isNetworkError(Object error) {
     final errorStr = error.toString().toLowerCase();
     return errorStr.contains('network') ||

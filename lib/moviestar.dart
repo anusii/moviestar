@@ -34,10 +34,10 @@ import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/theme/app_theme.dart';
 import 'package:moviestar/utils/create_solid_login.dart';
 
-// The main widget could be in a separate file, but handy having it in main and
-// the file is not too large (TO BE FIXED). The widget essentially orchestrates the building
-// of other widgets. Generically we set up to build a `Home()` widget containing
-// the App. For SolidPod we wrap the `Home()` widget within the `SolidLogin()`
+// The main widget could be in a separate file, but handy having it in main and.
+// the file is not too large (TO BE FIXED). The widget essentially orchestrates the building.
+// of other widgets. Generically we set up to build a `Home()` widget containing.
+// the App. For SolidPod we wrap the `Home()` widget within the `SolidLogin()`.
 // widget so we start with a login screen, though this is optional.
 
 /// The root widget of the Movie Star application.

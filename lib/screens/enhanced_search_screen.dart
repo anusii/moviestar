@@ -178,6 +178,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
   }
 
   // Shows a dialog to add content item to custom lists.
+
   void _showAddToCustomListsDialog(ContentItem contentItem) {
     final movie = Movie.fromContentItem(contentItem);
 
@@ -189,7 +190,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
           originalContentItem: contentItem,
           favoritesService: widget.favoritesService,
           onListsUpdated: () {
-            // No need to refresh search results
+            // No need to refresh search results.
           },
         );
       },

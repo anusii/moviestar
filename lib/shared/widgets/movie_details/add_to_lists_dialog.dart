@@ -17,11 +17,13 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/shared/widgets/movie_details/add_to_lists_dialog/list_operations.dart';
 import 'package:moviestar/shared/widgets/movie_details/add_to_lists_dialog/ui_builder.dart';
 
-// Re-export helper classes for backward compatibility
+// Re-export helper classes for backward compatibility.
+
 export 'package:moviestar/shared/widgets/movie_details/add_to_lists_dialog/list_operations.dart';
 export 'package:moviestar/shared/widgets/movie_details/add_to_lists_dialog/ui_builder.dart';
 
 /// Dialog for adding a movie to custom lists.
+
 class AddToListsDialog extends StatefulWidget {
   final Movie movie;
   final FavoritesService favoritesService;
@@ -110,10 +112,12 @@ class _AddToListsDialogState extends State<AddToListsDialog> {
         constraints: const BoxConstraints(maxHeight: 500),
         child: Column(
           children: [
-            // Header
+            // Header.
+
             UiBuilder.buildHeader(context, widget.movie),
 
-            // Lists content
+            // Lists content.
+
             Expanded(
               child: widget.customLists.isNotEmpty
                   ? ListView.builder(
@@ -138,7 +142,8 @@ class _AddToListsDialogState extends State<AddToListsDialog> {
                   : UiBuilder.buildEmptyListsState(context),
             ),
 
-            // Create new list button
+            // Create new list button.
+
             UiBuilder.buildCreateListButton(
               context,
               _isLoading,

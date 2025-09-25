@@ -25,20 +25,26 @@ import 'package:moviestar/shared/widgets/movie_details/info_builders/rating_sect
 
 /// A widget that displays the movie info section without the title.
 /// Used when the title is displayed separately with action buttons.
+
 class MovieInfoSectionWithoutTitle extends StatefulWidget {
   /// The movie to display.
+
   final Movie movie;
 
   /// Service for managing favorite movies.
+
   final FavoritesService favoritesService;
 
   /// Whether this is a shared movie.
+
   final bool isSharedMovie;
 
   /// Shared movie data if applicable.
+
   final Map<String, dynamic>? sharedMovieData;
 
   /// Creates a new [MovieInfoSectionWithoutTitle] widget.
+
   const MovieInfoSectionWithoutTitle({
     super.key,
     required this.movie,
@@ -69,7 +75,8 @@ class _MovieInfoSectionWithoutTitleState
     _loadPersonalRating();
     _loadPersonalComments();
 
-    // Listen to text changes in comments field
+    // Listen to text changes in comments field.
+
     _commentsController.addListener(_onCommentsTextChanged);
   }
 
@@ -91,7 +98,8 @@ class _MovieInfoSectionWithoutTitleState
 
   Future<void> _loadPersonalRating() async {
     if (widget.isSharedMovie) {
-      // For shared movies, extract rating from shared data
+      // For shared movies, extract rating from shared data.
+
       final rating = widget.sharedMovieData?['rating'];
       if (rating != null) {
         setState(() {
@@ -101,7 +109,8 @@ class _MovieInfoSectionWithoutTitleState
       return;
     }
 
-    // For own movies, load from favorites service
+    // For own movies, load from favorites service.
+
     try {
       final rating =
           await widget.favoritesService.getPersonalRating(widget.movie);
@@ -111,7 +120,7 @@ class _MovieInfoSectionWithoutTitleState
         });
       }
     } catch (e) {
-      // Error loading rating
+      // Error loading rating.
     }
   }
 
@@ -143,13 +152,14 @@ class _MovieInfoSectionWithoutTitleState
         });
       }
     } catch (e) {
-      // Error updating rating
+      // Error updating rating.
     }
   }
 
   Future<void> _loadPersonalComments() async {
     if (widget.isSharedMovie) {
-      // For shared movies, extract comments from shared data
+      // For shared movies, extract comments from shared data.
+
       final comments = widget.sharedMovieData?['comments'] as String?;
       if (comments != null && comments.isNotEmpty) {
         setState(() {
@@ -160,7 +170,8 @@ class _MovieInfoSectionWithoutTitleState
       return;
     }
 
-    // For own movies, load from favorites service
+    // For own movies, load from favorites service.
+
     try {
       final comments =
           await widget.favoritesService.getMovieComments(widget.movie);
@@ -171,7 +182,7 @@ class _MovieInfoSectionWithoutTitleState
         });
       }
     } catch (e) {
-      // Error loading comments
+      // Error loading comments.
     }
   }
 
@@ -205,7 +216,7 @@ class _MovieInfoSectionWithoutTitleState
         });
       }
     } catch (e) {
-      // Error saving comments
+      // Error saving comments.
     }
   }
 
@@ -231,7 +242,7 @@ class _MovieInfoSectionWithoutTitleState
         });
       }
     } catch (e) {
-      // Error clearing comments
+      // Error clearing comments.
     }
   }
 
@@ -243,7 +254,8 @@ class _MovieInfoSectionWithoutTitleState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Rating and content type row (no title)
+        // Rating and content type row (no title).
+
         RatingSection.buildRatingRow(
           context,
           contentType: contentTypeInfo['text'],
@@ -253,7 +265,8 @@ class _MovieInfoSectionWithoutTitleState
         ),
         const Gap(Gaps.l),
 
-        // Shared movie indicator
+        // Shared movie indicator.
+
         if (widget.isSharedMovie)
           RatingSection.buildSharedIndicator(
             context,
@@ -261,7 +274,8 @@ class _MovieInfoSectionWithoutTitleState
                 MovieInfoBuilder.getSharedByText(widget.sharedMovieData),
           ),
 
-        // Personal Rating Section
+        // Personal Rating Section.
+
         RatingSection.buildPersonalRatingSection(
           context,
           isSharedMovie: widget.isSharedMovie,
@@ -271,7 +285,8 @@ class _MovieInfoSectionWithoutTitleState
         ),
         const Gap(Gaps.l),
 
-        // Movie Overview/Description Section
+        // Movie Overview/Description Section.
+
         if (widget.movie.overview.isNotEmpty) ...[
           Text(
             'Overview',
@@ -307,7 +322,8 @@ class _MovieInfoSectionWithoutTitleState
           const Gap(Gaps.l),
         ],
 
-        // Comments Section
+        // Comments Section.
+
         CommentsSection.buildCommentsSection(
           context,
           isSharedMovie: widget.isSharedMovie,

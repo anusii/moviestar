@@ -29,14 +29,18 @@ import 'package:moviestar/widgets/common_sharing_ui.dart';
 
 /// A widget that displays the recipient input section for batch sharing.
 /// Handles WebID input and validation.
+
 class RecipientSection extends StatelessWidget {
   /// Controller for the WebID input field.
+
   final TextEditingController controller;
 
   /// Callback when WebID is validated.
+
   final void Function(String?) onValidated;
 
   /// Creates a new [RecipientSection].
+
   const RecipientSection({
     super.key,
     required this.controller,

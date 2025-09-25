@@ -35,6 +35,7 @@ import 'package:moviestar/screens/movie_details_screen.dart';
 ///
 /// This centralizes the navigation logic for movie details, ensuring.
 /// consistent behavior across the app.
+
 Future<void> navigateToMovieDetails(
   BuildContext context,
   Movie movie,
@@ -58,6 +59,7 @@ Future<void> navigateToMovieDetails(
 /// Creates a route for the movie details screen.
 ///
 /// This can be used with custom navigation animations or named routes.
+
 Route<void> createMovieDetailsRoute(
   Movie movie,
   FavoritesService favoritesService,

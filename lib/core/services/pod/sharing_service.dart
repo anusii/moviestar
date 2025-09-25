@@ -34,18 +34,22 @@ import 'package:moviestar/services/share_operation_handler.dart';
 import 'package:moviestar/services/webid_validator.dart';
 
 /// Service class for POD sharing operations.
+
 class PodSharingService {
   /// Get the current user's WebID.
+
   static Future<String?> getCurrentWebId() async {
     return ShareOperationHandler.getCurrentWebId();
   }
 
   /// Validate a WebID (with caching).
+
   static Future<bool> validateWebId(String webId) async {
     return WebIdValidator.validateWebId(webId);
   }
 
   /// Share a single file using real POD permission granting.
+
   static Future<ShareResult> shareFile(
     ShareRequest request,
     BuildContext context,
@@ -55,6 +59,7 @@ class PodSharingService {
   }
 
   /// Share multiple files.
+
   static Future<BatchShareResult> shareMultipleFiles(
     List<ShareRequest> requests,
     BuildContext context,
@@ -70,6 +75,7 @@ class PodSharingService {
   }
 
   /// Grant permissions for a file using real POD calls.
+
   static Future<PermissionResult> grantPermissions(
     PermissionRequest request,
     BuildContext context,
@@ -79,6 +85,7 @@ class PodSharingService {
   }
 
   /// Perform batch sharing with progress callback.
+
   static Future<BatchShareResult> performBatchShare(
     BatchShareRequest request,
     BuildContext context,
@@ -94,21 +101,25 @@ class PodSharingService {
   }
 
   /// Clear WebID validation cache.
+
   static void clearCache() {
     WebIdValidator.clearCache();
   }
 
   /// Get sharing status message.
+
   static String getStatusMessage(SolidFunctionCallStatus status) {
     return ShareOperationHandler.getStatusMessage(status);
   }
 
   /// Generate movie file name based on content type.
+
   static String getMovieFileName(Movie movie) {
     return MovieFileManager.getMovieFileName(movie);
   }
 
   /// Check if a movie file exists in POD.
+
   static Future<bool> movieFileExists(
     Movie movie,
     BuildContext context,
@@ -118,6 +129,7 @@ class PodSharingService {
   }
 
   /// Read movie data from POD.
+
   static Future<Map<String, dynamic>?> readMovieData(
     Movie movie,
     BuildContext context,
@@ -127,6 +139,7 @@ class PodSharingService {
   }
 
   /// Write movie data to POD.
+
   static Future<bool> writeMovieData(
     Movie movie,
     BuildContext context,
@@ -144,6 +157,7 @@ class PodSharingService {
   }
 
   /// Share a movie file with enhanced error handling.
+
   static Future<ShareResult> shareMovieFile(
     Movie movie,
     String recipientWebId,
@@ -161,6 +175,7 @@ class PodSharingService {
   }
 
   /// Batch share multiple movie files.
+
   static Future<BatchShareResult> shareMultipleMovieFiles(
     List<Movie> movies,
     String recipientWebId,
@@ -180,6 +195,7 @@ class PodSharingService {
   }
 
   /// Create or update a movie file with user data.
+
   static Future<bool> createOrUpdateMovieFile(
     Movie movie,
     BuildContext context,

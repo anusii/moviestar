@@ -21,6 +21,7 @@ import 'package:moviestar/widgets/common_sharing_ui.dart'
     show SharingStatusIndicator, WebIdInput, ShareStatus;
 
 /// Custom single movie sharing UI with integrated design.
+
 class MovieSharingUI extends StatefulWidget {
   final Movie movie;
   final VoidCallback onSharingComplete;
@@ -58,7 +59,8 @@ class _MovieSharingUIState extends State<MovieSharingUI> {
     });
 
     try {
-      // Construct file name based on content type
+      // Construct file name based on content type.
+
       final isTV = widget.movie.contentType == ContentType.tvShow;
       final filePrefix = isTV ? 'TVShow' : 'Movie';
 

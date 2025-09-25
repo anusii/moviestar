@@ -15,6 +15,7 @@ import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Search and filter controller for kanban board.
+
 class KanbanSearchController extends ChangeNotifier {
   String _searchQuery = '';
   final Set<String> _selectedGenres = {};
@@ -25,7 +26,8 @@ class KanbanSearchController extends ChangeNotifier {
   ContentType? _contentTypeFilter;
   bool _isSearchActive = false;
 
-  // Getters
+  // Getters.
+
   String get searchQuery => _searchQuery;
   Set<String> get selectedGenres => Set.unmodifiable(_selectedGenres);
   double? get minRating => _minRating;
@@ -37,6 +39,7 @@ class KanbanSearchController extends ChangeNotifier {
   bool get hasActiveFilters => _isSearchActive || _hasAnyFilters();
 
   /// Update search query.
+
   void updateSearchQuery(String query) {
     _searchQuery = query.trim();
     _isSearchActive = _searchQuery.isNotEmpty;
@@ -44,6 +47,7 @@ class KanbanSearchController extends ChangeNotifier {
   }
 
   /// Toggle genre filter.
+
   void toggleGenre(String genre) {
     if (_selectedGenres.contains(genre)) {
       _selectedGenres.remove(genre);
@@ -54,6 +58,7 @@ class KanbanSearchController extends ChangeNotifier {
   }
 
   /// Set rating range filter.
+
   void setRatingRange(double? min, double? max) {
     _minRating = min;
     _maxRating = max;
@@ -61,6 +66,7 @@ class KanbanSearchController extends ChangeNotifier {
   }
 
   /// Set year range filter.
+
   void setYearRange(int? start, int? end) {
     _startYear = start;
     _endYear = end;
@@ -68,12 +74,14 @@ class KanbanSearchController extends ChangeNotifier {
   }
 
   /// Set content type filter.
+
   void setContentTypeFilter(ContentType? contentType) {
     _contentTypeFilter = contentType;
     notifyListeners();
   }
 
   /// Clear all filters.
+
   void clearAllFilters() {
     _searchQuery = '';
     _selectedGenres.clear();
@@ -87,6 +95,7 @@ class KanbanSearchController extends ChangeNotifier {
   }
 
   /// Clear only search query.
+
   void clearSearch() {
     _searchQuery = '';
     _isSearchActive = false;
@@ -94,6 +103,7 @@ class KanbanSearchController extends ChangeNotifier {
   }
 
   /// Check if any filters are active (excluding search).
+
   bool _hasAnyFilters() {
     return _selectedGenres.isNotEmpty ||
         _minRating != null ||
@@ -104,17 +114,20 @@ class KanbanSearchController extends ChangeNotifier {
   }
 
   /// Filter movies based on current criteria.
+
   List<Movie> filterMovies(List<Movie> movies) {
     if (!hasActiveFilters) return movies;
 
     return movies.where((movie) {
-      // Search query filter
+      // Search query filter.
+
       if (_isSearchActive && _searchQuery.isNotEmpty) {
         final query = _searchQuery.toLowerCase();
         final titleMatch = movie.title.toLowerCase().contains(query);
         final overviewMatch = movie.overview.toLowerCase().contains(query);
         final genreMatch = movie.genreIds.any((genreId) {
-          // Simple genre matching - could be enhanced with genre name lookup
+          // Simple genre matching - could be enhanced with genre name lookup.
+
           return genreId.toString().contains(query);
         });
 
@@ -123,7 +136,8 @@ class KanbanSearchController extends ChangeNotifier {
         }
       }
 
-      // Genre filter
+      // Genre filter.
+
       if (_selectedGenres.isNotEmpty) {
         final movieGenres = movie.genreIds.map((id) => id.toString()).toSet();
         if (!_selectedGenres.any((genre) => movieGenres.contains(genre))) {
@@ -131,7 +145,8 @@ class KanbanSearchController extends ChangeNotifier {
         }
       }
 
-      // Rating filter
+      // Rating filter.
+
       if (_minRating != null && movie.voteAverage < _minRating!) {
         return false;
       }
@@ -139,7 +154,8 @@ class KanbanSearchController extends ChangeNotifier {
         return false;
       }
 
-      // Year filter
+      // Year filter.
+
       if (_startYear != null || _endYear != null) {
         final movieYear = movie.releaseDate.year;
         if (_startYear != null && movieYear < _startYear!) {
@@ -150,7 +166,8 @@ class KanbanSearchController extends ChangeNotifier {
         }
       }
 
-      // Content type filter
+      // Content type filter.
+
       if (_contentTypeFilter != null &&
           movie.contentType != _contentTypeFilter) {
         return false;
@@ -162,6 +179,7 @@ class KanbanSearchController extends ChangeNotifier {
 }
 
 /// Search bar widget for kanban board.
+
 class KanbanSearchBar extends StatefulWidget {
   final KanbanSearchController controller;
   final String hintText;

@@ -102,14 +102,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
   }
 
   /// Checks all movie providers for API key errors and updates state.
+
   void _checkForApiKeyErrors(
-    AsyncValue<CacheResult<List<Movie>>> popularMovies,
+    AsyncValue<CacheResult<List<Movie>>> recommendedMovies,
     AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,
     AsyncValue<CacheResult<List<Movie>>> topRatedMovies,
     AsyncValue<CacheResult<List<Movie>>> upcomingMovies,
   ) {
     final errorState = HomeErrorHandler.checkForApiKeyErrors(
-      popularMovies,
+      recommendedMovies,
       nowPlayingMovies,
       topRatedMovies,
       upcomingMovies,
@@ -136,7 +137,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
 
     // Invalidate all providers to force refresh.
 
-    ref.invalidate(popularMoviesWithCacheInfoProvider);
+    ref.invalidate(recommendedMoviesWithCacheInfoProvider);
     ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
     ref.invalidate(topRatedMoviesWithCacheInfoProvider);
     ref.invalidate(upcomingMoviesWithCacheInfoProvider);
@@ -163,7 +164,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
 
     if (!mounted) return;
 
-    final popularMovies = ref.read(popularMoviesWithCacheInfoProvider);
+    final recommendedMovies = ref.read(recommendedMoviesWithCacheInfoProvider);
     final nowPlayingMovies = ref.read(nowPlayingMoviesWithCacheInfoProvider);
     final topRatedMovies = ref.read(topRatedMoviesWithCacheInfoProvider);
     final upcomingMovies = ref.read(upcomingMoviesWithCacheInfoProvider);
@@ -171,7 +172,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
     // Check if all categories have loaded.
 
     final allLoaded = [
-      popularMovies,
+      recommendedMovies,
       nowPlayingMovies,
       topRatedMovies,
       upcomingMovies,
@@ -182,8 +183,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
     // Extract cache results.
 
     final results = <String, bool>{};
-    popularMovies.whenOrNull(
-      data: (result) => results['Popular'] = result.fromCache,
+    recommendedMovies.whenOrNull(
+      data: (result) => results['Recommended'] = result.fromCache,
     );
     nowPlayingMovies.whenOrNull(
       data: (result) => results['Now Playing'] = result.fromCache,
@@ -213,7 +214,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final popularMovies = ref.watch(popularMoviesWithCacheInfoProvider);
+    final recommendedMovies = ref.watch(recommendedMoviesWithCacheInfoProvider);
     final nowPlayingMovies = ref.watch(nowPlayingMoviesWithCacheInfoProvider);
     final topRatedMovies = ref.watch(topRatedMoviesWithCacheInfoProvider);
     final upcomingMovies = ref.watch(upcomingMoviesWithCacheInfoProvider);
@@ -222,7 +223,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
     // Check for API key errors across all providers.
 
     _checkForApiKeyErrors(
-      popularMovies,
+      recommendedMovies,
       nowPlayingMovies,
       topRatedMovies,
       upcomingMovies,
@@ -236,7 +237,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
       onRefresh: _forceRefresh,
       child: _buildContentForViewMode(
         currentViewMode,
-        popularMovies,
+        recommendedMovies,
         nowPlayingMovies,
         topRatedMovies,
         upcomingMovies,
@@ -245,9 +246,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
   }
 
   // Build content based on the selected view mode.
+
   Widget _buildContentForViewMode(
     HomeViewMode viewMode,
-    AsyncValue<CacheResult<List<Movie>>> popularMovies,
+    AsyncValue<CacheResult<List<Movie>>> recommendedMovies,
     AsyncValue<CacheResult<List<Movie>>> nowPlayingMovies,
     AsyncValue<CacheResult<List<Movie>>> topRatedMovies,
     AsyncValue<CacheResult<List<Movie>>> upcomingMovies,
@@ -271,7 +273,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ScreenStateMixin {
       parentWidget: widget,
       onNavigate: safeNavigateTo,
       scrollControllers: _scrollControllers,
-      popularMovies: popularMovies,
+      recommendedMovies: recommendedMovies,
       nowPlayingMovies: nowPlayingMovies,
       topRatedMovies: topRatedMovies,
       upcomingMovies: upcomingMovies,

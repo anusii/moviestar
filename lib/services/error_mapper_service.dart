@@ -34,9 +34,11 @@ import 'package:moviestar/services/error_mapper/smart_detection.dart';
 import 'package:moviestar/utils/network_client.dart';
 
 /// Service that maps technical exceptions to user-friendly errors.
+
 class ErrorMapperService {
   /// Maps a technical error to a user-friendly error with appropriate actions.
   /// This is the synchronous version for backward compatibility.
+
   static UserFriendlyError mapError(
     Object error,
     StackTrace stackTrace, {
@@ -47,6 +49,7 @@ class ErrorMapperService {
 
   /// Maps a technical error to a user-friendly error with smart detection.
   /// This version performs async API key and network validation for better accuracy.
+
   static Future<UserFriendlyError> mapErrorSmart(
     Object error,
     StackTrace stackTrace, {
@@ -59,12 +62,14 @@ class ErrorMapperService {
         context: context,
       );
     } catch (e) {
-      // Fall back to traditional error mapping
+      // Fall back to traditional error mapping.
+
       return _mapErrorTraditionally(error, stackTrace, context);
     }
   }
 
   /// Maps errors using traditional logic (fallback).
+
   static UserFriendlyError _mapErrorTraditionally(
     Object error,
     StackTrace stackTrace,
@@ -92,6 +97,7 @@ class ErrorMapperService {
   }
 
   /// Builds actions list based on context.
+
   static List<ErrorAction> _buildActions(ErrorContext? context) {
     final actions = <ErrorAction>[];
 
@@ -112,11 +118,13 @@ class ErrorMapperService {
   }
 
   /// Analyzes error text to detect specific patterns and suggest appropriate error types.
+
   static ErrorType analyzeErrorText(String errorText) {
     return ErrorAnalysis.analyzeErrorText(errorText);
   }
 
   /// Creates a user-friendly error from a raw error string (fallback method).
+
   static UserFriendlyError fromErrorString(
     String errorText, {
     ErrorContext? context,

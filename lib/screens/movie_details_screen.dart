@@ -220,9 +220,11 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
   }
 
   // Shares the movie file using the common sharing UI.
+
   Future<void> _shareMovie() async {
     try {
       // Check if user has POD storage enabled and is using the adapter.
+
       if (widget.favoritesService is! FavoritesServiceAdapter) {
         _showErrorDialog('POD storage is required for sharing');
         return;
@@ -231,23 +233,28 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
       final adapter = widget.favoritesService as FavoritesServiceAdapter;
 
       // Check if POD storage is enabled.
+
       if (!adapter.isPodStorageEnabled) {
         _showErrorDialog('POD storage must be enabled to share movies');
         return;
       }
 
       // Ensure the movie file exists before sharing.
+
       final hasFile = await widget.favoritesService.hasMovieFile(widget.movie);
       if (!hasFile) {
-        // Create the movie file by setting an empty comment to enable sharing
+        // Create the movie file by setting an empty comment to enable sharing.
+
         await widget.favoritesService.setMovieComments(widget.movie, '');
-        // Then remove the empty comment to keep the file clean
+        // Then remove the empty comment to keep the file clean.
+
         await widget.favoritesService.removeMovieComments(widget.movie);
       }
 
-      // Movie file path logic is handled by MovieSharingUI
+      // Movie file path logic is handled by MovieSharingUI.
 
-      // Use our custom movie sharing UI
+      // Use our custom movie sharing UI.
+
       if (!mounted) return;
 
       await Navigator.of(context).push(
@@ -354,7 +361,8 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title row with action buttons
+                  // Title row with action buttons.
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -383,7 +391,8 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
                     ],
                   ),
                   const SizedBox(height: 16),
-                  // Rest of movie info (without title)
+                  // Rest of movie info (without title).
+
                   MovieInfoSectionWithoutTitle(
                     movie: widget.movie,
                     favoritesService: widget.favoritesService,

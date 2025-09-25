@@ -27,6 +27,7 @@ import 'package:moviestar/utils/serializer.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 
 /// Handler for custom list sharing functionality.
+
 class ListSharingHandler {
   final BuildContext context;
   final ConsumerStatefulWidget widget;
@@ -43,6 +44,7 @@ class ListSharingHandler {
   });
 
   /// Shows options for a custom list (edit, share, delete).
+
   Future<void> showListOptions(
     CustomList list,
     VoidCallback onEdit,
@@ -107,6 +109,7 @@ class ListSharingHandler {
   }
 
   /// Shows a loading dialog during sharing process.
+
   void _showSharingDialog() {
     showDialog(
       context: context,
@@ -140,6 +143,7 @@ class ListSharingHandler {
   }
 
   /// Shares the custom list and all movies using batch sharing UI.
+
   Future<void> shareCustomList(CustomList list) async {
     if (list.movieIds.isEmpty) {
       screenState.showInfoSnackBar('No movies to share');
@@ -185,7 +189,7 @@ class ListSharingHandler {
         try {
           await _createMovieFileIfNotExists(movie);
         } catch (e) {
-          // Continue with other movies
+          // Continue with other movies.
         }
         if (!context.mounted) return;
       }
@@ -217,6 +221,7 @@ class ListSharingHandler {
   }
 
   /// Loads movies for sharing from POD or API.
+
   Future<List<Movie>> _loadMoviesForSharing(CustomList list) async {
     final moviesToShare = <Movie>[];
 
@@ -237,7 +242,7 @@ class ListSharingHandler {
           moviesToShare.addAll(podMovies);
         }
       } catch (e) {
-        // Failed to get movies from POD
+        // Failed to get movies from POD.
       }
     }
 
@@ -267,7 +272,7 @@ class ListSharingHandler {
 
           moviesToShare.add(movieWithContentType);
         } catch (e) {
-          // Failed to fetch movie details
+          // Failed to fetch movie details.
         }
       }
     }
@@ -276,6 +281,7 @@ class ListSharingHandler {
   }
 
   /// Creates a movie file if it doesn't exist (needed before sharing).
+
   Future<void> _createMovieFileIfNotExists(Movie movie) async {
     try {
       final isTV = movie.contentType == ContentType.tvShow;
@@ -289,7 +295,7 @@ class ListSharingHandler {
           return;
         }
       } catch (e) {
-        // File doesn't exist, we'll create it
+        // File doesn't exist, we'll create it.
       }
 
       final adapter = favoritesService as FavoritesServiceAdapter;

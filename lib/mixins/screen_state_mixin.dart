@@ -31,22 +31,26 @@ import 'package:moviestar/constants/timing_constants.dart';
 
 /// Mixin that provides common state management functionality for screen widgets.
 ///
-/// This mixin eliminates boilerplate code by providing:.
+/// This mixin eliminates boilerplate code by providing:
 /// - Safe navigation methods with mounted checks.
 /// - Loading state management.
 /// - Consistent error and success messaging.
 /// - Mounted-safe setState wrapper.
+
 mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
   /// Whether the screen is currently in a loading state.
+
   bool _isLoading = false;
 
   /// Getter for current loading state.
+
   bool get isLoading => _isLoading;
 
   /// Safely calls setState only if the widget is still mounted.
   ///
   /// This prevents "setState() called after dispose()" errors that are.
   /// common when async operations complete after widget disposal.
+
   void safeSetState(VoidCallback fn) {
     if (mounted) {
       setState(fn);
@@ -54,6 +58,7 @@ mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// Sets the loading state and updates the UI safely.
+
   void setLoadingState(bool loading) {
     safeSetState(() {
       _isLoading = loading;
@@ -61,6 +66,7 @@ mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// Shows a loading state with optional message.
+
   void showLoading([String? message]) {
     setLoadingState(true);
     if (message != null) {
@@ -69,6 +75,7 @@ mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// Hides the loading state.
+
   void hideLoading() {
     setLoadingState(false);
   }
@@ -76,12 +83,14 @@ mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
   /// Safely navigates to a new route with mounted check.
   ///
   /// Returns the result from the navigation, or null if widget is not mounted.
+
   Future<U?> safeNavigateTo<U>(Route<U> route) async {
     if (!mounted) return null;
     return Navigator.push<U>(context, route);
   }
 
   /// Safely navigates to a named route with mounted check.
+
   Future<U?> safeNavigateToNamed<U>(
     String routeName, {
     Object? arguments,
@@ -95,6 +104,7 @@ mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// Safely pops the current route if mounted.
+
   void safePop<U>([U? result]) {
     if (mounted && Navigator.canPop(context)) {
       Navigator.pop<U>(context, result);
@@ -102,6 +112,7 @@ mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// Shows a loading snackbar with spinner.
+
   void showLoadingSnackBar(String message) {
     if (!mounted) return;
 
@@ -127,6 +138,7 @@ mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// Shows an error snackbar with consistent styling.
+
   void showErrorSnackBar(String message, {VoidCallback? onRetry}) {
     if (!mounted) return;
 
@@ -156,6 +168,7 @@ mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// Shows a success snackbar with consistent styling.
+
   void showSuccessSnackBar(String message) {
     if (!mounted) return;
 
@@ -175,6 +188,7 @@ mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// Shows an info snackbar with consistent styling.
+
   void showInfoSnackBar(String message, {Duration? duration}) {
     if (!mounted) return;
 
@@ -188,6 +202,7 @@ mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// Hides the current snackbar if one is showing.
+
   void hideCurrentSnackBar() {
     if (!mounted) return;
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -197,6 +212,7 @@ mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
   ///
   /// Shows loading state during execution and handles errors automatically.
   /// Returns true if the operation succeeded, false if it failed.
+
   Future<bool> executeWithLoading(
     Future<void> Function() operation, {
     String? loadingMessage,
@@ -233,8 +249,10 @@ mixin ScreenStateMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// Gets themed colors for consistent styling.
+
   ColorScheme get colorScheme => Theme.of(context).colorScheme;
 
   /// Gets themed text styles for consistent styling.
+
   TextTheme get textTheme => Theme.of(context).textTheme;
 }

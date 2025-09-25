@@ -14,14 +14,14 @@ import 'package:solidpod/solidpod.dart' show getWebId;
 
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
 import 'package:moviestar/models/movie.dart';
-// Import providers from main file to resolve dependencies
 import 'package:moviestar/providers/cached_movie_service_provider.dart'
     show
         configuredCachedMovieServiceProvider,
         cachingEnabledProvider,
         cacheOnlyModeProvider;
 
-/// Direct API key provider that accesses secure storage without service dependency
+/// Direct API key provider that accesses secure storage without service dependency.
+
 final directApiKeyProvider = FutureProvider<String?>((ref) async {
   try {
     const storage = FlutterSecureStorage(
@@ -32,10 +32,12 @@ final directApiKeyProvider = FutureProvider<String?>((ref) async {
       mOptions: MacOsOptions(synchronizable: false),
     );
 
-    // Try multiple storage keys to find the API key
+    // Try multiple storage keys to find the API key.
+
     String? apiKey;
 
-    // Try user-specific key first (current approach)
+    // Try user-specific key first (current approach).
+
     try {
       final webId = await getWebId();
       if (webId != null && webId.isNotEmpty) {
@@ -43,10 +45,11 @@ final directApiKeyProvider = FutureProvider<String?>((ref) async {
         apiKey = await storage.read(key: userKey);
       }
     } catch (e) {
-      // Failed to read API key from storage
+      // Failed to read API key from storage.
     }
 
-    // Try legacy key if user key not found
+    // Try legacy key if user key not found.
+
     if (apiKey == null || apiKey.isEmpty) {
       apiKey = await storage.read(key: 'movie_db_api_key');
     }
@@ -57,14 +60,16 @@ final directApiKeyProvider = FutureProvider<String?>((ref) async {
   }
 });
 
-/// Provider for popular movies with caching information.
-final popularMoviesWithCacheInfoProvider =
+/// Provider for recommended movies with caching information.
+
+final recommendedMoviesWithCacheInfoProvider =
     FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
   final apiKeyAsync = ref.watch(directApiKeyProvider);
   final apiKey = apiKeyAsync.valueOrNull;
 
-  // If no API key is set, return empty result instead of cached content
+  // If no API key is set, return empty result instead of cached content.
+
   if (apiKey == null || apiKey.trim().isEmpty) {
     return CacheResult<List<Movie>>(
       data: <Movie>[],
@@ -74,10 +79,11 @@ final popularMoviesWithCacheInfoProvider =
   }
 
   // Watch cache settings to invalidate when they change.
+
   ref.watch(cachingEnabledProvider);
   ref.watch(cacheOnlyModeProvider);
   try {
-    final result = await cachedService.getPopularMoviesWithCacheInfo();
+    final result = await cachedService.getRecommendedMoviesWithCacheInfo();
     return result;
   } catch (e) {
     rethrow;
@@ -85,13 +91,15 @@ final popularMoviesWithCacheInfoProvider =
 });
 
 /// Provider for now playing movies with caching information.
+
 final nowPlayingMoviesWithCacheInfoProvider =
     FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
   final apiKeyAsync = ref.watch(directApiKeyProvider);
   final apiKey = apiKeyAsync.valueOrNull;
 
-  // If no API key is set, return empty result instead of cached content
+  // If no API key is set, return empty result instead of cached content.
+
   if (apiKey == null || apiKey.trim().isEmpty) {
     return CacheResult<List<Movie>>(
       data: <Movie>[],
@@ -101,19 +109,22 @@ final nowPlayingMoviesWithCacheInfoProvider =
   }
 
   // Watch cache settings to invalidate when they change.
+
   ref.watch(cachingEnabledProvider);
   ref.watch(cacheOnlyModeProvider);
   return cachedService.getNowPlayingMoviesWithCacheInfo();
 });
 
 /// Provider for top rated movies with caching information.
+
 final topRatedMoviesWithCacheInfoProvider =
     FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
   final apiKeyAsync = ref.watch(directApiKeyProvider);
   final apiKey = apiKeyAsync.valueOrNull;
 
-  // If no API key is set, return empty result instead of cached content
+  // If no API key is set, return empty result instead of cached content.
+
   if (apiKey == null || apiKey.trim().isEmpty) {
     return CacheResult<List<Movie>>(
       data: <Movie>[],
@@ -123,19 +134,22 @@ final topRatedMoviesWithCacheInfoProvider =
   }
 
   // Watch cache settings to invalidate when they change.
+
   ref.watch(cachingEnabledProvider);
   ref.watch(cacheOnlyModeProvider);
   return cachedService.getTopRatedMoviesWithCacheInfo();
 });
 
 /// Provider for upcoming movies with caching information.
+
 final upcomingMoviesWithCacheInfoProvider =
     FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
   final apiKeyAsync = ref.watch(directApiKeyProvider);
   final apiKey = apiKeyAsync.valueOrNull;
 
-  // If no API key is set, return empty result instead of cached content
+  // If no API key is set, return empty result instead of cached content.
+
   if (apiKey == null || apiKey.trim().isEmpty) {
     return CacheResult<List<Movie>>(
       data: <Movie>[],
@@ -145,18 +159,20 @@ final upcomingMoviesWithCacheInfoProvider =
   }
 
   // Watch cache settings to invalidate when they change.
+
   ref.watch(cachingEnabledProvider);
   ref.watch(cacheOnlyModeProvider);
   return cachedService.getUpcomingMoviesWithCacheInfo();
 });
 
 /// Provider for cache statistics.
+
 final cacheStatsProvider =
     FutureProvider<Map<CacheCategory, Map<String, dynamic>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
   return await cachedService.getCacheStats();
 });
 
-/// These providers are imported from the main file
-/// They are used by the movie providers but defined in the main cached_movie_service_provider.dart
+/// These providers are imported from the main file.
+/// They are used by the movie providers but defined in the main cached_movie_service_provider.dart.
 /// to avoid circular dependencies.

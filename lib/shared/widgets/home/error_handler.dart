@@ -23,8 +23,10 @@ import 'package:moviestar/services/error_mapper_service.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 
 /// Utility class for handling errors in the home screen context.
+
 class HomeErrorHandler {
   /// Checks if an error is an API key related error.
+
   static bool isApiKeyError(Object error) {
     final errorString = error.toString().toLowerCase();
     return errorString.contains('401') ||
@@ -35,6 +37,7 @@ class HomeErrorHandler {
   }
 
   /// Checks all movie providers for API key errors and returns error state.
+
   static ApiKeyErrorState checkForApiKeyErrors(
     AsyncValue<CacheResult<List<dynamic>>> popularMovies,
     AsyncValue<CacheResult<List<dynamic>>> nowPlayingMovies,
@@ -69,6 +72,7 @@ class HomeErrorHandler {
   }
 
   /// Builds a smart error widget for the home screen.
+
   static Widget buildSmartErrorWidget(
     WidgetRef ref,
     Object error,
@@ -95,13 +99,14 @@ class HomeErrorHandler {
 
         return ErrorDisplayWidget(
           message: 'Error loading movies: $error',
-          onRetry: () => ref.invalidate(popularMoviesWithCacheInfoProvider),
+          onRetry: () => ref.invalidate(recommendedMoviesWithCacheInfoProvider),
         );
       },
     );
   }
 
   /// Builds a compact smart error widget for movie rows.
+
   static Widget buildSmartErrorWidgetCompact(
     WidgetRef ref,
     Object error,
@@ -142,7 +147,7 @@ class HomeErrorHandler {
       ref,
       error,
       stackTrace,
-      () => ref.invalidate(popularMoviesWithCacheInfoProvider),
+      () => ref.invalidate(recommendedMoviesWithCacheInfoProvider),
     );
   }
 
@@ -189,6 +194,7 @@ class HomeErrorHandler {
 }
 
 /// Represents the state of API key errors.
+
 class ApiKeyErrorState {
   final bool hasError;
   final String? errorMessage;

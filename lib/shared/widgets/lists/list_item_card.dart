@@ -17,6 +17,7 @@ import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/utils/date_format_util.dart';
 
 /// A card that displays a custom list item with actions.
+
 class ListItemCard extends StatelessWidget {
   final CustomList list;
   final FavoritesService favoritesService;

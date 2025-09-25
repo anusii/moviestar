@@ -17,8 +17,10 @@ import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/widgets/cache_feedback_widget.dart';
 
 /// Static helper class for building cache-related tiles.
+
 class CacheTileBuilders {
   /// Builds the offline mode tile with proper enabled/disabled state.
+
   static Widget buildOfflineModeTile({
     required BuildContext context,
     required WidgetRef ref,
@@ -52,6 +54,7 @@ class CacheTileBuilders {
               ref.read(cacheOnlyModeProvider.notifier).setCacheOnlyMode(value);
 
               // Show feedback about the mode change.
+
               CacheFeedbackWidget.showOfflineModeNotification(
                 context,
                 isEnabled: value,
@@ -64,6 +67,7 @@ class CacheTileBuilders {
   }
 
   /// Builds the API key caching tile.
+
   static Widget buildApiKeyCachingTile({
     required BuildContext context,
     required WidgetRef ref,
@@ -89,6 +93,7 @@ class CacheTileBuilders {
                 .setLocalApiKeyCachingEnabled(value);
 
             // Show feedback about the change.
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(

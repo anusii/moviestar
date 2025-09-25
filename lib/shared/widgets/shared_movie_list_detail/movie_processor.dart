@@ -8,13 +8,16 @@ library;
 import 'package:flutter/material.dart';
 
 /// Handles movie processing and display utilities for shared movie list detail screen.
+
 class SharedListMovieProcessor {
   /// Extract owner name from WebID.
+
   static String getOwnerName(String webId) {
     if (webId.isEmpty) return 'Unknown';
 
     try {
       // For WebIDs like: https://pods.dev.solidcommunity.au/my-moviestar/profile/card#me.
+
       final match = RegExp(r'://[^/]+/([^/]+)/').firstMatch(webId);
       if (match != null) {
         final username = match.group(1) ?? 'Unknown';
@@ -22,6 +25,7 @@ class SharedListMovieProcessor {
       }
 
       // If it doesn't match the expected pattern, return the full WebID.
+
       return webId.length > 30 ? '${webId.substring(0, 30)}...' : webId;
     } catch (e) {
       return webId.length > 30 ? '${webId.substring(0, 30)}...' : webId;
@@ -29,6 +33,7 @@ class SharedListMovieProcessor {
   }
 
   /// Build rating display widget.
+
   static Widget buildRatingDisplay(dynamic rating) {
     if (rating == null) return const SizedBox.shrink();
 
@@ -49,6 +54,7 @@ class SharedListMovieProcessor {
   }
 
   /// Build movie card widget for a single movie in the list.
+
   static Widget buildMovieCard({
     required BuildContext context,
     required Map<String, dynamic> movieData,
@@ -73,6 +79,7 @@ class SharedListMovieProcessor {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Movie header.
+
               Row(
                 children: [
                   Container(
@@ -118,6 +125,7 @@ class SharedListMovieProcessor {
               ),
 
               // Movie comments.
+
               if (comments.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Container(
@@ -172,6 +180,7 @@ class SharedListMovieProcessor {
   }
 
   /// Build list metadata header widget.
+
   static Widget buildListHeader({
     required BuildContext context,
     required String listName,
@@ -341,6 +350,7 @@ class SharedListMovieProcessor {
   }
 
   /// Build empty state widget when no movies are present.
+
   static Widget buildEmptyState() {
     return const Center(
       child: Padding(

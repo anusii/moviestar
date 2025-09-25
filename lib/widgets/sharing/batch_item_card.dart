@@ -32,17 +32,22 @@ import 'package:moviestar/utils/movie_display_utils.dart';
 
 /// A card widget that displays a file item in the batch sharing interface.
 /// Shows file information, permissions, and poster image if available.
+
 class BatchSharingItemCard extends StatelessWidget {
   /// The shareable file to display.
+
   final ShareableFile file;
 
   /// The index of this file in the sharing list.
+
   final int index;
 
   /// Callback when permissions are updated for this file.
+
   final void Function(int index, List<String> permissions) onPermissionsChanged;
 
   /// Creates a new [BatchSharingItemCard].
+
   const BatchSharingItemCard({
     super.key,
     required this.file,
@@ -71,7 +76,8 @@ class BatchSharingItemCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // File header
+          // File header.
+
           Row(
             children: [
               Icon(
@@ -136,6 +142,7 @@ class BatchSharingItemCard extends StatelessWidget {
           const SizedBox(height: 12),
 
           // Permission checkboxes or read-only indicator.
+
           if (isIndividualFile)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -163,7 +170,8 @@ class BatchSharingItemCard extends StatelessWidget {
               ),
             )
           else
-            // Permission checkboxes for movie list only
+            // Permission checkboxes for movie list only.
+
             Wrap(
               spacing: 16,
               children: [
@@ -180,6 +188,7 @@ class BatchSharingItemCard extends StatelessWidget {
 
   /// Build permission checkbox.
   /// Only enables interaction for movie list files.
+
   Widget _buildPermissionCheckbox(
     BuildContext context,
     String permission,

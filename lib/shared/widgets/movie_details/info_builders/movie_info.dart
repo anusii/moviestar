@@ -11,8 +11,10 @@ import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Builds basic movie information widgets.
+
 class MovieInfoBuilder {
   /// Build the movie title.
+
   static Widget buildTitle(BuildContext context, Movie movie) {
     return Text(
       movie.title,
@@ -25,6 +27,7 @@ class MovieInfoBuilder {
   }
 
   /// Get content type text and color.
+
   static Map<String, dynamic> getContentTypeInfo(Movie movie) {
     final isTV = movie.contentType == ContentType.tvShow;
     return {
@@ -34,6 +37,7 @@ class MovieInfoBuilder {
   }
 
   /// Get formatted release date.
+
   static String getFormattedReleaseDate(Movie movie) {
     try {
       final year = movie.releaseDate.year;
@@ -44,6 +48,7 @@ class MovieInfoBuilder {
   }
 
   /// Get shared by text from shared movie data.
+
   static String getSharedByText(Map<String, dynamic>? sharedMovieData) {
     if (sharedMovieData == null) return 'someone';
 
@@ -55,7 +60,8 @@ class MovieInfoBuilder {
     }
 
     if (sharedByWebId != null && sharedByWebId.isNotEmpty) {
-      // Extract friendly name from WebID
+      // Extract friendly name from WebID.
+
       final match = RegExp(r'://[^/]+/([^/]+)/').firstMatch(sharedByWebId);
       if (match != null) {
         return match.group(1) ?? 'someone';

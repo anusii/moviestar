@@ -14,8 +14,10 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/shared/widgets/kanban/board_controller.dart';
 
 /// Static helper class for showing messages during kanban operations.
+
 class MessageHelpers {
   /// Show removal success message.
+
   static void showRemovalMessage(
     BuildContext context,
     Movie movie,
@@ -34,8 +36,8 @@ class MessageHelpers {
       case KanbanColumnType.customList:
         message = 'Removed "${movie.title}" from custom list';
         break;
-      case KanbanColumnType.popular:
-        return; // Can't remove from popular
+      case KanbanColumnType.recommended:
+        return; // Can't remove from recommended
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -44,6 +46,7 @@ class MessageHelpers {
   }
 
   /// Show success message for context menu actions.
+
   static void showSuccessMessage(
     BuildContext context,
     String action,
@@ -62,6 +65,7 @@ class MessageHelpers {
   }
 
   /// Show error message for failed operations.
+
   static void showErrorMessage(
     BuildContext context,
     String action,
@@ -80,6 +84,7 @@ class MessageHelpers {
   }
 
   /// Generate operation description for queue tracking.
+
   static String generateOperationDescription(
     Movie movie,
     String targetName,
@@ -91,6 +96,7 @@ class MessageHelpers {
   }
 
   /// Convert success message to operation description for queue.
+
   static String successMessageToOperation(String successMessage) {
     return successMessage
         .replaceFirst('Added', 'Adding')

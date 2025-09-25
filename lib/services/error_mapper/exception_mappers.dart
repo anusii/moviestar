@@ -13,14 +13,17 @@ import 'package:moviestar/models/app_error.dart';
 import 'package:moviestar/utils/network_client.dart';
 
 /// Handles mapping of specific exception types to user-friendly errors.
+
 class ExceptionMappers {
   /// Maps NetworkException to user-friendly error.
+
   static UserFriendlyError mapNetworkException(
     NetworkException error,
     StackTrace stackTrace,
     List<ErrorAction> actions,
   ) {
-    // Analyze status code to determine error type and actions
+    // Analyze status code to determine error type and actions.
+
     if (error.statusCode == 401) {
       return UserFriendlyError.apiKeyError(
         actions: actions,
@@ -57,6 +60,7 @@ class ExceptionMappers {
   }
 
   /// Maps HTTP ClientException to user-friendly error.
+
   static UserFriendlyError mapHttpClientException(
     http.ClientException error,
     StackTrace stackTrace,
@@ -70,6 +74,7 @@ class ExceptionMappers {
   }
 
   /// Maps SocketException to user-friendly error.
+
   static UserFriendlyError mapSocketException(
     SocketException error,
     StackTrace stackTrace,
@@ -83,6 +88,7 @@ class ExceptionMappers {
   }
 
   /// Maps FormatException to user-friendly error.
+
   static UserFriendlyError mapFormatException(
     FormatException error,
     StackTrace stackTrace,
@@ -96,6 +102,7 @@ class ExceptionMappers {
   }
 
   /// Maps TimeoutException to user-friendly error.
+
   static UserFriendlyError mapTimeoutException(
     TimeoutException error,
     StackTrace stackTrace,
@@ -109,6 +116,7 @@ class ExceptionMappers {
   }
 
   /// Maps unknown exceptions to user-friendly error.
+
   static UserFriendlyError mapUnknownException(
     Object error,
     StackTrace stackTrace,
@@ -123,6 +131,7 @@ class ExceptionMappers {
 }
 
 /// Custom TimeoutException for timeout scenarios.
+
 class TimeoutException implements Exception {
   final String message;
 

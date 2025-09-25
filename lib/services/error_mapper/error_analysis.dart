@@ -10,8 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:moviestar/models/app_error.dart';
 
 /// Handles error text analysis and error creation from strings.
+
 class ErrorAnalysis {
   /// Analyzes error text to detect specific patterns and suggest appropriate error types.
+
   static ErrorType analyzeErrorText(String errorText) {
     final lowerText = errorText.toLowerCase();
 
@@ -50,6 +52,7 @@ class ErrorAnalysis {
   }
 
   /// Creates a user-friendly error from a raw error string (fallback method).
+
   static UserFriendlyError fromErrorString(
     String errorText, {
     VoidCallback? onRetry,
@@ -62,7 +65,8 @@ class ErrorAnalysis {
     final errorType = analyzeErrorText(errorText);
     final actions = <ErrorAction>[];
 
-    // Add common actions based on error type
+    // Add common actions based on error type.
+
     switch (errorType) {
       case ErrorType.apiKeyError:
         if (onConfigureApiKey != null) {

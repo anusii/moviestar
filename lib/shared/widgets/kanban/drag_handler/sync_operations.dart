@@ -18,8 +18,10 @@ import 'drop_operations.dart';
 import 'message_helpers.dart';
 
 /// Static helper class for background sync operations.
+
 class SyncOperations {
   /// Background sync operation for drop actions.
+
   static Future<void> syncDropOperation(
     FavoritesService favoritesService,
     KanbanBoardController controller,
@@ -31,13 +33,15 @@ class SyncOperations {
   ) async {
     controller.updateQueueStatus(operationId, OperationStatus.inProgress);
     try {
-      // Ensure movie file exists before adding to user lists
+      // Ensure movie file exists before adding to user lists.
+
       await DropOperations.ensureMovieFileExists(
         favoritesService,
         dragData.movie,
       );
 
-      // Add to target list
+      // Add to target list.
+
       await DropOperations.addToTargetList(
         favoritesService,
         dragData.movie,
@@ -45,7 +49,8 @@ class SyncOperations {
         targetId,
       );
 
-      // Only remove from source if it's a move operation (not from Popular)
+      // Only remove from source if it's a move operation (not from Recommended).
+
       if (!isCopyOperation) {
         await DropOperations.removeFromSourceList(
           favoritesService,
@@ -55,7 +60,8 @@ class SyncOperations {
         );
       }
 
-      // Clear optimistic state and update queue status
+      // Clear optimistic state and update queue status.
+
       DropOperations.clearOptimisticState(
         controller,
         dragData,
@@ -65,7 +71,8 @@ class SyncOperations {
       );
       controller.updateQueueStatus(operationId, OperationStatus.completed);
     } catch (e) {
-      // Revert optimistic updates on error
+      // Revert optimistic updates on error.
+
       DropOperations.markSyncErrors(
         controller,
         dragData,
@@ -78,6 +85,7 @@ class SyncOperations {
   }
 
   /// Background sync for context menu actions.
+
   static Future<void> syncContextMenuAction(
     BuildContext context,
     FavoritesService favoritesService,
@@ -94,7 +102,8 @@ class SyncOperations {
   ) async {
     controller.updateQueueStatus(operationId, OperationStatus.inProgress);
     try {
-      // Ensure movie file exists for copy operations (especially from Popular)
+      // Ensure movie file exists for copy operations (especially from Recommended).
+
       if (action != 'remove') {
         await DropOperations.ensureMovieFileExists(favoritesService, movie);
       }
@@ -118,7 +127,8 @@ class SyncOperations {
           }
           break;
         default:
-          // Handle custom list copy operations
+          // Handle custom list copy operations.
+
           if (action.startsWith('copy_custom_')) {
             final listId = action.substring('copy_custom_'.length);
             await favoritesService.addMovieToCustomList(
@@ -129,7 +139,8 @@ class SyncOperations {
           }
       }
 
-      // Clear optimistic state and update queue status
+      // Clear optimistic state and update queue status.
+
       if (targetType != null && targetListId != null) {
         controller.clearOptimisticState(targetType, targetListId, movie.id);
       }
@@ -138,7 +149,8 @@ class SyncOperations {
       }
       controller.updateQueueStatus(operationId, OperationStatus.completed);
 
-      // Show success message (except for remove, which is handled above)
+      // Show success message (except for remove, which is handled above).
+
       if (action != 'remove') {
         if (context.mounted) {
           MessageHelpers.showSuccessMessage(
@@ -152,7 +164,8 @@ class SyncOperations {
         }
       }
     } catch (e) {
-      // Revert optimistic updates on error
+      // Revert optimistic updates on error.
+
       if (targetType != null && targetListId != null) {
         controller.markSyncError(targetType, targetListId, movie.id);
       }
@@ -162,7 +175,8 @@ class SyncOperations {
 
       controller.updateQueueStatus(operationId, OperationStatus.failed);
 
-      // Show error message
+      // Show error message.
+
       if (context.mounted) {
         MessageHelpers.showErrorMessage(context, action, movie);
       }

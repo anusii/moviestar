@@ -31,80 +31,104 @@ import 'package:moviestar/widgets/error_display_widget.dart';
 
 /// Base screen widget that provides common functionality for all screens.
 ///
-/// This widget eliminates boilerplate by providing:.
+/// This widget eliminates boilerplate by providing:
 /// - Consistent Scaffold structure with themed AppBar.
 /// - Built-in loading overlay functionality.
 /// - Error display integration.
 /// - RefreshIndicator support.
 /// - Navigation safety.
+
 class BaseScreen extends StatelessWidget {
   /// The title to display in the AppBar.
+
   final String? title;
 
   /// Custom title widget to display instead of text title.
+
   final Widget? titleWidget;
 
   /// The main body content of the screen.
+
   final Widget body;
 
   /// Whether to show a loading overlay.
+
   final bool isLoading;
 
   /// Custom loading widget to show instead of default CircularProgressIndicator.
+
   final Widget? loadingWidget;
 
   /// Error message to display if there's an error state.
+
   final String? error;
 
   /// Callback when error retry button is tapped.
+
   final VoidCallback? onErrorRetry;
 
   /// Whether to enable pull-to-refresh functionality.
+
   final bool enableRefresh;
 
   /// Callback when pull-to-refresh is triggered.
+
   final Future<void> Function()? onRefresh;
 
   /// Custom actions to show in the AppBar.
+
   final List<Widget>? actions;
 
   /// Custom leading widget for the AppBar.
+
   final Widget? leading;
 
   /// Whether to automatically add a back button if applicable.
+
   final bool automaticallyImplyLeading;
 
   /// Background color of the AppBar.
+
   final Color? appBarBackgroundColor;
 
   /// Foreground color of the AppBar.
+
   final Color? appBarForegroundColor;
 
   /// Elevation of the AppBar.
+
   final double? appBarElevation;
 
   /// Whether to show the AppBar.
+
   final bool showAppBar;
 
   /// Bottom widget for the AppBar.
+
   final PreferredSizeWidget? appBarBottom;
 
   /// Background color of the screen body.
+
   final Color? backgroundColor;
 
   /// Floating action button for the screen.
+
   final Widget? floatingActionButton;
 
   /// Bottom navigation bar or persistent bottom widget.
+
   final Widget? bottomNavigationBar;
 
   /// Drawer widget.
+
   final Widget? drawer;
 
   /// End drawer widget.
+
   final Widget? endDrawer;
 
   /// Creates a new [BaseScreen].
+
   const BaseScreen({
     super.key,
     this.title,
@@ -138,14 +162,16 @@ class BaseScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget content = body;
 
-    // Wrap with error display if there's an error
+    // Wrap with error display if there's an error.
+
     if (error != null) {
       content = ErrorDisplayWidget(
         message: error!,
         onRetry: onErrorRetry,
       );
     } else {
-      // Wrap with RefreshIndicator if enabled
+      // Wrap with RefreshIndicator if enabled.
+
       if (enableRefresh && onRefresh != null) {
         content = RefreshIndicator(
           onRefresh: onRefresh!,
@@ -171,6 +197,7 @@ class BaseScreen extends StatelessWidget {
   }
 
   /// Builds the AppBar with consistent theming.
+
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       title: titleWidget ?? (title != null ? Text(title!) : null),
@@ -187,6 +214,7 @@ class BaseScreen extends StatelessWidget {
   }
 
   /// Builds the loading overlay.
+
   Widget _buildLoadingOverlay(BuildContext context) {
     return Container(
       color: Colors.black.withValues(alpha: 0.3),
@@ -218,8 +246,10 @@ class BaseScreen extends StatelessWidget {
 }
 
 /// Convenient factory constructors for common screen patterns.
+
 class BaseScreenFactory {
   /// Creates a BaseScreen with a search bar as the title.
+
   static BaseScreen withSearchBar({
     Key? key,
     required Widget body,
@@ -243,7 +273,8 @@ class BaseScreenFactory {
           final colorScheme = theme.colorScheme;
           final appBarTheme = theme.appBarTheme;
 
-          // Use app bar's foreground color, falling back to onSurface
+          // Use app bar's foreground color, falling back to onSurface.
+
           final textColor =
               appBarTheme.foregroundColor ?? colorScheme.onSurface;
 
@@ -282,6 +313,7 @@ class BaseScreenFactory {
   }
 
   /// Creates a BaseScreen with a settings-style layout.
+
   static BaseScreen forSettings({
     Key? key,
     String title = 'Settings',

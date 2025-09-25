@@ -12,26 +12,34 @@ import 'package:moviestar/core/services/network/connectivity_service.dart';
 import 'package:moviestar/models/app_error.dart';
 
 /// Context for error mapping operations.
+
 class ErrorContext {
   /// Optional retry callback.
+
   final VoidCallback? onRetry;
 
   /// Optional callback to navigate to API key configuration.
+
   final VoidCallback? onConfigureApiKey;
 
   /// Optional callback to navigate to network settings.
+
   final VoidCallback? onNetworkSettings;
 
   /// Optional callback to contact support.
+
   final VoidCallback? onContactSupport;
 
   /// Optional callback to dismiss the error.
+
   final VoidCallback? onDismiss;
 
   /// API key validation service for smart detection.
+
   final ApiKeyValidationService? apiKeyValidationService;
 
   /// Network connectivity service for smart detection.
+
   final NetworkConnectivityService? networkConnectivityService;
 
   const ErrorContext({
@@ -46,17 +54,21 @@ class ErrorContext {
 }
 
 /// Handles smart error detection and validation.
+
 class SmartErrorDetection {
   /// Maps a technical error to a user-friendly error with smart detection.
   /// This version performs async API key and network validation for better accuracy.
+
   static Future<UserFriendlyError> mapErrorSmart(
     Object error,
     StackTrace stackTrace, {
     ErrorContext? context = const ErrorContext(),
   }) async {
-    // Step 1: Check if this is clearly an API key error based on error content
+    // Step 1: Check if this is clearly an API key error based on error content.
+
     if (ApiKeyValidationService.isApiKeyError(error)) {
-      // Verify API key status if service is available
+      // Verify API key status if service is available.
+
       if (context?.apiKeyValidationService != null) {
         try {
           final apiKeyResult =
@@ -65,14 +77,16 @@ class SmartErrorDetection {
             return _createApiKeyError(error, stackTrace, context, apiKeyResult);
           }
         } catch (e) {
-          // If API key validation fails, fall back to error-based detection
+          // If API key validation fails, fall back to error-based detection.
         }
       }
-      // Fallback to error-based API key detection
+      // Fallback to error-based API key detection.
+
       return _mapApiKeyError(error, stackTrace, context);
     }
 
-    // Step 2: Check network connectivity if this seems like a network error
+    // Step 2: Check network connectivity if this seems like a network error.
+
     if (NetworkConnectivityService.isNetworkError(error) &&
         context?.networkConnectivityService != null) {
       try {
@@ -80,7 +94,8 @@ class SmartErrorDetection {
             await context!.networkConnectivityService!.quickCheck();
 
         if (connectivityResult.isNetworkProblem) {
-          // Definitive network problem
+          // Definitive network problem.
+
           return _createNetworkError(
             error,
             stackTrace,
@@ -88,17 +103,20 @@ class SmartErrorDetection {
             connectivityResult,
           );
         } else if (connectivityResult.isInconclusive) {
-          // Network check failed, might still be network issue
+          // Network check failed, might still be network issue.
+
           return _mapPossibleNetworkError(error, stackTrace, context);
         }
-        // If network is fine, continue with other checks
+        // If network is fine, continue with other checks.
       } catch (e) {
-        // If network check fails, assume it could be a network issue
+        // If network check fails, assume it could be a network issue.
+
         return _mapPossibleNetworkError(error, stackTrace, context);
       }
     }
 
-    // Step 3: Double-check API key if network seems fine but we have auth-like errors
+    // Step 3: Double-check API key if network seems fine but we have auth-like errors.
+
     if (context?.apiKeyValidationService != null &&
         _couldBeApiKeyIssue(error)) {
       try {
@@ -108,15 +126,17 @@ class SmartErrorDetection {
           return _createApiKeyError(error, stackTrace, context, apiKeyResult);
         }
       } catch (e) {
-        // If API key validation fails, continue with traditional mapping
+        // If API key validation fails, continue with traditional mapping.
       }
     }
 
-    // Step 4: Should not reach here - caller should handle fallback
+    // Step 4: Should not reach here - caller should handle fallback.
+
     throw Exception('Smart detection failed, fallback required');
   }
 
   /// Checks if an error could potentially be an API key issue.
+
   static bool _couldBeApiKeyIssue(Object error) {
     final errorString = error.toString().toLowerCase();
     return errorString.contains('401') ||
@@ -127,6 +147,7 @@ class SmartErrorDetection {
   }
 
   /// Creates an API key error with enhanced context.
+
   static UserFriendlyError _createApiKeyError(
     Object error,
     StackTrace stackTrace,
@@ -174,6 +195,7 @@ class SmartErrorDetection {
   }
 
   /// Creates a network error with enhanced context.
+
   static UserFriendlyError _createNetworkError(
     Object error,
     StackTrace stackTrace,
@@ -211,6 +233,7 @@ class SmartErrorDetection {
   }
 
   /// Maps a possible network error when connectivity check is inconclusive.
+
   static UserFriendlyError _mapPossibleNetworkError(
     Object error,
     StackTrace stackTrace,
@@ -239,6 +262,7 @@ class SmartErrorDetection {
   }
 
   /// Maps errors that are likely API key issues (fallback method).
+
   static UserFriendlyError _mapApiKeyError(
     Object error,
     StackTrace stackTrace,

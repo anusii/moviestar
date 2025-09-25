@@ -18,8 +18,10 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/shared/widgets/kanban/board_controller.dart';
 
 /// Static helper class for building context menus.
+
 class ContextMenuBuilder {
   /// Build context menu items based on current movie location.
+
   static List<PopupMenuEntry<String>> buildContextMenuItems(
     BuildContext context,
     Movie movie,
@@ -29,7 +31,8 @@ class ContextMenuBuilder {
   ) {
     final items = <PopupMenuEntry<String>>[];
 
-    // Add "Copy to..." options
+    // Add "Copy to..." options.
+
     if (sourceType != KanbanColumnType.toWatch) {
       items.add(
         const PopupMenuItem(
@@ -60,9 +63,11 @@ class ContextMenuBuilder {
       );
     }
 
-    // Add custom list options
+    // Add custom list options.
+
     for (final customList in customLists) {
-      // Skip if the movie is already in this custom list
+      // Skip if the movie is already in this custom list.
+
       if (sourceType == KanbanColumnType.customList &&
           sourceId == customList.id) {
         continue;
@@ -87,8 +92,9 @@ class ContextMenuBuilder {
       );
     }
 
-    // Add divider before remove option (only for non-Popular movies)
-    if (sourceType != KanbanColumnType.popular) {
+    // Add divider before remove option (only for non-Recommended movies).
+
+    if (sourceType != KanbanColumnType.recommended) {
       if (items.isNotEmpty) {
         items.add(const PopupMenuDivider());
       }
@@ -116,6 +122,7 @@ class ContextMenuBuilder {
   }
 
   /// Parse context menu action to determine target details.
+
   static ContextMenuAction parseAction(String action) {
     String? targetListId;
     KanbanColumnType? targetType;
@@ -152,6 +159,7 @@ class ContextMenuBuilder {
 }
 
 /// Data class for context menu action details.
+
 class ContextMenuAction {
   final KanbanColumnType? targetType;
   final String? targetListId;

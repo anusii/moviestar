@@ -21,19 +21,19 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
 import 'package:flutter/material.dart';
 
+import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/services/favorites_service.dart';
 
 /// Navigates to the movie details screen with the specified movie.
 ///
-/// This centralizes the navigation logic for movie details, ensuring
+/// This centralizes the navigation logic for movie details, ensuring.
 /// consistent behavior across the app.
 Future<void> navigateToMovieDetails(
   BuildContext context,

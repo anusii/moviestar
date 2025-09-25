@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Software Innovation Institute
+/// Authors: Software Innovation Institute.
 
 library;
 
@@ -27,7 +27,42 @@ import 'package:solidpod/solidpod.dart' show SolidFunctionCallStatus;
 // ignore: implementation_imports
 import 'package:solidpod/src/solid/constants/web_acl.dart' show RecipientType;
 
-/// Request model for sharing a file
+import 'package:moviestar/models/movie.dart';
+
+/// Represents a file that can be shared with permissions.
+class ShareableFile {
+  final String fileName;
+  final String displayName;
+  final String fileType;
+  final List<String> permissions;
+  final Movie? movie;
+
+  const ShareableFile({
+    required this.fileName,
+    required this.displayName,
+    required this.fileType,
+    required this.permissions,
+    this.movie,
+  });
+
+  ShareableFile copyWith({
+    String? fileName,
+    String? displayName,
+    String? fileType,
+    List<String>? permissions,
+    Movie? movie,
+  }) {
+    return ShareableFile(
+      fileName: fileName ?? this.fileName,
+      displayName: displayName ?? this.displayName,
+      fileType: fileType ?? this.fileType,
+      permissions: permissions ?? this.permissions,
+      movie: movie ?? this.movie,
+    );
+  }
+}
+
+/// Request model for sharing a file.
 class ShareRequest {
   final String fileName;
   final String displayName;
@@ -46,7 +81,7 @@ class ShareRequest {
   });
 }
 
-/// Result model for sharing operations
+/// Result model for sharing operations.
 class ShareResult {
   final bool success;
   final String? error;
@@ -80,7 +115,7 @@ class ShareResult {
   }
 }
 
-/// Request model for batch sharing
+/// Request model for batch sharing.
 class BatchShareRequest {
   final List<ShareRequest> requests;
   final String recipientWebId;
@@ -93,7 +128,7 @@ class BatchShareRequest {
   });
 }
 
-/// Result model for batch sharing operations
+/// Result model for batch sharing operations.
 class BatchShareResult {
   final List<ShareResult> results;
   final int successCount;
@@ -107,7 +142,7 @@ class BatchShareResult {
         allSuccessful = results.every((r) => r.success);
 }
 
-/// Permission request model
+/// Permission request model.
 class PermissionRequest {
   final String fileName;
   final String webId;
@@ -122,7 +157,7 @@ class PermissionRequest {
   });
 }
 
-/// Permission result model
+/// Permission result model.
 class PermissionResult {
   final bool granted;
   final String? error;

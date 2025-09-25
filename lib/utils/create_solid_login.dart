@@ -2,11 +2,11 @@
 //
 // Time-stamp: <Wednesday 2025-07-23 16:57:13 +1000 Graham Williams>
 //
-/// Copyright (C) 2025, Software Innovation Institute, ANU
+/// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
-/// Licensed under the GNU General Public License, Version 3 (the "License");
+/// Licensed under the GNU General Public License, Version 3 (the "License");.
 ///
-/// License: https://www.gnu.org/licenses/gpl-3.0.en.html
+/// License: https://www.gnu.org/licenses/gpl-3.0.en.html.
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -35,14 +35,14 @@ import 'package:moviestar/my_home_page.dart';
 
 /// Creates a Solid login widget for authentication.
 ///
-/// This is a simplified version that provides a standard Solid authentication
+/// This is a simplified version that provides a standard Solid authentication.
 /// interface for applications that need to connect to Solid PODs.
 ///
-/// Parameters:
-///   context: BuildContext for widget creation
-///   prefs: SharedPreferences for accessing user preferences
+/// Parameters:.
+///   context: BuildContext for widget creation.
+///   prefs: SharedPreferences for accessing user preferences.
 ///
-/// Returns:
+/// Returns:.
 ///   A Widget configured for Solid authentication.
 
 Widget createSolidLogin(BuildContext context, SharedPreferences prefs) {
@@ -98,7 +98,7 @@ Widget _buildNormalLogin(String serverUrl, SharedPreferences prefs) {
   );
 }
 
-/// A wrapper widget that checks if the API key is set and shows a dialog if not
+/// A wrapper widget that checks if the API key is set and shows a dialog if not.
 class ApiKeyCheckWrapper extends StatefulWidget {
   final Widget child;
   final SharedPreferences prefs;

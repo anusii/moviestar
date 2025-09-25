@@ -19,11 +19,11 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Software Innovation Institute
+/// Authors: Software Innovation Institute.
 
 library;
 
 // Export all sharing widget components for backwards compatibility
-export 'package:moviestar/widgets/sharing/sharing_components.dart';
-export 'package:moviestar/widgets/sharing/sharing_form_widgets.dart';
-export 'package:moviestar/widgets/sharing/sharing_display_widgets.dart';
+export 'package:moviestar/widgets/sharing/components.dart';
+export 'package:moviestar/widgets/sharing/form_widgets.dart';
+export 'package:moviestar/widgets/sharing/display_widgets.dart';

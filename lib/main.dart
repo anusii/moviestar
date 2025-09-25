@@ -1,4 +1,4 @@
-/// Moviestar - Manage and share ratings through private PODs
+/// Moviestar - Manage and share ratings through private PODs.
 ///
 // Time-stamp: <Wednesday 2025-07-23 16:55:28 +1000 Graham Williams>
 ///
@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang, Graham Williams, Ashley Tang
+/// Authors: Kevin Wang, Graham Williams, Ashley Tang.
 
 library;
 
@@ -32,12 +32,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'package:moviestar/core/services/cache/settings_service.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/theme_provider.dart';
-import 'package:moviestar/services/cache_settings_service.dart';
 import 'package:moviestar/utils/is_desktop.dart';
 
 /// Main entry point for the Movie Star application.
@@ -65,12 +65,6 @@ void main() async {
   Hive.registerAdapter(CustomListAdapter());
   Hive.registerAdapter(ContentItemAdapter());
   Hive.registerAdapter(ContentTypeAdapter());
-
-  // Globally remove [debugPrint] messages.
-
-  // debugPrint = (String? message, {int? wrapWidth}) {
-  //   null;
-  // };
 
   // Ensure Flutter bindings are initialized for async operations
 

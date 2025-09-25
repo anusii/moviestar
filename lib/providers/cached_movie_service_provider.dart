@@ -25,105 +25,67 @@
 
 library;
 
-import 'package:flutter/foundation.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:solidpod/solidpod.dart' show getWebId;
 
-import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/services/api_key_service.dart';
-import 'package:moviestar/services/cache_settings_service.dart';
-import 'package:moviestar/services/cached_movie_service.dart';
-import 'package:moviestar/services/content_service.dart';
-import 'package:moviestar/services/hive_movie_cache_service.dart';
-import 'package:moviestar/services/movie_service.dart';
+import 'package:moviestar/core/services/api/content_service.dart';
+import 'package:moviestar/core/services/api/key_service.dart';
+import 'package:moviestar/core/services/api/movie_service.dart';
+import 'package:moviestar/core/services/cache/cached_movie_service.dart';
+import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
+import 'package:moviestar/core/services/cache/settings_service.dart';
+import 'package:moviestar/providers/cached_movie_service_provider/direct_movie_service.dart';
+import 'package:moviestar/providers/cached_movie_service_provider/state_notifiers.dart';
 
-/// StateNotifier for managing caching enabled setting with persistence.
-
-class CachingEnabledNotifier extends StateNotifier<bool> {
-  final CacheSettingsService _settingsService;
-
-  CachingEnabledNotifier(this._settingsService) : super(true) {
-    _init();
-  }
-
-  Future<void> _init() async {
-    await _settingsService.initialize();
-    if (!mounted) return;
-    state = _settingsService.cachingEnabled;
-  }
-
-  Future<void> setCachingEnabled(bool enabled) async {
-    await _settingsService.setCachingEnabled(enabled);
-    if (!mounted) return;
-    state = enabled;
-  }
-}
-
-/// StateNotifier for managing offline mode setting with persistence.
-
-class CacheOnlyModeNotifier extends StateNotifier<bool> {
-  final CacheSettingsService _settingsService;
-
-  CacheOnlyModeNotifier(this._settingsService) : super(false) {
-    _init();
-  }
-
-  Future<void> _init() async {
-    await _settingsService.initialize();
-    if (!mounted) return;
-    state = _settingsService.cacheOnlyMode;
-  }
-
-  Future<void> setCacheOnlyMode(bool enabled) async {
-    await _settingsService.setCacheOnlyMode(enabled);
-    if (!mounted) return;
-    state = enabled;
-  }
-}
-
-/// StateNotifier for managing API key state and changes.
-
-class ApiKeyNotifier extends StateNotifier<String?> {
-  final ApiKeyService _apiKeyService;
-
-  ApiKeyNotifier(this._apiKeyService) : super(null) {
-    _init();
-    // Listen for API key changes.
-
-    _apiKeyService.addListener(_onApiKeyChanged);
-  }
-
-  Future<void> _init() async {
-    final apiKey = await _apiKeyService.getApiKey();
-    if (!mounted) return;
-    state = apiKey;
-  }
-
-  void _onApiKeyChanged() async {
-    if (!mounted) return;
-    try {
-      final apiKey = await _apiKeyService.getApiKey();
-      if (!mounted) return;
-      state = apiKey;
-    } catch (e) {
-      if (mounted) {
-        debugPrint('Error in ApiKeyNotifier._onApiKeyChanged: $e');
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _apiKeyService.removeListener(_onApiKeyChanged);
-    super.dispose();
-  }
-}
+// Re-export the extracted classes for backward compatibility
+export 'package:moviestar/providers/cached_movie_service_provider/direct_movie_service.dart';
+export 'package:moviestar/providers/cached_movie_service_provider/provider_definitions.dart';
+export 'package:moviestar/providers/cached_movie_service_provider/state_notifiers.dart';
 
 /// Provider for the API key service.
 /// Note: Context needs to be set manually via updateContext() for POD operations.
 
-final apiKeyServiceProvider = Provider<ApiKeyService>((ref) {
-  return ApiKeyService();
+final apiKeyServiceProvider = Provider<ApiKeyService?>((ref) {
+  // ApiKeyService requires BuildContext and Widget, so return null here
+  // Services should create their own instance with proper context
+  return null;
+});
+
+/// Direct API key provider that accesses secure storage without service dependency
+final directApiKeyProvider = FutureProvider<String?>((ref) async {
+  try {
+    const storage = FlutterSecureStorage(
+      aOptions: AndroidOptions(),
+      iOptions: IOSOptions(
+        accessibility: KeychainAccessibility.first_unlock_this_device,
+      ),
+      mOptions: MacOsOptions(synchronizable: false),
+    );
+
+    // Try multiple storage keys to find the API key
+    String? apiKey;
+
+    // Try user-specific key first (current approach)
+    try {
+      final webId = await getWebId();
+      if (webId != null && webId.isNotEmpty) {
+        final userKey = 'user_api_key_$webId';
+        apiKey = await storage.read(key: userKey);
+      }
+    } catch (e) {
+      // Failed to read API key from storage
+    }
+
+    // Try legacy key if user key not found
+    if (apiKey == null || apiKey.isEmpty) {
+      apiKey = await storage.read(key: 'movie_db_api_key');
+    }
+
+    return apiKey;
+  } catch (e) {
+    return null;
+  }
 });
 
 /// Provider for the API key state that watches for changes.
@@ -133,18 +95,17 @@ final apiKeyProvider = StateNotifierProvider<ApiKeyNotifier, String?>((ref) {
   return ApiKeyNotifier(apiKeyService);
 });
 
-/// Provider for the movie service.
+/// Provider for the movie service using direct API key access.
 
-final movieServiceProvider = Provider<MovieService>((ref) {
-  final apiKeyService = ref.watch(apiKeyServiceProvider);
-  // Watch the API key to trigger recreation when it changes.
+final movieServiceProvider = Provider.autoDispose<MovieService>((ref) {
+  // Watch the direct API key to trigger recreation when it changes.
+  final apiKeyAsync = ref.watch(directApiKeyProvider);
+  final apiKey = apiKeyAsync.valueOrNull;
 
-  ref.watch(apiKeyProvider);
-
-  final movieService = MovieService(apiKeyService);
+  // Create a DirectMovieService that uses the API key directly
+  final movieService = DirectMovieService(apiKey);
 
   // Ensure proper disposal.
-
   ref.onDispose(() {
     movieService.dispose();
   });
@@ -164,6 +125,23 @@ final contentServiceProvider = Provider<ContentService>((ref) {
 
   // Ensure proper disposal.
 
+  ref.onDispose(() {
+    contentService.dispose();
+  });
+
+  return contentService;
+});
+
+/// Direct provider for the content service that uses the direct API key.
+
+final directContentServiceProvider =
+    FutureProvider<ContentService>((ref) async {
+  final apiKey = await ref.watch(directApiKeyProvider.future);
+
+  // Use the new constructor that accepts API key directly
+  final contentService = ContentService.withApiKey(apiKey);
+
+  // Ensure proper disposal.
   ref.onDispose(() {
     contentService.dispose();
   });
@@ -230,28 +208,6 @@ final cachingEnabledProvider =
   return CachingEnabledNotifier(settingsService);
 });
 
-/// StateNotifier for managing local API key caching setting with persistence.
-
-class LocalApiKeyCachingNotifier extends StateNotifier<bool> {
-  final CacheSettingsService _settingsService;
-
-  LocalApiKeyCachingNotifier(this._settingsService) : super(false) {
-    _init();
-  }
-
-  Future<void> _init() async {
-    await _settingsService.initialize();
-    if (!mounted) return;
-    state = _settingsService.localApiKeyCachingEnabled;
-  }
-
-  Future<void> setLocalApiKeyCachingEnabled(bool enabled) async {
-    await _settingsService.setLocalApiKeyCachingEnabled(enabled);
-    if (!mounted) return;
-    state = enabled;
-  }
-}
-
 /// Provider for local API key caching state with persistence.
 
 final localApiKeyCachingProvider =
@@ -283,100 +239,4 @@ final configuredCachedMovieServiceProvider =
   });
 
   return cachedService;
-});
-
-/// Provider for popular movies with caching information.
-
-final popularMoviesWithCacheInfoProvider =
-    FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
-  final cachedService = ref.watch(configuredCachedMovieServiceProvider);
-  final apiKey = ref.watch(apiKeyProvider);
-
-  // If no API key is set, return empty result instead of cached content
-  if (apiKey == null || apiKey.trim().isEmpty) {
-    return CacheResult<List<Movie>>(
-      data: <Movie>[],
-      fromCache: false,
-      cacheAge: null,
-    );
-  }
-
-  // Watch cache settings to invalidate when they change.
-  ref.watch(cachingEnabledProvider);
-  ref.watch(cacheOnlyModeProvider);
-  return cachedService.getPopularMoviesWithCacheInfo();
-});
-
-/// Provider for now playing movies with caching information.
-
-final nowPlayingMoviesWithCacheInfoProvider =
-    FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
-  final cachedService = ref.watch(configuredCachedMovieServiceProvider);
-  final apiKey = ref.watch(apiKeyProvider);
-
-  // If no API key is set, return empty result instead of cached content
-  if (apiKey == null || apiKey.trim().isEmpty) {
-    return CacheResult<List<Movie>>(
-      data: <Movie>[],
-      fromCache: false,
-      cacheAge: null,
-    );
-  }
-
-  // Watch cache settings to invalidate when they change.
-  ref.watch(cachingEnabledProvider);
-  ref.watch(cacheOnlyModeProvider);
-  return cachedService.getNowPlayingMoviesWithCacheInfo();
-});
-
-/// Provider for top rated movies with caching information.
-
-final topRatedMoviesWithCacheInfoProvider =
-    FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
-  final cachedService = ref.watch(configuredCachedMovieServiceProvider);
-  final apiKey = ref.watch(apiKeyProvider);
-
-  // If no API key is set, return empty result instead of cached content
-  if (apiKey == null || apiKey.trim().isEmpty) {
-    return CacheResult<List<Movie>>(
-      data: <Movie>[],
-      fromCache: false,
-      cacheAge: null,
-    );
-  }
-
-  // Watch cache settings to invalidate when they change.
-  ref.watch(cachingEnabledProvider);
-  ref.watch(cacheOnlyModeProvider);
-  return cachedService.getTopRatedMoviesWithCacheInfo();
-});
-
-/// Provider for upcoming movies with caching information.
-
-final upcomingMoviesWithCacheInfoProvider =
-    FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
-  final cachedService = ref.watch(configuredCachedMovieServiceProvider);
-  final apiKey = ref.watch(apiKeyProvider);
-
-  // If no API key is set, return empty result instead of cached content
-  if (apiKey == null || apiKey.trim().isEmpty) {
-    return CacheResult<List<Movie>>(
-      data: <Movie>[],
-      fromCache: false,
-      cacheAge: null,
-    );
-  }
-
-  // Watch cache settings to invalidate when they change.
-  ref.watch(cachingEnabledProvider);
-  ref.watch(cacheOnlyModeProvider);
-  return cachedService.getUpcomingMoviesWithCacheInfo();
-});
-
-/// Provider for cache statistics.
-
-final cacheStatsProvider =
-    FutureProvider<Map<CacheCategory, Map<String, dynamic>>>((ref) async {
-  final cachedService = ref.watch(configuredCachedMovieServiceProvider);
-  return await cachedService.getCacheStats();
 });

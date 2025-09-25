@@ -19,22 +19,22 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Software Innovation Institute
+/// Authors: Software Innovation Institute.
 
 library;
 
 import 'package:flutter/material.dart';
 
-import 'package:gap/gap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:moviestar/constants/dimensions.dart';
+import 'package:moviestar/core/services/favorites/service_adapter.dart';
+import 'package:moviestar/core/services/favorites/service_manager.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/screens/shared_movie_list_detail_screen.dart';
-import 'package:moviestar/services/favorites_service_adapter.dart';
-import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/widgets/common_sharing_ui.dart';
+import 'package:moviestar/widgets/shared_movies/item_builders.dart';
 
 class ListSharedMovies extends StatefulWidget {
   final Map<String, dynamic>
@@ -83,7 +83,6 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
         );
       }
     } catch (e) {
-      debugPrint('❌ Error sharing movie: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -95,85 +94,145 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
     }
   }
 
-  // Extract owner name from WebID.
+  // Handle navigation for tapped items.
+  Future<void> _handleItemTap({
+    required String resourceUrl,
+    required Map<String, dynamic> itemData,
+  }) async {
+    final movieTitle = itemData['fileName'] ?? 'Unknown Movie';
 
-  String _getOwnerName(String webId) {
     try {
-      final uri = Uri.parse(webId);
-      final pathSegments = uri.pathSegments;
-      if (pathSegments.isNotEmpty) {
-        return pathSegments.first.replaceAll('-', ' ').toUpperCase();
+      if (itemData['type'] == 'movieList') {
+        await _navigateToMovieList(resourceUrl, itemData);
+      } else {
+        await _navigateToMovie(resourceUrl, itemData);
       }
-      return 'Unknown';
     } catch (e) {
-      return 'Unknown';
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error opening: $movieTitle'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
     }
   }
 
-  // Build rating display.
+  // Navigate to movie list detail screen.
+  Future<void> _navigateToMovieList(
+    String resourceUrl,
+    Map<String, dynamic> itemData,
+  ) async {
+    final movieTitle = itemData['fileName'] ?? 'Unknown Movie';
+    final listName = itemData['listName'] ?? movieTitle;
+    final listDescription = itemData['description'] ?? '';
+    final movies =
+        (itemData['movies'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ??
+            <Map<String, dynamic>>[];
+    final owner = itemData['owner'] ?? '';
+    final ownerWebId = itemData['ownerWebId'] ?? '';
+    final sharedBy = itemData['sharedBy'] ?? '';
+    final sharedByWebId = itemData['sharedByWebId'] ?? '';
+    final permissions = itemData['permissions'] ?? 'none';
 
-  Widget _buildRatingDisplay(dynamic rating) {
-    if (rating == null) return const SizedBox.shrink();
-
-    final ratingValue =
-        rating is double ? rating : double.tryParse(rating.toString()) ?? 0.0;
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(Icons.star, color: Colors.amber, size: 16),
-        const Gap(4),
-        Text(
-          ratingValue.toStringAsFixed(1),
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+    if (mounted) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SharedMovieListDetailScreen(
+            listName: listName,
+            listDescription: listDescription,
+            owner: owner,
+            ownerWebId: ownerWebId,
+            sharedBy: sharedBy,
+            sharedByWebId: sharedByWebId,
+            movies: movies,
+            permissions: permissions,
+          ),
         ),
-      ],
-    );
+      );
+    }
   }
 
-  // Build permissions badge.
+  // Navigate to movie details screen.
+  Future<void> _navigateToMovie(
+    String resourceUrl,
+    Map<String, dynamic> itemData,
+  ) async {
+    final movieTitle = itemData['fileName'] ?? 'Unknown Movie';
+    final movieId = int.tryParse(itemData['movieId']?.toString() ?? '0') ?? 0;
+    final posterUrl = itemData['posterUrl'] ?? '';
+    final backdropUrl = itemData['backdropUrl'] ?? posterUrl ?? '';
+    final overview = itemData['overview'] ?? 'Shared movie';
+    final releaseDate =
+        DateTime.tryParse(itemData['releaseDate'] ?? '') ?? DateTime.now();
+    final voteAverage = (itemData['voteAverage'] as num?)?.toDouble() ?? 0.0;
+    final genreIds =
+        (itemData['genreIds'] as List?)?.map((e) => e as int).toList() ??
+            <int>[];
 
-  Widget _buildPermissionsBadge(String permissions) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: permissions.contains('read')
-            ? Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.1)
-            : Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: permissions.contains('read')
-              ? Theme.of(context).colorScheme.tertiary
-              : Theme.of(context).colorScheme.error,
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            permissions.contains('read')
-                ? Icons.visibility
-                : Icons.visibility_off,
-            size: 12,
-            color: permissions.contains('read')
-                ? Theme.of(context).colorScheme.tertiary
-                : Theme.of(context).colorScheme.error,
-          ),
-          const Gap(4),
-          Text(
-            permissions.toUpperCase(),
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: permissions.contains('read')
-                  ? Theme.of(context).colorScheme.tertiary
-                  : Theme.of(context).colorScheme.error,
-            ),
-          ),
-        ],
-      ),
+    final movie = Movie(
+      id: movieId,
+      title: movieTitle,
+      overview: overview,
+      posterUrl: posterUrl,
+      backdropUrl: backdropUrl,
+      voteAverage: voteAverage,
+      releaseDate: releaseDate,
+      genreIds: genreIds,
     );
+
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+
+    final favoritesServiceManager =
+        FavoritesServiceManager(prefs, context, widget);
+    final favoritesService = FavoritesServiceAdapter(favoritesServiceManager);
+
+    if (mounted) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MovieDetailsScreen(
+            movie: movie,
+            favoritesService: favoritesService,
+            sharedMovieData: itemData,
+          ),
+        ),
+      );
+    }
+  }
+
+  // Handle share action for movies.
+  Future<void> _handleShareAction({
+    required String resourceUrl,
+    required Map<String, dynamic> itemData,
+  }) async {
+    final movieTitle = itemData['fileName'] ?? 'Unknown Movie';
+    final movieId = int.tryParse(itemData['movieId']?.toString() ?? '0') ?? 0;
+    final posterUrl = itemData['posterUrl'] ?? '';
+    final backdropUrl = itemData['backdropUrl'] ?? posterUrl ?? '';
+    final overview = itemData['overview'] ?? 'My rated movie';
+    final releaseDate =
+        DateTime.tryParse(itemData['releaseDate'] ?? '') ?? DateTime.now();
+    final voteAverage = (itemData['voteAverage'] as num?)?.toDouble() ?? 0.0;
+    final genreIds =
+        (itemData['genreIds'] as List?)?.map((e) => e as int).toList() ??
+            <int>[];
+
+    final movie = Movie(
+      id: movieId,
+      title: movieTitle,
+      overview: overview,
+      posterUrl: posterUrl,
+      backdropUrl: backdropUrl,
+      voteAverage: voteAverage,
+      releaseDate: releaseDate,
+      genreIds: genreIds,
+    );
+
+    await _shareMovie(movie, resourceUrl);
   }
 
   @override
@@ -220,380 +279,37 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
         final entry = allItems[index];
         final resourceUrl = entry.key;
         final itemData = entry.value;
-
-        final movieTitle = itemData['fileName'] ?? 'Unknown Movie';
-        final owner = itemData['owner'] ?? '';
-        final ownerWebId = itemData['ownerWebId'] ?? '';
-        final sharedBy = itemData['sharedBy'] ?? '';
-        final sharedByWebId = itemData['sharedByWebId'] ?? '';
-        final permissions = itemData['permissions'] ?? 'none';
-        final rating = itemData['rating'];
-        final comments = itemData['comments'] ?? '';
         final isUserRatedMovie = itemData['isUserRatedMovie'] == true;
         final canShare = itemData['canShare'] == true;
 
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(12),
-            onTap: () async {
-              try {
-                // Check if this is a movie list or individual movie
-                if (itemData['type'] == 'movieList') {
-                  // Navigate to SharedMovieListDetailScreen
-                  final listName = itemData['listName'] ?? movieTitle;
-                  final listDescription = itemData['description'] ?? '';
-                  final movies = (itemData['movies'] as List<dynamic>?)
-                          ?.cast<Map<String, dynamic>>() ??
-                      <Map<String, dynamic>>[];
-
-                  if (context.mounted) {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SharedMovieListDetailScreen(
-                          listName: listName,
-                          listDescription: listDescription,
-                          owner: owner,
-                          ownerWebId: ownerWebId,
-                          sharedBy: sharedBy,
-                          sharedByWebId: sharedByWebId,
-                          movies: movies,
-                          permissions: permissions,
-                        ),
-                      ),
-                    );
-                  }
-                } else {
-                  // Handle individual movie navigation
-                  final movieId =
-                      int.tryParse(itemData['movieId']?.toString() ?? '0') ?? 0;
-                  final posterUrl = itemData['posterUrl'] ?? '';
-                  final backdropUrl =
-                      itemData['backdropUrl'] ?? posterUrl ?? '';
-                  final overview = itemData['overview'] ?? 'Shared movie';
-                  final releaseDate =
-                      DateTime.tryParse(itemData['releaseDate'] ?? '') ??
-                          DateTime.now();
-                  final voteAverage =
-                      (itemData['voteAverage'] as num?)?.toDouble() ?? 0.0;
-                  final genreIds = (itemData['genreIds'] as List?)
-                          ?.map((e) => e as int)
-                          .toList() ??
-                      <int>[];
-
-                  final movie = Movie(
-                    id: movieId,
-                    title: movieTitle,
-                    overview: overview,
-                    posterUrl: posterUrl,
-                    backdropUrl: backdropUrl,
-                    voteAverage: voteAverage,
-                    releaseDate: releaseDate,
-                    genreIds: genreIds,
-                  );
-
-                  // Get SharedPreferences and create FavoritesServiceManager.
-                  final prefs = await SharedPreferences.getInstance();
-                  if (!context.mounted) return;
-
-                  final favoritesServiceManager = FavoritesServiceManager(
-                    prefs,
-                    context,
-                    widget,
-                  );
-                  final favoritesService = FavoritesServiceAdapter(
-                    favoritesServiceManager,
-                  );
-
-                  // Navigate to MovieDetailsScreen with shared movie data.
-                  if (context.mounted) {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MovieDetailsScreen(
-                          movie: movie,
-                          favoritesService: favoritesService,
-                          sharedMovieData: itemData,
-                        ),
-                      ),
-                    );
-                  }
-                }
-              } catch (e) {
-                debugPrint('Error navigating: $e');
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error opening: $movieTitle'),
-                      backgroundColor: Theme.of(context).colorScheme.error,
-                    ),
-                  );
-                }
-              }
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header row with movie icon and title.
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          itemData['type'] == 'movieList'
-                              ? Icons.playlist_play
-                              : Icons.movie,
-                          color: Theme.of(context).colorScheme.primary,
-                          size: 24,
-                        ),
-                      ),
-                      const Gap(12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              itemData['type'] == 'movieList'
-                                  ? 'List: ${itemData['listName'] ?? movieTitle}'
-                                  : movieTitle,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            if (itemData['type'] == 'movieList') ...[
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.movie,
-                                    size: 16,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${itemData['movieCount'] ?? 0} movies',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ] else if (rating != null) ...[
-                              const SizedBox(height: 4),
-                              _buildRatingDisplay(rating),
-                            ],
-                          ],
-                        ),
-                      ),
-                      if (isUserRatedMovie && canShare) ...[
-                        IconButton(
-                          onPressed: () async {
-                            // Create Movie object
-                            final movieId = int.tryParse(
-                                  itemData['movieId']?.toString() ?? '0',
-                                ) ??
-                                0;
-                            final posterUrl = itemData['posterUrl'] ?? '';
-                            final backdropUrl =
-                                itemData['backdropUrl'] ?? posterUrl ?? '';
-                            final overview =
-                                itemData['overview'] ?? 'My rated movie';
-                            final releaseDate = DateTime.tryParse(
-                                  itemData['releaseDate'] ?? '',
-                                ) ??
-                                DateTime.now();
-                            final voteAverage =
-                                (itemData['voteAverage'] as num?)?.toDouble() ??
-                                    0.0;
-                            final genreIds = (itemData['genreIds'] as List?)
-                                    ?.map((e) => e as int)
-                                    .toList() ??
-                                <int>[];
-
-                            final movie = Movie(
-                              id: movieId,
-                              title: movieTitle,
-                              overview: overview,
-                              posterUrl: posterUrl,
-                              backdropUrl: backdropUrl,
-                              voteAverage: voteAverage,
-                              releaseDate: releaseDate,
-                              genreIds: genreIds,
-                            );
-
-                            // Use the movie file path from the URL.
-
-                            await _shareMovie(movie, resourceUrl);
-                          },
-                          icon: const Icon(Icons.share),
-                          tooltip: 'Share this movie with others',
-                          style: IconButton.styleFrom(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary.withValues(alpha: 0.1),
-                            foregroundColor:
-                                Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ] else
-                        _buildPermissionsBadge(permissions),
-                    ],
-                  ),
-
-                  // Movie/List details.
-                  if (comments.isNotEmpty ||
-                      (itemData['type'] == 'movieList' &&
-                          itemData['description'] != null &&
-                          itemData['description'].toString().isNotEmpty)) ...[
-                    const Gap(12),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerHighest
-                            .withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.comment,
-                                size: 14,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                              ),
-                              const Gap(4),
-                              Text(
-                                itemData['type'] == 'movieList'
-                                    ? 'Description:'
-                                    : 'Review:',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelSmall
-                                    ?.copyWith(fontWeight: FontWeight.w600),
-                              ),
-                            ],
-                          ),
-                          const Gap(4),
-                          Text(
-                            itemData['type'] == 'movieList'
-                                ? (itemData['description'] ?? '')
-                                : comments,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(fontStyle: FontStyle.italic),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-
-                  const Gap(12),
-
-                  // Sharing info or ownership info.
-                  Row(
-                    children: [
-                      Expanded(
-                        child: isUserRatedMovie
-                            ? const SizedBox.shrink()
-                            : Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.person,
-                                        size: 14,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurfaceVariant,
-                                      ),
-                                      const Gap(4),
-                                      Text(
-                                        'Owner: ${_getOwnerName(owner)}',
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.bodySmall,
-                                      ),
-                                    ],
-                                  ),
-                                  const Gap(2),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.share,
-                                        size: 14,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurfaceVariant,
-                                      ),
-                                      const Gap(4),
-                                      Text(
-                                        'Shared by: ${_getOwnerName(sharedBy)}',
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.bodySmall,
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: isUserRatedMovie
-                              ? Theme.of(
-                                  context,
-                                ).colorScheme.primary.withValues(alpha: 0.1)
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant
-                                  .withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          isUserRatedMovie ? Icons.edit : Icons.visibility,
-                          size: 16,
-                          color: isUserRatedMovie
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+        // Use appropriate builder method based on item type
+        if (itemData['type'] == 'movieList') {
+          return SharedMoviesItemBuilders.buildMovieListItem(
+            context: context,
+            itemData: itemData,
+            resourceUrl: resourceUrl,
+            onTap: () => _handleItemTap(
+              resourceUrl: resourceUrl,
+              itemData: itemData,
             ),
-          ),
-        );
+          );
+        } else {
+          return SharedMoviesItemBuilders.buildMovieItem(
+            context: context,
+            itemData: itemData,
+            resourceUrl: resourceUrl,
+            onTap: () => _handleItemTap(
+              resourceUrl: resourceUrl,
+              itemData: itemData,
+            ),
+            onShare: isUserRatedMovie && canShare
+                ? () => _handleShareAction(
+                      resourceUrl: resourceUrl,
+                      itemData: itemData,
+                    )
+                : () {},
+          );
+        }
       },
     );
   }

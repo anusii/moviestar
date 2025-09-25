@@ -1,4 +1,4 @@
-/// Movie Category Screen - Full list view for a specific category
+/// Movie Category Screen - Full list view for a specific category.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -28,10 +28,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
+import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/services/favorites_service.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 

@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -27,11 +27,11 @@ import 'package:flutter/material.dart';
 
 import 'package:solidpod/solidpod.dart';
 
-import 'package:moviestar/services/api_key_service.dart';
-import 'package:moviestar/services/pod_file_operations_service.dart';
+import 'package:moviestar/core/services/api/key_service.dart';
+import 'package:moviestar/core/services/pod/file_operations_service.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/utils/pod_path_helper.dart';
-import 'package:moviestar/utils/turtle_serializer.dart';
+import 'package:moviestar/utils/serializer.dart';
 
 /// Service for managing user profiles in the POD following the ontology structure.
 
@@ -64,7 +64,6 @@ class UserProfileService {
       final webId = await getWebId();
       return webId;
     } catch (e) {
-      debugPrint('❌ Failed to get current user web ID: $e');
       return null;
     }
   }
@@ -80,13 +79,11 @@ class UserProfileService {
     try {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
-        debugPrint('❌ User not logged in, cannot create profile');
         return false;
       }
 
       final webId = await getCurrentUserWebId();
       if (webId == null) {
-        debugPrint('❌ Could not get Web ID for user');
         return false;
       }
 
@@ -98,8 +95,10 @@ class UserProfileService {
 
       String? actualApiKey = apiKey;
       if (actualApiKey == null) {
-        final apiKeyService = ApiKeyService();
+        if (!_context.mounted) return false;
+        final apiKeyService = ApiKeyService(_context, _child);
         actualApiKey = await apiKeyService.getApiKey();
+        if (!_context.mounted) return false;
       }
 
       // Use existing API key ID if available, otherwise create new one.
@@ -159,10 +158,8 @@ class UserProfileService {
         return true;
       }
 
-      debugPrint('❌ Failed to write profile to POD');
       return false;
     } catch (e) {
-      debugPrint('❌ Exception in create/update user profile: $e');
       return false;
     }
   }
@@ -202,10 +199,8 @@ class UserProfileService {
         return apiKeyId;
       }
 
-      debugPrint('❌ Failed to write API key file to POD');
       return null;
     } catch (e) {
-      debugPrint('❌ Exception creating API key file: $e');
       return null;
     }
   }
@@ -232,7 +227,6 @@ class UserProfileService {
 
       return null;
     } catch (e) {
-      debugPrint('❌ Exception finding existing API key file: $e');
       return null;
     }
   }
@@ -243,7 +237,6 @@ class UserProfileService {
     try {
       final loggedIn = await isLoggedIn();
       if (!loggedIn) {
-        debugPrint('❌ User not logged in, cannot load profile');
         return null;
       }
 
@@ -282,9 +275,7 @@ class UserProfileService {
 
       return null;
     } catch (e) {
-      if (!e.toString().contains('does not exist')) {
-        debugPrint('❌ Error loading existing profile: $e');
-      }
+      if (!e.toString().contains('does not exist')) {}
       return null;
     }
   }
@@ -335,16 +326,14 @@ class UserProfileService {
             };
             return _cachedProfile;
           }
-        }
+        } else {}
       } catch (e) {
         if (!e.toString().contains('does not exist')) {
-          debugPrint('❌ Failed to read profile from POD: $e');
-        }
+        } else {}
       }
 
       return null;
     } catch (e) {
-      debugPrint('❌ Failed to get user profile: $e');
       return null;
     }
   }
@@ -353,24 +342,34 @@ class UserProfileService {
 
   Future<bool> addMovieListToProfile(String movieListId) async {
     try {
-      final profile = await getUserProfile();
-      if (profile == null) return false;
+      var profile = await getUserProfile();
+      if (profile == null) {
+        // Create a basic profile first
+        final created = await createOrUpdateUserProfile();
+        if (created) {
+          profile = await getUserProfile();
+        }
+        if (profile == null) {
+          return false;
+        }
+      }
 
       final movieListIds = List<String>.from(profile['movieListIds'] ?? []);
+
       if (!movieListIds.contains(movieListId)) {
         movieListIds.add(movieListId);
 
-        return await createOrUpdateUserProfile(
+        final success = await createOrUpdateUserProfile(
           apiKey: profile['apiKey'],
           dobString: profile['dob'],
           genderString: profile['gender'],
           movieListIds: movieListIds,
         );
+        return success;
       }
 
       return true;
     } catch (e) {
-      debugPrint('❌ Failed to add movie list to profile: $e');
       return false;
     }
   }
@@ -396,7 +395,6 @@ class UserProfileService {
 
       return true;
     } catch (e) {
-      debugPrint('❌ Failed to remove movie list from profile: $e');
       return false;
     }
   }
@@ -414,7 +412,6 @@ class UserProfileService {
 
       return true;
     } catch (e) {
-      debugPrint('❌ Failed to initialize profile: $e');
       return false;
     }
   }

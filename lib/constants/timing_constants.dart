@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -72,6 +72,12 @@ class TimingConstants {
   /// Standard SnackBar display duration (3 seconds).
 
   static const Duration snackbarStandardDuration = Duration(seconds: 3);
+
+  /// API key cache valid duration (24 hours).
+  ///
+  /// Duration for which cached API keys remain valid.
+
+  static const int cacheValidHours = 24;
 
   /// Long SnackBar display duration (4 seconds).
 

@@ -2,11 +2,11 @@
 ///
 // Time-stamp: <Tuesday 2025-09-02 14:46:26 +1000 Graham Williams>
 ///
-/// Copyright (C) 2025, Software Innovation Institute, ANU
+/// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
-/// Licensed under the GNU General Public License, Version 3 (the "License");
+/// Licensed under the GNU General Public License, Version 3 (the "License");.
 ///
-/// License: https://www.gnu.org/licenses/gpl-3.0.en.html
+/// License: https://www.gnu.org/licenses/gpl-3.0.en.html.
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Kevin Wang, Graham Williams, Ashley Tang, Tony Chen
+/// Authors: Kevin Wang, Graham Williams, Ashley Tang, Tony Chen.
 
 library;
 
@@ -32,15 +32,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidpod/solidpod.dart' show logoutPopup, getWebId;
 import 'package:solidui/solidui.dart';
 
+import 'package:moviestar/core/services/api/key_service.dart';
+import 'package:moviestar/core/services/favorites/service.dart';
+import 'package:moviestar/core/services/favorites/service_adapter.dart';
+import 'package:moviestar/core/services/favorites/service_manager.dart';
 import 'package:moviestar/moviestar.dart';
-import 'package:moviestar/providers/cached_movie_service_provider.dart';
+import 'package:moviestar/providers/cached_movie_service_provider.dart'
+    hide directApiKeyProvider;
+import 'package:moviestar/providers/cached_movie_service_provider/provider_definitions.dart'
+    show directApiKeyProvider;
 import 'package:moviestar/providers/view_mode_provider.dart';
 import 'package:moviestar/screens/enhanced_search_screen.dart';
 import 'package:moviestar/screens/settings_screen.dart';
-import 'package:moviestar/services/api_key_service.dart';
-import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/services/favorites_service_adapter.dart';
-import 'package:moviestar/services/favorites_service_manager.dart';
 import 'package:moviestar/utils/create_solid_login.dart';
 import 'package:moviestar/utils/initialise_app_folders.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
@@ -82,7 +85,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   bool _showSettings = false;
 
-  /// API key service reference for cleanup
+  /// API key service reference for cleanup.
   late final ApiKeyService _apiKeyService;
 
   @override
@@ -95,10 +98,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     );
     _favoritesService = FavoritesServiceAdapter(_favoritesServiceManager);
 
-    // Set context for provider-based API key service.
-
-    _apiKeyService = ref.read(apiKeyServiceProvider);
-    _apiKeyService.updateContext(context, widget);
+    // Create API key service directly with context
+    _apiKeyService = ApiKeyService(context, widget);
 
     // Listen for API key changes.
 
@@ -168,13 +169,22 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     }
   }
 
-  void _onApiKeyChanged() {
+  Future<void> _onApiKeyChanged() async {
+    if (!mounted) return;
+
     // When API key changes, update the movie service.
     final movieService = ref.read(movieServiceProvider);
-    movieService.updateApiKey();
+    await movieService.updateApiKey();
+
+    // Clear cache to force fresh data with new API key
+    try {
+      final cachedService = ref.read(configuredCachedMovieServiceProvider);
+      await cachedService.clearAllCache();
+    } catch (e) {
+      // Log but don't fail - provider invalidation will still work
+    }
 
     // Invalidate all movie providers to force refresh with new API key.
-
     ref.invalidate(popularMoviesWithCacheInfoProvider);
     ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
     ref.invalidate(topRatedMoviesWithCacheInfoProvider);
@@ -182,21 +192,21 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     ref.invalidate(configuredCachedMovieServiceProvider);
 
     // Rebuild screens to ensure they have the latest data.
+    if (mounted) {
+      setState(() {
+        _buildScreens();
+      });
 
-    setState(() {
-      _buildScreens();
-    });
+      // Force refresh by rebuilding.
 
-    // Force refresh by rebuilding.
-
-    setState(() {});
+      setState(() {});
+    }
   }
 
   void _buildScreens() {
-    final apiKeyService = ref.read(apiKeyServiceProvider);
     _menuItems = SolidScaffoldConfig.createMenuItems(
       favoritesService: _favoritesService,
-      apiKeyService: apiKeyService,
+      apiKeyService: _apiKeyService,
       favoritesServiceManager: _favoritesServiceManager,
     );
 
@@ -213,18 +223,16 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       // Check if API key is present and show dialog immediately if missing
       bool hasApiKey = false;
       try {
-        final apiKeyService = ref.read(apiKeyServiceProvider);
-        final apiKey = await apiKeyService.getApiKey();
+        final apiKey = await _apiKeyService.getApiKey();
         hasApiKey = apiKey != null && apiKey.trim().isNotEmpty;
 
         if (!hasApiKey) {
           // Show API key dialog immediately but continue with POD initialization
-          debugPrint('⚠️  No API key configured - showing setup dialog');
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             if (mounted) {
               final apiKeySet = await showApiKeyDialog(
                 context,
-                apiKeyService,
+                _apiKeyService,
                 onApiKeySet: () {
                   // Reinitialize after API key is set
                   reinitializeAfterApiKey();
@@ -232,15 +240,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               );
               if (!apiKeySet) {
                 // If user dismissed without setting API key, they can still use POD features
-                debugPrint(
-                  '⚠️  User dismissed API key dialog - movie features unavailable',
-                );
               }
             }
           });
         }
       } catch (e) {
-        debugPrint('⚠️  Error checking API key during initialization: $e');
+        // Failed to initialize API services
       }
 
       // Always initialize POD folders regardless of API key status
@@ -270,13 +275,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               try {
                 final enabled =
                     await _favoritesServiceManager.enablePodStorage();
-                if (!enabled) {
-                  debugPrint(
-                    '❌ [MyHomePage] Failed to automatically enable POD storage',
-                  );
-                }
+                if (!enabled) {}
               } catch (e) {
-                debugPrint('❌ [MyHomePage] Error enabling POD storage: $e');
+                // Failed to enable POD storage
               }
             }
 
@@ -312,19 +313,33 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   /// Handles the search action.
 
-  void _handleSearch() {
+  void _handleSearch() async {
     if (mounted) {
-      // Get the content service - it will be fresh due to provider dependencies
-      final contentService = ref.read(contentServiceProvider);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => EnhancedSearchScreen(
-            favoritesService: _favoritesService,
-            contentService: contentService,
-          ),
-        ),
-      );
+      try {
+        // Get the content service with proper API key
+        final contentService =
+            await ref.read(directContentServiceProvider.future);
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EnhancedSearchScreen(
+                favoritesService: _favoritesService,
+                contentService: contentService,
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        // Show error or fallback
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Search is not available at the moment'),
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -365,23 +380,56 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   void _handleSettings() {
     // Show Settings by replacing the body content
-    setState(() {
-      _showSettings = true;
-    });
+    if (mounted) {
+      setState(() {
+        _showSettings = true;
+      });
+    }
   }
 
-  /// Reinitializes the app after API key is set
+  /// Reinitializes the app after API key is set.
   Future<void> reinitializeAfterApiKey() async {
+    if (!mounted) return;
+
+    // Invalidate all providers immediately to trigger API key refresh
+    ref.invalidate(directApiKeyProvider);
+    ref.invalidate(apiKeyProvider);
+
+    // Allow time for core providers to refresh
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    if (!mounted) return;
+
+    // Clear cache to force fresh data with new API key
+    try {
+      final cachedService = ref.read(configuredCachedMovieServiceProvider);
+      await cachedService.clearAllCache();
+    } catch (e) {
+      // Log but don't fail - provider invalidation will still work
+    }
+
+    // Invalidate all movie providers for immediate refresh
+    ref.invalidate(movieServiceProvider);
+    ref.invalidate(contentServiceProvider);
+    ref.invalidate(popularMoviesWithCacheInfoProvider);
+    ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
+    ref.invalidate(topRatedMoviesWithCacheInfoProvider);
+    ref.invalidate(upcomingMoviesWithCacheInfoProvider);
+    ref.invalidate(configuredCachedMovieServiceProvider);
+
+    // Re-initialize app data
     await _initialiseAppData();
   }
 
   /// Handles menu tab selection.
 
   void _onTabSelected(int index) {
-    setState(() {
-      _selectedTabIndex = index;
-      _showSettings = false; // Hide Settings when navigating to other tabs
-    });
+    if (mounted) {
+      setState(() {
+        _selectedTabIndex = index;
+        _showSettings = false; // Hide Settings when navigating to other tabs
+      });
+    }
   }
 
   @override
@@ -397,23 +445,19 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       avatarIcon: Icons.account_circle,
     );
 
-    // Create loading overlay if needed.
-
-    final loadingOverlay = _isLoadingFolders
-        ? const Center(child: CircularProgressIndicator())
-        : null;
-
     final solidScaffold = SolidScaffold(
       menu: _menuItems,
       selectedIndex: _selectedTabIndex,
       onMenuSelected: _onTabSelected,
       appBar: SolidAppBarConfig(
         title: 'MovieStar',
-        versionConfig: SolidVersionConfig(
-          changelogUrl:
-              'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
-          showDate: true,
-        ),
+        versionConfig: mounted
+            ? SolidVersionConfig(
+                changelogUrl:
+                    'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
+                showDate: true,
+              )
+            : null,
         actions: SolidScaffoldConfig.createAppBarActions(
           ref: ref,
           onViewModeToggle: _handleViewModeToggle,
@@ -477,14 +521,20 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         enabled: true,
         showInAppBarActions: true,
       ),
-      child: loadingOverlay,
     );
 
-    // Return Settings screen overlay if Settings is active, otherwise return SolidScaffold
-    return _showSettings ? _buildSettingsOverlay(solidScaffold) : solidScaffold;
+    // Return appropriate widget with proper loading overlay
+    if (_showSettings) {
+      return _buildSettingsOverlay(solidScaffold);
+    }
+
+    // Individual components handle their own loading states
+    // Removed full-screen loading overlay to prevent sudden loading indicator
+
+    return solidScaffold;
   }
 
-  /// Builds the Settings screen as an overlay on top of the SolidScaffold
+  /// Builds the Settings screen as an overlay on top of the SolidScaffold.
   Widget _buildSettingsOverlay(Widget solidScaffold) {
     return Stack(
       children: [
@@ -494,15 +544,17 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                setState(() {
-                  _showSettings = false;
-                });
+                if (mounted) {
+                  setState(() {
+                    _showSettings = false;
+                  });
+                }
               },
             ),
           ),
           body: SettingsScreen(
             favoritesService: _favoritesService,
-            apiKeyService: ref.read(apiKeyServiceProvider),
+            apiKeyService: _apiKeyService,
             favoritesServiceManager: _favoritesServiceManager,
           ),
         ),

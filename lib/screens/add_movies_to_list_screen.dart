@@ -21,7 +21,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
@@ -29,15 +29,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/screens/add_movies_to_list/content_builders.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 
@@ -144,7 +144,8 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     safeSetState(() => _error = null);
 
     try {
-      final contentService = ref.read(contentServiceProvider);
+      final contentService =
+          await ref.read(directContentServiceProvider.future);
       final popularMixedContent = await contentService.getPopularMixedContent();
 
       // Remove content already in the list.
@@ -196,7 +197,8 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     });
 
     try {
-      final contentService = ref.read(contentServiceProvider);
+      final contentService =
+          await ref.read(directContentServiceProvider.future);
       final results = await contentService.searchContentComprehensive(query);
 
       // Filter out content already in the list.
@@ -249,243 +251,27 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
   }
 
   // Builds a content item card (for search results).
-
   Widget _buildContentCard(ContentItem contentItem) {
-    final isInList = _moviesInList.contains(contentItem.id);
-
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: CachedNetworkImage(
-            imageUrl: contentItem.posterUrl,
-            width: 50,
-            height: 75,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => Container(
-              width: 50,
-              height: 75,
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              child: const Center(child: CircularProgressIndicator()),
-            ),
-            errorWidget: (context, url, error) => Container(
-              width: 50,
-              height: 75,
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              child: const Icon(Icons.movie),
-            ),
-          ),
-        ),
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                contentItem.title,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Text(
-              contentItem.contentTypeIcon,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.star,
-                  color: Colors.amber,
-                  size: 16,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  contentItem.voteAverage.toStringAsFixed(1),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  '${contentItem.contentTypeLabel} • ${contentItem.releaseYear}',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-            if (contentItem.overview.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(
-                contentItem.overview,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ],
-        ),
-        trailing: isInList
-            ? Icon(
-                Icons.check_circle,
-                color: Theme.of(context).colorScheme.primary,
-              )
-            : IconButton(
-                icon: Icon(
-                  Icons.add_circle_outline,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                onPressed: () => _addContentToList(contentItem),
-              ),
-      ),
+    return ContentBuilders.buildContentCard(
+      context,
+      contentItem,
+      _moviesInList,
+      () => _addContentToList(contentItem),
     );
   }
 
   // Builds the search tab content.
 
   Widget _buildSearchTab() {
-    if (_isSearchLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (_error != null) {
-      return ErrorDisplayWidget(
-        message: 'Search failed: $_error',
-        onRetry: () => _searchMovies(_searchController.text),
-      );
-    }
-
-    if (_searchResults.isEmpty || _hasNoSearchResults()) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.search,
-              size: 64,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.4),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _searchController.text.isEmpty
-                  ? 'Search for movies and TV shows to add'
-                  : _searchController.text.length < 2
-                      ? 'Type at least 2 characters'
-                      : 'No results found',
-              style: TextStyle(
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withValues(alpha: 0.6),
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Find movies and TV shows by title, actor, or genre',
-              style: TextStyle(
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withValues(alpha: 0.4),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView(
-      children: [
-        if (_searchResults['title']?.isNotEmpty ?? false) ...[
-          _buildSearchSection(
-            'Title Matches',
-            _searchResults['title']!,
-            Icons.movie,
-          ),
-        ],
-        if (_searchResults['actor']?.isNotEmpty ?? false) ...[
-          _buildSearchSection(
-            'Actor Matches',
-            _searchResults['actor']!,
-            Icons.person,
-          ),
-        ],
-        if (_searchResults['genre']?.isNotEmpty ?? false) ...[
-          _buildSearchSection(
-            'Genre Matches',
-            _searchResults['genre']!,
-            Icons.category,
-          ),
-        ],
-      ],
-    );
-  }
-
-  // Builds a search results section.
-
-  Widget _buildSearchSection(
-    String title,
-    List<ContentItem> contents,
-    IconData icon,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                color: Theme.of(context).colorScheme.primary,
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '${contents.length}',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        ...contents.map((content) => _buildContentCard(content)),
-        const SizedBox(height: 8),
-      ],
+    return ContentBuilders.buildSearchTab(
+      context,
+      isSearchLoading: _isSearchLoading,
+      error: _error,
+      searchResults: _searchResults,
+      searchController: _searchController,
+      moviesInList: _moviesInList,
+      onAddContent: _addContentToList,
+      onRetry: () => _searchMovies(_searchController.text),
     );
   }
 
@@ -558,14 +344,6 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
         ..._suggestedContent.map((content) => _buildContentCard(content)),
       ],
     );
-  }
-
-  // Check if all search result categories are empty.
-
-  bool _hasNoSearchResults() {
-    return (_searchResults['title']?.isEmpty ?? true) &&
-        (_searchResults['actor']?.isEmpty ?? true) &&
-        (_searchResults['genre']?.isEmpty ?? true);
   }
 
   @override

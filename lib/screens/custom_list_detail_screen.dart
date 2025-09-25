@@ -21,31 +21,26 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Ashley Tang
+/// Authors: Ashley Tang.
 
 library;
 
 import 'package:flutter/material.dart';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
-import 'package:solidpod/solidpod.dart';
 
+import 'package:moviestar/core/services/favorites/service.dart';
+import 'package:moviestar/core/services/favorites/service_adapter.dart';
 import 'package:moviestar/mixins/screen_state_mixin.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/providers/cached_movie_service_provider.dart';
-import 'package:moviestar/screens/movie_details_screen.dart';
-import 'package:moviestar/services/favorites_service.dart';
-import 'package:moviestar/services/favorites_service_adapter.dart';
-import 'package:moviestar/services/movie_list_service.dart';
-import 'package:moviestar/services/user_profile_service.dart';
-import 'package:moviestar/utils/date_format_util.dart';
-import 'package:moviestar/utils/movie_display_utils.dart';
-import 'package:moviestar/utils/turtle_serializer.dart';
+import 'package:moviestar/screens/custom_list_detail/dialog_builders.dart';
+import 'package:moviestar/screens/custom_list_detail/movie_loader.dart';
+import 'package:moviestar/shared/widgets/custom_list_detail/list_header_widget.dart';
+import 'package:moviestar/shared/widgets/custom_list_detail/list_movie_grid.dart';
+import 'package:moviestar/shared/widgets/lists/list_sharing_handler.dart';
 import 'package:moviestar/widgets/base_screen.dart';
-import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 
 /// A screen that displays the detailed view of a custom movie list.
 
@@ -100,21 +95,6 @@ class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
 
   // Gets content as movie with proper type routing.
 
-  Future<Movie> _getContentAsMovieWithType(
-    int contentId,
-    String contentType,
-  ) async {
-    final cachedMovieService = ref.read(cachedMovieServiceProvider);
-    final contentService = ref.read(contentServiceProvider);
-
-    if (contentType == 'tv') {
-      final tvShowContent = await contentService.getTVDetails(contentId);
-      return Movie.fromContentItem(tvShowContent);
-    } else {
-      return await cachedMovieService.getMovieDetails(contentId);
-    }
-  }
-
   // Loads movies in this custom list from cache.
 
   Future<void> _loadMovies() async {
@@ -149,9 +129,7 @@ class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
           return;
         }
       } catch (e) {
-        debugPrint(
-          '⚠️ [CustomList] Failed to load movies from POD: $e, falling back to API',
-        );
+        // Failed to load cached movies
       }
     }
 
@@ -161,208 +139,68 @@ class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
   }
 
   // Loads specific movies from API.
-
   Future<void> _loadMoviesFromAPI(List<int> movieIds) async {
-    for (int i = 0; i < movieIds.length; i++) {
-      final movieId = movieIds[i];
+    final filtered = movieIds
+        .where(
+          (id) => !_moviesMap.containsKey(id) && !_loadingMovieIds.contains(id),
+        )
+        .toList();
 
-      if (_moviesMap.containsKey(movieId) ||
-          _loadingMovieIds.contains(movieId)) {
-        continue; // Already loaded or loading.
-      }
-
-      safeSetState(() {
-        _loadingMovieIds.add(movieId);
-      });
-
-      try {
-        final contentType = _currentList.getContentTypeAt(
-          _currentList.movieIds.indexOf(movieId),
-        );
-        final movie = await _getContentAsMovieWithType(movieId, contentType);
-
+    await MovieLoader.loadMoviesFromAPI(
+      ref,
+      filtered,
+      (movieId, movie) {
         if (mounted) {
           safeSetState(() {
             _moviesMap[movieId] = movie;
             _loadingMovieIds.remove(movieId);
-            _failedMovieIds
-                .remove(movieId); // Remove from failed if it was there.
+            _failedMovieIds.remove(movieId);
           });
         }
-      } catch (e) {
-        debugPrint('❌ [CustomList] Failed to load movie $movieId from API: $e');
+      },
+      (movieId, error) {
         if (mounted) {
           safeSetState(() {
             _loadingMovieIds.remove(movieId);
             _failedMovieIds.add(movieId);
           });
         }
-      }
-    }
+      },
+    );
   }
 
   // Shows options for the custom list (edit, share, delete).
 
   Future<void> _showListOptions() async {
-    final hasMovies = _currentList.movieIds.isNotEmpty;
-    final isPodEnabled = widget.favoritesService is FavoritesServiceAdapter &&
-        (widget.favoritesService as FavoritesServiceAdapter)
-            .isPodStorageEnabled;
-
-    await showModalBottomSheet(
-      context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.edit),
-            title: const Text('Edit List'),
-            onTap: () {
-              Navigator.pop(context);
-              _showEditListDialog();
-            },
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.share,
-              color: (hasMovies && isPodEnabled)
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.38),
-            ),
-            title: Text(
-              'Share List',
-              style: TextStyle(
-                color: (hasMovies && isPodEnabled)
-                    ? Theme.of(context).colorScheme.onSurface
-                    : Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.38),
-              ),
-            ),
-            onTap: (hasMovies && isPodEnabled)
-                ? () {
-                    Navigator.pop(context);
-                    _shareCustomList();
-                  }
-                : null,
-          ),
-          ListTile(
-            leading: const Icon(Icons.delete, color: Colors.red),
-            title: const Text('Delete List'),
-            onTap: () {
-              Navigator.pop(context);
-              _showDeleteConfirmation();
-            },
-          ),
-        ],
-      ),
+    await CustomListDialogBuilders.showListOptions(
+      context,
+      _currentList,
+      onEdit: _showEditListDialog,
+      onShare: _shareCustomList,
+      onDelete: _showDeleteConfirmation,
     );
   }
 
   // Shows a dialog to edit the custom list.
 
   Future<void> _showEditListDialog() async {
-    final TextEditingController nameController =
-        TextEditingController(text: _currentList.name);
-    final TextEditingController descriptionController =
-        TextEditingController(text: _currentList.description ?? '');
-
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit List'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'List Name',
-                border: OutlineInputBorder(),
-              ),
-              autofocus: true,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Description (Optional)',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final name = nameController.text.trim();
-              if (name.isNotEmpty) {
-                final description = descriptionController.text.trim();
-                final updatedList = _currentList.copyWith(
-                  name: name,
-                  description: description.isEmpty ? null : description,
-                );
-                await widget.favoritesService.updateCustomList(updatedList);
-                setState(() {
-                  _currentList = updatedList;
-                });
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  showSuccessSnackBar('Updated "$name" list');
-                }
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+    await CustomListDialogBuilders.showEditListDialog(
+      context,
+      _currentList,
+      widget.favoritesService,
+      () {
+        _loadMovies();
+      },
     );
-
-    nameController.dispose();
-    descriptionController.dispose();
   }
 
   // Shows a confirmation dialog before deleting the list.
 
   Future<void> _showDeleteConfirmation() async {
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete List'),
-        content: Text(
-          'Are you sure you want to delete "${_currentList.name}"? This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () async {
-              await widget.favoritesService.deleteCustomList(_currentList.id);
-              if (context.mounted) {
-                Navigator.pop(context); // Close dialog.
-                Navigator.pop(context); // Go back to lists screen.
-                showSuccessSnackBar('Deleted "${_currentList.name}" list');
-              }
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+    await CustomListDialogBuilders.showDeleteConfirmation(
+      context,
+      _currentList,
+      widget.favoritesService,
     );
   }
 
@@ -391,19 +229,6 @@ class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
     if (mounted) {
       showSuccessSnackBar('Removed "$movieTitle" from list');
     }
-  }
-
-  // Navigates to the movie details screen.
-
-  void _openMovieDetails(Movie movie) {
-    safeNavigateTo(
-      MaterialPageRoute(
-        builder: (context) => MovieDetailsScreen(
-          movie: movie,
-          favoritesService: widget.favoritesService,
-        ),
-      ),
-    );
   }
 
   @override
@@ -438,119 +263,71 @@ Recipients will be able to:
                 : null,
           ),
         ),
-        // Add padding to move the button away from the right edge to avoid debug banner.
-        Padding(
-          padding: const EdgeInsets.only(right: 60),
-          child: IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: _showListOptions,
-          ),
+        IconButton(
+          icon: const Icon(Icons.more_vert),
+          onPressed: _showListOptions,
         ),
       ],
-      body: Column(
-        children: [
-          // List info header.
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          radius: 24,
-                          child: Text(
-                            _currentList.name.isNotEmpty
-                                ? _currentList.name[0].toUpperCase()
-                                : 'L',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _currentList.name,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              if (_currentList.description != null &&
-                                  _currentList.description!.isNotEmpty) ...[
-                                const SizedBox(height: 4),
-                                Text(
-                                  _currentList.description!,
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.movie,
-                          size: 16,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${_currentList.movieCount} movies',
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Icon(
-                          Icons.access_time,
-                          size: 16,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Updated ${DateFormatUtil.formatShort(_currentList.updatedAt)}',
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // List info header.
+            ListHeaderWidget(
+              customList: _currentList,
+              totalMovies: _currentList.movieIds.length,
+              loadedMovies: _moviesMap.length,
+              showTitle: false,
+              showOptions: false,
             ),
-          ),
 
-          // Movies list.
-          Expanded(
-            child: _currentList.movieIds.isEmpty
-                ? _buildEmptyState()
-                : _buildMoviesList(),
-          ),
-        ],
+            const SizedBox(height: 8),
+
+            // Movies list.
+            Expanded(
+              child: _currentList.movieIds.isEmpty
+                  ? _buildEmptyState()
+                  : ListMovieGrid(
+                      movieIds: _currentList.movieIds,
+                      moviesMap: _moviesMap,
+                      loadingMovieIds: _loadingMovieIds,
+                      failedMovieIds: _failedMovieIds,
+                      onRemoveMovie: _removeMovieFromList,
+                      onRetryLoad: _retryLoadMovie,
+                      onRefresh: _loadMovies,
+                      favoritesService: widget.favoritesService,
+                    ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  /// Retry loading a specific movie.
+  Future<void> _retryLoadMovie(int movieId) async {
+    await MovieLoader.retryLoadMovie(
+      ref,
+      movieId,
+      _moviesMap,
+      {},
+      (id, movie) {
+        if (mounted) {
+          setState(() {
+            _moviesMap[id] = movie;
+            _loadingMovieIds.remove(id);
+            _failedMovieIds.remove(id);
+          });
+        }
+      },
+      (id, error) {
+        if (mounted) {
+          setState(() {
+            _loadingMovieIds.remove(id);
+            _failedMovieIds.add(id);
+          });
+        }
+      },
     );
   }
 
@@ -589,543 +366,17 @@ Recipients will be able to:
     );
   }
 
-  // Builds the movies list view.
-
-  Widget _buildMoviesList() {
-    return RefreshIndicator(
-      onRefresh: () async {
-        // Clear cache and reload.
-
-        setState(() {
-          _moviesMap.clear();
-          _loadingMovieIds.clear();
-          _failedMovieIds.clear();
-        });
-        await _loadMovies();
-      },
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _currentList.movieIds.length,
-        itemBuilder: (context, index) {
-          final movieId = _currentList.movieIds[index];
-          final movie = _moviesMap[movieId];
-          final isLoading = _loadingMovieIds.contains(movieId);
-          final hasFailed = _failedMovieIds.contains(movieId);
-
-          if (movie != null) {
-            // Movie is loaded - show full movie card.
-
-            return _buildLoadedMovieCard(movie);
-          } else if (isLoading) {
-            // Movie is loading - show loading card.
-
-            return _buildLoadingMovieCard(movieId);
-          } else if (hasFailed) {
-            // Movie failed to load - show error card with retry.
-
-            return _buildFailedMovieCard(movieId);
-          } else {
-            // This shouldn't happen, but show loading as fallback.
-
-            return _buildLoadingMovieCard(movieId);
-          }
-        },
-      ),
-    );
-  }
-
-  // Builds a card for a successfully loaded movie.
-
-  Widget _buildLoadedMovieCard(Movie movie) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () => _openMovieDetails(movie),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              // Movie poster.
-
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: isValidImageUrl(movie.posterUrl)
-                    ? CachedNetworkImage(
-                        imageUrl: movie.posterUrl.trim(),
-                        width: 60,
-                        height: 90,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          width: 60,
-                          height: 90,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHighest,
-                          child:
-                              const Center(child: CircularProgressIndicator()),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          width: 60,
-                          height: 90,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHighest,
-                          child: const Icon(Icons.movie),
-                        ),
-                      )
-                    : Container(
-                        width: 60,
-                        height: 90,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerHighest,
-                        child: const Icon(Icons.movie),
-                      ),
-              ),
-              const SizedBox(width: 12),
-
-              // Movie details.
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      movie.title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.star,
-                          color: Colors.amber,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          movie.voteAverage.toStringAsFixed(1),
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Text(
-                          movie.releaseDate.year.toString(),
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (movie.overview.isNotEmpty) ...[
-                      const SizedBox(height: 6),
-                      Text(
-                        movie.overview,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-
-              // Actions menu.
-
-              PopupMenuButton<String>(
-                icon: Icon(
-                  Icons.more_vert,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-                onSelected: (value) {
-                  if (value == 'remove') {
-                    _removeMovieFromList(movie.id);
-                  }
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'remove',
-                    child: Row(
-                      children: [
-                        Icon(Icons.remove_circle_outline, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text('Remove from List'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Builds a card for a movie that is currently loading.
-
-  Widget _buildLoadingMovieCard(int movieId) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            // Loading placeholder for poster.
-
-            Container(
-              width: 60,
-              height: 90,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-            const SizedBox(width: 12),
-
-            // Loading content.
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 16,
-                    width: 120,
-                    decoration: BoxDecoration(
-                      color:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    height: 12,
-                    width: 80,
-                    decoration: BoxDecoration(
-                      color:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Loading movie details...',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Builds a card for a movie that failed to load.
-
-  Widget _buildFailedMovieCard(int movieId) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            // Error placeholder for poster.
-
-            Container(
-              width: 60,
-              height: 90,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.errorContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.error_outline,
-                color: Theme.of(context).colorScheme.onErrorContainer,
-              ),
-            ),
-            const SizedBox(width: 12),
-
-            // Error content.
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Movie ID: $movieId',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Failed to load movie details',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                      fontSize: 12,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      safeSetState(() {
-                        _failedMovieIds.remove(movieId);
-                      });
-                      await _loadMovies();
-                    },
-                    icon: const Icon(Icons.refresh, size: 16),
-                    label: const Text('Retry'),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(80, 32),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Remove option.
-
-            PopupMenuButton<String>(
-              icon: Icon(
-                Icons.more_vert,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              onSelected: (value) {
-                if (value == 'remove') {
-                  _removeMovieFromList(movieId);
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'remove',
-                  child: Row(
-                    children: [
-                      Icon(Icons.remove_circle_outline, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text('Remove from List'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Shows a loading dialog during sharing process.
-  void _showSharingDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Dialog(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Preparing to share...',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'This may take a few seconds',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   // Shares the custom list and all movies using batch sharing UI.
 
   Future<void> _shareCustomList() async {
-    if (_currentList.movieIds.isEmpty) {
-      showErrorSnackBar('No movies to share');
-      return;
-    }
+    final sharingHandler = ListSharingHandler(
+      context: context,
+      widget: widget,
+      ref: ref,
+      favoritesService: widget.favoritesService,
+      screenState: this,
+    );
 
-    // Show loading dialog
-    _showSharingDialog();
-
-    // Get all loaded movies from the current list.
-
-    final moviesToShare = <Movie>[];
-    for (final movieId in _currentList.movieIds) {
-      final movie = _moviesMap[movieId];
-      if (movie != null) {
-        moviesToShare.add(movie);
-      }
-    }
-
-    if (moviesToShare.isEmpty) {
-      showErrorSnackBar('Movies are still loading. Please wait.');
-      return;
-    }
-
-    // Store context references before async operations.
-
-    final theme = Theme.of(context);
-
-    try {
-      // Create MovieList service to create the list file first.
-
-      final userProfileService = UserProfileService(context, widget);
-      final movieListService = MovieListService(
-        context,
-        widget,
-        userProfileService,
-      );
-
-      // Create the MovieList TTL file.
-
-      final listId = await movieListService.createMovieList(
-        _currentList.name,
-        movies: moviesToShare,
-        description: _currentList.description ?? 'Custom movie list',
-      );
-
-      if (!mounted) return;
-
-      if (listId == null) {
-        if (mounted) {
-          showErrorSnackBar('Failed to create movie list');
-        }
-        return;
-      }
-
-      // Ensure all individual movie files exist before sharing.
-
-      for (final movie in moviesToShare) {
-        try {
-          await _createMovieFileIfNotExists(movie);
-        } catch (e) {
-          // Continue with other movies - the batch UI will handle individual failures.
-        }
-        if (!mounted) return;
-      }
-
-      // Navigate to the batch sharing UI.
-
-      if (mounted) {
-        await safeNavigateTo(
-          MaterialPageRoute(
-            fullscreenDialog: true,
-            builder: (context) => MovieStarBatchSharingUi(
-              listId: listId,
-              listName: _currentList.name,
-              movies: moviesToShare,
-              backgroundColor: theme.scaffoldBackgroundColor,
-              onSharingComplete: () {
-                // Handle completion callback.
-              },
-              child: widget,
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        showErrorSnackBar('Error sharing list: $e');
-      }
-    } finally {
-      // Dismiss loading dialog
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-    }
-  }
-
-  // Creates a movie file if it doesn't exist (needed before sharing).
-
-  Future<void> _createMovieFileIfNotExists(Movie movie) async {
-    try {
-      final movieFileName = 'movies/Movie-${movie.id}.ttl';
-
-      // Check if the file already exists.
-
-      try {
-        if (!mounted) return;
-        final existingContent = await readPod(movieFileName, context, widget);
-        if (existingContent.isNotEmpty) {
-          return;
-        }
-      } catch (e) {
-        // File doesn't exist, we'll create it.
-      }
-
-      // Get current rating and comments from favorites service.
-
-      final adapter = widget.favoritesService as FavoritesServiceAdapter;
-      final currentRating = await adapter.getPersonalRating(movie);
-      final currentComments = await adapter.getMovieComments(movie);
-
-      // Create the movie TTL content with any existing user data.
-
-      final ttlContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
-        movie,
-        currentRating,
-        currentComments,
-      );
-
-      // Write the movie file to POD.
-
-      if (!mounted) return;
-      final result = await writePod(
-        movieFileName,
-        ttlContent,
-        context,
-        widget,
-        encrypted: false,
-      );
-
-      if (result != SolidFunctionCallStatus.success) {
-        throw Exception('Failed to write movie file to POD');
-      }
-    } catch (e) {
-      rethrow;
-    }
+    await sharingHandler.shareCustomList(_currentList);
   }
 }

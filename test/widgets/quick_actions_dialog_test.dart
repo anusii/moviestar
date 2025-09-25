@@ -14,7 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/services/favorites_service.dart';
+import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/widgets/quick_actions_dialog.dart';
 
 // Simple test implementation that implements the interface

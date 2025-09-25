@@ -35,10 +35,7 @@ dependencies:
   rxdart: ^0.28.0
   shared_preferences: ^2.2.2
   solidpod: ^0.7.11
-  solidui: #^0.0.1
-    git:
-      url: https://github.com/anusii/solidui.git
-      ref: dev
+  solidui: ^0.0.
   universal_io: ^2.2.2
   url_launcher: ^6.3.1
   window_manager: ^0.5.0

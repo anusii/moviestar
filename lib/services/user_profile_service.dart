@@ -220,7 +220,7 @@ class UserProfileService {
       // TODO: In a full implementation, we would scan the keys/ directory
       // For now, we can check a few common patterns or implement a simple cache.
       // This would require listing directory contents which isn't directly supported.
-      // by the current POD API. A proper implementation would:.
+      // by the current POD API. A proper implementation would:
       // 1. Maintain an index file of API keys.
       // 2. Or scan the keys directory for existing files.
       // 3. Or store the API key ID in the user profile and read it back.

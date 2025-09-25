@@ -73,6 +73,12 @@ lint_file() {
             next_line=""
         fi
 
+        # Get previous line for current-line-is-continuation check (if exists)
+        local prev_line_for_continuation=""
+        if [[ $i -gt 0 ]]; then
+            prev_line_for_continuation="${lines[$((i-1))]}"
+        fi
+
         # Optimized comment detection - check // first, then ///
         if [[ "$line" =~ ^[[:space:]]*// ]]; then
             is_comment=true
@@ -101,9 +107,18 @@ lint_file() {
                     ((file_violations++))
                 fi
             elif ! should_ignore_line "$line"; then
+                # Check if comment ends with : or , followed by period (incorrect)
+                # But skip docstring patterns like "/// Parameters:" or "/// Returns:"
+                if [[ "$content" =~ [,:]\.$  ]] && [[ ! "$content" =~ ^(Parameters|Returns|Usage\ examples): ]]; then
+                    echo "  Line $line_num: Comment should not have period after colon/comma: $line"
+                    ((file_violations++))
                 # Check if comment ends with : or , (list/continuation indicators)
-                if [[ "$content" =~ [,:]$ ]]; then
+                elif [[ "$content" =~ [,:]$ ]]; then
                     # Don't require period for comments ending in : or ,
+                    :
+                # Check if current line is a continuation of previous comment
+                elif [[ -n "$prev_line_for_continuation" ]] && [[ "$prev_line_for_continuation" =~ ^[[:space:]]*// ]] && [[ "$content" =~ ^[a-z0-9-] ]]; then
+                    # Don't require period for continuation comments (current line starts with lowercase)
                     :
                 # Check if next line is a continuation comment (starts with lowercase or number)
                 elif [[ -n "$next_line" ]] && [[ "$next_line" =~ ^[[:space:]]*// ]]; then

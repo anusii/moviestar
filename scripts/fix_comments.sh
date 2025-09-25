@@ -75,6 +75,12 @@ fix_file() {
             next_line="${lines[$((i+1))]}"
         fi
 
+        # Get previous line for current-line-is-continuation check (if exists)
+        local prev_line=""
+        if [[ $i -gt 0 ]]; then
+            prev_line="${lines[$((i-1))]}"
+        fi
+
         # Check if current line is a comment and fix period if needed
         if [[ "$line" =~ ^[[:space:]]*// ]]; then
             current_is_comment=true
@@ -96,22 +102,28 @@ fix_file() {
             # Check if this is an uppercase header (e.g., "MOVIE METHODS")
             # Must be ALL uppercase letters and spaces, no lowercase allowed
             # Require at least 2 characters total
-            if [[ -n "$content" ]] && [[ ${#content} -ge 2 ]] && [[ "$content" =~ ^[A-Z][A-Z\ ]*[.]?$ ]] && [[ "$content" == "${content^^}" ]]; then
+            if [[ -n "$content" ]] && [[ ${#content} -ge 2 ]] && [[ "$content" == "${content^^}" ]] && [[ "$content" =~ ^[A-Z][A-Z\ ]*$ ]]; then
                 # For uppercase headers, remove trailing period if present
-                if [[ "$content" =~ [.]$ ]]; then
-                    content="${content%\.}"
-                    local original_content="${line#*//}"
-                    [[ "$original_content" =~ ^/ ]] && original_content="${original_content#/}"
-                    original_content="${original_content# }"
-                    local prefix="${line%"$original_content"}"
-                    processed_line="${prefix}${content}"
+                if [[ "$line" =~ \.$  ]]; then
+                    processed_line="${line%\.}"
                     ((fixes++))
                     [[ "$dry_run" == true ]] && echo "  Would remove period from uppercase header" >&2
                 fi
             elif ! should_ignore_line "$line"; then
+                # Check if comment ends with : or , followed by period (incorrect)
+                # But skip docstring patterns like "/// Parameters:" or "/// Returns:"
+                if [[ "$content" =~ [,:]\.$  ]] && [[ ! "$content" =~ ^(Parameters|Returns|Usage\ examples): ]]; then
+                    # Remove incorrectly placed period after colon/comma
+                    processed_line="${line%\.}"
+                    ((fixes++))
+                    [[ "$dry_run" == true ]] && echo "  Would remove period after colon/comma" >&2
                 # Check if comment ends with : or , (list/continuation indicators)
-                if [[ "$content" =~ [,:]$ ]]; then
+                elif [[ "$content" =~ [,:]$ ]]; then
                     # Don't add period for comments ending in : or ,
+                    :
+                # Check if current line is a continuation of previous comment
+                elif [[ -n "$prev_line" ]] && [[ "$prev_line" =~ ^[[:space:]]*// ]] && [[ "$content" =~ ^[a-z0-9-] ]]; then
+                    # Don't add period for continuation comments (current line starts with lowercase)
                     :
                 # Check if next line is a continuation comment
                 elif [[ -n "$next_line" ]] && [[ "$next_line" =~ ^[[:space:]]*// ]]; then
@@ -124,21 +136,13 @@ fix_file() {
                         :
                     elif [[ -n "$content" ]] && [[ ! "$content" =~ [.!?]$ ]]; then
                         # Add period for single-line comment
-                        local original_content="${line#*//}"
-                        [[ "$original_content" =~ ^/ ]] && original_content="${original_content#/}"
-                        original_content="${original_content# }"
-                        local prefix="${line%"$original_content"}"
-                        processed_line="${prefix}${content}."
+                        processed_line="${line}."
                         ((fixes++))
                         [[ "$dry_run" == true ]] && echo "  Would add period to comment" >&2
                     fi
                 # For regular single-line comments, add period if missing
                 elif [[ -n "$content" ]] && [[ ! "$content" =~ [.!?]$ ]]; then
-                    local original_content="${line#*//}"
-                    [[ "$original_content" =~ ^/ ]] && original_content="${original_content#/}"
-                    original_content="${original_content# }"
-                    local prefix="${line%"$original_content"}"
-                    processed_line="${prefix}${content}."
+                    processed_line="${line}."
                     ((fixes++))
                     [[ "$dry_run" == true ]] && echo "  Would add period to comment" >&2
                 fi

@@ -133,7 +133,7 @@ class _PodSettingsPanelState extends ConsumerState<PodSettingsPanel> {
 
     final loggedIn = await isLoggedIn();
 
-    // If user is logged in and POD storage is not explicitly disabled,.
+    // If user is logged in and POD storage is not explicitly disabled,
     // enable it by default.
 
     if (loggedIn && !widget.favoritesServiceManager.isPodStorageEnabled) {

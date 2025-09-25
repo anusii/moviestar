@@ -31,7 +31,7 @@ import 'package:moviestar/widgets/error_display_widget.dart';
 
 /// Base screen widget that provides common functionality for all screens.
 ///
-/// This widget eliminates boilerplate by providing:.
+/// This widget eliminates boilerplate by providing:
 /// - Consistent Scaffold structure with themed AppBar.
 /// - Built-in loading overlay functionality.
 /// - Error display integration.

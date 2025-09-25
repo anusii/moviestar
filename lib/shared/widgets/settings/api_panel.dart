@@ -121,7 +121,7 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
       // Now invalidate all dependent movie providers
       ref.invalidate(movieServiceProvider);
       ref.invalidate(contentServiceProvider);
-      ref.invalidate(popularMoviesWithCacheInfoProvider);
+      ref.invalidate(recommendedMoviesWithCacheInfoProvider);
       ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
       ref.invalidate(topRatedMoviesWithCacheInfoProvider);
       ref.invalidate(upcomingMoviesWithCacheInfoProvider);

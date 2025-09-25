@@ -45,7 +45,7 @@ class SyncOperations {
         targetId,
       );
 
-      // Only remove from source if it's a move operation (not from Popular)
+      // Only remove from source if it's a move operation (not from Recommended)
       if (!isCopyOperation) {
         await DropOperations.removeFromSourceList(
           favoritesService,
@@ -94,7 +94,7 @@ class SyncOperations {
   ) async {
     controller.updateQueueStatus(operationId, OperationStatus.inProgress);
     try {
-      // Ensure movie file exists for copy operations (especially from Popular)
+      // Ensure movie file exists for copy operations (especially from Recommended)
       if (action != 'remove') {
         await DropOperations.ensureMovieFileExists(favoritesService, movie);
       }

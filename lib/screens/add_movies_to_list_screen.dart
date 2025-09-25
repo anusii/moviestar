@@ -146,10 +146,11 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
     try {
       final contentService =
           await ref.read(directContentServiceProvider.future);
-      final popularMixedContent = await contentService.getPopularMixedContent();
+      final recommendedMixedContent =
+          await contentService.getRecommendedMixedContent();
 
       // Remove content already in the list.
-      final filteredSuggestions = popularMixedContent
+      final filteredSuggestions = recommendedMixedContent
           .where((content) => !_moviesInList.contains(content.id))
           .take(20)
           .toList();
@@ -331,7 +332,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
               ),
               const SizedBox(width: 8),
               Text(
-                'Popular Content',
+                'Recommended Content',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 16,

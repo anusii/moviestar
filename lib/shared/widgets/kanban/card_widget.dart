@@ -165,8 +165,8 @@ class KanbanCardWidget extends StatelessWidget {
               ),
             ),
           ),
-          // Show copy indicator for Popular movies
-          if (columnType == KanbanColumnType.popular)
+          // Show copy indicator for Recommended movies
+          if (columnType == KanbanColumnType.recommended)
             Positioned(
               top: 4,
               right: 4,

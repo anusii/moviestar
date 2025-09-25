@@ -95,7 +95,7 @@ class HomeErrorHandler {
 
         return ErrorDisplayWidget(
           message: 'Error loading movies: $error',
-          onRetry: () => ref.invalidate(popularMoviesWithCacheInfoProvider),
+          onRetry: () => ref.invalidate(recommendedMoviesWithCacheInfoProvider),
         );
       },
     );
@@ -142,7 +142,7 @@ class HomeErrorHandler {
       ref,
       error,
       stackTrace,
-      () => ref.invalidate(popularMoviesWithCacheInfoProvider),
+      () => ref.invalidate(recommendedMoviesWithCacheInfoProvider),
     );
   }
 

@@ -339,7 +339,7 @@ class ContentBuilders {
       children: [
         buildSearchSection(
           context,
-          'Popular Content',
+          'Recommended Content',
           suggestedContent,
           Icons.trending_up,
           moviesInList,

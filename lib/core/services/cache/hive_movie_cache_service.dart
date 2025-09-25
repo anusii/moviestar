@@ -32,9 +32,9 @@ import 'package:moviestar/models/movie.dart';
 /// Categories available for movie caching.
 
 enum CacheCategory {
-  /// Popular movies from TMDB.
+  /// Recommended movies from TMDB.
 
-  popular('popular'),
+  recommended('recommended'),
 
   /// Movies currently playing in theaters.
 
@@ -70,9 +70,9 @@ class CacheConfig {
 
   static const Duration defaultTtl = Duration(hours: 1);
 
-  /// Time-to-live (TTL) for popular movies (30 minutes).
+  /// Time-to-live (TTL) for recommended movies (30 minutes).
 
-  static const Duration popularTtl = Duration(minutes: 30);
+  static const Duration recommendedTtl = Duration(minutes: 30);
 
   /// Time-to-live (TTL) for now playing movies (15 minutes).
 
@@ -90,8 +90,8 @@ class CacheConfig {
 
   static Duration getTtlForCategory(CacheCategory category) {
     switch (category) {
-      case CacheCategory.popular:
-        return popularTtl;
+      case CacheCategory.recommended:
+        return recommendedTtl;
       case CacheCategory.nowPlaying:
         return nowPlayingTtl;
       case CacheCategory.topRated:

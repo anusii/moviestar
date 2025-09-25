@@ -87,8 +87,13 @@ class KanbanColumnWidget extends StatelessWidget {
     );
 
     // Apply sorting based on column's sort criteria
-    final sortCriteria = controller.columnSortCriteria[columnData.categoryId] ??
-        MovieSortCriteria.nameAsc;
+    // Default: recommended -> ratingDesc, others -> nameAsc
+    final defaultCriteria =
+        columnData.columnType == KanbanColumnType.recommended
+            ? MovieSortCriteria.ratingDesc
+            : MovieSortCriteria.nameAsc;
+    final sortCriteria =
+        controller.columnSortCriteria[columnData.categoryId] ?? defaultCriteria;
     final sortedMovies = sortMovies(
       List<Movie>.from(moviesWithOptimistic),
       sortCriteria,
@@ -96,7 +101,7 @@ class KanbanColumnWidget extends StatelessWidget {
 
     final displayMovies = sortedMovies.take(maxItemsPerColumn).toList();
     final hasMore = sortedMovies.length > maxItemsPerColumn;
-    final canAcceptDrop = columnData.columnType != KanbanColumnType.popular;
+    final canAcceptDrop = columnData.columnType != KanbanColumnType.recommended;
     final hasPendingOps = controller.isPendingOperation(
       columnData.columnType,
       columnData.categoryId,

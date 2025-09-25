@@ -23,7 +23,7 @@ import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/shared/widgets/home/cache_badges.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
-/// Widget that displays popular, now playing, top rated, and upcoming movie sections.
+/// Widget that displays recommended, now playing, top rated, and upcoming movie sections.
 class HomeMovieSections extends ConsumerWidget {
   final FavoritesService favoritesService;
   final StatefulWidget parentWidget;
@@ -40,7 +40,7 @@ class HomeMovieSections extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final popularMovies = ref.watch(popularMoviesWithCacheInfoProvider);
+    final recommendedMovies = ref.watch(recommendedMoviesWithCacheInfoProvider);
     final nowPlayingMovies = ref.watch(nowPlayingMoviesWithCacheInfoProvider);
     final topRatedMovies = ref.watch(topRatedMoviesWithCacheInfoProvider);
     final upcomingMovies = ref.watch(upcomingMoviesWithCacheInfoProvider);
@@ -50,10 +50,10 @@ class HomeMovieSections extends ConsumerWidget {
         _buildMovieRow(
           context,
           ref,
-          'Popular on Movie Star',
-          popularMovies,
-          'popular',
-          CacheCategory.popular,
+          'Recommended on Movie Star',
+          recommendedMovies,
+          'recommended',
+          CacheCategory.recommended,
         ),
         _buildMovieRow(
           context,
@@ -238,7 +238,7 @@ class HomeMovieSections extends ConsumerWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      ref.invalidate(popularMoviesWithCacheInfoProvider);
+                      ref.invalidate(recommendedMoviesWithCacheInfoProvider);
                       ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
                       ref.invalidate(topRatedMoviesWithCacheInfoProvider);
                       ref.invalidate(upcomingMoviesWithCacheInfoProvider);

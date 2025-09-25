@@ -57,8 +57,8 @@ final directApiKeyProvider = FutureProvider<String?>((ref) async {
   }
 });
 
-/// Provider for popular movies with caching information.
-final popularMoviesWithCacheInfoProvider =
+/// Provider for recommended movies with caching information.
+final recommendedMoviesWithCacheInfoProvider =
     FutureProvider.autoDispose<CacheResult<List<Movie>>>((ref) async {
   final cachedService = ref.watch(configuredCachedMovieServiceProvider);
   final apiKeyAsync = ref.watch(directApiKeyProvider);
@@ -77,7 +77,7 @@ final popularMoviesWithCacheInfoProvider =
   ref.watch(cachingEnabledProvider);
   ref.watch(cacheOnlyModeProvider);
   try {
-    final result = await cachedService.getPopularMoviesWithCacheInfo();
+    final result = await cachedService.getRecommendedMoviesWithCacheInfo();
     return result;
   } catch (e) {
     rethrow;

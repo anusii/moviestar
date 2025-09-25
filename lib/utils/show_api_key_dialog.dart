@@ -32,6 +32,7 @@ import 'package:moviestar/core/services/api/key_service.dart';
 
 /// Shows the API key setup dialog.
 /// Returns true if API key was successfully set, false otherwise.
+
 Future<bool> showApiKeyDialog(
   BuildContext context,
   ApiKeyService apiKeyService, {
@@ -261,7 +262,8 @@ void _showApiKeyHelpDialog(BuildContext context) {
               ),
               const SizedBox(height: 20),
 
-              // Prominent link section at the top
+              // Prominent link section at the top.
+
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -338,7 +340,8 @@ void _showApiKeyHelpDialog(BuildContext context) {
 
               const SizedBox(height: 20),
 
-              // Condensed steps
+              // Condensed steps.
+
               Text(
                 'Quick Steps:',
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(

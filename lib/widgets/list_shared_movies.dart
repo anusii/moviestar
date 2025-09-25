@@ -53,6 +53,7 @@ class ListSharedMovies extends StatefulWidget {
 
 class _ListSharedMoviesState extends State<ListSharedMovies> {
   // Share a movie using the common sharing UI.
+
   Future<void> _shareMovie(Movie movie, String movieFilePath) async {
     try {
       final result = await navigateToGrantPermissionUi(
@@ -65,10 +66,12 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
       );
 
       if (mounted) {
-        // Refresh the parent screen data
+        // Refresh the parent screen data.
+
         widget.onDataChanged();
 
-        // Show result message
+        // Show result message.
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -95,6 +98,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
   }
 
   // Handle navigation for tapped items.
+
   Future<void> _handleItemTap({
     required String resourceUrl,
     required Map<String, dynamic> itemData,
@@ -120,6 +124,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
   }
 
   // Navigate to movie list detail screen.
+
   Future<void> _navigateToMovieList(
     String resourceUrl,
     Map<String, dynamic> itemData,
@@ -156,6 +161,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
   }
 
   // Navigate to movie details screen.
+
   Future<void> _navigateToMovie(
     String resourceUrl,
     Map<String, dynamic> itemData,
@@ -205,6 +211,7 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
   }
 
   // Handle share action for movies.
+
   Future<void> _handleShareAction({
     required String resourceUrl,
     required Map<String, dynamic> itemData,
@@ -237,23 +244,27 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
 
   @override
   Widget build(BuildContext context) {
-    // Separate movies and movie lists from the shared data
+    // Separate movies and movie lists from the shared data.
+
     final movies =
         widget.sharedMoviesMap['movies'] as Map<String, dynamic>? ?? {};
     final movieLists =
         widget.sharedMoviesMap['movieLists'] as Map<String, dynamic>? ?? {};
 
-    // Combine both into a single list for display
+    // Combine both into a single list for display.
+
     final allItems = <MapEntry<String, Map<String, dynamic>>>[];
 
-    // Add movie lists first (higher priority)
+    // Add movie lists first (higher priority).
+
     for (final entry in movieLists.entries) {
       final listData = entry.value as Map<String, dynamic>;
       listData['type'] = 'movieList'; // Add type identifier
       allItems.add(MapEntry(entry.key, listData));
     }
 
-    // Add individual movies
+    // Add individual movies.
+
     for (final entry in movies.entries) {
       final movieData = entry.value as Map<String, dynamic>;
       movieData['type'] = 'movie'; // Add type identifier
@@ -282,7 +293,8 @@ class _ListSharedMoviesState extends State<ListSharedMovies> {
         final isUserRatedMovie = itemData['isUserRatedMovie'] == true;
         final canShare = itemData['canShare'] == true;
 
-        // Use appropriate builder method based on item type
+        // Use appropriate builder method based on item type.
+
         if (itemData['type'] == 'movieList') {
           return SharedMoviesItemBuilders.buildMovieListItem(
             context: context,

@@ -15,8 +15,10 @@ import 'package:moviestar/shared/utils/turtle/base_serializer.dart';
 import 'package:moviestar/shared/utils/turtle/namespace_manager.dart';
 
 /// Handles User profile ↔ Turtle serialization operations.
+
 class UserProfileTurtleSerializer extends TurtleBaseSerializer {
   /// Creates a user profile in TTL format following the ontology structure.
+
   static String createUserProfile(
     String userWebId, {
     String? apiKey,
@@ -27,6 +29,7 @@ class UserProfileTurtleSerializer extends TurtleBaseSerializer {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
     // Create the user resource.
+
     final userResource = URIRef(userWebId);
     triples[userResource] = {
       TurtleNamespaceManager.rdfType: [
@@ -41,12 +44,14 @@ class UserProfileTurtleSerializer extends TurtleBaseSerializer {
     };
 
     // Add API key if provided.
+
     if (apiKey != null && apiKey.isNotEmpty) {
       triples[userResource]![TurtleNamespaceManager.hasApiKey] =
           TurtleNamespaceManager.moviestarDataNS.withAttr('ApiKey-$apiKey');
     }
 
     // Add DOB if provided.
+
     if (dobString != null && dobString.isNotEmpty) {
       triples[userResource]![TurtleNamespaceManager.dob] = Literal(
         dobString,
@@ -55,12 +60,14 @@ class UserProfileTurtleSerializer extends TurtleBaseSerializer {
     }
 
     // Add gender if provided.
+
     if (genderString != null && genderString.isNotEmpty) {
       triples[userResource]![TurtleNamespaceManager.gender] =
           Literal(genderString);
     }
 
     // Add movie lists if provided.
+
     if (movieListIds != null && movieListIds.isNotEmpty) {
       final movieListRefs = movieListIds
           .map(

@@ -16,13 +16,16 @@ import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Utilities for parsing Turtle content and extracting structured data.
+
 class TurtleParsingUtils {
   /// Extracts Movie object from RDF triples.
+
   static Movie? extractMovieFromTriples(
     Map<String, List<dynamic>> predicates,
   ) {
     try {
       // Try different namespace variations for predicates.
+
       final idValues = predicates['http://schema.org/identifier'] ??
           predicates['identifier'] ??
           predicates['#identifier'] ??
@@ -84,7 +87,8 @@ class TurtleParsingUtils {
               .toList()
           : <int>[];
 
-      // Determine content type from RDF type in predicates
+      // Determine content type from RDF type in predicates.
+
       ContentType? contentType;
       final typeValues =
           predicates['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] ??
@@ -118,9 +122,11 @@ class TurtleParsingUtils {
   }
 
   /// Tries to parse JSON backup data from TTL content.
+
   static List<Movie>? tryParseMovieJsonBackup(String ttlContent) {
     try {
       // First try to parse from JSON backup for backward compatibility.
+
       final jsonMatch = RegExp(r'# JSON_DATA: (.+)').firstMatch(ttlContent);
       if (jsonMatch != null) {
         final jsonData = jsonMatch.group(1)!;
@@ -129,6 +135,7 @@ class TurtleParsingUtils {
       }
 
       // Try to parse individual movie JSON backup format.
+
       final movieJsonMatch =
           RegExp(r'# JSON_MOVIE_DATA: (.+)').firstMatch(ttlContent);
       if (movieJsonMatch != null) {
@@ -144,6 +151,7 @@ class TurtleParsingUtils {
   }
 
   /// Tries to parse user data JSON backup from TTL content.
+
   static Map<String, dynamic>? tryParseUserDataJsonBackup(String ttlContent) {
     try {
       final movieJsonMatch = RegExp(
@@ -174,6 +182,7 @@ class TurtleParsingUtils {
   }
 
   /// Safely parses TTL content to triple map.
+
   static Map<String, Map<String, List<dynamic>>>? safeParseTtl(
     String ttlContent,
   ) {
@@ -185,6 +194,7 @@ class TurtleParsingUtils {
   }
 
   /// Checks if a subject has a specific RDF type.
+
   static bool hasRdfType(
     Map<String, List<dynamic>> predicates,
     List<String> typeMatches,
@@ -199,6 +209,7 @@ class TurtleParsingUtils {
   }
 
   /// Extracts first value from predicate variations.
+
   static String extractFirstValue(
     Map<String, List<dynamic>> predicates,
     List<String> predicateVariations,

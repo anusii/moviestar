@@ -18,23 +18,30 @@ import 'package:moviestar/widgets/movie_card.dart';
 
 /// A widget that builds movie list items for list view mode in the home screen.
 /// This component displays up to 5 movies in a vertical list format.
+
 class HomeMovieListItems extends StatelessWidget {
   /// List of movies to display.
+
   final List<Movie> movies;
 
   /// Whether the movies are from cache.
+
   final bool fromCache;
 
   /// Service for managing favorite movies.
+
   final FavoritesService favoritesService;
 
   /// Parent widget for navigation context.
+
   final StatefulWidget parentWidget;
 
   /// Callback for safe navigation.
+
   final void Function(Route<dynamic> route) onNavigate;
 
   /// Creates a new [HomeMovieListItems] widget.
+
   const HomeMovieListItems({
     super.key,
     required this.movies,

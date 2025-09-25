@@ -12,8 +12,10 @@ import 'package:gap/gap.dart';
 import 'package:moviestar/constants/dimensions.dart';
 
 /// Builds individual items for shared movies list.
+
 class SharedMoviesItemBuilders {
   /// Build a rating display widget.
+
   static Widget buildRatingDisplay(dynamic rating) {
     if (rating == null) {
       return const SizedBox.shrink();
@@ -41,6 +43,7 @@ class SharedMoviesItemBuilders {
   }
 
   /// Build a permissions badge widget.
+
   static Widget buildPermissionsBadge(String permissions) {
     Color badgeColor;
     IconData badgeIcon;
@@ -98,6 +101,7 @@ class SharedMoviesItemBuilders {
   }
 
   /// Build a movie list item.
+
   static Widget buildMovieListItem({
     required BuildContext context,
     required Map<String, dynamic> itemData,
@@ -153,6 +157,7 @@ class SharedMoviesItemBuilders {
   }
 
   /// Build a movie item.
+
   static Widget buildMovieItem({
     required BuildContext context,
     required Map<String, dynamic> itemData,

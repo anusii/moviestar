@@ -16,14 +16,18 @@ import 'package:moviestar/constants/dimensions.dart';
 
 /// A skeleton placeholder for kanban columns during loading.
 /// Provides visual feedback that a column will appear while maintaining layout.
+
 class KanbanColumnSkeleton extends StatefulWidget {
   /// Optional skeleton title text.
+
   final String? title;
 
   /// Number of skeleton items to show in the column.
+
   final int itemCount;
 
   /// Width of the skeleton column.
+
   final double width;
 
   const KanbanColumnSkeleton({
@@ -85,12 +89,14 @@ class _KanbanColumnSkeletonState extends State<KanbanColumnSkeleton>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header skeleton
+          // Header skeleton.
+
           Container(
             padding: const EdgeInsets.all(Dimensions.m),
             child: Row(
               children: [
-                // Title skeleton
+                // Title skeleton.
+
                 Expanded(
                   child: AnimatedBuilder(
                     animation: _animation,
@@ -121,7 +127,8 @@ class _KanbanColumnSkeletonState extends State<KanbanColumnSkeleton>
                   ),
                 ),
                 const Gap(Dimensions.s),
-                // Count badge skeleton
+                // Count badge skeleton.
+
                 AnimatedBuilder(
                   animation: _animation,
                   builder: (context, child) {
@@ -147,7 +154,8 @@ class _KanbanColumnSkeletonState extends State<KanbanColumnSkeleton>
             ),
           ),
 
-          // Skeleton movie items content
+          // Skeleton movie items content.
+
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(8),
@@ -166,6 +174,7 @@ class _KanbanColumnSkeletonState extends State<KanbanColumnSkeleton>
   }
 
   /// Build a skeleton movie item placeholder.
+
   Widget _buildSkeletonMovieItem(ThemeData theme) {
     return Container(
       height: 80,
@@ -179,7 +188,8 @@ class _KanbanColumnSkeletonState extends State<KanbanColumnSkeleton>
       ),
       child: Row(
         children: [
-          // Poster skeleton
+          // Poster skeleton.
+
           Container(
             width: 50,
             height: 70,
@@ -190,13 +200,15 @@ class _KanbanColumnSkeletonState extends State<KanbanColumnSkeleton>
             ),
           ),
           const Gap(8),
-          // Text content skeleton
+          // Text content skeleton.
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Title skeleton
+                // Title skeleton.
+
                 Container(
                   height: 16,
                   width: double.infinity,
@@ -206,7 +218,8 @@ class _KanbanColumnSkeletonState extends State<KanbanColumnSkeleton>
                   ),
                 ),
                 const Gap(4),
-                // Subtitle skeleton
+                // Subtitle skeleton.
+
                 Container(
                   height: 12,
                   width: 100,

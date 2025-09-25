@@ -26,59 +26,78 @@ library;
 import 'package:flutter/material.dart';
 
 /// Types of errors that can occur in the application.
+
 enum ErrorType {
   /// API key is missing or invalid (401 errors).
+
   apiKeyError,
 
   /// Network connectivity issues.
+
   networkError,
 
   /// Server is temporarily unavailable (5xx errors).
+
   serverError,
 
   /// Request timed out.
+
   timeoutError,
 
   /// Invalid data format or parsing errors.
+
   dataFormatError,
 
   /// Unknown or unexpected errors.
+
   unknownError,
 }
 
 /// Types of actions users can take to resolve errors.
+
 enum ErrorActionType {
   /// Retry the failed operation.
+
   retry,
 
   /// Navigate to API key configuration.
+
   configureApiKey,
 
   /// Navigate to network settings.
+
   networkSettings,
 
   /// Contact support.
+
   contactSupport,
 
   /// Dismiss the error.
+
   dismiss,
 }
 
 /// Represents an action that can be taken to resolve an error.
+
 class ErrorAction {
   /// The type of action.
+
   final ErrorActionType type;
 
   /// The label to display on the action button.
+
   final String label;
 
   /// The callback to execute when the action is triggered.
+
   final VoidCallback onPressed;
 
   /// Icon to display with the action.
+
   final IconData icon;
 
   /// Whether this action is the primary action (highlighted).
+
   final bool isPrimary;
 
   const ErrorAction({
@@ -90,6 +109,7 @@ class ErrorAction {
   });
 
   /// Creates a retry action.
+
   static ErrorAction retry(VoidCallback onRetry) {
     return ErrorAction(
       type: ErrorActionType.retry,
@@ -101,6 +121,7 @@ class ErrorAction {
   }
 
   /// Creates a configure API key action.
+
   static ErrorAction configureApiKey(VoidCallback onConfigure) {
     return ErrorAction(
       type: ErrorActionType.configureApiKey,
@@ -112,6 +133,7 @@ class ErrorAction {
   }
 
   /// Creates a network settings action.
+
   static ErrorAction networkSettings(VoidCallback onSettings) {
     return ErrorAction(
       type: ErrorActionType.networkSettings,
@@ -122,6 +144,7 @@ class ErrorAction {
   }
 
   /// Creates a contact support action.
+
   static ErrorAction contactSupport(VoidCallback onContact) {
     return ErrorAction(
       type: ErrorActionType.contactSupport,
@@ -132,6 +155,7 @@ class ErrorAction {
   }
 
   /// Creates a dismiss action.
+
   static ErrorAction dismiss(VoidCallback onDismiss) {
     return ErrorAction(
       type: ErrorActionType.dismiss,
@@ -143,32 +167,42 @@ class ErrorAction {
 }
 
 /// Represents a user-friendly error with actionable guidance.
+
 class UserFriendlyError {
   /// The type of error.
+
   final ErrorType type;
 
   /// User-friendly title for the error.
+
   final String title;
 
   /// User-friendly message explaining what went wrong.
+
   final String message;
 
   /// Additional details or suggestions for resolution.
+
   final String details;
 
   /// Actions the user can take to resolve the error.
+
   final List<ErrorAction> actions;
 
   /// The original technical error (for debugging/logging).
+
   final Object? originalError;
 
   /// The original stack trace (for debugging/logging).
+
   final StackTrace? stackTrace;
 
   /// Icon to display with the error.
+
   final IconData icon;
 
   /// Color theme for the error display.
+
   final Color? color;
 
   const UserFriendlyError({
@@ -184,6 +218,7 @@ class UserFriendlyError {
   });
 
   /// Creates an API key error.
+
   static UserFriendlyError apiKeyError({
     required List<ErrorAction> actions,
     Object? originalError,
@@ -204,6 +239,7 @@ class UserFriendlyError {
   }
 
   /// Creates a network error.
+
   static UserFriendlyError networkError({
     required List<ErrorAction> actions,
     Object? originalError,
@@ -224,6 +260,7 @@ class UserFriendlyError {
   }
 
   /// Creates a server error.
+
   static UserFriendlyError serverError({
     required List<ErrorAction> actions,
     Object? originalError,
@@ -244,6 +281,7 @@ class UserFriendlyError {
   }
 
   /// Creates a timeout error.
+
   static UserFriendlyError timeoutError({
     required List<ErrorAction> actions,
     Object? originalError,
@@ -263,6 +301,7 @@ class UserFriendlyError {
   }
 
   /// Creates a data format error.
+
   static UserFriendlyError dataFormatError({
     required List<ErrorAction> actions,
     Object? originalError,
@@ -283,6 +322,7 @@ class UserFriendlyError {
   }
 
   /// Creates an unknown error.
+
   static UserFriendlyError unknownError({
     required List<ErrorAction> actions,
     Object? originalError,
@@ -303,9 +343,11 @@ class UserFriendlyError {
   }
 
   /// Whether this error has technical details available for debugging.
+
   bool get hasTechnicalDetails => originalError != null;
 
   /// Gets the technical error details as a formatted string.
+
   String get technicalDetails {
     if (originalError == null) return 'No technical details available';
 

@@ -27,14 +27,18 @@ import 'package:flutter/material.dart';
 
 /// A widget that displays the collection overview in the batch sharing interface.
 /// Shows the collection name and file count summary.
+
 class CollectionOverview extends StatelessWidget {
   /// The name of the collection.
+
   final String listName;
 
   /// The number of movies in the collection.
+
   final int movieCount;
 
   /// Creates a new [CollectionOverview].
+
   const CollectionOverview({
     super.key,
     required this.listName,

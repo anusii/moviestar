@@ -24,17 +24,22 @@ import 'package:moviestar/widgets/error_display_widget.dart';
 
 /// A widget that displays an API key error overlay for the home screen.
 /// This overlay appears when there's an API key configuration issue.
+
 class HomeApiErrorOverlay extends ConsumerWidget {
   /// Whether there's an API key error.
+
   final bool hasApiKeyError;
 
   /// The API key error message.
+
   final String? apiKeyErrorMessage;
 
   /// Callback to handle error state reset.
+
   final VoidCallback onRetry;
 
   /// Creates a new [HomeApiErrorOverlay] widget.
+
   const HomeApiErrorOverlay({
     super.key,
     required this.hasApiKeyError,
@@ -55,6 +60,7 @@ class HomeApiErrorOverlay extends ConsumerWidget {
         StackTrace.current,
         () {
           // Retry by refreshing all providers.
+
           ref.invalidate(recommendedMoviesWithCacheInfoProvider);
           ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
           ref.invalidate(topRatedMoviesWithCacheInfoProvider);
@@ -80,6 +86,7 @@ class HomeApiErrorOverlay extends ConsumerWidget {
         }
 
         // Fallback to basic error display.
+
         return Center(
           child: Padding(
             padding: const EdgeInsets.all(Dimensions.huge),
@@ -113,6 +120,7 @@ class HomeApiErrorOverlay extends ConsumerWidget {
   }
 
   /// Creates a user-friendly error with smart detection services.
+
   Future<UserFriendlyError> _createUserFriendlyError(
     WidgetRef ref,
     Object error,
@@ -120,11 +128,13 @@ class HomeApiErrorOverlay extends ConsumerWidget {
     VoidCallback onRetry,
   ) async {
     // Create services for smart detection.
+
     final apiKeyService = ref.read(apiKeyServiceProvider);
     final apiKeyValidationService = ApiKeyValidationService(apiKeyService);
     final networkConnectivityService = NetworkConnectivityService.forTMDB();
 
     // Create error context with available actions and services.
+
     final errorContext = ErrorContext(
       onRetry: onRetry,
       onConfigureApiKey: null,
@@ -134,6 +144,7 @@ class HomeApiErrorOverlay extends ConsumerWidget {
 
     try {
       // Use smart error mapping.
+
       return await ErrorMapperService.mapErrorSmart(
         error,
         stackTrace,
@@ -141,6 +152,7 @@ class HomeApiErrorOverlay extends ConsumerWidget {
       );
     } catch (e) {
       // If smart mapping fails, fall back to traditional mapping.
+
       return ErrorMapperService.mapError(
         error,
         stackTrace,

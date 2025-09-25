@@ -13,11 +13,14 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
 /// Widget that displays loading state for custom lists.
+
 class CustomListLoadingState extends StatelessWidget {
   /// Message to display while loading.
+
   final String message;
 
   /// Creates a new [CustomListLoadingState].
+
   const CustomListLoadingState({
     super.key,
     this.message = 'Loading Custom Lists...',
@@ -60,11 +63,14 @@ class CustomListLoadingState extends StatelessWidget {
 }
 
 /// Widget that displays empty state for custom lists.
+
 class CustomListEmptyState extends StatelessWidget {
   /// Name of the custom list.
+
   final String listName;
 
   /// Creates a new [CustomListEmptyState].
+
   const CustomListEmptyState({
     super.key,
     required this.listName,
@@ -85,17 +91,22 @@ class CustomListEmptyState extends StatelessWidget {
 }
 
 /// Widget that displays loading state for movie content.
+
 class MovieLoadingCard extends StatelessWidget {
   /// Width of the loading card.
+
   final double width;
 
   /// Height of the loading card.
+
   final double height;
 
   /// Whether this is for a list item layout.
+
   final bool isListItem;
 
   /// Creates a new [MovieLoadingCard].
+
   const MovieLoadingCard({
     super.key,
     this.width = 100,
@@ -184,17 +195,22 @@ class MovieLoadingCard extends StatelessWidget {
 }
 
 /// Widget that displays error state for movie loading.
+
 class MovieErrorCard extends StatelessWidget {
   /// Width of the error card.
+
   final double width;
 
   /// Height of the error card.
+
   final double height;
 
   /// Whether this is for a list item layout.
+
   final bool isListItem;
 
   /// Creates a new [MovieErrorCard].
+
   const MovieErrorCard({
     super.key,
     this.width = 100,

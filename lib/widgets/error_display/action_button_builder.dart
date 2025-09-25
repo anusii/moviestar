@@ -16,17 +16,22 @@ import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/models/app_error.dart';
 
 /// Static helper class for building action buttons in error displays.
+
 class ActionButtonBuilder {
   /// Builds action buttons based on the number and type of actions.
+
   static Widget buildActionButtons(List<ErrorAction> actions) {
     if (actions.length == 1) {
       // Single action - full width button.
+
       return _buildSingleActionButton(actions.first);
     } else if (actions.length == 2) {
       // Two actions - side by side with equal heights.
+
       return _buildTwoActionButtons(actions);
     } else {
       // Multiple actions - wrap them.
+
       return _buildMultipleActionButtons(actions);
     }
   }

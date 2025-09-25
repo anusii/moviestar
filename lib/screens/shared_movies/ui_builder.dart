@@ -13,8 +13,10 @@ import 'package:moviestar/constants/dimensions.dart';
 import 'package:moviestar/widgets/list_shared_movies.dart';
 
 /// Handles UI building for shared movies screen.
+
 class SharedMoviesUIBuilder {
   /// Build the loaded screen with shared movies data.
+
   static Widget buildLoadedScreen(
     Map<String, dynamic> sharedMoviesMap,
     VoidCallback onDataChanged,
@@ -29,6 +31,7 @@ class SharedMoviesUIBuilder {
   }
 
   /// Build the empty state when no shared movies are found.
+
   static Widget buildEmptyState() {
     return Center(
       child: Padding(
@@ -72,6 +75,7 @@ class SharedMoviesUIBuilder {
   }
 
   /// Build the error state when there's an issue loading shared movies.
+
   static Widget buildErrorState() {
     return Center(
       child: Padding(

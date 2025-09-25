@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
 
 /// Configuration settings for the kanban board.
+
 class KanbanSettings {
   final int maxItemsPerColumn;
   final bool showMoviePosters;
@@ -72,6 +73,7 @@ class KanbanSettings {
 }
 
 /// Controller for managing kanban settings.
+
 class KanbanSettingsController extends ChangeNotifier {
   KanbanSettings _settings = const KanbanSettings();
 

@@ -18,8 +18,10 @@ import 'package:moviestar/models/movie.dart';
 
 /// A widget that provides cache badge functionality for the home screen.
 /// This component handles different types of cache indicators and badges.
+
 class HomeCacheBadges {
   /// Builds cache indicator for section headers.
+
   static Widget buildSectionCacheIndicator(
     AsyncValue<CacheResult<List<Movie>>> moviesAsync,
     bool cacheOnlyMode,
@@ -46,6 +48,7 @@ class HomeCacheBadges {
   }
 
   /// Builds offline mode badge.
+
   static Widget buildOfflineModeBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -72,6 +75,7 @@ class HomeCacheBadges {
   }
 
   /// Builds cache age badge.
+
   static Widget buildCacheAgeBadge(Duration cacheAge) {
     final ageText = formatCacheAge(cacheAge);
     return Container(
@@ -99,6 +103,7 @@ class HomeCacheBadges {
   }
 
   /// Builds cache badge for fresh cache data.
+
   static Widget buildCacheBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -125,6 +130,7 @@ class HomeCacheBadges {
   }
 
   /// Builds network badge for fresh data.
+
   static Widget buildNetworkBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -151,6 +157,7 @@ class HomeCacheBadges {
   }
 
   /// Formats cache age into human-readable string.
+
   static String formatCacheAge(Duration age) {
     if (age.inDays > 0) {
       return '${age.inDays}d old';

@@ -29,7 +29,7 @@ import 'package:solidpod/solidpod.dart';
 
 /// Gets the correct path for reading files from POD.
 ///
-/// Due to a discrepancy in solidpod:.
+/// Due to a discrepancy in solidpod:
 /// - writePod automatically prepends getDataDirPath() to the fileName.
 /// - readPod uses the filePath directly without preprocessing.
 ///

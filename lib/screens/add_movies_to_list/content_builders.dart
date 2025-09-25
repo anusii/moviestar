@@ -13,8 +13,10 @@ import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/widgets/error_display_widget.dart';
 
 /// Builds content-related widgets for the Add Movies to List screen.
+
 class ContentBuilders {
   /// Build a content card for a content item.
+
   static Widget buildContentCard(
     BuildContext context,
     ContentItem contentItem,
@@ -116,6 +118,7 @@ class ContentBuilders {
   }
 
   /// Build a search section with title and content list.
+
   static Widget buildSearchSection(
     BuildContext context,
     String title,
@@ -178,6 +181,7 @@ class ContentBuilders {
   }
 
   /// Build the search tab content.
+
   static Widget buildSearchTab(
     BuildContext context, {
     required bool isSearchLoading,
@@ -275,6 +279,7 @@ class ContentBuilders {
   }
 
   /// Build the suggestions tab content.
+
   static Widget buildSuggestionsTab(
     BuildContext context, {
     required bool isSuggestionsLoading,

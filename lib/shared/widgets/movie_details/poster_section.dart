@@ -18,11 +18,14 @@ import 'package:moviestar/utils/movie_display_utils.dart';
 
 /// A widget that displays the poster/hero section of a movie details screen.
 /// This component shows the backdrop image with a collapsible app bar.
+
 class MoviePosterSection extends StatelessWidget {
   /// The movie to display.
+
   final Movie movie;
 
   /// Creates a new [MoviePosterSection] widget.
+
   const MoviePosterSection({
     super.key,
     required this.movie,

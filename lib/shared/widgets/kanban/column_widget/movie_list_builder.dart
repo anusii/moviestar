@@ -16,8 +16,10 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/shared/widgets/kanban/board_controller.dart';
 
 /// Static helper class for building movie lists.
+
 class MovieListBuilder {
   /// Build the movie list widget with loading and empty states.
+
   static Widget buildMovieList(
     BuildContext context,
     String title,
@@ -61,11 +63,13 @@ class MovieListBuilder {
   }
 
   /// Build loading state widget.
+
   static Widget buildLoadingState(BuildContext context, String title) {
     return _buildSkeletonLoadingState(context, title);
   }
 
   /// Build skeleton-style loading state for consistent kanban column loading UX.
+
   static Widget _buildSkeletonLoadingState(BuildContext context, String title) {
     return ListView.builder(
       padding: const EdgeInsets.all(8),
@@ -80,6 +84,7 @@ class MovieListBuilder {
   }
 
   /// Build a loading skeleton for a movie item.
+
   static Widget _buildLoadingMovieItem(BuildContext context) {
     final theme = Theme.of(context);
 
@@ -95,7 +100,8 @@ class MovieListBuilder {
       ),
       child: Row(
         children: [
-          // Poster skeleton
+          // Poster skeleton.
+
           Container(
             width: 50,
             height: 70,
@@ -106,13 +112,15 @@ class MovieListBuilder {
             ),
           ),
           const Gap(8),
-          // Text content skeleton
+          // Text content skeleton.
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Title skeleton
+                // Title skeleton.
+
                 Container(
                   height: 16,
                   width: double.infinity,
@@ -122,7 +130,8 @@ class MovieListBuilder {
                   ),
                 ),
                 const Gap(4),
-                // Subtitle skeleton
+                // Subtitle skeleton.
+
                 Container(
                   height: 12,
                   width: 100,
@@ -141,6 +150,7 @@ class MovieListBuilder {
   }
 
   /// Build empty state widget.
+
   static Widget buildEmptyState(BuildContext context) {
     return Center(
       child: Text(

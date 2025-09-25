@@ -32,6 +32,7 @@ import 'package:moviestar/widgets/sharing/components.dart';
 import 'package:moviestar/widgets/sharing/form_widgets.dart';
 
 /// Sharing status indicator.
+
 class SharingStatusIndicator extends StatelessWidget {
   final ShareStatus status;
   final String? message;
@@ -112,6 +113,7 @@ class SharingStatusIndicator extends StatelessWidget {
 }
 
 /// Batch sharing item tile.
+
 class ShareableItemTile extends StatelessWidget {
   final ShareableFile file;
   final ValueChanged<List<String>> onPermissionsChanged;
@@ -137,7 +139,8 @@ class ShareableItemTile extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            // Icon or thumbnail
+            // Icon or thumbnail.
+
             if (hasMovie)
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
@@ -181,7 +184,8 @@ class ShareableItemTile extends StatelessWidget {
                 ),
               ),
             const SizedBox(width: 12),
-            // File info
+            // File info.
+
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,7 +216,8 @@ class ShareableItemTile extends StatelessWidget {
                 ],
               ),
             ),
-            // Permissions
+            // Permissions.
+
             if (isReadOnly)
               Chip(
                 label: Text(
@@ -235,7 +240,8 @@ class ShareableItemTile extends StatelessWidget {
                 readOnly: !isMovieList,
                 requireRead: isMovieList, // Movie lists require read permission
               ),
-            // Remove button
+            // Remove button.
+
             if (onRemove != null)
               IconButton(
                 icon: const Icon(Icons.remove_circle_outline),
@@ -251,6 +257,7 @@ class ShareableItemTile extends StatelessWidget {
 }
 
 /// Navigate to GrantPermissionUi with consistent theming.
+
 Future<bool?> navigateToGrantPermissionUi({
   required BuildContext context,
   required String fileName,

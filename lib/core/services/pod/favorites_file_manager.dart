@@ -36,19 +36,23 @@ import 'package:moviestar/utils/serializer.dart';
 
 /// Manages movie file operations for PodFavoritesService.
 /// Extracted to reduce main service file size while preserving exact behavior.
+
 class PodFavoritesFileManager with PodOperationsMixin {
   final BuildContext _context;
   final Widget _child;
 
   /// Track which movies have files to avoid unnecessary reads.
+
   final Set<int> _moviesWithFiles = {};
 
   /// Track pending movie file updates to batch them.
+
   final Map<int, Timer> _pendingMovieUpdates = {};
 
   PodFavoritesFileManager(this._context, this._child);
 
   /// Gets the file path for a movie.
+
   String getMovieFilePathFor(Movie movie) {
     final contentType =
         movie.contentType == ContentType.tvShow ? 'tvShow' : 'movie';
@@ -56,22 +60,26 @@ class PodFavoritesFileManager with PodOperationsMixin {
   }
 
   /// Gets the file path for a movie by movie object (compatibility method).
+
   String? getMovieFilePathByMovie(Movie movie) {
     return getMovieFilePathFor(movie);
   }
 
   /// Creates or updates a movie file with user data.
   /// Uses batching to avoid race conditions.
+
   Future<void> createOrUpdateMovieFile(
     Movie movie, {
     double? rating,
     String? comment,
     bool isWatched = false,
   }) async {
-    // Cancel any pending update for this movie
+    // Cancel any pending update for this movie.
+
     _pendingMovieUpdates[movie.id]?.cancel();
 
-    // Schedule the update with a delay to batch multiple operations
+    // Schedule the update with a delay to batch multiple operations.
+
     _pendingMovieUpdates[movie.id] = Timer(
       const Duration(milliseconds: 500),
       () async {
@@ -87,6 +95,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
   }
 
   /// Performs the actual movie file update.
+
   Future<void> performMovieFileUpdate(
     Movie movie, {
     double? rating,
@@ -99,7 +108,8 @@ class PodFavoritesFileManager with PodOperationsMixin {
         return;
       }
 
-      // Read existing file to preserve data
+      // Read existing file to preserve data.
+
       Map<String, dynamic>? existingData;
       final filePath = getMovieFilePathFor(movie);
 
@@ -116,15 +126,18 @@ class PodFavoritesFileManager with PodOperationsMixin {
           );
         }
       } catch (e) {
-        // File doesn't exist yet, that's okay
+        // File doesn't exist yet, that's okay.
+
         if (!e.toString().contains('does not exist')) {}
       }
 
-      // Prepare updated data
+      // Prepare updated data.
+
       final currentRating = rating ?? existingData?['rating'];
       final currentComment = comment ?? existingData?['comment'];
 
-      // Create the TTL content
+      // Create the TTL content.
+
       final ttlContent = TurtleSerializer.movieWithUserDataToTurtle(
         movie,
         currentRating,
@@ -135,7 +148,8 @@ class PodFavoritesFileManager with PodOperationsMixin {
         return;
       }
 
-      // Write to POD
+      // Write to POD.
+
       final result = await PodFileOperationsService.writeFile(
         filePath,
         ttlContent,
@@ -148,18 +162,21 @@ class PodFavoritesFileManager with PodOperationsMixin {
         _moviesWithFiles.add(movie.id);
       } else {}
     } catch (e) {
-      // Failed to add movie file
+      // Failed to add movie file.
     }
   }
 
   /// Checks if a movie has an associated file in POD.
+
   Future<bool> hasMovieFile(Movie movie) async {
-    // Check cache first
+    // Check cache first.
+
     if (_moviesWithFiles.contains(movie.id)) {
       return true;
     }
 
-    // Check POD
+    // Check POD.
+
     final filePath = getMovieFilePathFor(movie);
     final fileExists = await PodFileOperationsService.fileExists(
       filePath,
@@ -175,6 +192,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
   }
 
   /// Reads movie file data.
+
   Future<Map<String, dynamic>?> readMovieFile(Movie movie) async {
     try {
       final loggedIn = await isLoggedIn();
@@ -201,6 +219,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
   }
 
   /// Cancels all pending movie file updates.
+
   void cancelPendingUpdates() {
     for (final timer in _pendingMovieUpdates.values) {
       timer.cancel();
@@ -209,6 +228,7 @@ class PodFavoritesFileManager with PodOperationsMixin {
   }
 
   /// Loads full movie data from POD file.
+
   Future<Movie?> loadMovieData(int movieId) async {
     try {
       final loggedIn = await isLoggedIn();
@@ -225,15 +245,17 @@ class PodFavoritesFileManager with PodOperationsMixin {
 
       if (result.success && (result.data?.isNotEmpty ?? false)) {
         // TODO: Convert Map<String, dynamic> to Movie
+
         return null; // TODO: Convert Map<String, dynamic> to Movie
       }
     } catch (e) {
-      // Failed to parse movie data
+      // Failed to parse movie data.
     }
     return null;
   }
 
   /// Parses movie list data from TTL content.
+
   Future<List<Movie>?> parseMovieListData(String ttlContent) async {
     try {
       final movieListData = TurtleSerializer.movieListFromTurtle(ttlContent);
@@ -241,12 +263,13 @@ class PodFavoritesFileManager with PodOperationsMixin {
         return movieListData['movies'] as List<Movie>? ?? [];
       }
     } catch (e) {
-      // Failed to parse movie list from turtle
+      // Failed to parse movie list from turtle.
     }
     return null;
   }
 
   /// Loads full movie details from individual movie file for a placeholder movie.
+
   Future<Movie?> loadFullMovieDetails(Movie placeholderMovie) async {
     try {
       final loggedIn = await isLoggedIn();
@@ -254,7 +277,8 @@ class PodFavoritesFileManager with PodOperationsMixin {
         return null;
       }
 
-      // Construct the path to the individual movie file
+      // Construct the path to the individual movie file.
+
       final contentTypeStr = placeholderMovie.contentType == ContentType.tvShow
           ? 'TVShow'
           : 'Movie';
@@ -263,7 +287,8 @@ class PodFavoritesFileManager with PodOperationsMixin {
 
       if (!_context.mounted) return null;
 
-      // Read the individual movie TTL file using POD operations
+      // Read the individual movie TTL file using POD operations.
+
       final result = await PodFileOperationsService.readFile(
         movieFilePath,
         _context,
@@ -271,7 +296,8 @@ class PodFavoritesFileManager with PodOperationsMixin {
       );
 
       if (result.success && (result.data?.isNotEmpty ?? false)) {
-        // Parse the movie details from the TTL content
+        // Parse the movie details from the TTL content.
+
         final movieList = TurtleSerializer.moviesFromTurtle(result.data!);
 
         if (movieList.isNotEmpty) {
@@ -280,13 +306,14 @@ class PodFavoritesFileManager with PodOperationsMixin {
         } else {}
       } else {}
     } catch (e) {
-      // Failed to load full movie details
+      // Failed to load full movie details.
     }
 
     return null;
   }
 
   /// Disposes resources.
+
   void dispose() {
     cancelPendingUpdates();
   }

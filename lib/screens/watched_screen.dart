@@ -63,6 +63,7 @@ class WatchedScreen extends StatefulWidget {
 
 class _WatchedScreenState extends State<WatchedScreen> with ScreenStateMixin {
   /// Currently selected sort criteria.
+
   MovieSortCriteria _sortCriteria = MovieSortCriteria.nameAsc;
 
   @override
@@ -166,10 +167,12 @@ Recipients will be able to:
     }
 
     // Store context references before async operations.
+
     final theme = Theme.of(context);
 
     try {
-      // Create MovieList service to create the list file first
+      // Create MovieList service to create the list file first.
+
       final userProfileService = UserProfileService(context, widget);
       final movieListService = MovieListService(
         context,
@@ -177,7 +180,8 @@ Recipients will be able to:
         userProfileService,
       );
 
-      // Create the MovieList TTL file
+      // Create the MovieList TTL file.
+
       final listId = await movieListService.createMovieList(
         'Watched Movies',
         movies: movies,
@@ -194,6 +198,7 @@ Recipients will be able to:
       }
 
       // Ensure all individual movie files exist before sharing.
+
       for (final movie in movies) {
         try {
           await _createMovieFileIfNotExists(movie);
@@ -204,6 +209,7 @@ Recipients will be able to:
       }
 
       // Navigate to the batch sharing UI.
+
       if (mounted) {
         await safeNavigateTo(
           MaterialPageRoute(
@@ -235,6 +241,7 @@ Recipients will be able to:
       final movieFileName = 'movies/Movie-${movie.id}.ttl';
 
       // Check if the file already exists.
+
       if (!mounted) return;
       if (await PodFileOperationsService.fileExists(
         movieFileName,
@@ -245,11 +252,13 @@ Recipients will be able to:
       }
 
       // Get current rating and comments from favorites service.
+
       final adapter = widget.favoritesService as FavoritesServiceAdapter;
       final currentRating = await adapter.getPersonalRating(movie);
       final currentComments = await adapter.getMovieComments(movie);
 
       // Create the movie TTL content with any existing user data.
+
       final ttlContent = TurtleSerializer.movieWithUserDataToTurtleOntology(
         movie,
         currentRating,
@@ -257,6 +266,7 @@ Recipients will be able to:
       );
 
       // Write the movie file to POD.
+
       if (!mounted) return;
       final result = await PodFileOperationsService.writeFile(
         movieFileName,

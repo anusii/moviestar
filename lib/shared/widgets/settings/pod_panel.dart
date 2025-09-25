@@ -52,8 +52,10 @@ class _PodSettingsPanelState extends ConsumerState<PodSettingsPanel> {
   }
 
   /// Enable POD storage and migrate data.
+
   Future<void> _enablePodStorage() async {
     // Show loading indicator.
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -97,6 +99,7 @@ class _PodSettingsPanelState extends ConsumerState<PodSettingsPanel> {
   }
 
   /// Disable POD storage and revert to local storage.
+
   Future<void> _disablePodStorage() async {
     try {
       await widget.favoritesServiceManager.disablePodStorage();
@@ -124,26 +127,31 @@ class _PodSettingsPanelState extends ConsumerState<PodSettingsPanel> {
   }
 
   /// Initialises POD storage state, enabling by default for logged-in users.
+
   Future<void> _initializePodStorageState() async {
     // Check if user is logged in.
+
     final loggedIn = await isLoggedIn();
 
     // If user is logged in and POD storage is not explicitly disabled,
     // enable it by default.
+
     if (loggedIn && !widget.favoritesServiceManager.isPodStorageEnabled) {
       // Try to enable POD storage silently for logged-in users.
+
       try {
         await widget.favoritesServiceManager.enablePodStorage();
       } catch (e) {
-        // If enabling fails, leave it disabled but don't show error
-        // (user can manually enable if they want)
+        // If enabling fails, leave it disabled but don't show error.
+        // (user can manually enable if they want).
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Use the actual service state instead of local state
+    // Use the actual service state instead of local state.
+
     final podStorageEnabled =
         widget.favoritesServiceManager.isPodStorageEnabled;
 

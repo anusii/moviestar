@@ -32,6 +32,7 @@ import 'package:gap/gap.dart';
 import 'package:moviestar/constants/dimensions.dart';
 
 /// Enum representing different sort criteria for movies.
+
 enum MovieSortCriteria {
   nameAsc,
   nameDesc,
@@ -42,14 +43,18 @@ enum MovieSortCriteria {
 }
 
 /// A widget that displays sorting controls for movie lists.
+
 class SortControls extends StatelessWidget {
   /// The currently selected sort criteria.
+
   final MovieSortCriteria selectedCriteria;
 
   /// Callback when sort criteria changes.
+
   final ValueChanged<MovieSortCriteria> onSortChanged;
 
   /// Creates a new [SortControls] widget.
+
   const SortControls({
     super.key,
     required this.selectedCriteria,

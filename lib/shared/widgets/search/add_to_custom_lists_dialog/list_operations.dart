@@ -16,8 +16,10 @@ import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Static helper class for custom list operations.
+
 class ListOperations {
   /// Loads all custom lists from the favorites service.
+
   static Future<List<CustomList>> loadCustomLists(
     FavoritesService favoritesService,
   ) async {
@@ -25,6 +27,7 @@ class ListOperations {
   }
 
   /// Loads the status of a movie in all custom lists.
+
   static Future<Set<String>> loadMovieListStatus(
     FavoritesService favoritesService,
     List<CustomList> customLists,
@@ -46,6 +49,7 @@ class ListOperations {
   }
 
   /// Toggles a movie's membership in a custom list.
+
   static Future<void> toggleMovieInList(
     FavoritesService favoritesService,
     String listId,
@@ -68,6 +72,7 @@ class ListOperations {
   }
 
   /// Creates a new list and adds the movie to it.
+
   static Future<CustomList> createNewListAndAdd(
     FavoritesService favoritesService,
     String listName,
@@ -86,6 +91,7 @@ class ListOperations {
   }
 
   /// Shows error message via SnackBar.
+
   static void showErrorMessage(BuildContext context, String message) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(

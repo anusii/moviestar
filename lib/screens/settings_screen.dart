@@ -120,6 +120,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           const Gap(20),
 
           // Settings Sections.
+
           ApiSettingsPanel(
             buildSection: _buildSection,
             apiKeyService: widget.apiKeyService,

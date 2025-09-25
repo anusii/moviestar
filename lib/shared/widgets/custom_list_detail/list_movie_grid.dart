@@ -123,7 +123,8 @@ class ListMovieGrid extends ConsumerWidget {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              // Movie poster
+              // Movie poster.
+
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: isValidImageUrl(movie.posterUrl)
@@ -161,7 +162,8 @@ class ListMovieGrid extends ConsumerWidget {
               ),
               const SizedBox(width: 12),
 
-              // Movie details
+              // Movie details.
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,7 +219,8 @@ class ListMovieGrid extends ConsumerWidget {
                 ),
               ),
 
-              // Actions menu
+              // Actions menu.
+
               PopupMenuButton<String>(
                 icon: Icon(
                   Icons.more_vert,
@@ -257,7 +260,8 @@ class ListMovieGrid extends ConsumerWidget {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            // Loading placeholder for poster
+            // Loading placeholder for poster.
+
             Container(
               width: 60,
               height: 90,
@@ -271,7 +275,8 @@ class ListMovieGrid extends ConsumerWidget {
             ),
             const SizedBox(width: 12),
 
-            // Loading placeholder for details
+            // Loading placeholder for details.
+
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,7 +314,8 @@ class ListMovieGrid extends ConsumerWidget {
               ),
             ),
 
-            // Loading indicator for actions
+            // Loading indicator for actions.
+
             Container(
               width: 24,
               height: 24,
@@ -339,7 +345,8 @@ class ListMovieGrid extends ConsumerWidget {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            // Error icon placeholder
+            // Error icon placeholder.
+
             Container(
               width: 60,
               height: 90,
@@ -358,7 +365,8 @@ class ListMovieGrid extends ConsumerWidget {
             ),
             const SizedBox(width: 12),
 
-            // Error message
+            // Error message.
+
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,7 +404,8 @@ class ListMovieGrid extends ConsumerWidget {
               ),
             ),
 
-            // Remove option
+            // Remove option.
+
             PopupMenuButton<String>(
               icon: Icon(
                 Icons.more_vert,

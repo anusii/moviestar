@@ -34,6 +34,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/network_client.dart';
 
 //
+
 class ContentService {
   // Base URL for The Movie Database API.
 
@@ -76,8 +77,9 @@ class ContentService {
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
     _searchService = ContentSearchService(_client!);
 
-    // On Linux, add a small delay to ensure services are ready
-    // This helps with search immediately after API key is added
+    // On Linux, add a small delay to ensure services are ready.
+    // This helps with search immediately after API key is added.
+
     if (Platform.isLinux) {
       await Future.delayed(const Duration(milliseconds: 500));
     }
@@ -89,8 +91,9 @@ class ContentService {
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
     _searchService = ContentSearchService(_client!);
 
-    // On Linux, add a small delay to ensure services are ready
-    // This helps with search immediately after API key is added
+    // On Linux, add a small delay to ensure services are ready.
+    // This helps with search immediately after API key is added.
+
     if (Platform.isLinux) {
       await Future.delayed(const Duration(milliseconds: 500));
     }
@@ -343,7 +346,8 @@ class ContentService {
   ) async {
     await _ensureClientInitialized();
     if (_searchService == null) {
-      // Fallback: reinitialize if still null
+      // Fallback: reinitialize if still null.
+
       await _initializeClient();
     }
     return await _searchService!.searchContentComprehensive(query);

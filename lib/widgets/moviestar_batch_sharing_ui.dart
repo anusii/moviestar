@@ -34,26 +34,34 @@ import 'package:moviestar/widgets/sharing/recipient_section.dart';
 
 /// Custom MovieStar batch sharing UI that shows all files to be shared.
 /// and allows per-file permission configuration.
+
 class MovieStarBatchSharingUi extends StatefulWidget {
   /// The movie list ID.
+
   final String listId;
 
   /// The movie list name.
+
   final String listName;
 
   /// List of movies in the collection.
+
   final List<Movie> movies;
 
   /// Widget to return to.
+
   final Widget child;
 
   /// Callback when sharing is complete.
+
   final VoidCallback onSharingComplete;
 
   /// Custom app bar.
+
   final PreferredSizeWidget? customAppBar;
 
   /// Background color.
+
   final Color backgroundColor;
 
   const MovieStarBatchSharingUi({
@@ -99,10 +107,12 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
   }
 
   /// Reset all file permissions to their defaults.
+
   void _resetPermissionsToDefaults() {
     _sharingState.resetPermissionsToDefaults();
 
-    // Show confirmation
+    // Show confirmation.
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Permissions reset to defaults'),
@@ -113,6 +123,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
   }
 
   /// Start the batch sharing process using PodSharingService.
+
   Future<void> _startBatchSharing() async {
     final result = await _sharingState.startBatchSharing(context, widget);
 
@@ -191,6 +202,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
   }
 
   /// Build the sharing progress screen.
+
   Widget _buildSharingProgress() {
     return BatchSharingProgressTracker(
       currentOperation: _sharingState.currentOperation,
@@ -200,6 +212,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
   }
 
   /// Build the sharing setup screen.
+
   Widget _buildSharingSetup() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -208,7 +221,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Collection overview
+            // Collection overview.
+
             CollectionOverview(
               listName: widget.listName,
               movieCount: widget.movies.length,
@@ -216,7 +230,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
 
             const SizedBox(height: 24),
 
-            // Recipient section
+            // Recipient section.
+
             RecipientSection(
               controller: _sharingState.webIdController,
               onValidated: _sharingState.updateWebId,
@@ -224,7 +239,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
 
             const SizedBox(height: 24),
 
-            // Files and permissions section
+            // Files and permissions section.
+
             BatchSharingPermissionsPanel(
               shareableFiles: _sharingState.shareableFiles,
               onPermissionsChanged: _sharingState.updateFilePermissions,
@@ -233,7 +249,8 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
 
             const SizedBox(height: 32),
 
-            // Share button
+            // Share button.
+
             _buildShareButton(),
           ],
         ),
@@ -242,6 +259,7 @@ class _MovieStarBatchSharingUiState extends State<MovieStarBatchSharingUi> {
   }
 
   /// Build share button.
+
   Widget _buildShareButton() {
     final totalFiles = _sharingState.shareableFiles.length;
 

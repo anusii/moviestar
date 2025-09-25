@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// File information for batch sharing.
+
 class ShareableFile {
   final String fileName;
   final String displayName;
@@ -55,6 +56,7 @@ class ShareableFile {
 }
 
 /// Share status enum.
+
 enum ShareStatus {
   idle,
   sharing,
@@ -63,6 +65,7 @@ enum ShareStatus {
 }
 
 /// Reusable sharing dialog wrapper with consistent theming.
+
 class ShareDialogWrapper extends StatelessWidget {
   final String title;
   final Widget child;

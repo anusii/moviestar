@@ -19,8 +19,10 @@ import 'package:moviestar/services/webid_validator.dart';
 import 'package:moviestar/utils/serializer.dart';
 
 /// Handles movie file operations for POD sharing.
+
 class MovieFileManager {
   /// Generate movie file name based on content type.
+
   static String getMovieFileName(Movie movie) {
     final contentPrefix =
         movie.contentType == ContentType.tvShow ? 'TVShow' : 'Movie';
@@ -28,6 +30,7 @@ class MovieFileManager {
   }
 
   /// Check if a movie file exists in POD.
+
   static Future<bool> movieFileExists(
     Movie movie,
     BuildContext context,
@@ -38,6 +41,7 @@ class MovieFileManager {
   }
 
   /// Read movie data from POD.
+
   static Future<Map<String, dynamic>?> readMovieData(
     Movie movie,
     BuildContext context,
@@ -59,6 +63,7 @@ class MovieFileManager {
   }
 
   /// Write movie data to POD.
+
   static Future<bool> writeMovieData(
     Movie movie,
     BuildContext context,
@@ -85,6 +90,7 @@ class MovieFileManager {
   }
 
   /// Share a movie file with enhanced error handling.
+
   static Future<ShareResult> shareMovieFile(
     Movie movie,
     String recipientWebId,
@@ -93,17 +99,20 @@ class MovieFileManager {
     List<String> permissions = const ['read'],
   }) async {
     try {
-      // Validate WebID first
+      // Validate WebID first.
+
       if (!await WebIdValidator.validateWebId(recipientWebId)) {
         return ShareResult.failure('Invalid recipient WebID: $recipientWebId');
       }
 
-      // Check if context is still mounted before checking movie file
+      // Check if context is still mounted before checking movie file.
+
       if (!context.mounted) {
         return ShareResult.failure('Context no longer mounted');
       }
 
-      // Check if movie file exists
+      // Check if movie file exists.
+
       if (!await movieFileExists(movie, context, child)) {
         return ShareResult.failure('Movie file does not exist for sharing');
       }
@@ -114,7 +123,8 @@ class MovieFileManager {
 
       final fileName = getMovieFileName(movie);
 
-      // Create share request
+      // Create share request.
+
       final shareRequest = ShareRequest(
         fileName: fileName,
         displayName: movie.title,
@@ -138,6 +148,7 @@ class MovieFileManager {
   }
 
   /// Batch share multiple movie files.
+
   static Future<BatchShareResult> shareMultipleMovieFiles(
     List<Movie> movies,
     String recipientWebId,
@@ -176,6 +187,7 @@ class MovieFileManager {
   }
 
   /// Create or update a movie file with user data.
+
   static Future<bool> createOrUpdateMovieFile(
     Movie movie,
     BuildContext context,
@@ -183,16 +195,19 @@ class MovieFileManager {
     double? rating,
     String? comment,
   }) async {
-    // Read existing data first to preserve any existing rating/comment
+    // Read existing data first to preserve any existing rating/comment.
+
     final existingData = await readMovieData(movie, context, child);
     final existingRating = existingData?['rating'] as double?;
     final existingComment = existingData?['comment'] as String?;
 
-    // Use provided parameters, fallback to existing data
+    // Use provided parameters, fallback to existing data.
+
     final finalRating = rating ?? existingRating;
     final finalComment = comment ?? existingComment;
 
-    // Check if context is still mounted after async operation
+    // Check if context is still mounted after async operation.
+
     if (!context.mounted) {
       return false;
     }

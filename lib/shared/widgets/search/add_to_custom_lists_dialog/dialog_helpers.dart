@@ -14,8 +14,10 @@ import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Static helper class for dialog operations.
+
 class DialogHelpers {
   /// Shows the create new list dialog.
+
   static void showCreateNewListDialog(
     BuildContext context,
     TextEditingController controller,
@@ -52,6 +54,7 @@ class DialogHelpers {
   }
 
   /// Shows a success message for creating a new list and adding a movie.
+
   static void showSuccessMessage(
     BuildContext context,
     String listName,

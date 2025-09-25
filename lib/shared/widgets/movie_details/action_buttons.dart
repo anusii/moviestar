@@ -17,35 +17,46 @@ import 'package:moviestar/core/services/favorites/service_adapter.dart';
 
 /// A widget that displays the action buttons for a movie details screen.
 /// This component shows bookmark, watched, add to list, and share buttons.
+
 class MovieActionButtons extends StatelessWidget {
   /// Whether the movie is in the to-watch list.
+
   final bool isInToWatch;
 
   /// Whether the movie is in the watched list.
+
   final bool isInWatched;
 
   /// Whether this is a shared movie.
+
   final bool isSharedMovie;
 
   /// Whether the movie has a local file.
+
   final bool hasMovieFile;
 
   /// Service for managing favorite movies.
+
   final FavoritesService favoritesService;
 
   /// Callback when to-watch is toggled.
+
   final VoidCallback onToggleToWatch;
 
   /// Callback when watched is toggled.
+
   final VoidCallback onToggleWatched;
 
   /// Callback to show add to lists dialog.
+
   final VoidCallback onShowAddToLists;
 
   /// Callback to share the movie.
+
   final VoidCallback onShareMovie;
 
   /// Creates a new [MovieActionButtons] widget.
+
   const MovieActionButtons({
     super.key,
     required this.isInToWatch,

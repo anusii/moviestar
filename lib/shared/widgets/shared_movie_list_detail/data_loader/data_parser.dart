@@ -11,12 +11,15 @@ library;
 import 'dart:convert';
 
 /// Static helper class for data parsing operations.
+
 class DataParser {
   /// Extract title from enhanced movie data.
+
   static String? extractTitleFromEnhancedData(
     Map<String, dynamic> enhancedData,
   ) {
-    // Check if we have a title field in the enhanced data
+    // Check if we have a title field in the enhanced data.
+
     final title = enhancedData['title'] as String?;
     if (title != null && title.isNotEmpty) {
       return title;
@@ -25,6 +28,7 @@ class DataParser {
   }
 
   /// Parses individual movie file content to extract title, rating and comments.
+
   static Future<Map<String, dynamic>?> parseIndividualMovieData(
     String ttlContent,
   ) async {
@@ -33,7 +37,8 @@ class DataParser {
       String? comments;
       String? title;
 
-      // Try to parse JSON backup data first (more reliable)
+      // Try to parse JSON backup data first (more reliable).
+
       final movieJsonMatch = RegExp(
         r'# JSON_MOVIE_DATA: (.+)',
       ).firstMatch(ttlContent);
@@ -57,12 +62,14 @@ class DataParser {
       }
 
       // If no JSON backup, try TTL parsing (fallback).
+
       if (title == null || rating == null || comments == null) {
         final lines = ttlContent.split('\n');
         for (final line in lines) {
           final trimmedLine = line.trim();
 
           // Extract title.
+
           if (title == null &&
               (trimmedLine.contains('schema:name') ||
                   trimmedLine.contains('sdo:name') ||
@@ -74,6 +81,7 @@ class DataParser {
           }
 
           // Extract rating.
+
           if (rating == null && trimmedLine.contains('schema:ratingValue')) {
             final match = RegExp(r'"?([0-9.]+)"?').firstMatch(trimmedLine);
             if (match != null) {
@@ -82,6 +90,7 @@ class DataParser {
           }
 
           // Extract comments.
+
           if (comments == null && trimmedLine.contains('schema:reviewBody')) {
             final match = RegExp(r'"([^"]*)"').firstMatch(trimmedLine);
             if (match != null) {
@@ -91,7 +100,8 @@ class DataParser {
         }
       }
 
-      // Build comprehensive result with TMDB metadata if available
+      // Build comprehensive result with TMDB metadata if available.
+
       final result = <String, dynamic>{};
 
       if (title != null) result['title'] = title;
@@ -100,9 +110,11 @@ class DataParser {
         result['comments'] = comments;
       }
 
-      // Include TMDB metadata from JSON backup if available
+      // Include TMDB metadata from JSON backup if available.
+
       if (movieMetadata != null) {
-        // Add poster and backdrop URLs
+        // Add poster and backdrop URLs.
+
         if (movieMetadata['poster_path'] != null) {
           result['posterUrl'] =
               'https://image.tmdb.org/t/p/w500${movieMetadata['poster_path']}';
@@ -112,7 +124,8 @@ class DataParser {
               'https://image.tmdb.org/t/p/w1280${movieMetadata['backdrop_path']}';
         }
 
-        // Add other TMDB fields
+        // Add other TMDB fields.
+
         if (movieMetadata['overview'] != null) {
           result['overview'] = movieMetadata['overview'];
         }

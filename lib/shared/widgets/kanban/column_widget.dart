@@ -22,11 +22,13 @@ import 'package:moviestar/widgets/sort_controls.dart';
 
 import 'board_controller.dart';
 
-// Re-export helper classes for backward compatibility
+// Re-export helper classes for backward compatibility.
+
 export 'package:moviestar/shared/widgets/kanban/column_widget/header_builder.dart';
 export 'package:moviestar/shared/widgets/kanban/column_widget/movie_list_builder.dart';
 
 /// Column data for building kanban columns.
+
 class KanbanColumnData {
   final String title;
   final List<Movie> movies;
@@ -48,6 +50,7 @@ class KanbanColumnData {
 }
 
 /// Kanban column widget with drag target support.
+
 class KanbanColumnWidget extends StatelessWidget {
   final KanbanColumnData columnData;
   final KanbanBoardController controller;
@@ -79,15 +82,17 @@ class KanbanColumnWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Apply optimistic updates
+    // Apply optimistic updates.
+
     final moviesWithOptimistic = controller.getMoviesWithOptimisticUpdates(
       columnData.movies,
       columnData.columnType,
       columnData.categoryId,
     );
 
-    // Apply sorting based on column's sort criteria
-    // Default: recommended -> ratingDesc, others -> nameAsc
+    // Apply sorting based on column's sort criteria.
+    // Default: recommended -> ratingDesc, others -> nameAsc.
+
     final defaultCriteria =
         columnData.columnType == KanbanColumnType.recommended
             ? MovieSortCriteria.ratingDesc
@@ -121,7 +126,8 @@ class KanbanColumnWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Column header
+          // Column header.
+
           HeaderBuilder.buildColumnHeader(
             context,
             columnData.title,
@@ -136,7 +142,8 @@ class KanbanColumnWidget extends StatelessWidget {
             columnData.fromCache,
           ),
 
-          // Movie items
+          // Movie items.
+
           Expanded(
             child: MovieListBuilder.buildMovieList(
               context,
@@ -153,7 +160,8 @@ class KanbanColumnWidget extends StatelessWidget {
       ),
     );
 
-    // Wrap in DragTarget if it can accept drops
+    // Wrap in DragTarget if it can accept drops.
+
     if (!canAcceptDrop) {
       return columnContent;
     }

@@ -18,12 +18,14 @@ import 'package:moviestar/shared/widgets/search/add_to_custom_lists_dialog/dialo
 import 'package:moviestar/shared/widgets/search/add_to_custom_lists_dialog/list_operations.dart';
 import 'package:moviestar/shared/widgets/search/add_to_custom_lists_dialog/ui_builders.dart';
 
-// Re-export helper classes for backward compatibility
+// Re-export helper classes for backward compatibility.
+
 export 'package:moviestar/shared/widgets/search/add_to_custom_lists_dialog/dialog_helpers.dart';
 export 'package:moviestar/shared/widgets/search/add_to_custom_lists_dialog/list_operations.dart';
 export 'package:moviestar/shared/widgets/search/add_to_custom_lists_dialog/ui_builders.dart';
 
 /// Dialog for adding a movie to custom lists.
+
 class AddToCustomListsDialog extends StatefulWidget {
   final Movie movie;
   final ContentItem originalContentItem;

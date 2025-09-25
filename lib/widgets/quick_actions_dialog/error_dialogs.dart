@@ -11,8 +11,10 @@ library;
 import 'package:flutter/material.dart';
 
 /// Static helper class for building error dialogs.
+
 class ErrorDialogs {
   /// Shows an error dialog with the given message.
+
   static void showErrorDialog({
     required BuildContext context,
     required String message,

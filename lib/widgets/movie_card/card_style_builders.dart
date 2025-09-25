@@ -18,8 +18,10 @@ import 'package:moviestar/utils/movie_display_utils.dart';
 import 'cache_indicator_builders.dart';
 
 /// Static helper class for building different movie card styles.
+
 class CardStyleBuilders {
   /// Builds a poster-style movie card.
+
   static Widget buildPosterCard({
     required Movie movie,
     required double? width,
@@ -71,6 +73,7 @@ class CardStyleBuilders {
   }
 
   /// Builds a list item-style movie card.
+
   static Widget buildListItemCard({
     required BuildContext context,
     required Movie movie,
@@ -146,6 +149,7 @@ class CardStyleBuilders {
   }
 
   /// Builds the default subtitle for list items.
+
   static Widget? _buildDefaultSubtitle({
     required BuildContext context,
     required Movie movie,
@@ -157,7 +161,8 @@ class CardStyleBuilders {
   }) {
     final parts = <Widget>[];
 
-    // Add rating if enabled
+    // Add rating if enabled.
+
     if (showRating) {
       parts.add(
         Text(
@@ -167,7 +172,8 @@ class CardStyleBuilders {
       );
     }
 
-    // Add year if enabled
+    // Add year if enabled.
+
     if (showYear) {
       final year = formatMovieYear(movie.releaseDate);
       if (year.isNotEmpty) {
@@ -181,7 +187,8 @@ class CardStyleBuilders {
       }
     }
 
-    // Add content type if enabled
+    // Add content type if enabled.
+
     if (showContentType && movie.contentType != null) {
       if (parts.isNotEmpty) parts.add(const Text(' • '));
       parts.add(

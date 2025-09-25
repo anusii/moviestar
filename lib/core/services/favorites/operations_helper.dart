@@ -14,6 +14,7 @@ import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/serializer.dart';
 
 /// Helper for MovieList CRUD operations.
+
 class MovieListOperationsHelper with PodOperationsMixin {
   final BuildContext _context;
   final Widget _child;
@@ -30,6 +31,7 @@ class MovieListOperationsHelper with PodOperationsMixin {
   );
 
   /// Adds a movie to a MovieList.
+
   Future<bool> addMovieToList(
     String movieListId,
     Movie movie, {
@@ -61,6 +63,7 @@ class MovieListOperationsHelper with PodOperationsMixin {
   }
 
   /// Removes a movie from a MovieList.
+
   Future<bool> removeMovieFromList(String movieListId, int movieId) async {
     try {
       final movieList = await _getMovieList(movieListId);
@@ -80,6 +83,7 @@ class MovieListOperationsHelper with PodOperationsMixin {
   }
 
   /// Deletes a MovieList.
+
   Future<bool> deleteMovieList(String movieListId) async {
     if (!await validateContextAndLogin(_context)) {
       return false;
@@ -113,12 +117,13 @@ class MovieListOperationsHelper with PodOperationsMixin {
         }
       } else {}
     } catch (e) {
-      // Failed to remove movie from list
+      // Failed to remove movie from list.
     }
     return false;
   }
 
   /// Updates the name of a MovieList.
+
   Future<bool> updateMovieListName(String movieListId, String newName) async {
     try {
       final movieList = await _getMovieList(movieListId);
@@ -139,6 +144,7 @@ class MovieListOperationsHelper with PodOperationsMixin {
   }
 
   /// Batch adds multiple movies to a MovieList.
+
   Future<bool> batchAddMoviesToList(
     String movieListId,
     List<Movie> movies,
@@ -168,6 +174,7 @@ class MovieListOperationsHelper with PodOperationsMixin {
   }
 
   /// Gets all MovieLists for the current user.
+
   Future<List<Map<String, dynamic>>> getAllMovieLists() async {
     if (!await validateContextAndLogin(_context)) {
       return [];
@@ -194,6 +201,7 @@ class MovieListOperationsHelper with PodOperationsMixin {
   }
 
   /// Gets MovieLists containing a specific movie.
+
   Future<List<String>> getMovieListsContainingMovie(int movieId) async {
     final allLists = await getAllMovieLists();
     final listsWithMovie = <String>[];
@@ -213,7 +221,8 @@ class MovieListOperationsHelper with PodOperationsMixin {
       return _cache[movieListId];
     }
 
-    // Load from POD if not in cache
+    // Load from POD if not in cache.
+
     final fileName = getMovieListFilePath(movieListId);
 
     final result = await PodFileOperationsService.readFile(
@@ -252,6 +261,7 @@ class MovieListOperationsHelper with PodOperationsMixin {
   }
 
   /// Gets the file path for a MovieList file.
+
   @override
   String getMovieListFilePath(String movieListId) {
     return 'user_lists/MovieList-$movieListId.ttl';

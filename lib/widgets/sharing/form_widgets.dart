@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:moviestar/core/services/pod/sharing_service.dart';
 
 /// Permission selector widget for choosing access levels.
+
 class PermissionSelector extends StatefulWidget {
   final List<String> availablePermissions;
   final List<String> selectedPermissions;
@@ -58,10 +59,12 @@ class _PermissionSelectorState extends State<PermissionSelector> {
     super.initState();
     _selected = List.from(widget.selectedPermissions);
 
-    // Ensure read permission is always included if required
+    // Ensure read permission is always included if required.
+
     if (widget.requireRead && !_selected.contains('read')) {
       _selected.add('read');
-      // Notify parent of the change
+      // Notify parent of the change.
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         widget.onChanged(_selected);
       });
@@ -206,6 +209,7 @@ class _PermissionSelectorState extends State<PermissionSelector> {
 }
 
 /// WebID input field with validation.
+
 class WebIdInput extends StatefulWidget {
   final TextEditingController controller;
   final Function(String?) onValidated;

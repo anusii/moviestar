@@ -15,8 +15,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 
 /// Static helper class for building cache-related dialogs.
+
 class CacheDialogBuilders {
   /// Shows smart confirmation dialog for clearing cache based on current settings.
+
   static Future<bool?> showClearCacheDialog({
     required BuildContext context,
     required WidgetRef ref,
@@ -30,12 +32,14 @@ class CacheDialogBuilders {
 
     if (!cachingEnabled) {
       // Caching is disabled - clearing cache is harmless.
+
       dialogTitle = 'Clear All Cache';
       dialogContent = '''
 This will remove any cached movie data. Since caching is disabled, this won't affect your ability to load movies from the network.''';
       confirmButtonText = 'Clear';
     } else if (cacheOnlyMode) {
       // Offline mode is enabled - this will break the app!
+
       dialogTitle = '⚠️ Clear Cache in Offline Mode';
       dialogContent = '''
 WARNING: You have Offline Mode enabled, which means no network calls are allowed.
@@ -46,6 +50,7 @@ Recommended: Disable Offline Mode first, then clear cache.''';
       confirmButtonText = 'Clear Anyway';
     } else {
       // Normal case - caching enabled but can fallback to network.
+
       dialogTitle = 'Clear All Cache';
       dialogContent = '''
 This will remove all cached movie data. Fresh data will be downloaded from the network when needed.''';
@@ -62,8 +67,10 @@ This will remove all cached movie data. Fresh data will be downloaded from the n
           onPressed: () {
             Navigator.of(context).pop(false);
             // Automatically disable offline mode.
+
             ref.read(cacheOnlyModeProvider.notifier).setCacheOnlyMode(false);
             // Show feedback.
+
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text(
@@ -96,6 +103,7 @@ This will remove all cached movie data. Fresh data will be downloaded from the n
   }
 
   /// Shows dialog for force refresh with offline mode handling.
+
   static Future<bool?> showForceRefreshDialog({
     required BuildContext context,
     required WidgetRef ref,
@@ -103,10 +111,12 @@ This will remove all cached movie data. Fresh data will be downloaded from the n
   }) async {
     if (!cacheOnlyMode) {
       // Not in offline mode - just proceed with refresh.
+
       return true;
     }
 
     // In offline mode, force refresh would require network calls.
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -129,10 +139,12 @@ Do you want to temporarily disable Offline Mode and refresh all data?'''),
     );
 
     if (confirmed == true) {
-      // Disable offline mode temporarily
+      // Disable offline mode temporarily.
+
       ref.read(cacheOnlyModeProvider.notifier).setCacheOnlyMode(false);
 
-      // Show feedback
+      // Show feedback.
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

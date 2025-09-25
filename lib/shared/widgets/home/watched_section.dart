@@ -25,29 +25,38 @@ import 'package:moviestar/widgets/movie_card.dart';
 
 /// A widget that displays the Watched section for the home screen.
 /// This section shows movies from the user's watched list.
+
 class HomeWatchedSection extends ConsumerWidget {
   /// Service for managing favorite movies.
+
   final FavoritesService favoritesService;
 
   /// Parent widget for navigation context.
+
   final StatefulWidget parentWidget;
 
   /// Callback for safe navigation.
+
   final void Function(Route<dynamic> route) onNavigate;
 
   /// Scroll controller for the watched section.
+
   final ScrollController scrollController;
 
   /// Callback to build cache age badge.
+
   final Widget Function(Duration cacheAge) buildCacheAgeBadge;
 
   /// Callback to build movie list items for list view.
+
   final Widget Function(List<Movie> movies, bool fromCache) buildMovieListItems;
 
   /// Whether to show as list items (for list view) or movie row (for grid view).
+
   final bool showAsListItems;
 
   /// Creates a new [HomeWatchedSection] widget.
+
   const HomeWatchedSection({
     super.key,
     required this.favoritesService,
@@ -69,6 +78,7 @@ class HomeWatchedSection extends ConsumerWidget {
   }
 
   /// Builds the watched movies row for grid view.
+
   Widget _buildWatchedMovieRow(BuildContext context, WidgetRef ref) {
     final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
 
@@ -76,6 +86,7 @@ class HomeWatchedSection extends ConsumerWidget {
       stream: favoritesService.watchedMovies,
       builder: (context, snapshot) {
         // Check if the service is a FavoritesServiceAdapter with caching.
+
         final isCached = favoritesService is FavoritesServiceAdapter;
         Map<String, dynamic>? cacheStats;
 
@@ -138,6 +149,7 @@ class HomeWatchedSection extends ConsumerWidget {
                     ),
                   ),
                   // Show cache indicator for user data if cached.
+
                   if (fromCache && cacheAge != null)
                     buildCacheAgeBadge(cacheAge),
                 ],
@@ -160,6 +172,7 @@ class HomeWatchedSection extends ConsumerWidget {
   }
 
   /// Builds the content for watched movies based on stream state.
+
   Widget _buildWatchedMovieContent(
     BuildContext context,
     WidgetRef ref,
@@ -177,6 +190,7 @@ class HomeWatchedSection extends ConsumerWidget {
     }
 
     // Enhanced loading indicator for initial load and connection state.
+
     if (snapshot.connectionState == ConnectionState.waiting ||
         !snapshot.hasData) {
       return Container(
@@ -251,7 +265,8 @@ class HomeWatchedSection extends ConsumerWidget {
               favoritesService: favoritesService,
               parentWidget: parentWidget,
               onTap: () {
-                // Navigate to movie details using the provided callback
+                // Navigate to movie details using the provided callback.
+
                 onNavigate(
                   MaterialPageRoute(
                     builder: (context) => MovieDetailsScreen(
@@ -270,11 +285,13 @@ class HomeWatchedSection extends ConsumerWidget {
   }
 
   /// Builds the watched list items for list view.
+
   Widget _buildWatchedListItems(BuildContext context, WidgetRef ref) {
     return StreamBuilder<List<Movie>>(
       stream: favoritesService.watchedMovies,
       builder: (context, snapshot) {
         // Check if the service is a FavoritesServiceAdapter with caching.
+
         final isCached = favoritesService is FavoritesServiceAdapter;
         bool fromCache = false;
 

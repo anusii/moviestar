@@ -12,8 +12,10 @@ import 'package:gap/gap.dart';
 import 'package:moviestar/constants/dimensions.dart';
 
 /// Builds the comments section for movie details.
+
 class CommentsSection {
   /// Build the comments section with text field and controls.
+
   static Widget buildCommentsSection(
     BuildContext context, {
     required bool isSharedMovie,
@@ -62,7 +64,8 @@ class CommentsSection {
         ),
         const Gap(Gaps.s),
         if (isSharedMovie && comments != null && comments.isNotEmpty)
-          // Display shared comments (read-only)
+          // Display shared comments (read-only).
+
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
@@ -80,7 +83,8 @@ class CommentsSection {
             ),
           )
         else if (!isSharedMovie)
-          // Editable comments for own movies
+          // Editable comments for own movies.
+
           Column(
             children: [
               TextField(
@@ -130,7 +134,8 @@ class CommentsSection {
             ],
           )
         else
-          // No shared comments available
+          // No shared comments available.
+
           Text(
             'No comments shared',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(

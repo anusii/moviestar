@@ -31,8 +31,9 @@ import 'package:moviestar/core/services/pod/file_operations_service.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 
 /// Base class for services that interact with Solid POD storage.
-/// Provides common functionality for login validation, context checking,.
+/// Provides common functionality for login validation, context checking,
 /// and POD file operations while preserving exact existing behavior.
+
 abstract class BasePodService extends ChangeNotifier {
   final BuildContext _context;
   final Widget _child;
@@ -40,15 +41,18 @@ abstract class BasePodService extends ChangeNotifier {
   BasePodService(this._context, this._child);
 
   /// Widget context for POD operations.
+
   @protected
   BuildContext get context => _context;
 
   /// Widget for returning after operations.
+
   @protected
   Widget get child => _child;
 
   /// Executes a POD operation with standard validation and error handling.
   /// Preserves exact behavior of existing services.
+
   @protected
   Future<T?> executePodOperation<T>({
     required Future<T?> Function() operation,
@@ -57,7 +61,8 @@ abstract class BasePodService extends ChangeNotifier {
     bool checkContext = true,
   }) async {
     try {
-      // Check login status if required
+      // Check login status if required.
+
       if (requiresLogin) {
         final loggedIn = await isLoggedIn();
         if (!loggedIn) {
@@ -65,12 +70,14 @@ abstract class BasePodService extends ChangeNotifier {
         }
       }
 
-      // Check context validity if required
+      // Check context validity if required.
+
       if (checkContext && !context.mounted) {
         return null;
       }
 
-      // Execute the actual operation
+      // Execute the actual operation.
+
       return await operation();
     } catch (e) {
       return null;
@@ -79,6 +86,7 @@ abstract class BasePodService extends ChangeNotifier {
 
   /// Safely reads a file from POD with standard error handling.
   /// Returns file content directly or null on failure.
+
   @protected
   Future<String?> safeReadFile(String path) async {
     return await executePodOperation(
@@ -99,6 +107,7 @@ abstract class BasePodService extends ChangeNotifier {
 
   /// Safely writes a file to POD with standard error handling.
   /// Returns true on success, false on failure.
+
   @protected
   Future<bool> safeWriteFile(
     String path,
@@ -123,6 +132,7 @@ abstract class BasePodService extends ChangeNotifier {
 
   /// Safely deletes a file from POD with standard error handling.
   /// Returns true on success, false on failure.
+
   @protected
   Future<bool> safeDeleteFile(String path) async {
     final result = await executePodOperation(
@@ -140,26 +150,30 @@ abstract class BasePodService extends ChangeNotifier {
   }
 
   /// Standard debug logging format used across all services.
+
   @protected
   void logDebug(String message, {bool isError = false}) {
-    // Logging disabled
+    // Logging disabled.
   }
 
   /// Standard success logging format.
+
   @protected
   void logSuccess(String message) {
-    // Logging disabled
+    // Logging disabled.
   }
 
   /// Standard info logging format.
+
   @protected
   void logInfo(String message) {
-    // Logging disabled
+    // Logging disabled.
   }
 
   /// Standard warning logging format.
+
   @protected
   void logWarning(String message) {
-    // Logging disabled
+    // Logging disabled.
   }
 }

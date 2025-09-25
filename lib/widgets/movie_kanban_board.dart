@@ -19,7 +19,6 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
-// Import extracted kanban components
 import 'package:moviestar/shared/widgets/kanban/board_controller.dart';
 import 'package:moviestar/shared/widgets/kanban/card_widget.dart';
 import 'package:moviestar/shared/widgets/kanban/column_widget.dart';
@@ -33,6 +32,7 @@ import 'package:moviestar/widgets/movie_kanban_board/operation_indicator.dart';
 
 /// Custom Kanban board widget for displaying movies in columns.
 /// Now serves as an orchestrator for the extracted kanban components.
+
 class MovieKanbanBoard extends ConsumerStatefulWidget {
   final FavoritesService favoritesService;
 
@@ -60,7 +60,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     _searchController = KanbanSearchController();
     _settingsController = KanbanSettingsController();
 
-    // Initialize drag handler after context is available
+    // Initialize drag handler after context is available.
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _dragHandler = KanbanDragHandler(
         favoritesService: widget.favoritesService,
@@ -80,6 +81,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }
 
   /// Handle drop operations.
+
   void _handleDrop(
     MovieDragData dragData,
     KanbanColumnType targetType,
@@ -90,6 +92,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }
 
   /// Show context menu for movie operations.
+
   void _showMovieContextMenu(
     Offset position,
     Movie movie,
@@ -107,6 +110,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }
 
   /// Navigate to category screen.
+
   void _navigateToCategory(
     String title,
     List<Movie> movies,
@@ -126,6 +130,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }
 
   /// Navigate to custom list detail screen.
+
   void _navigateToCustomList(CustomList customList) {
     Navigator.push(
       context,
@@ -139,6 +144,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }
 
   /// Build movie item using the kanban card widget.
+
   Widget _buildMovieItem(
     Movie movie,
     String category, {
@@ -173,21 +179,24 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           children: [
             Column(
               children: [
-                // Search bar (if search functionality is enabled)
+                // Search bar (if search functionality is enabled).
+
                 if (_searchController.hasActiveFilters)
                   KanbanSearchBar(
                     controller: _searchController,
                     onClear: () => setState(() {}),
                   ),
 
-                // Main kanban board
+                // Main kanban board.
+
                 Expanded(
                   child: _buildKanbanBoard(),
                 ),
               ],
             ),
 
-            // Floating operation queue indicator (no layout shift)
+            // Floating operation queue indicator (no layout shift).
+
             if (_kanbanController.operationQueue.isNotEmpty)
               KanbanOperationIndicator(
                 queueCount: _kanbanController.operationQueue.length,
@@ -199,6 +208,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }
 
   /// Build the main kanban board with columns.
+
   Widget _buildKanbanBoard() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -237,6 +247,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }
 
   /// Build all kanban columns.
+
   Widget _buildKanbanColumns(
     dynamic recommendedCacheResult,
     AsyncSnapshot<List<Movie>> toWatchSnapshot,
@@ -249,7 +260,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     final watchedMovies = watchedSnapshot.data ?? [];
     final customLists = customListsSnapshot.data ?? [];
 
-    // Apply search filters if active
+    // Apply search filters if active.
+
     final filteredRecommended = _searchController.hasActiveFilters
         ? _searchController.filterMovies(recommendedMovies)
         : recommendedMovies;
@@ -263,7 +275,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Recommended column
+        // Recommended column.
+
         _buildSingleColumn(
           title: 'Recommended',
           movies: filteredRecommended,
@@ -274,7 +287,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
               !(recommendedCacheResult.fromCache ?? false),
         ),
 
-        // To Watch column
+        // To Watch column.
+
         _buildSingleColumn(
           title: 'To Watch',
           movies: filteredToWatch,
@@ -284,7 +298,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           isLoading: !toWatchSnapshot.hasData,
         ),
 
-        // Watched column
+        // Watched column.
+
         _buildSingleColumn(
           title: 'Watched',
           movies: filteredWatched,
@@ -294,13 +309,15 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
           isLoading: !watchedSnapshot.hasData,
         ),
 
-        // Custom list columns with skeleton support and smooth transitions
+        // Custom list columns with skeleton support and smooth transitions.
+
         ..._buildCustomListColumnsWithTransitions(customLists, loadingData),
       ],
     );
   }
 
   /// Build a single kanban column using the extracted component.
+
   Widget _buildSingleColumn({
     required String title,
     required List<Movie> movies,
@@ -333,6 +350,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }
 
   /// Build unified custom list column using KanbanColumnWidget.
+
   Widget _buildUnifiedCustomListColumn(CustomList customList) {
     return FutureBuilder<List<Movie>>(
       future: widget.favoritesService.getMoviesInCustomList(customList.id),
@@ -353,11 +371,13 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
   }
 
   /// Build custom list columns with smooth transitions from skeleton to real content.
+
   List<Widget> _buildCustomListColumnsWithTransitions(
     List<CustomList> customLists,
     KanbanLoadingData loadingData,
   ) {
-    // If we're in initial loading and have no custom lists yet, show skeleton columns
+    // If we're in initial loading and have no custom lists yet, show skeleton columns.
+
     if (loadingData.showSkeletonColumns) {
       return [
         AnimatedSwitcher(
@@ -379,7 +399,8 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
       ];
     }
 
-    // Show actual custom list columns with smooth transitions
+    // Show actual custom list columns with smooth transitions.
+
     return customLists
         .map(
           (customList) => AnimatedSwitcher(

@@ -89,7 +89,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
 
   Map<String, List<ContentItem>> _searchResults = {};
 
-  // Suggested content (popular movies and TV shows)
+  // Suggested content (popular movies and TV shows).
 
   List<ContentItem> _suggestedContent = [];
 
@@ -150,6 +150,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
           await contentService.getRecommendedMixedContent();
 
       // Remove content already in the list.
+
       final filteredSuggestions = recommendedMixedContent
           .where((content) => !_moviesInList.contains(content.id))
           .take(20)
@@ -203,6 +204,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
       final results = await contentService.searchContentComprehensive(query);
 
       // Filter out content already in the list.
+
       final filteredResults = <String, List<ContentItem>>{};
       for (final entry in results.entries) {
         filteredResults[entry.key] = entry.value
@@ -252,6 +254,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
   }
 
   // Builds a content item card (for search results).
+
   Widget _buildContentCard(ContentItem contentItem) {
     return ContentBuilders.buildContentCard(
       context,
@@ -377,6 +380,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
       body: Column(
         children: [
           // Search bar (only shown in search tab).
+
           AnimatedBuilder(
             animation: _tabController,
             builder: (context, child) {
@@ -427,6 +431,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
           ),
 
           // Tab content.
+
           Expanded(
             child: TabBarView(
               controller: _tabController,

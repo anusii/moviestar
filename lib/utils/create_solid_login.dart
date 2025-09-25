@@ -82,6 +82,7 @@ Widget _buildNormalLogin(String serverUrl, SharedPreferences prefs) {
                     'https://github.com/yourusername/moviestar/blob/main/README.md',
 
                 // Use a wrapper widget to check for API key after login.
+
                 child: ApiKeyCheckWrapper(
                   prefs: prefs,
                   child: MyHomePage(
@@ -99,6 +100,7 @@ Widget _buildNormalLogin(String serverUrl, SharedPreferences prefs) {
 }
 
 /// A wrapper widget that checks if the API key is set and shows a dialog if not.
+
 class ApiKeyCheckWrapper extends StatefulWidget {
   final Widget child;
   final SharedPreferences prefs;
@@ -118,16 +120,16 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
   void initState() {
     super.initState();
 
-    // Delay the check to ensure the widget is fully built AND POD is authenticated
-    // API key checking is now handled in MyHomePage instead
-    // Wait longer to allow POD authentication and API key fetching to complete
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   Future.delayed(const Duration(seconds: 3), () {
-    //     if (mounted && !_hasCheckedApiKey) {
-    //       _checkApiKey();
-    //     }
-    //   });
-    // });
+    // Delay the check to ensure the widget is fully built AND POD is authenticated.
+    // API key checking is now handled in MyHomePage instead.
+    // Wait longer to allow POD authentication and API key fetching to complete.
+    // WidgetsBinding.instance.addPostFrameCallback((_) {.
+    //   Future.delayed(const Duration(seconds: 3), () {.
+    //     if (mounted && !_hasCheckedApiKey) {.
+    //       _checkApiKey();.
+    //     }.
+    //   });.
+    // });.
   }
 
   @override

@@ -33,27 +33,27 @@ import 'package:moviestar/widgets/error_display/user_friendly_error_renderer.dar
 
 /// A reusable widget for displaying error states with consistent styling.
 ///
-/// This widget provides a standard way to display errors across the app,.
+/// This widget provides a standard way to display errors across the app,
 /// including an error icon, message, multiple action buttons, and expandable.
 /// technical details for debugging.
 ///
-/// Usage examples:.
+/// Usage examples:
 /// ```dart.
 /// // Using UserFriendlyError (recommended).
-/// ErrorDisplayWidget.fromUserFriendlyError(.
-///   error: userFriendlyError,.
+/// ErrorDisplayWidget.fromUserFriendlyError(
+///   error: userFriendlyError,
 /// ).
 ///
 /// // Legacy usage for backward compatibility.
 /// ErrorDisplayWidget(.
-///   message: 'Failed to load data',.
-///   onRetry: () => refreshData(),.
+///   message: 'Failed to load data',
+///   onRetry: () => refreshData(),
 /// ).
 ///
 /// // Compact error widget for smaller spaces.
-/// ErrorDisplayWidget.compact(.
-///   message: 'Failed to load movies',.
-///   onRetry: () => retryLoad(),.
+/// ErrorDisplayWidget.compact(
+///   message: 'Failed to load movies',
+///   onRetry: () => retryLoad(),
 /// ).
 /// ```.
 
@@ -88,7 +88,8 @@ class ErrorDisplayWidget extends StatelessWidget {
 
   /// Creates a new [ErrorDisplayWidget].
 
-  // ignore: avoid-unnecessary-nullable-parameters
+  // ignore: avoid-unnecessary-nullable-parameters.
+
   const ErrorDisplayWidget({
     super.key,
     required this.message,
@@ -140,7 +141,8 @@ class ErrorDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use UserFriendlyError if available, otherwise fall back to legacy fields
+    // Use UserFriendlyError if available, otherwise fall back to legacy fields.
+
     if (userFriendlyError != null) {
       return UserFriendlyErrorRenderer(
         error: userFriendlyError!,

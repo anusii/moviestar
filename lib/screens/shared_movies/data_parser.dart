@@ -8,8 +8,10 @@ library;
 import 'dart:convert';
 
 /// Handles parsing of movie and movie list data from TTL content.
+
 class SharedMoviesDataParser {
   /// Parse movie data from TTL content.
+
   static Future<Map<String, dynamic>?> parseMovieData(
     String ttlContent,
     String resourceUrl,
@@ -28,6 +30,7 @@ class SharedMoviesDataParser {
       String? comments;
 
       // Extract movie/TV show ID from URL (e.g. Movie-123.ttl or TVShow-123.ttl -> 123).
+
       final urlParts = resourceUrl.split('/');
       final fileName = urlParts.last;
       final idMatch = RegExp(
@@ -39,6 +42,7 @@ class SharedMoviesDataParser {
       }
 
       // Try to parse JSON backup data first (more reliable).
+
       final movieJsonMatch = RegExp(
         r'# JSON_MOVIE_DATA: (.+)',
       ).firstMatch(ttlContent);
@@ -51,6 +55,7 @@ class SharedMoviesDataParser {
         final movieData = jsonDecode(movieJsonData) as Map<String, dynamic>;
 
         // Extract all movie metadata.
+
         movieTitle = movieData['title'] as String?;
         movieId ??= movieData['id']?.toString();
         posterUrl = movieData['posterUrl'] as String?;
@@ -64,6 +69,7 @@ class SharedMoviesDataParser {
       }
 
       // Extract user data (rating and comments) if available.
+
       if (userJsonMatch != null) {
         final userJsonData = userJsonMatch.group(1)!;
         final userData = jsonDecode(userJsonData) as Map<String, dynamic>;
@@ -72,6 +78,7 @@ class SharedMoviesDataParser {
       }
 
       // If JSON parsing failed, fall back to TTL parsing.
+
       if (movieTitle == null || movieId == null) {
         final titleMatch = RegExp(r':title\s+"([^"]+)"').firstMatch(ttlContent);
         if (titleMatch != null) {
@@ -128,6 +135,7 @@ class SharedMoviesDataParser {
         }
 
         // Try to extract genre IDs if available.
+
         if (genreIds == null) {
           final genreMatches =
               RegExp(r':genreId\s+"([^"]+)"').allMatches(ttlContent);
@@ -139,6 +147,7 @@ class SharedMoviesDataParser {
         }
 
         // Extract user-specific data from TTL.
+
         final userRatingMatch =
             RegExp(r':userRating\s+"([^"]+)"').firstMatch(ttlContent);
         if (userRatingMatch != null) {
@@ -154,6 +163,7 @@ class SharedMoviesDataParser {
 
       if (movieTitle != null && movieId != null) {
         // Extract sharer info from resource info.
+
         final sharerWebId = resourceInfo['sharedBy'] as String? ?? '';
         final sharerId = Uri.tryParse(sharerWebId)?.pathSegments.last ?? '';
 
@@ -175,12 +185,13 @@ class SharedMoviesDataParser {
         };
       }
     } catch (e) {
-      // Failed to parse movie data
+      // Failed to parse movie data.
     }
     return null;
   }
 
   /// Parse movie list data from TTL content.
+
   static Future<Map<String, dynamic>?> parseMovieListData(
     String ttlContent,
     String resourceUrl,
@@ -192,6 +203,7 @@ class SharedMoviesDataParser {
       final List<Map<String, dynamic>> movies = [];
 
       // Try JSON backup first.
+
       final listJsonMatch =
           RegExp(r'# JSON_LIST_DATA: (.+)').firstMatch(ttlContent);
 
@@ -210,6 +222,7 @@ class SharedMoviesDataParser {
         }
       } else {
         // Fallback to TTL parsing.
+
         final nameMatch = RegExp(r':name\s+"([^"]+)"').firstMatch(ttlContent);
         if (nameMatch != null) {
           listName = nameMatch.group(1);
@@ -222,6 +235,7 @@ class SharedMoviesDataParser {
         }
 
         // Extract movies from TTL.
+
         final movieMatches =
             RegExp(r':hasMovie\s+:movie-(\d+)\s*\.').allMatches(ttlContent);
 
@@ -229,6 +243,7 @@ class SharedMoviesDataParser {
           final movieId = match.group(1);
           if (movieId != null) {
             // Try to find movie details in the TTL.
+
             final movieSection = RegExp(
               ':movie-$movieId\\s+[^.]*\\.',
               multiLine: true,
@@ -258,6 +273,7 @@ class SharedMoviesDataParser {
 
       if (listName != null) {
         // Extract sharer info.
+
         final sharerWebId = resourceInfo['sharedBy'] as String? ?? '';
         final sharerId = Uri.tryParse(sharerWebId)?.pathSegments.last ?? '';
 
@@ -271,7 +287,7 @@ class SharedMoviesDataParser {
         };
       }
     } catch (e) {
-      // Failed to parse movie list data
+      // Failed to parse movie list data.
     }
     return null;
   }

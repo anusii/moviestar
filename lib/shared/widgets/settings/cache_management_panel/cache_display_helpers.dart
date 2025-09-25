@@ -15,8 +15,10 @@ import 'package:gap/gap.dart';
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
 
 /// Static helper class for cache display utilities.
+
 class CacheDisplayHelpers {
   /// Gets display name for cache category.
+
   static String getCategoryDisplayName(CacheCategory category) {
     switch (category) {
       case CacheCategory.toWatch:
@@ -35,6 +37,7 @@ class CacheDisplayHelpers {
   }
 
   /// Gets human-readable time ago string.
+
   static String getTimeAgo(Duration duration) {
     if (duration.inDays > 0) {
       return '${duration.inDays}d';
@@ -48,6 +51,7 @@ class CacheDisplayHelpers {
   }
 
   /// Builds cache statistics widget.
+
   static Widget buildCacheStatistics({
     required BuildContext context,
     required Map<CacheCategory, Map<String, dynamic>> stats,

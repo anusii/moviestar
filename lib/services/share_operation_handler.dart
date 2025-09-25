@@ -22,8 +22,10 @@ import 'package:moviestar/models/sharing_models.dart';
 import 'package:moviestar/services/webid_validator.dart';
 
 /// Handles sharing operations and permission management for POD files.
+
 class ShareOperationHandler {
   /// Get the current user's WebID.
+
   static Future<String?> getCurrentWebId() async {
     try {
       final webId = await getWebId();
@@ -34,18 +36,21 @@ class ShareOperationHandler {
   }
 
   /// Share a single file using real POD permission granting.
+
   static Future<ShareResult> shareFile(
     ShareRequest request,
     BuildContext context,
     Widget widget,
   ) async {
     try {
-      // Check if context is still mounted before async operations
+      // Check if context is still mounted before async operations.
+
       if (!context.mounted) {
         return ShareResult.failure('Context no longer mounted');
       }
 
-      // Ensure user is logged in and has proper keys
+      // Ensure user is logged in and has proper keys.
+
       await loginIfRequired(context);
       if (!context.mounted) {
         return ShareResult.failure('Context no longer mounted');
@@ -56,12 +61,14 @@ class ShareOperationHandler {
         return ShareResult.failure('Context no longer mounted');
       }
 
-      // Validate WebID
+      // Validate WebID.
+
       if (!await WebIdValidator.validateWebId(request.recipientWebId)) {
         return ShareResult.failure('Invalid WebID: ${request.recipientWebId}');
       }
 
-      // Get current user's WebID
+      // Get current user's WebID.
+
       final ownerWebId = await getCurrentWebId();
       if (ownerWebId == null) {
         return ShareResult.failure('Unable to get current user WebID');
@@ -71,7 +78,8 @@ class ShareOperationHandler {
         return ShareResult.failure('Context no longer mounted');
       }
 
-      // Grant permission using actual solidpod call
+      // Grant permission using actual solidpod call.
+
       final result = await grantPermission(
         request.fileName,
         true, // fileFlag - this is a file, not a folder
@@ -107,6 +115,7 @@ class ShareOperationHandler {
   }
 
   /// Share multiple files.
+
   static Future<BatchShareResult> shareMultipleFiles(
     List<ShareRequest> requests,
     BuildContext context,
@@ -128,13 +137,15 @@ class ShareOperationHandler {
   }
 
   /// Grant permissions for a file using real POD calls.
+
   static Future<PermissionResult> grantPermissions(
     PermissionRequest request,
     BuildContext context,
     Widget widget,
   ) async {
     try {
-      // Check if context is still mounted before async operations
+      // Check if context is still mounted before async operations.
+
       if (!context.mounted) {
         return const PermissionResult(
           granted: false,
@@ -142,7 +153,8 @@ class ShareOperationHandler {
         );
       }
 
-      // Ensure user is logged in and has proper keys
+      // Ensure user is logged in and has proper keys.
+
       await loginIfRequired(context);
       if (!context.mounted) {
         return const PermissionResult(
@@ -159,7 +171,8 @@ class ShareOperationHandler {
         );
       }
 
-      // Get current user's WebID
+      // Get current user's WebID.
+
       final ownerWebId = await getCurrentWebId();
       if (ownerWebId == null) {
         return const PermissionResult(
@@ -175,7 +188,8 @@ class ShareOperationHandler {
         );
       }
 
-      // Grant permission using actual solidpod call
+      // Grant permission using actual solidpod call.
+
       final result = await grantPermission(
         request.fileName,
         true, // fileFlag
@@ -204,6 +218,7 @@ class ShareOperationHandler {
   }
 
   /// Perform batch sharing with progress callback.
+
   static Future<BatchShareResult> performBatchShare(
     BatchShareRequest request,
     BuildContext context,
@@ -241,6 +256,7 @@ class ShareOperationHandler {
   }
 
   /// Get sharing status message.
+
   static String getStatusMessage(SolidFunctionCallStatus status) {
     switch (status) {
       case SolidFunctionCallStatus.success:

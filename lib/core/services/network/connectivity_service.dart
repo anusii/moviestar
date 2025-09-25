@@ -30,17 +30,22 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:moviestar/constants/timing_constants.dart';
 
 /// Result of network connectivity check.
+
 class NetworkConnectivityResult {
   /// Whether the device has internet access.
+
   final bool hasInternetAccess;
 
   /// Whether the check was successful (no errors occurred).
+
   final bool checkSuccessful;
 
   /// Any error that occurred during the check.
+
   final String? errorMessage;
 
   /// Response time for connectivity check (if available).
+
   final Duration? responseTime;
 
   const NetworkConnectivityResult({
@@ -51,6 +56,7 @@ class NetworkConnectivityResult {
   });
 
   /// Creates a successful result with internet access.
+
   static NetworkConnectivityResult connected({
     Duration responseTime = Duration.zero,
   }) {
@@ -62,6 +68,7 @@ class NetworkConnectivityResult {
   }
 
   /// Creates a successful result without internet access.
+
   static NetworkConnectivityResult disconnected({
     Duration responseTime = Duration.zero,
   }) {
@@ -73,6 +80,7 @@ class NetworkConnectivityResult {
   }
 
   /// Creates a result for when the check failed.
+
   static NetworkConnectivityResult error(String errorMessage) {
     return NetworkConnectivityResult(
       hasInternetAccess: false,
@@ -82,24 +90,30 @@ class NetworkConnectivityResult {
   }
 
   /// Whether this result indicates a definitive network problem.
+
   bool get isNetworkProblem => checkSuccessful && !hasInternetAccess;
 
   /// Whether the check was inconclusive (error occurred).
+
   bool get isInconclusive => !checkSuccessful;
 }
 
 /// Service for checking network connectivity and internet access.
+
 class NetworkConnectivityService {
   final InternetConnection _internetConnection;
 
   /// Creates a new NetworkConnectivityService.
+
   NetworkConnectivityService([
     InternetConnection? internetConnection,
   ]) : _internetConnection = internetConnection ?? InternetConnection();
 
   /// Creates a service with custom check options for TMDB endpoints.
+
   factory NetworkConnectivityService.forTMDB() {
-    // Create custom checker that tests TMDB endpoints specifically
+    // Create custom checker that tests TMDB endpoints specifically.
+
     final customConnection = InternetConnection.createInstance(
       customCheckOptions: [
         InternetCheckOption(
@@ -116,6 +130,7 @@ class NetworkConnectivityService {
   }
 
   /// Checks if the device has internet connectivity.
+
   Future<NetworkConnectivityResult> checkConnectivity({
     Duration timeout = NetworkTimingConstants.defaultTimeout,
   }) async {
@@ -150,6 +165,7 @@ class NetworkConnectivityService {
   }
 
   /// Quick connectivity check with shorter timeout.
+
   Future<NetworkConnectivityResult> quickCheck() async {
     return checkConnectivity(
       timeout: NetworkTimingConstants.quickCheckTimeout,
@@ -157,16 +173,19 @@ class NetworkConnectivityService {
   }
 
   /// Stream of connectivity status changes.
+
   Stream<InternetStatus> get onStatusChange {
     return _internetConnection.onStatusChange;
   }
 
   /// Checks if the device can reach TMDB servers specifically.
+
   Future<NetworkConnectivityResult> checkTMDBConnectivity() async {
     try {
       final stopwatch = Stopwatch()..start();
 
-      // Try to resolve TMDB domain
+      // Try to resolve TMDB domain.
+
       final lookupResult = await InternetAddress.lookup(
         'api.themoviedb.org',
       ).timeout(NetworkTimingConstants.dnsLookupTimeout);
@@ -200,6 +219,7 @@ class NetworkConnectivityService {
   }
 
   /// Determines if an error is likely due to network connectivity issues.
+
   static bool isNetworkError(Object error) {
     final errorString = error.toString().toLowerCase();
 
@@ -216,6 +236,7 @@ class NetworkConnectivityService {
   }
 
   /// Gets a user-friendly message for network errors.
+
   static String getNetworkErrorMessage(Object error) {
     final errorString = error.toString().toLowerCase();
 
@@ -238,6 +259,7 @@ class NetworkConnectivityService {
   }
 
   /// Provides suggestions for resolving network issues.
+
   static List<String> getNetworkTroubleshootingTips() {
     return [
       'Check if you are connected to Wi-Fi or mobile data',
@@ -249,7 +271,8 @@ class NetworkConnectivityService {
   }
 
   /// Dispose of resources (if needed in the future).
+
   void dispose() {
-    // Currently no resources to dispose, but keeping for future use
+    // Currently no resources to dispose, but keeping for future use.
   }
 }

@@ -18,12 +18,15 @@ import 'package:moviestar/shared/utils/turtle/namespace_manager.dart';
 import 'package:moviestar/shared/utils/turtle/parsing_utils.dart';
 
 /// Handles Rating and Comment ↔ Turtle serialization operations.
+
 class RatingCommentTurtleSerializer extends TurtleBaseSerializer {
   /// Converts ratings map to TTL format using proper RDF triples.
+
   static String ratingsToTurtle(Map<String, double> ratings) {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
     // Create the ratings list resource.
+
     final ratingsResource = TurtleNamespaceManager.localNS.withAttr('ratings');
     triples[ratingsResource] = {
       TurtleNamespaceManager.rdfType: TurtleNamespaceManager.movieListType,
@@ -31,6 +34,7 @@ class RatingCommentTurtleSerializer extends TurtleBaseSerializer {
     };
 
     // Add individual rating definitions.
+
     for (final entry in ratings.entries) {
       final ratingResource =
           TurtleNamespaceManager.localNS.withAttr('rating${entry.key}');
@@ -49,10 +53,12 @@ class RatingCommentTurtleSerializer extends TurtleBaseSerializer {
   }
 
   /// Converts movie comments to TTL format using proper RDF triples.
+
   static String commentsToTurtle(Map<String, String> comments) {
     final triples = <URIRef, Map<URIRef, dynamic>>{};
 
     // Create the comments list resource.
+
     final commentsResource =
         TurtleNamespaceManager.localNS.withAttr('comments');
     triples[commentsResource] = {
@@ -61,6 +67,7 @@ class RatingCommentTurtleSerializer extends TurtleBaseSerializer {
     };
 
     // Add individual comment definitions.
+
     for (final entry in comments.entries) {
       final commentResource =
           TurtleNamespaceManager.localNS.withAttr('comment${entry.key}');
@@ -79,13 +86,16 @@ class RatingCommentTurtleSerializer extends TurtleBaseSerializer {
   }
 
   /// Enhanced ratings serialization with JSON backup.
+
   static String ratingsToTurtleWithJson(Map<String, double> ratings) {
     final buffer = StringBuffer();
 
     // Add proper TTL structure.
+
     buffer.writeln(ratingsToTurtle(ratings));
 
     // Add JSON backup as comment.
+
     buffer.writeln();
     buffer.writeln('# JSON_DATA: ${jsonEncode(ratings)}');
 
@@ -93,13 +103,16 @@ class RatingCommentTurtleSerializer extends TurtleBaseSerializer {
   }
 
   /// Enhanced comments serialization with JSON backup.
+
   static String commentsToTurtleWithJson(Map<String, String> comments) {
     final buffer = StringBuffer();
 
     // Add proper TTL structure.
+
     buffer.writeln(commentsToTurtle(comments));
 
     // Add JSON backup as comment.
+
     buffer.writeln();
     buffer.writeln('# JSON_DATA: ${jsonEncode(comments)}');
 
@@ -107,9 +120,11 @@ class RatingCommentTurtleSerializer extends TurtleBaseSerializer {
   }
 
   /// Parses ratings from TTL content using proper RDF parsing.
+
   static Map<String, double> ratingsFromTurtle(String ttlContent) {
     try {
       // First try JSON backup for backward compatibility.
+
       final jsonMatch = RegExp(r'# JSON_DATA: (.+)').firstMatch(ttlContent);
       if (jsonMatch != null) {
         final jsonData = jsonMatch.group(1)!;
@@ -118,16 +133,19 @@ class RatingCommentTurtleSerializer extends TurtleBaseSerializer {
       }
 
       // Parse using proper RDF.
+
       final triples = TurtleParsingUtils.safeParseTtl(ttlContent);
       if (triples == null) return {};
 
       final ratings = <String, double>{};
 
       // Find rating resources.
+
       for (final subject in triples.keys) {
         final predicates = triples[subject]!;
 
         // Check if this is a rating resource.
+
         final isRating = TurtleParsingUtils.hasRdfType(
           predicates,
           ['Rating', '#Rating'],
@@ -157,9 +175,11 @@ class RatingCommentTurtleSerializer extends TurtleBaseSerializer {
   }
 
   /// Parses comments from TTL content using proper RDF parsing.
+
   static Map<String, String> commentsFromTurtle(String ttlContent) {
     try {
       // First try JSON backup for backward compatibility.
+
       final jsonMatch = RegExp(r'# JSON_DATA: (.+)').firstMatch(ttlContent);
       if (jsonMatch != null) {
         final jsonData = jsonMatch.group(1)!;
@@ -168,16 +188,19 @@ class RatingCommentTurtleSerializer extends TurtleBaseSerializer {
       }
 
       // Parse using proper RDF.
+
       final triples = TurtleParsingUtils.safeParseTtl(ttlContent);
       if (triples == null) return {};
 
       final comments = <String, String>{};
 
       // Find comment resources.
+
       for (final subject in triples.keys) {
         final predicates = triples[subject]!;
 
         // Check if this is a comment resource.
+
         final isComment = TurtleParsingUtils.hasRdfType(
           predicates,
           ['Comment', '#Comment'],

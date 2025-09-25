@@ -50,7 +50,8 @@ class _SharedMovieListDetailScreenState
   Map<String, String> _movieTitles = {}; // Cache for movie titles.
   bool _loadingTitles = true;
 
-  // Decomposed operation classes
+  // Decomposed operation classes.
+
   late final SharedListDataLoader _dataLoader;
   late final SharedListNavigationHandler _navigationHandler;
 
@@ -62,6 +63,7 @@ class _SharedMovieListDetailScreenState
   }
 
   /// Initialize decomposed components.
+
   void _initializeComponents() {
     _dataLoader = SharedListDataLoader(
       ref: ref,
@@ -81,6 +83,7 @@ class _SharedMovieListDetailScreenState
   }
 
   /// Load movie titles using data loader.
+
   Future<void> _loadMovieTitles() async {
     try {
       final titles = await _dataLoader.loadMovieTitles(widget.movies);
@@ -108,7 +111,8 @@ class _SharedMovieListDetailScreenState
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // List metadata header using decomposed component
+          // List metadata header using decomposed component.
+
           SharedListMovieProcessor.buildListHeader(
             context: context,
             listName: widget.listName,
@@ -119,7 +123,8 @@ class _SharedMovieListDetailScreenState
             movieCount: widget.movies.length,
           ),
 
-          // Movies list
+          // Movies list.
+
           Expanded(
             child: widget.movies.isEmpty
                 ? SharedListMovieProcessor.buildEmptyState()

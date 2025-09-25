@@ -28,6 +28,7 @@ import 'package:moviestar/shared/widgets/home/watched_section.dart';
 import 'package:moviestar/widgets/movie_kanban_board.dart';
 
 /// Widget that builds different view modes for the home screen.
+
 class HomeViewModes extends ConsumerWidget {
   final HomeViewMode viewMode;
   final FavoritesService favoritesService;

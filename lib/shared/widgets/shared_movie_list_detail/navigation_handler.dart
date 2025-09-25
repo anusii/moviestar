@@ -19,6 +19,7 @@ import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/shared/widgets/shared_movie_list_detail/data_loader.dart';
 
 /// Handles navigation operations for shared movie list detail screen.
+
 class SharedListNavigationHandler {
   final WidgetRef ref;
   final BuildContext context;
@@ -39,6 +40,7 @@ class SharedListNavigationHandler {
   /// Navigate to movie details screen with enhanced data.
   /// Uses direct Movie creation approach (similar to working Shared tab logic).
   /// instead of TMDB API calls to avoid API key and network issues.
+
   Future<void> navigateToMovieDetails(Map<String, dynamic> movieData) async {
     try {
       final movieId =
@@ -49,6 +51,7 @@ class SharedListNavigationHandler {
       }
 
       // Show loading indicator.
+
       if (context.mounted) {
         showDialog(
           context: context,
@@ -58,7 +61,8 @@ class SharedListNavigationHandler {
         );
       }
 
-      // Get enhanced movie data for ratings and comments
+      // Get enhanced movie data for ratings and comments.
+
       final enhancedMovieData = await FetchOperations.fetchIndividualMovieData(
         context,
         widget,
@@ -67,8 +71,9 @@ class SharedListNavigationHandler {
         movieData,
       );
 
-      // Create Movie object directly from available data (like working Shared tab logic)
-      // This avoids TMDB API calls and associated API key/network issues
+      // Create Movie object directly from available data (like working Shared tab logic).
+      // This avoids TMDB API calls and associated API key/network issues.
+
       final movieTitle = enhancedMovieData['title'] ??
           enhancedMovieData['fileName'] ??
           'Unknown Movie';
@@ -98,17 +103,20 @@ class SharedListNavigationHandler {
         genreIds: genreIds,
       );
 
-      // Dismiss loading indicator
+      // Dismiss loading indicator.
+
       if (context.mounted) {
         Navigator.pop(context);
       }
 
       // Use provided favorites service or create a minimal one for shared context.
+
       FavoritesService finalFavoritesService;
       if (favoritesService != null) {
         finalFavoritesService = favoritesService!;
       } else {
-        // Create a minimal favorites service for shared viewing context
+        // Create a minimal favorites service for shared viewing context.
+
         final prefs = await SharedPreferences.getInstance();
         if (!context.mounted) return;
 
@@ -122,6 +130,7 @@ class SharedListNavigationHandler {
       }
 
       // Navigate to MovieDetailsScreen with enhanced shared movie data.
+
       if (context.mounted) {
         await screenStateMixin.safeNavigateTo(
           MaterialPageRoute(
@@ -139,8 +148,10 @@ class SharedListNavigationHandler {
   }
 
   /// Handle navigation errors with appropriate user feedback.
+
   Future<void> _handleNavigationError(dynamic error) async {
     // Dismiss loading indicator if it's showing.
+
     if (context.mounted) {
       Navigator.of(
         context,
@@ -159,6 +170,7 @@ class SharedListNavigationHandler {
   }
 
   /// Show loading dialog during navigation.
+
   void showLoadingDialog() {
     if (context.mounted) {
       showDialog(
@@ -170,6 +182,7 @@ class SharedListNavigationHandler {
   }
 
   /// Dismiss loading dialog.
+
   void dismissLoadingDialog() {
     if (context.mounted) {
       Navigator.pop(context);
@@ -177,6 +190,7 @@ class SharedListNavigationHandler {
   }
 
   /// Show error message to user.
+
   void showErrorMessage(String message) {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -189,6 +203,7 @@ class SharedListNavigationHandler {
   }
 
   /// Show success message to user.
+
   void showSuccessMessage(String message) {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

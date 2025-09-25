@@ -15,6 +15,7 @@ import 'package:gap/gap.dart';
 import 'package:moviestar/constants/dimensions.dart';
 
 /// A floating widget that shows the number of pending operations.
+
 class KanbanOperationIndicator extends StatelessWidget {
   final int queueCount;
 

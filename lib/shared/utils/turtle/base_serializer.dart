@@ -9,8 +9,10 @@
 library;
 
 /// Base class providing common utilities for all Turtle serializers.
+
 abstract class TurtleBaseSerializer {
   /// Escapes special characters in strings for TTL format.
+
   static String escapeString(String input) {
     return input
         .replaceAll('\\', '\\\\')
@@ -21,11 +23,13 @@ abstract class TurtleBaseSerializer {
   }
 
   /// Escapes and sanitizes strings for TTL format.
+
   static String escapeAndSanitizeString(String input) {
     return escapeString(input);
   }
 
   /// Generates a unique ID for resources.
+
   static String generateId() {
     return DateTime.now().millisecondsSinceEpoch.toString() +
         (1000 + (DateTime.now().microsecond % 9000)).toString();

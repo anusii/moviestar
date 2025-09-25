@@ -9,14 +9,16 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rxdart/rxdart.dart';
+
+import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
-import 'package:moviestar/core/services/favorites/service.dart';
-import 'package:moviestar/widgets/movie_kanban_board.dart';
 import 'package:moviestar/shared/widgets/kanban/skeleton_column.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:moviestar/widgets/movie_kanban_board.dart';
 
 // Mock FavoritesService for testing
 class MockFavoritesService extends ChangeNotifier implements FavoritesService {

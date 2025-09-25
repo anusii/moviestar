@@ -9,13 +9,14 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:moviestar/screens/enhanced_search_screen.dart';
 import 'package:moviestar/core/services/api/content_service.dart';
 import 'package:moviestar/core/services/favorites/service.dart';
+import 'package:moviestar/screens/enhanced_search_screen.dart';
 
 void main() {
   group('EnhancedSearchScreen Tests', () {

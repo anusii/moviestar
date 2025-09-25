@@ -8,14 +8,14 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:moviestar/core/services/favorites/service.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/screens/custom_list_detail_screen.dart';
-import 'package:moviestar/core/services/favorites/service.dart';
 
 void main() {
   group('CustomListDetailScreen Tests', () {

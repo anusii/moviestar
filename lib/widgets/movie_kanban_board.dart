@@ -23,6 +23,7 @@ import 'package:moviestar/shared/widgets/kanban/board_controller.dart';
 import 'package:moviestar/shared/widgets/kanban/card_widget.dart';
 import 'package:moviestar/shared/widgets/kanban/column_widget.dart';
 import 'package:moviestar/shared/widgets/kanban/drag_handler.dart';
+import 'package:moviestar/shared/widgets/home/movie_filtering_helper.dart';
 import 'package:moviestar/shared/widgets/kanban/search_filter.dart';
 import 'package:moviestar/shared/widgets/kanban/settings_panel.dart';
 import 'package:moviestar/shared/widgets/kanban/skeleton_column.dart';
@@ -219,10 +220,34 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
               ref.watch(recommendedMoviesWithCacheInfoProvider);
           return recommendedMoviesAsync.when(
             data: (recommendedCacheResult) {
-              return KanbanStreamBuilder(
-                favoritesService: widget.favoritesService,
-                recommendedCacheResult: recommendedCacheResult,
-                builder: _buildKanbanColumns,
+              return FutureBuilder<List<Movie>>(
+                future: MovieFilteringHelper.filterMoviesByUserLists(
+                  widget.favoritesService,
+                  recommendedCacheResult.data,
+                ),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // Show original data while filtering to avoid empty list issues.
+
+                    return KanbanStreamBuilder(
+                      favoritesService: widget.favoritesService,
+                      recommendedCacheResult: recommendedCacheResult,
+                      builder: _buildKanbanColumns,
+                    );
+                  }
+
+                  final filteredCacheResult = CacheResult<List<Movie>>(
+                    data: snapshot.data ?? recommendedCacheResult.data,
+                    fromCache: recommendedCacheResult.fromCache,
+                    cacheAge: recommendedCacheResult.cacheAge,
+                  );
+
+                  return KanbanStreamBuilder(
+                    favoritesService: widget.favoritesService,
+                    recommendedCacheResult: filteredCacheResult,
+                    builder: _buildKanbanColumns,
+                  );
+                },
               );
             },
             loading: () => KanbanStreamBuilder(

@@ -21,6 +21,7 @@ import 'package:moviestar/providers/cached_movie_service_provider.dart';
 import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/shared/widgets/home/cache_badges.dart';
+import 'package:moviestar/shared/widgets/home/movie_filtering_helper.dart';
 import 'package:moviestar/widgets/movie_card.dart';
 
 /// Widget that displays recommended, now playing, top rated, and upcoming movie sections.
@@ -48,12 +49,12 @@ class HomeMovieSections extends ConsumerWidget {
 
     return Column(
       children: [
-        _buildMovieRow(
+        _buildFilteredRecommendedMovieRow(
           context,
           ref,
           'Recommended on Movie Star',
           recommendedMovies,
-          'recommended',
+          'popular',
           CacheCategory.recommended,
         ),
         _buildMovieRow(
@@ -81,6 +82,72 @@ class HomeMovieSections extends ConsumerWidget {
           CacheCategory.upcoming,
         ),
       ],
+    );
+  }
+
+  /// Filters recommended movies to exclude those already in user lists (TO WATCH, WATCHED, or custom lists).
+
+  Widget _buildFilteredRecommendedMovieRow(
+    BuildContext context,
+    WidgetRef ref,
+    String title,
+    AsyncValue<CacheResult<List<Movie>>> recommendedMovies,
+    String key,
+    CacheCategory category,
+  ) {
+    return recommendedMovies.when(
+      data: (cacheResult) {
+        return FutureBuilder<List<Movie>>(
+          future: MovieFilteringHelper.filterMoviesByUserLists(
+            favoritesService,
+            cacheResult.data,
+          ),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // Show original data while filtering to avoid empty scrollbar issues.
+
+              return _buildMovieRow(
+                context,
+                ref,
+                title,
+                AsyncValue.data(cacheResult),
+                key,
+                category,
+              );
+            }
+
+            if (snapshot.hasError) {
+              return _buildMovieRow(
+                context,
+                ref,
+                title,
+                AsyncValue.error(snapshot.error!, StackTrace.current),
+                key,
+                category,
+              );
+            }
+
+            final filteredCacheResult = CacheResult<List<Movie>>(
+              data: snapshot.data ?? [],
+              fromCache: cacheResult.fromCache,
+              cacheAge: cacheResult.cacheAge,
+            );
+
+            return _buildMovieRow(
+              context,
+              ref,
+              title,
+              AsyncValue.data(filteredCacheResult),
+              key,
+              category,
+            );
+          },
+        );
+      },
+      loading: () =>
+          _buildMovieRow(context, ref, title, recommendedMovies, key, category),
+      error: (error, stackTrace) =>
+          _buildMovieRow(context, ref, title, recommendedMovies, key, category),
     );
   }
 

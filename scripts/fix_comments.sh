@@ -60,10 +60,20 @@ fix_file() {
     local prev_was_ignore=false
     local output=""
 
-    # Single-pass processing: fix periods AND blank lines in one read
-    while IFS= read -r line; do
+    # Read file into array for lookahead capability
+    mapfile -t lines < "$file_path"
+    local total_lines=${#lines[@]}
+
+    for ((i=0; i<total_lines; i++)); do
+        local line="${lines[$i]}"
         local current_is_comment=false
         local processed_line="$line"
+        local next_line=""
+
+        # Get next line for continuation check (if exists)
+        if [[ $((i+1)) -lt $total_lines ]]; then
+            next_line="${lines[$((i+1))]}"
+        fi
 
         # Check if current line is a comment and fix period if needed
         if [[ "$line" =~ ^[[:space:]]*// ]]; then
@@ -99,9 +109,31 @@ fix_file() {
                     [[ "$dry_run" == true ]] && echo "  Would remove period from uppercase header" >&2
                 fi
             elif ! should_ignore_line "$line"; then
-                # For regular comments, add period if missing
-                if [[ -n "$content" ]] && [[ ! "$content" =~ [.!?]$ ]]; then
-                    # Handle Windows line endings: content is clean but line may have \r\n
+                # Check if comment ends with : or , (list/continuation indicators)
+                if [[ "$content" =~ [,:]$ ]]; then
+                    # Don't add period for comments ending in : or ,
+                    :
+                # Check if next line is a continuation comment
+                elif [[ -n "$next_line" ]] && [[ "$next_line" =~ ^[[:space:]]*// ]]; then
+                    local next_content="${next_line#*//}"
+                    [[ "$next_content" =~ ^/ ]] && next_content="${next_content#/}"
+                    next_content="${next_content# }"
+                    # If next comment starts with lowercase, number, or dash (list item), this is a multi-line comment
+                    if [[ "$next_content" =~ ^[a-z0-9-] ]]; then
+                        # Don't add period for continuation comments
+                        :
+                    elif [[ -n "$content" ]] && [[ ! "$content" =~ [.!?]$ ]]; then
+                        # Add period for single-line comment
+                        local original_content="${line#*//}"
+                        [[ "$original_content" =~ ^/ ]] && original_content="${original_content#/}"
+                        original_content="${original_content# }"
+                        local prefix="${line%"$original_content"}"
+                        processed_line="${prefix}${content}."
+                        ((fixes++))
+                        [[ "$dry_run" == true ]] && echo "  Would add period to comment" >&2
+                    fi
+                # For regular single-line comments, add period if missing
+                elif [[ -n "$content" ]] && [[ ! "$content" =~ [.!?]$ ]]; then
                     local original_content="${line#*//}"
                     [[ "$original_content" =~ ^/ ]] && original_content="${original_content#/}"
                     original_content="${original_content# }"
@@ -130,7 +162,7 @@ fix_file() {
         prev_line="$processed_line"
         prev_was_comment=$current_is_comment
         prev_was_ignore=$current_is_ignore
-    done < "$file_path"
+    done
 
     # Apply changes
     if [[ "$dry_run" == true ]]; then

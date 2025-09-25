@@ -55,9 +55,23 @@ lint_file() {
     local prev_line=""
     local prev_was_comment=false
     local prev_was_ignore=false
+    local next_line=""
 
-    while IFS= read -r line; do
+    # Read file into array for lookahead capability
+    mapfile -t lines < "$file_path"
+    local total_lines=${#lines[@]}
+
+    for ((i=0; i<total_lines; i++)); do
+        local line="${lines[$i]}"
+        line_num=$((i+1))
         local is_comment=false
+
+        # Get next line for continuation check (if exists)
+        if [[ $((i+1)) -lt $total_lines ]]; then
+            next_line="${lines[$((i+1))]}"
+        else
+            next_line=""
+        fi
 
         # Optimized comment detection - check // first, then ///
         if [[ "$line" =~ ^[[:space:]]*// ]]; then
@@ -87,8 +101,25 @@ lint_file() {
                     ((file_violations++))
                 fi
             elif ! should_ignore_line "$line"; then
-                # For regular comments, check for missing period
-                if [[ -n "$content" ]] && [[ ! "$content" =~ [.!?]$ ]]; then
+                # Check if comment ends with : or , (list/continuation indicators)
+                if [[ "$content" =~ [,:]$ ]]; then
+                    # Don't require period for comments ending in : or ,
+                    :
+                # Check if next line is a continuation comment (starts with lowercase or number)
+                elif [[ -n "$next_line" ]] && [[ "$next_line" =~ ^[[:space:]]*// ]]; then
+                    local next_content="${next_line#*//}"
+                    [[ "$next_content" =~ ^/ ]] && next_content="${next_content#/}"
+                    next_content="${next_content# }"
+                    # If next comment starts with lowercase, number, or dash (list item), this is a multi-line comment
+                    if [[ "$next_content" =~ ^[a-z0-9-] ]]; then
+                        # Don't require period for continuation comments
+                        :
+                    elif [[ -n "$content" ]] && [[ ! "$content" =~ [.!?]$ ]]; then
+                        echo "  Line $line_num: Comment missing period: $line"
+                        ((file_violations++))
+                    fi
+                # For regular single-line comments, check for missing period
+                elif [[ -n "$content" ]] && [[ ! "$content" =~ [.!?]$ ]]; then
                     echo "  Line $line_num: Comment missing period: $line"
                     ((file_violations++))
                 fi
@@ -109,8 +140,7 @@ lint_file() {
         fi
 
         prev_line="$line"
-        ((line_num++))
-    done < "$file_path"
+    done
 
     violations=$((violations + file_violations))
 

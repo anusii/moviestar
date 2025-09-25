@@ -31,7 +31,7 @@ import 'package:moviestar/constants/timing_constants.dart';
 
 /// Mixin that provides common state management functionality for screen widgets.
 ///
-/// This mixin eliminates boilerplate code by providing:.
+/// This mixin eliminates boilerplate code by providing:
 /// - Safe navigation methods with mounted checks.
 /// - Loading state management.
 /// - Consistent error and success messaging.

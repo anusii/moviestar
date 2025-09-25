@@ -82,7 +82,7 @@ class ApiKeyValidationResult {
   /// Whether the API key issue should be treated as the primary problem.
 
   bool get shouldShowApiKeyError {
-    // Show API key error if:.
+    // Show API key error if:
     // 1. No API key is configured.
     // 2. API key is configured but invalid.
 

@@ -21,6 +21,7 @@ import 'package:moviestar/screens/movie_category_screen.dart';
 import 'package:moviestar/shared/widgets/home/cache_badges.dart';
 import 'package:moviestar/shared/widgets/home/custom_list_builder.dart';
 import 'package:moviestar/shared/widgets/home/error_handler.dart';
+import 'package:moviestar/shared/widgets/home/movie_filtering_helper.dart';
 import 'package:moviestar/shared/widgets/home/movie_list_items.dart';
 import 'package:moviestar/shared/widgets/home/movie_sections.dart';
 import 'package:moviestar/shared/widgets/home/to_watch_section.dart';
@@ -176,11 +177,13 @@ class HomeViewModes extends ConsumerWidget {
             scrollControllers: scrollControllers,
             showAsListSections: true,
           ),
-          _buildAsyncListSection(
+          MovieFilteringHelper.buildFilteredAsyncListSection(
             context,
             ref,
             'Recommended on Movie Star',
             recommendedMovies,
+            favoritesService,
+            _buildAsyncListSection,
           ),
           _buildAsyncListSection(context, ref, 'Now Playing', nowPlayingMovies),
           _buildAsyncListSection(context, ref, 'Top Rated', topRatedMovies),

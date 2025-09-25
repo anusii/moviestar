@@ -22,6 +22,17 @@ should_ignore_line() {
     [[ "$line" =~ ^[[:space:]]*///[[:space:]]*$ ]] && return 0
     [[ "$line" =~ ^[[:space:]]*//[[:space:]]*$ ]] && return 0
 
+    # Check if this is an uppercase header comment (e.g., "// MOVIE METHODS")
+    local content="${line#*//}"
+    [[ "$content" =~ ^/ ]] && content="${content#/}"
+    content="${content# }"
+    content="${content%$'\r'}"  # Strip Windows line endings
+
+    # Skip if content is all uppercase letters and spaces (section headers)
+    if [[ -n "$content" ]] && [[ "$content" =~ ^[A-Z][A-Z\ ]+$ ]]; then
+        return 0
+    fi
+
     case "$line" in
         *"// ignore:"*) return 0 ;;  # Skip Dart analyzer ignore directives
         *"TODO:"*|*"FIXME:"*|*"NOTE:"*|*"Time-stamp:"*|*"https://"*|*"http://"*) return 0 ;;
@@ -64,16 +75,31 @@ fix_file() {
                 current_is_ignore=true
             fi
 
-            if ! should_ignore_line "$line"; then
-                # Fast content extraction using parameter expansion
-                local content="${line#*//}"
-                [[ "$content" =~ ^/ ]] && content="${content#/}"
-                content="${content# }"
+            # Fast content extraction using parameter expansion
+            local content="${line#*//}"
+            [[ "$content" =~ ^/ ]] && content="${content#/}"
+            content="${content# }"
 
-                # Strip Windows line endings
-                content="${content%$'\r'}"
+            # Strip Windows line endings
+            content="${content%$'\r'}"
 
-                # Add period if missing
+            # Check if this is an uppercase header (e.g., "MOVIE METHODS")
+            # Must be ALL uppercase letters and spaces, no lowercase allowed
+            # Require at least 2 characters total
+            if [[ -n "$content" ]] && [[ ${#content} -ge 2 ]] && [[ "$content" =~ ^[A-Z][A-Z\ ]*[.]?$ ]] && [[ "$content" == "${content^^}" ]]; then
+                # For uppercase headers, remove trailing period if present
+                if [[ "$content" =~ [.]$ ]]; then
+                    content="${content%\.}"
+                    local original_content="${line#*//}"
+                    [[ "$original_content" =~ ^/ ]] && original_content="${original_content#/}"
+                    original_content="${original_content# }"
+                    local prefix="${line%"$original_content"}"
+                    processed_line="${prefix}${content}"
+                    ((fixes++))
+                    [[ "$dry_run" == true ]] && echo "  Would remove period from uppercase header" >&2
+                fi
+            elif ! should_ignore_line "$line"; then
+                # For regular comments, add period if missing
                 if [[ -n "$content" ]] && [[ ! "$content" =~ [.!?]$ ]]; then
                     # Handle Windows line endings: content is clean but line may have \r\n
                     local original_content="${line#*//}"

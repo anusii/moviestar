@@ -117,7 +117,7 @@ class ContentService {
     }
   }
 
-  // MOVIE METHODS.
+  // MOVIE METHODS
 
   // Gets a list of recommended movies.
 
@@ -151,7 +151,7 @@ class ContentService {
     return results.map((movie) => ContentItem.fromMovieJson(movie)).toList();
   }
 
-  // TV SHOW METHODS.
+  // TV SHOW METHODS
 
   // Gets a list of recommended TV shows.
 
@@ -212,7 +212,7 @@ class ContentService {
     return results.map((tvShow) => ContentItem.fromTVJson(tvShow)).toList();
   }
 
-  // MIXED CONTENT METHODS.
+  // MIXED CONTENT METHODS
 
   // Gets a mixed list of Now Playing movies and On The Air TV shows.
 
@@ -295,7 +295,7 @@ class ContentService {
     return combined;
   }
 
-  // SEARCH METHODS.
+  // SEARCH METHODS
 
   // Searches for content (movies and TV shows) matching the given query.
 
@@ -362,7 +362,7 @@ class ContentService {
     return await _searchService!.searchMoviesComprehensive(query);
   }
 
-  // DETAIL METHODS.
+  // DETAIL METHODS
 
   // Gets detailed information about a specific movie.
 

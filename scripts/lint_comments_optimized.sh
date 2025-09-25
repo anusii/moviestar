@@ -17,6 +17,17 @@ should_ignore_line() {
     [[ "$line" =~ ^[[:space:]]*///[[:space:]]*$ ]] && return 0
     [[ "$line" =~ ^[[:space:]]*//[[:space:]]*$ ]] && return 0
 
+    # Check if this is an uppercase header comment (e.g., "// MOVIE METHODS")
+    local content="${line#*//}"
+    [[ "$content" =~ ^/ ]] && content="${content#/}"
+    content="${content# }"
+    content="${content%$'\r'}"  # Strip Windows line endings
+
+    # Skip if content is all uppercase letters and spaces (section headers)
+    if [[ -n "$content" ]] && [[ "$content" =~ ^[A-Z][A-Z\ ]+$ ]]; then
+        return 0
+    fi
+
     case "$line" in
         *"// ignore:"*) return 0 ;;  # Skip Dart analyzer ignore directives
         *"TODO:"*|*"FIXME:"*|*"NOTE:"*|*"Time-stamp:"*|*"https://"*|*"http://"*) return 0 ;;
@@ -59,16 +70,24 @@ lint_file() {
                 prev_was_ignore=false
             fi
 
-            if ! should_ignore_line "$line"; then
-                # Fast comment content extraction using parameter expansion
-                local content="${line#*//}"
-                [[ "$content" =~ ^/ ]] && content="${content#/}"
-                content="${content# }"
+            # Extract comment content for checking
+            local content="${line#*//}"
+            [[ "$content" =~ ^/ ]] && content="${content#/}"
+            content="${content# }"
+            # Strip Windows line endings for consistent checking
+            content="${content%$'\r'}"
 
-                # Strip Windows line endings for consistent checking
-                content="${content%$'\r'}"
-
-                # Check for missing period
+            # Check if this is an uppercase header (with or without period)
+            # Must be ALL uppercase letters and spaces, no lowercase allowed
+            # Require at least 2 characters total
+            if [[ -n "$content" ]] && [[ ${#content} -ge 2 ]] && [[ "$content" =~ ^[A-Z][A-Z\ ]*[.]?$ ]] && [[ "$content" == "${content^^}" ]]; then
+                # For uppercase headers, check they DON'T have a period
+                if [[ "$content" =~ [.]$ ]]; then
+                    echo "  Line $line_num: Uppercase header should not have period: $line"
+                    ((file_violations++))
+                fi
+            elif ! should_ignore_line "$line"; then
+                # For regular comments, check for missing period
                 if [[ -n "$content" ]] && [[ ! "$content" =~ [.!?]$ ]]; then
                     echo "  Line $line_num: Comment missing period: $line"
                     ((file_violations++))

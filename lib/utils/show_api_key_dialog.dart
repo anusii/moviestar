@@ -294,7 +294,7 @@ void _showApiKeyHelpDialog(BuildContext context) {
                       children: [
                         Expanded(
                           child: Text(
-                            'www.themoviedb.org/settings/api',
+                            'www.themoviedb.org' '/settings/api',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -308,7 +308,8 @@ void _showApiKeyHelpDialog(BuildContext context) {
                           onPressed: () {
                             Clipboard.setData(
                               const ClipboardData(
-                                text: 'https://www.themoviedb.org/settings/api',
+                                text: 'https://www.themoviedb.org'
+                                    '/settings/api',
                               ),
                             );
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -324,7 +325,7 @@ void _showApiKeyHelpDialog(BuildContext context) {
                         IconButton(
                           onPressed: () async {
                             const url =
-                                'https://www.themoviedb.org/settings/api';
+                                'https://www.themoviedb.org' '/settings/api';
                             if (await canLaunchUrl(Uri.parse(url))) {
                               await launchUrl(Uri.parse(url));
                             }

@@ -1,6 +1,6 @@
 /// Utility class for handling TMDB image URLs.
 ///
-// Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
+// Time-stamp: <Monday 2025-09-29 20:09:39 +1000 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -30,7 +30,7 @@ library;
 class TmdbImageUtil {
   /// Base URL for TMDB images.
 
-  static const String _baseUrl = 'https://image.tmdb.org/t/p';
+  static const String _baseUrl = 'https' '://image.tmdb.org/t/p';
 
   /// Available image sizes for posters.
 

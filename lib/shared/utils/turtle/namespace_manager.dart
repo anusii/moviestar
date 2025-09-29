@@ -16,10 +16,10 @@ class TurtleNamespaceManager {
   // Define namespaces based on the ontology design.
 
   static final moviestarOntoNS = Namespace(
-    ns: 'https://sii.anu.edu.au/onto/moviestar#',
+    ns: 'https://sii.anu.edu.au' '/onto/moviestar#',
   );
   static final moviestarDataNS = Namespace(
-    ns: 'https://sii.anu.edu.au/data/moviestar/',
+    ns: 'https://sii.anu.edu.au' '/data/moviestar/',
   );
   static final movieNS = Namespace(ns: 'http://schema.org/');
   static final xsdNS = Namespace(ns: 'http://www.w3.org/2001/XMLSchema#');

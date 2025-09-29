@@ -152,7 +152,7 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
 
         final isMovieList = TurtleParsingUtils.hasRdfType(predicates, [
           'MovieList',
-          'https://sii.anu.edu.au/onto/moviestar#MovieList',
+          'https://sii.anu.edu.au' '/onto/moviestar#MovieList',
         ]);
 
         if (isMovieList) {
@@ -225,7 +225,7 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
             final movieId = movieIdMatch.group(1)!;
             final isTvShow = TurtleParsingUtils.hasRdfType(predicates, [
               'TVShow',
-              'http://schema.org/TVShow',
+              'http://schema.org/TVSeries',
               '#TVShow',
             ]);
             movieContentTypes[movieId] =

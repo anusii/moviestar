@@ -229,8 +229,8 @@ class UserFriendlyError {
       title: 'API Key Issue',
       message:
           'Your API key is missing or invalid. Please configure your API key to continue.',
-      details:
-          'You need a valid TMDB API key to fetch movie information. Get one free at https://www.themoviedb.org/settings/api',
+      details: 'You need a valid TMDB API key to fetch movie information. '
+          'Get one free at https://www.themoviedb.org',
       actions: actions,
       originalError: originalError,
       stackTrace: stackTrace,

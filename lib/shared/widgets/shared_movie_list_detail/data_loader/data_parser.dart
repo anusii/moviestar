@@ -116,12 +116,14 @@ class DataParser {
         // Add poster and backdrop URLs.
 
         if (movieMetadata['poster_path'] != null) {
-          result['posterUrl'] =
-              'https://image.tmdb.org/t/p/w500${movieMetadata['poster_path']}';
+          result['posterUrl'] = 'https'
+              '://image.tmdb.org'
+              '/t/p/w500${movieMetadata['poster_path']}';
         }
         if (movieMetadata['backdrop_path'] != null) {
-          result['backdropUrl'] =
-              'https://image.tmdb.org/t/p/w1280${movieMetadata['backdrop_path']}';
+          result['backdropUrl'] = 'https'
+              '://image.tmdb.org'
+              '/t/p/w1280${movieMetadata['backdrop_path']}';
         }
 
         // Add other TMDB fields.

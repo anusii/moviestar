@@ -299,7 +299,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
           'Movie',
           'TVShow',
           'http://schema.org/Movie',
-          'http://schema.org/TVShow',
+          'http://schema.org/TVSeries',
           '#Movie',
           '#TVShow',
         ]);
@@ -352,7 +352,7 @@ class MovieTurtleSerializer extends TurtleBaseSerializer {
           'Movie',
           'TVShow',
           'http://schema.org/Movie',
-          'http://schema.org/TVShow',
+          'http://schema.org/TVSeries',
           '#Movie',
           '#TVShow',
         ]);

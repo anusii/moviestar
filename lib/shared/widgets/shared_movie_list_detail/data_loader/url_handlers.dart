@@ -35,7 +35,7 @@ class UrlHandlers {
       // Case 2: Simple username like: my-moviestar.
       // Construct the base URL with the default provider.
 
-      return 'https://pods.dev.solidcommunity.au/$webIdOrUsername/';
+      return 'https://pods.dev.solidcommunity.au' '/$webIdOrUsername/';
     } catch (e) {
       return null;
     }

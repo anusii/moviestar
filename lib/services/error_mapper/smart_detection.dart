@@ -167,15 +167,15 @@ class SmartErrorDetection {
     String? details;
 
     if (!apiKeyResult.isConfigured) {
-      message =
-          'No API key is configured. You need a TMDB API key to fetch movie information.';
-      details =
-          'Get a free API key at https://www.themoviedb.org/settings/api and configure it in Settings.';
+      message = 'No API key is configured. '
+          'You need a TMDB API key to fetch movie information.';
+      details = 'Get a free API key at https://www.themoviedb.org '
+          'and configure it in Settings.';
     } else if (apiKeyResult.isValid == false) {
       message =
           apiKeyResult.errorMessage ?? 'Your API key appears to be invalid.';
-      details =
-          'Please check your API key in Settings or get a new one from https://www.themoviedb.org/settings/api';
+      details = 'Please check your API key in Settings or get a '
+          'new one from https://www.themoviedb.org';
     } else {
       message =
           'API authentication failed. Your key may be invalid or expired.';

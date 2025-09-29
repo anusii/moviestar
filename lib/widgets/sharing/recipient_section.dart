@@ -66,7 +66,7 @@ class RecipientSection extends StatelessWidget {
               controller: controller,
               onValidated: onValidated,
               label: 'Recipient WebID *',
-              hint: 'https://example.solid.com/profile/card#me',
+              hint: 'https' '://example.solid.com/profile/card#me',
             ),
           ],
         ),

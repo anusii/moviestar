@@ -1,6 +1,6 @@
 /// Create Solid Login Widget.
 //
-// Time-stamp: <Wednesday 2025-07-23 16:57:13 +1000 Graham Williams>
+// Time-stamp: <Monday 2025-09-29 20:06:28 +1000 Graham Williams>
 //
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -78,8 +78,7 @@ Widget _buildNormalLogin(String serverUrl, SharedPreferences prefs) {
                     : 'https://pods.dev.solidcommunity.au',
                 image: const AssetImage('assets/images/app_image.jpg'),
                 logo: const AssetImage('assets/images/app_icon.png'),
-                link:
-                    'https://github.com/yourusername/moviestar/blob/main/README.md',
+                link: 'https://github.com/anusii/moviestar/blob/dev/README.md',
 
                 // Use a wrapper widget to check for API key after login.
 

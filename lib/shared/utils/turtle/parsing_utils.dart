@@ -99,7 +99,7 @@ class TurtleParsingUtils {
         final isTvShow = typeValues.any(
           (type) =>
               type.toString().contains('TVShow') ||
-              type == 'http://schema.org/TVShow' ||
+              type == 'http://schema.org/TVSeries' ||
               type == '#TVShow',
         );
         contentType = isTvShow ? ContentType.tvShow : ContentType.movie;

@@ -2,7 +2,7 @@
 #
 # Generic Makefile
 #
-# Time-stamp: <Tuesday 2025-09-23 07:15:08 +1000 Graham Williams>
+# Time-stamp: <Monday 2025-10-06 07:28:43 +1100 Graham Williams>
 #
 # Copyright (c) Graham.Williams@togaware.com
 #
@@ -113,6 +113,12 @@ apk::
 	mv -f installers/$(APP)-*.apk installers/ARCHIVE/
 	rm -f installers/$(APP).apk
 
+appbundle::
+	rsync -avzh installers/$(APP).aab $(REPO):$(RLOC)
+	ssh $(REPO) chmod a+r $(RLOC)$(APP).aab
+	mv -f installers/$(APP)-*.aab installers/ARCHIVE/
+	rm -f installers/$(APP).aab
+
 deb:
 	@echo "Build $(APP) version $(VER)"
 	(cd installers; make $@)
@@ -135,5 +141,5 @@ deb:
 # /usr/bin/rattle. This is working so add deb into the install and now
 # utilise that for the default install on my machine.
 
-ginstall: deb apk prod
+ginstall: deb apk appbundle prod
 	(cd installers; make $@)

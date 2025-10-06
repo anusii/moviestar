@@ -33,13 +33,15 @@ class DropOperations {
     bool isCopyOperation,
   ) {
     controller.addOptimisticMovie(targetType, targetId, dragData.movie);
-    if (!isCopyOperation) {
-      controller.removeOptimisticMovie(
-        dragData.sourceType,
-        dragData.sourceId,
-        dragData.movie,
-      );
-    }
+    // Always remove from source for immediate UI feedback.
+    // For copy operations from Recommended, this prevents the delay
+    // where the movie appears in both lists during filtering.
+
+    controller.removeOptimisticMovie(
+      dragData.sourceType,
+      dragData.sourceId,
+      dragData.movie,
+    );
   }
 
   /// Add movie to target list based on column type.
@@ -137,13 +139,13 @@ class DropOperations {
     bool isCopyOperation,
   ) {
     controller.clearOptimisticState(targetType, targetId, dragData.movie.id);
-    if (!isCopyOperation) {
-      controller.clearOptimisticState(
-        dragData.sourceType,
-        dragData.sourceId,
-        dragData.movie.id,
-      );
-    }
+    // Always clear source optimistic state since we always apply it.
+
+    controller.clearOptimisticState(
+      dragData.sourceType,
+      dragData.sourceId,
+      dragData.movie.id,
+    );
   }
 
   /// Mark sync errors for failed operations.
@@ -156,12 +158,12 @@ class DropOperations {
     bool isCopyOperation,
   ) {
     controller.markSyncError(targetType, targetId, dragData.movie.id);
-    if (!isCopyOperation) {
-      controller.markSyncError(
-        dragData.sourceType,
-        dragData.sourceId,
-        dragData.movie.id,
-      );
-    }
+    // Always mark source sync error since we always apply optimistic removal.
+
+    controller.markSyncError(
+      dragData.sourceType,
+      dragData.sourceId,
+      dragData.movie.id,
+    );
   }
 }

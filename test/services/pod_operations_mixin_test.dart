@@ -62,15 +62,13 @@ void main() {
       testClass = TestMixinClass();
     });
 
-    testWidgets('retryOperation succeeds on first attempt',
-        (WidgetTester tester) async {
+    test('retryOperation succeeds on first attempt', () async {
       final result = await testClass.testRetryOperation(shouldFail: false);
       expect(result, equals('success after 1 attempts'));
       expect(testClass.operationCallCount, equals(1));
     });
 
-    testWidgets('retryOperation retries on failure',
-        (WidgetTester tester) async {
+    test('retryOperation retries on failure', () async {
       testClass.operationCallCount = 0;
       final result =
           await testClass.testRetryOperation(shouldFail: true, maxRetries: 3);
@@ -78,8 +76,7 @@ void main() {
       expect(testClass.operationCallCount, equals(3));
     });
 
-    testWidgets('retryOperation gives up after max retries',
-        (WidgetTester tester) async {
+    test('retryOperation gives up after max retries', () async {
       testClass.operationCallCount = 0;
       // Force all attempts to fail
       final result = await testClass.retryOperation(
@@ -109,8 +106,7 @@ void main() {
       );
     });
 
-    testWidgets('isFileNotFoundError detects file not found errors',
-        (WidgetTester tester) async {
+    test('isFileNotFoundError detects file not found errors', () {
       expect(
         testClass.testIsFileNotFoundError(Exception('File does not exist')),
         isTrue,
@@ -127,8 +123,7 @@ void main() {
       );
     });
 
-    testWidgets('isPermissionError detects permission errors',
-        (WidgetTester tester) async {
+    test('isPermissionError detects permission errors', () {
       expect(
         testClass.testIsPermissionError(Exception('Permission denied')),
         isTrue,

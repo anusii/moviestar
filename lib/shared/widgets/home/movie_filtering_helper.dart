@@ -25,6 +25,14 @@ class MovieFilteringHelper {
     FavoritesService favoritesService,
     List<Movie> movies,
   ) async {
+    // Wait for user lists to load before filtering.
+
+    await Future.wait([
+      favoritesService.toWatchMovies.first,
+      favoritesService.watchedMovies.first,
+      favoritesService.customLists.first,
+    ]);
+
     final filteredMovies = <Movie>[];
 
     for (final movie in movies) {
@@ -73,13 +81,19 @@ class MovieFilteringHelper {
           future: filterMoviesByUserLists(favoritesService, cacheResult.data),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              // Show original data while filtering to avoid empty scrollbar issues.
+              // Show empty list while filtering to avoid showing duplicates.
+
+              final emptyFilteredResult = CacheResult<List<Movie>>(
+                data: [],
+                fromCache: cacheResult.fromCache,
+                cacheAge: cacheResult.cacheAge,
+              );
 
               return buildAsyncListSection(
                 context,
                 ref,
                 title,
-                AsyncValue.data(cacheResult),
+                AsyncValue.data(emptyFilteredResult),
               );
             }
 

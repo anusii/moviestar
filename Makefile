@@ -2,7 +2,7 @@
 #
 # Generic Makefile
 #
-# Time-stamp: <Monday 2025-10-06 07:28:43 +1100 Graham Williams>
+# Time-stamp: <Tuesday 2025-10-07 13:57:39 +1100 Graham Williams>
 #
 # Copyright (c) Graham.Williams@togaware.com
 #
@@ -124,10 +124,12 @@ deb:
 	(cd installers; make $@)
 	rsync -avzh installers/$(APP)_$(VER)_amd64.deb $(REPO):$(RLOC)$(APP)_amd64.deb
 	ssh $(REPO) chmod a+r $(RLOC)$(APP)_amd64.deb
-	wget $(DWLD)$(APP)_amd64.deb -O $(APP)_amd64.deb
-	wajig install $(APP)_amd64.deb
 	rm -f $(APP)_amd64.deb
 	mv -f installers/$(APP)_*.deb installers/ARCHIVE/
+
+dinstall:
+	wget $(DWLD)$(APP)_amd64.deb -O $(APP)_amd64.deb
+	wajig install $(APP)_amd64.deb
 
 # 20250110 gjw A ginstall of the github built bundles, and the locally
 # built apk installed to the repository and moved into ARCHIVE.

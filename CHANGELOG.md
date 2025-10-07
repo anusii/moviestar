@@ -25,6 +25,7 @@ au](https://solidcommunity.au/docs/moviestar)
 
 ## 0.1 First stable release
 
++ Remove from RECOMMEND when moved to other column [0.0.34  20251007 atangster]
 + Review, cleanup, fix lints [0.0.33 20250929 gjw]
 + REFACTOR pod sharing [0.0.32 20250917 atangster]
 + Update SolidScaffold from solidui [0.0.31 20250913 tonypioneer]

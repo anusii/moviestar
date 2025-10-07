@@ -14,6 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/widgets/movie_sharing_ui.dart';
+import 'helpers/test_data_factory.dart';
 
 void main() {
   group('Navigation Integration Tests', () {
@@ -310,16 +311,7 @@ void main() {
 }
 
 Movie _createTestMovie() {
-  return Movie(
-    id: 123,
-    title: 'Test Movie',
-    overview: 'A test movie',
-    releaseDate: DateTime.parse('2025-01-01'),
-    posterUrl: 'https://image.tmdb.org/t/p/w500/test.jpg',
-    backdropUrl: 'https://image.tmdb.org/t/p/w1280/test.jpg',
-    genreIds: [28],
-    voteAverage: 7.5,
-  );
+  return TestDataFactory.createMovie();
 }
 
 class IntermediateScreen extends StatelessWidget {

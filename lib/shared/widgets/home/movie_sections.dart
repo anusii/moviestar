@@ -104,13 +104,19 @@ class HomeMovieSections extends ConsumerWidget {
           ),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              // Show original data while filtering to avoid empty scrollbar issues.
+              // Show empty list while filtering to avoid showing duplicates.
+
+              final emptyFilteredResult = CacheResult<List<Movie>>(
+                data: [],
+                fromCache: cacheResult.fromCache,
+                cacheAge: cacheResult.cacheAge,
+              );
 
               return _buildMovieRow(
                 context,
                 ref,
                 title,
-                AsyncValue.data(cacheResult),
+                AsyncValue.data(emptyFilteredResult),
                 key,
                 category,
               );

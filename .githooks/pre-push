@@ -21,3 +21,8 @@ fi
 
 echo "$result"
 printf "\e[32;1m%s\e[0m\n" 'Finished running Flutter analyze with 0 issues.'
+
+# Update versions every push!
+
+VER=$(egrep '^version:' pubspec.yaml | cut -d' ' -f2 | cut -d'+' -f1)
+perl -pi -e 's|^version:.*|version: "$(VER)"|' snap/snapcraft.yaml

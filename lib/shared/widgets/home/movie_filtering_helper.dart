@@ -26,7 +26,7 @@ class MovieFilteringHelper {
     List<Movie> movies,
   ) async {
     // Wait for user lists to load before filtering.
-    
+
     await Future.wait([
       favoritesService.toWatchMovies.first,
       favoritesService.watchedMovies.first,

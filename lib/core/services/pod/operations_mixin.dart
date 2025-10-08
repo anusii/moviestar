@@ -126,7 +126,7 @@ mixin PodOperationsMixin {
   bool isPermissionError(Object error) {
     final errorStr = error.toString().toLowerCase();
     return errorStr.contains('permission') ||
-        errorStr.contains('access denied') ||
+        errorStr.contains('denied') ||
         errorStr.contains('auth') ||
         errorStr.contains('unauthorized') ||
         errorStr.contains('forbidden') ||

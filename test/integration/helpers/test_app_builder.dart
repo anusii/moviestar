@@ -14,6 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:moviestar/core/services/favorites/service.dart';
+
 import 'mock_services.dart';
 
 /// Builds a test app with necessary providers and configuration.

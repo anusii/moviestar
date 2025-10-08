@@ -21,6 +21,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
+
 import '../helpers/mock_services.dart';
 import '../helpers/test_data_factory.dart';
 

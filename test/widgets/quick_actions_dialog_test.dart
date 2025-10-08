@@ -16,6 +16,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/widgets/quick_actions_dialog.dart';
+
 import '../integration/helpers/mock_services.dart';
 import '../integration/helpers/test_data_factory.dart';
 

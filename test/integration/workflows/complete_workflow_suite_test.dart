@@ -96,7 +96,9 @@ void main() {
         await tester.pump(const Duration(seconds: 3));
 
         expect(
-            await favoritesService.getPersonalRating(inception), equals(9.0));
+          await favoritesService.getPersonalRating(inception),
+          equals(9.0),
+        );
 
         // === PART 3: MARK AS WATCHED ===
 
@@ -197,15 +199,19 @@ void main() {
         final moviesInList =
             await favoritesService.getMovieIdsInCustomList(nolanList.id);
         expect(moviesInList.length, equals(3));
-        expect(moviesInList,
-            containsAll([inception.id, darkKnight.id, interstellar.id]));
+        expect(
+          moviesInList,
+          containsAll([inception.id, darkKnight.id, interstellar.id]),
+        );
 
         // === PART 8: UPDATE RATING ===
 
         // User reconsiders and updates Inception's rating.
 
         await favoritesService.setPersonalRating(
-            inception, 9.5); // Even better on rewatch!
+          inception,
+          9.5,
+        ); // Even better on rewatch!
 
         expect(
           await favoritesService.getPersonalRating(inception),

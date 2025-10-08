@@ -164,7 +164,8 @@ class TestDataFactory {
     return createMovie(
       id: id,
       title: title,
-      overview: 'A movie shared ${sharedBy != null ? 'by $sharedBy' : 'via POD'}',
+      overview:
+          'A movie shared ${sharedBy != null ? 'by $sharedBy' : 'via POD'}',
     );
   }
 

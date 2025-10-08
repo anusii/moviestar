@@ -42,7 +42,7 @@ Widget buildTestApp({
 }) {
   final overrides = <Override>[
     // Add service provider overrides here as needed.
-    
+
     ...?additionalOverrides,
   ];
 
@@ -193,15 +193,15 @@ Widget buildTestAppWithNavigationObserver({
 
 class NavigationTestObserver extends NavigatorObserver {
   /// Routes that were pushed.
-  
+
   final List<Route<dynamic>> pushedRoutes = [];
 
   /// Routes that were popped.
-  
+
   final List<Route<dynamic>> poppedRoutes = [];
 
   /// Number of routes currently in the stack.
-  
+
   int get routeCount => pushedRoutes.length - poppedRoutes.length;
 
   @override
@@ -217,7 +217,7 @@ class NavigationTestObserver extends NavigatorObserver {
   }
 
   /// Resets all tracked navigation events.
-  
+
   void reset() {
     pushedRoutes.clear();
     poppedRoutes.clear();

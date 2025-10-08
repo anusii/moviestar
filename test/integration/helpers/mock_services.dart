@@ -38,31 +38,31 @@ class MockFavoritesService implements FavoritesService {
   final Map<int, Movie> _toWatchMovies = {};
 
   /// Movies in the "Watched" list (stored by movie ID).
-  
+
   final Map<int, Movie> _watchedMovies = {};
 
   /// Personal ratings for movies (stored by movie ID).
-  
+
   final Map<int, double> _ratings = {};
 
   /// Comments for movies (stored by movie ID).
-  
+
   final Map<int, String> _comments = {};
 
   /// Custom lists created by the user.
-  
+
   final Map<String, CustomList> _customLists = {};
 
   /// Movie file paths (stored by movie ID).
-  
+
   final Map<int, String> _movieFiles = {};
 
   /// Whether operations should fail (for error testing).
-  
+
   bool shouldFail = false;
 
   /// Error message to throw when shouldFail is true.
-  
+
   String failureMessage = 'Mock service configured to fail';
 
   // ============================================================================
@@ -295,7 +295,7 @@ class MockFavoritesService implements FavoritesService {
   }
 
   /// Sets a file path for a movie (test helper method).
-  
+
   void setMovieFile(Movie movie, String filePath) {
     _movieFiles[movie.id] = filePath;
   }
@@ -328,13 +328,16 @@ class MockFavoritesService implements FavoritesService {
   // ============================================================================
 
   @override
-  Stream<List<Movie>> get toWatchMovies => Stream.value(_toWatchMovies.values.toList());
+  Stream<List<Movie>> get toWatchMovies =>
+      Stream.value(_toWatchMovies.values.toList());
 
   @override
-  Stream<List<Movie>> get watchedMovies => Stream.value(_watchedMovies.values.toList());
+  Stream<List<Movie>> get watchedMovies =>
+      Stream.value(_watchedMovies.values.toList());
 
   @override
-  Stream<List<CustomList>> get customLists => Stream.value(_customLists.values.toList());
+  Stream<List<CustomList>> get customLists =>
+      Stream.value(_customLists.values.toList());
 
   // ============================================================================
   // CHANGENOTIFIER IMPLEMENTATION
@@ -360,7 +363,7 @@ class MockFavoritesService implements FavoritesService {
   // ============================================================================
 
   /// Configures the mock to simulate failures.
-  
+
   void configureFailure({bool fail = true, String? message}) {
     shouldFail = fail;
     if (message != null) {
@@ -369,7 +372,7 @@ class MockFavoritesService implements FavoritesService {
   }
 
   /// Resets all state to empty (useful between tests).
-  
+
   void reset() {
     _toWatchMovies.clear();
     _watchedMovies.clear();
@@ -381,7 +384,7 @@ class MockFavoritesService implements FavoritesService {
   }
 
   /// Pre-populates the service with test data.
-  
+
   void seedData({
     List<Movie>? toWatch,
     List<Movie>? watched,
@@ -423,48 +426,48 @@ class MockFavoritesService implements FavoritesService {
 
 class MockMovieService {
   /// Movies to return from search operations.
-  
+
   List<Movie> mockSearchResults = [];
 
   /// Movie to return from getMovieDetails.
-  
+
   Movie? mockMovieDetails;
 
   /// Movies to return from getPopularMovies.
-  
+
   List<Movie> mockPopularMovies = [];
 
   /// Whether operations should fail (for error testing).
-  
+
   bool shouldFail = false;
 
   /// Error message to throw when shouldFail is true.
-  
+
   String failureMessage = 'Mock movie service configured to fail';
 
   /// Simulates searching for movies.
-  
+
   Future<List<Movie>> searchMovies(String query) async {
     if (shouldFail) throw Exception(failureMessage);
     return mockSearchResults;
   }
 
   /// Simulates getting movie details.
-  
+
   Future<Movie?> getMovieDetails(int movieId) async {
     if (shouldFail) throw Exception(failureMessage);
     return mockMovieDetails;
   }
 
   /// Simulates getting popular movies.
-  
+
   Future<List<Movie>> getPopularMovies() async {
     if (shouldFail) throw Exception(failureMessage);
     return mockPopularMovies;
   }
 
   /// Configures the mock to simulate failures.
-  
+
   void configureFailure({bool fail = true, String? message}) {
     shouldFail = fail;
     if (message != null) {
@@ -473,7 +476,7 @@ class MockMovieService {
   }
 
   /// Resets all state (useful between tests).
-  
+
   void reset() {
     mockSearchResults = [];
     mockMovieDetails = null;

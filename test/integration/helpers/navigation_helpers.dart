@@ -50,7 +50,8 @@ Finder findButtonByIcon(IconData icon) => find.byIcon(icon);
 
 /// Finds a button by text label.
 
-Finder findButtonByText(String text) => find.widgetWithText(ElevatedButton, text);
+Finder findButtonByText(String text) =>
+    find.widgetWithText(ElevatedButton, text);
 
 /// Finds a dialog by title.
 
@@ -161,7 +162,7 @@ Future<void> markAsWatched(WidgetTester tester) async {
   final watchedIcon = find.byIcon(Icons.check_circle_outline);
   if (watchedIcon.evaluate().isEmpty) {
     // Already watched, look for filled icon.
-    
+
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
     return;
   }
@@ -180,7 +181,7 @@ Future<void> setMovieRating(WidgetTester tester, double rating) async {
 
   // Sliders typically use 0-1 range, so normalize if needed.
   // Adjust based on your app's slider configuration.
-  
+
   final normalizedRating = rating / 10.0; // Assuming 0-10 rating scale.
 
   await tester.drag(sliderFinder, Offset(normalizedRating * 100, 0));
@@ -291,14 +292,16 @@ Future<void> closeDialog(WidgetTester tester) async {
 
 /// Confirms a dialog by tapping the confirm button.
 
-Future<void> confirmDialog(WidgetTester tester, {String confirmText = 'OK'}) async {
+Future<void> confirmDialog(WidgetTester tester,
+    {String confirmText = 'OK'}) async {
   await tester.tap(find.text(confirmText));
   await tester.pumpAndSettle();
 }
 
 /// Cancels a dialog by tapping the cancel button.
 
-Future<void> cancelDialog(WidgetTester tester, {String cancelText = 'Cancel'}) async {
+Future<void> cancelDialog(WidgetTester tester,
+    {String cancelText = 'Cancel'}) async {
   await tester.tap(find.text(cancelText));
   await tester.pumpAndSettle();
 }

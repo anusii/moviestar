@@ -293,7 +293,7 @@ Future<void> closeDialog(WidgetTester tester) async {
 /// Confirms a dialog by tapping the confirm button.
 
 Future<void> confirmDialog(WidgetTester tester,
-    {String confirmText = 'OK'}) async {
+    {String confirmText = 'OK',}) async {
   await tester.tap(find.text(confirmText));
   await tester.pumpAndSettle();
 }
@@ -301,7 +301,7 @@ Future<void> confirmDialog(WidgetTester tester,
 /// Cancels a dialog by tapping the cancel button.
 
 Future<void> cancelDialog(WidgetTester tester,
-    {String cancelText = 'Cancel'}) async {
+    {String cancelText = 'Cancel',}) async {
   await tester.tap(find.text(cancelText));
   await tester.pumpAndSettle();
 }

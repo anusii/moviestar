@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=com.togaware.moviestar
+Name=MovieStar
 Comment=Simple, Private, Secure Flutter Movie Ratings to Share
 Exec=moviestar
 Icon=${SNAP}/meta/gui/icon.png

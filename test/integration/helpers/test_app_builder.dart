@@ -30,6 +30,7 @@ import 'mock_services.dart';
 ///   ),
 /// );
 /// ```
+
 Widget buildTestApp({
   Widget? home,
   String? initialRoute,
@@ -40,7 +41,8 @@ Widget buildTestApp({
   ThemeData? theme,
 }) {
   final overrides = <Override>[
-    // Add service provider overrides here as needed
+    // Add service provider overrides here as needed.
+    
     ...?additionalOverrides,
   ];
 
@@ -68,6 +70,7 @@ Widget buildTestApp({
 ///   ),
 /// );
 /// ```
+
 Widget buildTestAppWithScaffold({
   Widget? body,
   AppBar? appBar,
@@ -97,6 +100,7 @@ Widget buildTestAppWithScaffold({
 ///   await initMockSharedPreferences();
 /// });
 /// ```
+
 Future<void> initMockSharedPreferences([
   Map<String, Object>? initialValues,
 ]) async {
@@ -113,6 +117,7 @@ Future<void> initMockSharedPreferences([
 /// ```dart
 /// final service = await createTestFavoritesService();
 /// ```
+
 Future<FavoritesService> createTestFavoritesService([
   Map<String, Object>? initialValues,
 ]) async {
@@ -131,6 +136,7 @@ Future<FavoritesService> createTestFavoritesService([
 ///   favoritesService: mockFavoritesService,
 /// );
 /// ```
+
 List<Override> getTestProviderOverrides({
   MockFavoritesService? favoritesService,
   MockMovieService? movieService,
@@ -162,6 +168,7 @@ List<Override> getTestProviderOverrides({
 /// // Later: verify navigation events
 /// expect(observer.pushedRoutes.length, equals(2));
 /// ```
+
 Widget buildTestAppWithNavigationObserver({
   required NavigatorObserver observer,
   Widget? home,
@@ -183,14 +190,18 @@ Widget buildTestAppWithNavigationObserver({
 /// Navigation observer for tracking navigation events in tests.
 ///
 /// Tracks push and pop operations for verification in tests.
+
 class NavigationTestObserver extends NavigatorObserver {
   /// Routes that were pushed.
+  
   final List<Route<dynamic>> pushedRoutes = [];
 
   /// Routes that were popped.
+  
   final List<Route<dynamic>> poppedRoutes = [];
 
   /// Number of routes currently in the stack.
+  
   int get routeCount => pushedRoutes.length - poppedRoutes.length;
 
   @override
@@ -206,6 +217,7 @@ class NavigationTestObserver extends NavigatorObserver {
   }
 
   /// Resets all tracked navigation events.
+  
   void reset() {
     pushedRoutes.clear();
     poppedRoutes.clear();

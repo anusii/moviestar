@@ -23,7 +23,8 @@ import 'package:moviestar/models/movie.dart';
 /// final movie = TestDataFactory.createMovie(title: 'Inception');
 /// final tvShow = TestDataFactory.createTVShow();
 /// final list = TestDataFactory.createCustomList(name: 'Favorites');
-/// ```
+/// ```.
+
 class TestDataFactory {
   /// Creates a test Movie with sensible defaults.
   ///
@@ -37,6 +38,7 @@ class TestDataFactory {
   /// - genreIds: [28] (Action)
   /// - voteAverage: 7.5
   /// - contentType: ContentType.movie
+
   static Movie createMovie({
     int id = 123,
     String title = 'Test Movie',
@@ -65,6 +67,7 @@ class TestDataFactory {
   ///
   /// This is a convenience method that creates a Movie with contentType set to
   /// ContentType.tvShow and appropriate default values.
+
   static Movie createTVShow({
     int id = 456,
     String title = 'Test TV Show',
@@ -92,6 +95,7 @@ class TestDataFactory {
   /// Creates a test Movie that already has a rating.
   ///
   /// Useful for testing rating display and update scenarios.
+
   static Movie createRatedMovie({
     int id = 789,
     String title = 'Rated Test Movie',
@@ -113,6 +117,7 @@ class TestDataFactory {
   /// - movieIds: []
   /// - createdAt: now
   /// - updatedAt: now
+
   static CustomList createCustomList({
     String? id,
     String name = 'Test List',
@@ -135,6 +140,7 @@ class TestDataFactory {
   /// Creates a CustomList with pre-populated movie IDs.
   ///
   /// Useful for testing list display with existing content.
+
   static CustomList createPopulatedList({
     String name = 'My Favorites',
     List<int>? movieIds,
@@ -149,6 +155,7 @@ class TestDataFactory {
   /// Creates a movie that simulates being shared via POD.
   ///
   /// This creates a movie with metadata that indicates it was shared.
+
   static Movie createSharedMovie({
     int id = 999,
     String title = 'Shared Test Movie',
@@ -165,6 +172,7 @@ class TestDataFactory {
   ///
   /// Useful for testing list views, grids, etc.
   /// Creates movies with sequential IDs starting from [startId].
+
   static List<Movie> createMovieList({
     int count = 5,
     int startId = 1,
@@ -183,6 +191,7 @@ class TestDataFactory {
   /// Creates a list of popular movies (high ratings).
   ///
   /// Useful for testing "Popular" or "Top Rated" sections.
+
   static List<Movie> createPopularMovies({int count = 3}) {
     return [
       createMovie(id: 1, title: 'The Shawshank Redemption', voteAverage: 9.3),

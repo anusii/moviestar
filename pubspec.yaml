@@ -45,6 +45,8 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
   # Database code generation dependencies
   build_runner: ^2.4.7
   hive_generator: ^2.0.1
@@ -52,6 +54,7 @@ dev_dependencies:
   comment_lint: ^0.1.0
   test: ^1.25.15
   ubuntu_lints: ^0.4.0
+  patrol: ^3.6.0
 
 dependency_overrides:
   rxdart: ^0.28.0
@@ -84,3 +87,8 @@ flutter_launcher_icons:
   windows:
     generate: true
     icon_size: 48 # min:48, max:256, default: 48
+
+patrol:
+  app_name: Movie Star
+  android:
+    package_name: au.edu.anu.sii.moviestar

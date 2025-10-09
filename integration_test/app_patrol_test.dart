@@ -30,6 +30,8 @@
 ///
 /// For development/CI on Windows/Web, use standard integration_test instead.
 
+library;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 

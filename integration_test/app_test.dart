@@ -24,6 +24,8 @@
 /// This test uses standard integration_test and can run with:
 /// `flutter test integration_test/app_test.dart -d windows`
 
+library;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';

@@ -29,7 +29,7 @@ void main() {
   testWidgets('Extract OAuth tokens from FlutterSecureStorage',
       (WidgetTester tester) async {
     // Start the app to initialize storage.
-    await app.main();
+    app.main();
     await tester.pumpAndSettle();
 
     print('Extracting tokens from FlutterSecureStorage...');

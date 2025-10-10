@@ -54,7 +54,7 @@ dev_dependencies:
   comment_lint: ^0.1.0
   test: ^1.25.15
   ubuntu_lints: ^0.4.0
-  patrol: ^3.6.0
+  puppeteer: ^3.19.0  # Browser automation for POD OAuth testing
 
 dependency_overrides:
   rxdart: ^0.28.0
@@ -87,8 +87,3 @@ flutter_launcher_icons:
   windows:
     generate: true
     icon_size: 48 # min:48, max:256, default: 48
-
-patrol:
-  app_name: Movie Star
-  android:
-    package_name: au.edu.anu.sii.moviestar

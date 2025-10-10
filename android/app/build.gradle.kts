@@ -37,7 +37,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        testInstrumentationRunner = "pl.leancode.patrol.PatrolJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
@@ -60,8 +60,4 @@ android {
 
 flutter {
     source = "../.."
-}
-
-dependencies {
-    androidTestImplementation("androidx.test:runner:1.6.2")
 }

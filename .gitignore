@@ -21,6 +21,9 @@ installers/*-windows.zip
 
 .Rhistory
 
+# Puppeteer browser cache
+.local-chrome/
+
 # Note: test_credentials.json and auth_tokens.json are committed for CI/CD
 # These are test-only credentials for a dev POD server, not production
 

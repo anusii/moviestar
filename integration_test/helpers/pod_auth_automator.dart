@@ -97,7 +97,7 @@ class PodAuthAutomator {
             print('  ERROR in callback:');
             print('    error: ${uri.queryParameters['error']}');
             print(
-                '    error_description: ${uri.queryParameters['error_description']}');
+                '    error_description: ${uri.queryParameters['error_description']}',);
           }
 
           // Abort the request since we don't have a server listening.
@@ -485,7 +485,7 @@ class PodAuthAutomator {
             return { success: false, error: err.toString() };
           }
         }
-      ''', args: [tokenEndpoint, tokenRequest]);
+      ''', args: [tokenEndpoint, tokenRequest],);
 
       if (result is Map && result['success'] == true) {
         return {
@@ -587,7 +587,7 @@ class PodAuthAutomator {
             return { success: false, error: err.toString() };
           }
         }
-      ''', args: [registrationEndpoint, registrationData]);
+      ''', args: [registrationEndpoint, registrationData],);
 
       if (result is Map && result['success'] == true) {
         final data = result['data'] as Map;
@@ -626,7 +626,7 @@ class PodAuthAutomator {
 
     final queryString = params.entries
         .map((e) =>
-            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',)
         .join('&');
 
     return '$authEndpoint?$queryString';

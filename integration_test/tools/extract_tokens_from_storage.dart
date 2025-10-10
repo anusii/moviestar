@@ -125,6 +125,6 @@ void main() {
     }
 
     expect(hasOAuthTokens, isTrue,
-        reason: 'Expected to find OAuth tokens in secure storage');
+        reason: 'Expected to find OAuth tokens in secure storage',);
   });
 }

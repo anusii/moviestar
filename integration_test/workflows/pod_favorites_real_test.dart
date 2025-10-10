@@ -107,21 +107,33 @@ void main() {
     // These tests would verify specific POD operations.
     // They require the app to be fully initialized with injected credentials.
 
-    testWidgets('can add movie to favorites on POD', (tester) async {
-      // TODO: Implement favorite addition test.
-      // This would:
-      // 1. Create a test movie
-      // 2. Add it to favorites
-      // 3. Verify it's stored in POD
-      // 4. Clean up test data
-    }, skip: true,); // Not yet implemented - requires POD operation testing
+    testWidgets(
+      'can add movie to favorites on POD',
+      (tester) async {
+        // TODO: Implement favorite addition test.
+        // This would:
+        // 1. Create a test movie
+        // 2. Add it to favorites
+        // 3. Verify it's stored in POD
+        // 4. Clean up test data
+      },
+      skip: true,
+    ); // Not yet implemented - requires POD operation testing
 
-    testWidgets('can remove movie from favorites on POD', (tester) async {
-      // TODO: Implement favorite removal test.
-    }, skip: true,); // Not yet implemented - requires POD operation testing
+    testWidgets(
+      'can remove movie from favorites on POD',
+      (tester) async {
+        // TODO: Implement favorite removal test.
+      },
+      skip: true,
+    ); // Not yet implemented - requires POD operation testing
 
-    testWidgets('can sync favorites from POD', (tester) async {
-      // TODO: Implement favorite sync test.
-    }, skip: true,); // Not yet implemented - requires POD operation testing
+    testWidgets(
+      'can sync favorites from POD',
+      (tester) async {
+        // TODO: Implement favorite sync test.
+      },
+      skip: true,
+    ); // Not yet implemented - requires POD operation testing
   });
 }

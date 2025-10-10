@@ -97,7 +97,8 @@ class PodAuthAutomator {
             print('  ERROR in callback:');
             print('    error: ${uri.queryParameters['error']}');
             print(
-                '    error_description: ${uri.queryParameters['error_description']}',);
+              '    error_description: ${uri.queryParameters['error_description']}',
+            );
           }
 
           // Abort the request since we don't have a server listening.
@@ -455,7 +456,8 @@ class PodAuthAutomator {
       };
 
       // Use fetch API to exchange code for tokens.
-      final result = await page.evaluate('''
+      final result = await page.evaluate(
+        '''
         async (endpoint, data) => {
           try {
             // Convert data to URL-encoded form
@@ -485,7 +487,9 @@ class PodAuthAutomator {
             return { success: false, error: err.toString() };
           }
         }
-      ''', args: [tokenEndpoint, tokenRequest],);
+      ''',
+        args: [tokenEndpoint, tokenRequest],
+      );
 
       if (result is Map && result['success'] == true) {
         return {
@@ -566,7 +570,8 @@ class PodAuthAutomator {
       };
 
       // Use fetch API to register client.
-      final result = await page.evaluate('''
+      final result = await page.evaluate(
+        '''
         async (endpoint, data) => {
           try {
             const response = await fetch(endpoint, {
@@ -587,7 +592,9 @@ class PodAuthAutomator {
             return { success: false, error: err.toString() };
           }
         }
-      ''', args: [registrationEndpoint, registrationData],);
+      ''',
+        args: [registrationEndpoint, registrationData],
+      );
 
       if (result is Map && result['success'] == true) {
         final data = result['data'] as Map;
@@ -625,8 +632,10 @@ class PodAuthAutomator {
     };
 
     final queryString = params.entries
-        .map((e) =>
-            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',)
+        .map(
+          (e) =>
+              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+        )
         .join('&');
 
     return '$authEndpoint?$queryString';

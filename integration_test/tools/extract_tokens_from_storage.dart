@@ -124,7 +124,10 @@ void main() {
       print('  - $key');
     }
 
-    expect(hasOAuthTokens, isTrue,
-        reason: 'Expected to find OAuth tokens in secure storage',);
+    expect(
+      hasOAuthTokens,
+      isTrue,
+      reason: 'Expected to find OAuth tokens in secure storage',
+    );
   });
 }

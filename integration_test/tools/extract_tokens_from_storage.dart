@@ -13,6 +13,8 @@
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 
+// ignore_for_file: avoid_print
+
 library;
 
 import 'dart:convert';
@@ -36,9 +38,7 @@ void main() {
 
     // Initialize secure storage with same options as the app.
     const storage = FlutterSecureStorage(
-      aOptions: AndroidOptions(
-        encryptedSharedPreferences: true,
-      ),
+      aOptions: AndroidOptions(),
       iOptions: IOSOptions(
         accessibility: KeychainAccessibility.first_unlock,
       ),

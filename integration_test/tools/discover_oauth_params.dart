@@ -12,6 +12,8 @@
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 
+// ignore_for_file: avoid_print
+
 library;
 
 import 'dart:io';

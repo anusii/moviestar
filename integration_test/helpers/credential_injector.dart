@@ -4,6 +4,8 @@
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 
+// ignore_for_file: avoid_print
+
 library;
 
 import 'dart:convert';
@@ -135,9 +137,7 @@ class CredentialInjector {
   /// which performs automated browser login to obtain real OAuth tokens.
   static Future<void> injectAuthTokens(Map<String, dynamic> tokens) async {
     const storage = FlutterSecureStorage(
-      aOptions: AndroidOptions(
-        encryptedSharedPreferences: true,
-      ),
+      aOptions: AndroidOptions(),
       iOptions: IOSOptions(
         accessibility: KeychainAccessibility.first_unlock,
       ),
@@ -250,9 +250,7 @@ class CredentialInjector {
   /// Clears injected credentials (for test cleanup).
   static Future<void> clearCredentials() async {
     const storage = FlutterSecureStorage(
-      aOptions: AndroidOptions(
-        encryptedSharedPreferences: true,
-      ),
+      aOptions: AndroidOptions(),
       iOptions: IOSOptions(
         accessibility: KeychainAccessibility.first_unlock,
       ),

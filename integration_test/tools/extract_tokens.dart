@@ -10,9 +10,10 @@
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 
+// ignore_for_file: avoid_print
+
 library;
 
-import 'dart:convert';
 import 'dart:io';
 
 import '../helpers/pod_auth_automator.dart';

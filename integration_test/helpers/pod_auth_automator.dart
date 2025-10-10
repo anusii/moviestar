@@ -5,6 +5,8 @@
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 
+// ignore_for_file: avoid_print
+
 library;
 
 import 'dart:convert';
@@ -421,72 +423,6 @@ class PodAuthAutomator {
     } catch (e) {
       print('No security key prompt found or error handling it: $e');
       return false;
-    }
-  }
-
-  /// Extracts authentication tokens from browser storage.
-  static Future<Map<String, dynamic>> _extractAuthTokens(Page page) async {
-    try {
-      // Extract data from sessionStorage and localStorage.
-      final storageData = await page.evaluate('''
-        function() {
-          var result = {
-            sessionStorage: {},
-            localStorage: {},
-            cookies: document.cookie
-          };
-
-          // Get sessionStorage.
-          for (var i = 0; i < sessionStorage.length; i++) {
-            var key = sessionStorage.key(i);
-            result.sessionStorage[key] = sessionStorage.getItem(key);
-          }
-
-          // Get localStorage.
-          for (var i = 0; i < localStorage.length; i++) {
-            var key = localStorage.key(i);
-            result.localStorage[key] = localStorage.getItem(key);
-          }
-
-          return result;
-        }
-      ''');
-
-      // Parse the result.
-      final tokens = <String, dynamic>{};
-
-      if (storageData is Map) {
-        // Extract relevant auth data.
-        final sessionStorage = storageData['sessionStorage'] as Map?;
-        final localStorage = storageData['localStorage'] as Map?;
-        final cookies = storageData['cookies'] as String?;
-
-        if (sessionStorage != null) {
-          tokens['sessionStorage'] = Map<String, dynamic>.from(sessionStorage);
-        }
-
-        if (localStorage != null) {
-          tokens['localStorage'] = Map<String, dynamic>.from(localStorage);
-        }
-
-        if (cookies != null && cookies.isNotEmpty) {
-          tokens['cookies'] = cookies;
-        }
-
-        // Extract OpenID Connect specific data.
-        if (sessionStorage != null) {
-          final authResponse =
-              sessionStorage['openidconnect_auth_response_info'];
-          if (authResponse != null) {
-            tokens['openidconnect_auth_response'] = authResponse.toString();
-          }
-        }
-      }
-
-      return tokens;
-    } catch (e) {
-      print('Error extracting auth tokens: $e');
-      return {};
     }
   }
 

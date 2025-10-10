@@ -101,8 +101,7 @@ void main() {
     }
 
     // Save to auth_tokens.json.
-    final outputFile =
-        File('integration_test/fixtures/auth_tokens.json');
+    final outputFile = File('integration_test/fixtures/auth_tokens.json');
 
     // Ensure directory exists.
     await outputFile.parent.create(recursive: true);

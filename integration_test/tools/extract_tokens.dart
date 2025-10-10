@@ -52,13 +52,18 @@ Future<void> main(List<String> args) async {
 
     print('✓ Tokens saved to: ${tokensFile.path}\n');
     print('Token summary:');
-    print('  - sessionStorage keys: ${(result.tokens!['sessionStorage'] as Map?)?.length ?? 0}');
-    print('  - localStorage keys: ${(result.tokens!['localStorage'] as Map?)?.length ?? 0}');
-    print('  - Cookies present: ${result.tokens!['cookies'] != null ? "Yes" : "No"}');
+    print(
+        '  - sessionStorage keys: ${(result.tokens!['sessionStorage'] as Map?)?.length ?? 0}');
+    print(
+        '  - localStorage keys: ${(result.tokens!['localStorage'] as Map?)?.length ?? 0}');
+    print(
+        '  - Cookies present: ${result.tokens!['cookies'] != null ? "Yes" : "No"}');
 
     // Check for OpenID Connect auth response.
-    final hasAuthResponse = result.tokens!['openidconnect_auth_response'] != null;
-    print('  - OpenID Connect response: ${hasAuthResponse ? "✓ Found" : "✗ Not found"}');
+    final hasAuthResponse =
+        result.tokens!['openidconnect_auth_response'] != null;
+    print(
+        '  - OpenID Connect response: ${hasAuthResponse ? "✓ Found" : "✗ Not found"}');
 
     if (!hasAuthResponse) {
       print('\n⚠ Warning: OpenID Connect auth response not found.');

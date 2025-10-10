@@ -94,7 +94,8 @@ class PodAuthAutomator {
           if (uri.queryParameters.containsKey('error')) {
             print('  ERROR in callback:');
             print('    error: ${uri.queryParameters['error']}');
-            print('    error_description: ${uri.queryParameters['error_description']}');
+            print(
+                '    error_description: ${uri.queryParameters['error_description']}');
           }
 
           // Abort the request since we don't have a server listening.
@@ -232,7 +233,8 @@ class PodAuthAutomator {
       print('✓ OAuth callback received!');
 
       // Validate authorization code.
-      final authorizationCode = capturedCode; // capturedCode is guaranteed non-null here
+      final authorizationCode =
+          capturedCode; // capturedCode is guaranteed non-null here
       if (authorizationCode == null || authorizationCode.isEmpty) {
         return AuthResult(
           success: false,
@@ -333,12 +335,16 @@ class PodAuthAutomator {
         print('Found ${buttons.length} buttons on page');
 
         for (final button in buttons) {
-          final text = await page.evaluate('el => el.textContent', args: [button]);
+          final text =
+              await page.evaluate('el => el.textContent', args: [button]);
           final textStr = text.toString().trim().toLowerCase();
 
           print('Button text: "$textStr"');
 
-          if (textStr == 'yes' || textStr == 'allow' || textStr == 'authorize' || textStr == 'consent') {
+          if (textStr == 'yes' ||
+              textStr == 'allow' ||
+              textStr == 'authorize' ||
+              textStr == 'consent') {
             print('✓ Found consent button with text: "$text", clicking...');
             await button.click();
             return true;
@@ -355,7 +361,9 @@ class PodAuthAutomator {
           final value = await page.evaluate('el => el.value', args: [input]);
           final valueStr = value.toString().trim().toLowerCase();
 
-          if (valueStr == 'yes' || valueStr == 'allow' || valueStr == 'authorize') {
+          if (valueStr == 'yes' ||
+              valueStr == 'allow' ||
+              valueStr == 'authorize') {
             print('✓ Found consent input with value: "$value", clicking...');
             await input.click();
             return true;
@@ -467,7 +475,8 @@ class PodAuthAutomator {
 
         // Extract OpenID Connect specific data.
         if (sessionStorage != null) {
-          final authResponse = sessionStorage['openidconnect_auth_response_info'];
+          final authResponse =
+              sessionStorage['openidconnect_auth_response_info'];
           if (authResponse != null) {
             tokens['openidconnect_auth_response'] = authResponse.toString();
           }
@@ -605,7 +614,8 @@ class PodAuthAutomator {
   static Future<String?> _registerOAuthClient(Page page) async {
     try {
       // Navigate to the registration endpoint.
-      const registrationEndpoint = 'https://pods.dev.solidcommunity.au/.oidc/reg';
+      const registrationEndpoint =
+          'https://pods.dev.solidcommunity.au/.oidc/reg';
 
       // Prepare registration request.
       final registrationData = {
@@ -615,7 +625,8 @@ class PodAuthAutomator {
         'grant_types': ['authorization_code'],
         'scope': 'openid profile',
         'application_type': 'web',
-        'token_endpoint_auth_method': 'none', // Public client (no client secret)
+        'token_endpoint_auth_method':
+            'none', // Public client (no client secret)
       };
 
       // Use fetch API to register client.
@@ -678,7 +689,8 @@ class PodAuthAutomator {
     };
 
     final queryString = params.entries
-        .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .map((e) =>
+            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
         .join('&');
 
     return '$authEndpoint?$queryString';

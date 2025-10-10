@@ -20,7 +20,8 @@ class TestConstants {
       'https://pods.dev.solidcommunity.au/healthpod-test/profile/card#me';
 
   /// Test POD URL.
-  static const testPodUrl = 'https://pods.dev.solidcommunity.au/healthpod-test/';
+  static const testPodUrl =
+      'https://pods.dev.solidcommunity.au/healthpod-test/';
 
   /// Test issuer URL.
   static const testIssuer = 'https://pods.dev.solidcommunity.au/';

@@ -1,0 +1,16 @@
+{
+  "_comment": "This is a template file. To generate real OAuth tokens, run:",
+  "_command": "dart run integration_test/tools/extract_tokens.dart",
+  "_note": "The generated auth_tokens.json file should NOT be committed to git (tokens expire in 1 hour)",
+  "access_token": "GENERATED_BY_EXTRACT_TOKENS_TOOL",
+  "refresh_token": null,
+  "id_token": "GENERATED_BY_EXTRACT_TOKENS_TOOL",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "webid": "https://pods.dev.solidcommunity.au/your-pod/profile/card#me",
+  "issuer": "https://pods.dev.solidcommunity.au",
+  "client_id": "GENERATED_BY_EXTRACT_TOKENS_TOOL",
+  "authorization_code": "GENERATED_BY_EXTRACT_TOKENS_TOOL",
+  "code_verifier": "GENERATED_BY_EXTRACT_TOKENS_TOOL",
+  "state": "GENERATED_TIMESTAMP"
+}

@@ -12,10 +12,9 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/widgets/movie_sharing_ui.dart';
 
-import 'helpers/test_data_factory.dart';
+import 'helpers/navigation_test_widgets.dart';
 
 void main() {
   group('Navigation Integration Tests', () {
@@ -79,7 +78,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           navigatorObservers: [
-            _DepthTrackingNavigatorObserver(
+            DepthTrackingNavigatorObserver(
               onPush: () => navigationDepth++,
               onPop: () => navigationDepth--,
             ),
@@ -94,7 +93,7 @@ void main() {
                       context,
                       MaterialPageRoute(
                         builder: (context) => MovieSharingUI(
-                          movie: _createTestMovie(),
+                          movie: createTestMovie(),
                           onSharingComplete: () {
                             Navigator.of(context)
                                 .popUntil((route) => route.isFirst);
@@ -146,7 +145,7 @@ void main() {
                         context,
                         MaterialPageRoute(
                           builder: (context) => MovieSharingUI(
-                            movie: _createTestMovie(),
+                            movie: createTestMovie(),
                             onSharingComplete: () {
                               Navigator.of(context)
                                   .popUntil((route) => route.isFirst);
@@ -211,7 +210,7 @@ void main() {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => _MockSharingScreen(
+                        builder: (context) => MockSharingScreen(
                           onComplete: () {
                             callbackExecuted = true;
                             Navigator.of(context)
@@ -247,7 +246,7 @@ void main() {
         (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: const _StatefulHomeScreen(),
+          home: const StatefulHomeScreen(),
         ),
       );
 
@@ -279,7 +278,7 @@ void main() {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const _DisposableWidget(),
+                      builder: (context) => const DisposableWidget(),
                     ),
                   );
                 },
@@ -309,172 +308,4 @@ void main() {
       expect(find.text('Open Disposable'), findsOneWidget);
     });
   });
-}
-
-Movie _createTestMovie() {
-  return TestDataFactory.createMovie();
-}
-
-class IntermediateScreen extends StatelessWidget {
-  const IntermediateScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Intermediate')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MovieSharingUI(
-                  movie: _createTestMovie(),
-                  onSharingComplete: () {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                  },
-                ),
-              ),
-            );
-          },
-          child: const Text('Open Sharing'),
-        ),
-      ),
-    );
-  }
-}
-
-class _MockSharingScreen extends StatelessWidget {
-  final VoidCallback onComplete;
-
-  const _MockSharingScreen({required this.onComplete});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Mock Sharing')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: onComplete,
-          child: const Text('Complete'),
-        ),
-      ),
-    );
-  }
-}
-
-class _StatefulHomeScreen extends StatefulWidget {
-  const _StatefulHomeScreen();
-
-  @override
-  State<_StatefulHomeScreen> createState() => _StatefulHomeScreenState();
-}
-
-class _StatefulHomeScreenState extends State<_StatefulHomeScreen> {
-  int _counter = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Stateful Home')),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('Count: $_counter'),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {
-                  setState(() {
-                    _counter++;
-                  });
-                },
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MovieSharingUI(
-                        movie: _createTestMovie(),
-                        onSharingComplete: () {
-                          Navigator.of(context)
-                              .popUntil((route) => route.isFirst);
-                        },
-                      ),
-                    ),
-                  );
-                },
-                child: const Text('Open Sharing'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DisposableWidget extends StatefulWidget {
-  const _DisposableWidget();
-
-  @override
-  State<_DisposableWidget> createState() => _DisposableWidgetState();
-}
-
-class _DisposableWidgetState extends State<_DisposableWidget> {
-  bool _isLoading = false;
-
-  Future<void> _startAsync() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Disposable')),
-      body: Center(
-        child: _isLoading
-            ? const CircularProgressIndicator()
-            : ElevatedButton(
-                onPressed: _startAsync,
-                child: const Text('Start Async'),
-              ),
-      ),
-    );
-  }
-}
-
-class _DepthTrackingNavigatorObserver extends NavigatorObserver {
-  final VoidCallback onPush;
-  final VoidCallback onPop;
-
-  _DepthTrackingNavigatorObserver({
-    required this.onPush,
-    required this.onPop,
-  });
-
-  @override
-  void didPush(Route route, Route? previousRoute) {
-    onPush();
-    super.didPush(route, previousRoute);
-  }
-
-  @override
-  void didPop(Route route, Route? previousRoute) {
-    onPop();
-    super.didPop(route, previousRoute);
-  }
 }

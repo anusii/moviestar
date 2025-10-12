@@ -34,7 +34,7 @@ void main() {
         contentType: ContentType.movie,
       );
 
-      testMovieListFile = ShareableFile(
+      testMovieListFile = const ShareableFile(
         fileName: 'user_lists/MovieList-123.ttl',
         displayName: 'My Test List',
         fileType: 'movielist',

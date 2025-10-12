@@ -24,7 +24,7 @@ void main() {
 
     testWidgets('should create widget with required parameters',
         (tester) async {
-      final screen = SharedMovieListDetailScreen(
+      final screen = const SharedMovieListDetailScreen(
         listName: 'Test List',
         listDescription: 'Test Description',
         owner: 'Test Owner',
@@ -55,7 +55,7 @@ void main() {
     testWidgets('should accept string listName parameter', (tester) async {
       const testListName = 'My Shared List';
 
-      final screen = SharedMovieListDetailScreen(
+      final screen = const SharedMovieListDetailScreen(
         listName: testListName,
         listDescription: 'Description',
         owner: 'Owner',
@@ -117,7 +117,7 @@ void main() {
     testWidgets('should accept permissions parameter', (tester) async {
       const testPermissions = 'read-write';
 
-      final screen = SharedMovieListDetailScreen(
+      final screen = const SharedMovieListDetailScreen(
         listName: 'Test',
         listDescription: 'Description',
         owner: 'Owner',
@@ -140,7 +140,7 @@ void main() {
     });
 
     testWidgets('should be a ConsumerStatefulWidget', (tester) async {
-      final screen = SharedMovieListDetailScreen(
+      final screen = const SharedMovieListDetailScreen(
         listName: 'Test',
         listDescription: 'Description',
         owner: 'Owner',

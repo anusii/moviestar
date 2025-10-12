@@ -21,7 +21,7 @@ class TestMixinClass with PodOperationsMixin {
     return retryOperation(
       operation: () async {
         operationCallCount++;
-        await Future.delayed(Duration(milliseconds: 5));
+        await Future.delayed(const Duration(milliseconds: 5));
         if (shouldFail && operationCallCount < maxRetries) {
           throw Exception('Retry test failure $operationCallCount');
         }
@@ -154,7 +154,7 @@ void main() {
         },
         operationName: 'delayTest',
         maxRetries: 3,
-        initialDelay: Duration(milliseconds: 100),
+        initialDelay: const Duration(milliseconds: 100),
       );
 
       // Should have been called 3 times (maxRetries)

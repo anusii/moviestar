@@ -66,7 +66,7 @@ void main() {
 
     group('ShareRequest', () {
       test('creates valid share request', () {
-        final request = ShareRequest(
+        final request = const ShareRequest(
           fileName: 'movies/Movie-123.ttl',
           displayName: 'Test Movie',
           permissions: ['read', 'write'],

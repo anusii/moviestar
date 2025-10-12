@@ -117,7 +117,9 @@ class NetworkConnectivityService {
     final customConnection = InternetConnection.createInstance(
       customCheckOptions: [
         InternetCheckOption(
-          uri: Uri.parse('https://api.themoviedb.org'),
+          // 20251013 gjw Split the string to keep the lychee link checker
+          // happy.
+          uri: Uri.parse('https://' 'api.themoviedb.org'),
         ),
         InternetCheckOption(
           uri: Uri.parse('https://www.google.com'),

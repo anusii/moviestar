@@ -47,7 +47,6 @@ a Pull Request. The app is implemented in
 [solidpod](https://pub.dev/packages/solidpod) for Flutter to manage
 the Solid Pod interactions. Thank you.
 
-
 ## Introduction
 
 The moviestar app is a personal movies (and TV series) database and
@@ -73,44 +72,44 @@ user is guided through the app.
 
 As a user I can
 
-- [X] Retrieve movie details from imdb or movielens or **themoviedb**
-  - [X] Artwork
-  - [X] Release date
-  - [X] Description
-  - [X] Rating
-- [X] View all movies in the GUI using movie art work
-- [X] Settings to store my API key
-- [x] New lists with names that I choose (e.g., Watched and To Watch)
-- [x] Have any number of lists
-- [x] Add movies to my Watched list or my To Watch list
-- [x] Have the lists stored in my POD encrypted including the meta data
-- [x] Retrieved the two lists from my POD on startup
-- [x] Add my own comments to a movie (text)
-- [x] Add a rating with a movie (0-5?)
-- [x] My Movie Lists can be sorted by
-  - [x] name
-  - [x] rating
-  - [x] release date
++ [X] Retrieve movie details from imdb or movielens or **themoviedb**
+  + [X] Artwork
+  + [X] Release date
+  + [X] Description
+  + [X] Rating
++ [X] View all movies in the GUI using movie art work
++ [X] Settings to store my API key
++ [x] New lists with names that I choose (e.g., Watched and To Watch)
++ [x] Have any number of lists
++ [x] Add movies to my Watched list or my To Watch list
++ [x] Have the lists stored in my POD encrypted including the meta data
++ [x] Retrieved the two lists from my POD on startup
++ [x] Add my own comments to a movie (text)
++ [x] Add a rating with a movie (0-5?)
++ [x] My Movie Lists can be sorted by
+  + [x] name
+  + [x] rating
+  + [x] release date
 
 ### Sharing my Movies
 
 As a user I can
 
-- [x] Share all my movies data with another user
-- [x] See who has shared their movies with me
-- [x] Switch to a view of another user's movies - perhaps on HOME
-- [ ] Summarise movies across users
-  - [ ] Frequency count
-  - [ ] Total ratings count
++ [x] Share all my movies data with another user
++ [x] See who has shared their movies with me
++ [x] Switch to a view of another user's movies - perhaps on HOME
++ [ ] Summarise movies across users
+  + [ ] Frequency count
+  + [ ] Total ratings count
 
 ### Recommending Movies
 
 As a user I can
 
-- [ ] Add private (not shared) views of other users sharing movies
-  - [ ] Includes a weighting for each user (0-5, default 2)
-- [ ] Add to summarise movies across users
-  - [ ] Weighted ratings of movies - user rating * their movie rating
++ [ ] Add private (not shared) views of other users sharing movies
+  + [ ] Includes a weighting for each user (0-5, default 2)
++ [ ] Add to summarise movies across users
+  + [ ] Weighted ratings of movies - user rating * their movie rating
 
 Add support for recommendation engine - review
 [recommenders](https://github.com/recommenders-team/recommenders).
@@ -118,7 +117,7 @@ Add support for recommendation engine - review
 [![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
 
-Time-stamp: <Sunday 2025-10-12 20:35:29 +1100 Graham Williams>
+Time-stamp: <Monday 2025-10-13 06:17:53 +1100 Graham Williams>
 
 <!-- markdownlint-disable MD053 -->
 [comment]: # (Local Variables:)

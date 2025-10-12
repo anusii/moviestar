@@ -126,20 +126,20 @@ class SolidScaffoldConfig {
 
 ''',
       ),
-      SolidMenuItem(
+      const SolidMenuItem(
         title: 'Shared',
         icon: Icons.movie_outlined,
-        child: const SharedMoviesScreen(),
+        child: SharedMoviesScreen(),
         tooltip: '''
 
 **Shared Movies:** Tap here to view movies shared from your POD.
 
 ''',
       ),
-      SolidMenuItem(
+      const SolidMenuItem(
         title: 'Files',
         icon: Icons.folder,
-        child: const FilesScreen(),
+        child: FilesScreen(),
         tooltip: '''
 
 **File Management:** Tap here to access file management features for your POD.

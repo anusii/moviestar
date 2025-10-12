@@ -71,7 +71,7 @@ final recommendedMoviesWithCacheInfoProvider =
   // If no API key is set, return empty result instead of cached content.
 
   if (apiKey == null || apiKey.trim().isEmpty) {
-    return CacheResult<List<Movie>>(
+    return const CacheResult<List<Movie>>(
       data: <Movie>[],
       fromCache: false,
       cacheAge: null,
@@ -101,7 +101,7 @@ final nowPlayingMoviesWithCacheInfoProvider =
   // If no API key is set, return empty result instead of cached content.
 
   if (apiKey == null || apiKey.trim().isEmpty) {
-    return CacheResult<List<Movie>>(
+    return const CacheResult<List<Movie>>(
       data: <Movie>[],
       fromCache: false,
       cacheAge: null,
@@ -126,7 +126,7 @@ final topRatedMoviesWithCacheInfoProvider =
   // If no API key is set, return empty result instead of cached content.
 
   if (apiKey == null || apiKey.trim().isEmpty) {
-    return CacheResult<List<Movie>>(
+    return const CacheResult<List<Movie>>(
       data: <Movie>[],
       fromCache: false,
       cacheAge: null,
@@ -151,7 +151,7 @@ final upcomingMoviesWithCacheInfoProvider =
   // If no API key is set, return empty result instead of cached content.
 
   if (apiKey == null || apiKey.trim().isEmpty) {
-    return CacheResult<List<Movie>>(
+    return const CacheResult<List<Movie>>(
       data: <Movie>[],
       fromCache: false,
       cacheAge: null,

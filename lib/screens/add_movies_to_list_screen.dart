@@ -356,7 +356,7 @@ class _AddMoviesToListScreenState extends ConsumerState<AddMoviesToListScreen>
       titleWidget: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Add Content'),
+          const Text('Add Content'),
           Text(
             widget.customList.name,
             style: TextStyle(

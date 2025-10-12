@@ -19,12 +19,12 @@ class ApiKeyService extends BasePodService {
   static const String _legacyApiKeySecureKey = 'movie_db_api_key';
   static const String _userApiKeyPrefix = 'user_api_key_';
   static const String _migrationCompleteKey = 'api_key_migration_complete';
-  static final FlutterSecureStorage _secureStorage = FlutterSecureStorage(
-    aOptions: const AndroidOptions(),
-    iOptions: const IOSOptions(
+  static final FlutterSecureStorage _secureStorage = const FlutterSecureStorage(
+    aOptions: AndroidOptions(),
+    iOptions: IOSOptions(
       accessibility: KeychainAccessibility.first_unlock_this_device,
     ),
-    mOptions: const MacOsOptions(synchronizable: false),
+    mOptions: MacOsOptions(synchronizable: false),
   );
 
   String? _cachedApiKey;

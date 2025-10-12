@@ -474,7 +474,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       appBar: SolidAppBarConfig(
         title: 'MovieStar',
         versionConfig: mounted
-            ? SolidVersionConfig(
+            ? const SolidVersionConfig(
                 changelogUrl:
                     'https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md',
                 showDate: true,

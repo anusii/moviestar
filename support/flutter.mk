@@ -165,7 +165,7 @@ pubspec.actual:
 .PHONY: fix
 fix:
 	@echo "Dart: FIX"
-	dart fix --apply lib
+	dart fix --apply
 	@echo $(SEPARATOR)
 
 .PHONY: format

@@ -3,6 +3,19 @@
 /// This test uses injected test credentials to verify POD operations
 /// work correctly with a real Solid POD.
 ///
+/// ## Token Expiration Issue
+///
+/// If you see `OpenIdException(invalid_grant)` errors, it means the OAuth tokens
+/// in `integration_test/fixtures/auth_tokens.json` have expired. OAuth access
+/// tokens typically expire after 1 hour, and refresh tokens may also expire.
+///
+/// To fix this, regenerate fresh tokens by running:
+/// ```bash
+/// dart run integration_test/tools/extract_tokens.dart
+/// ```
+///
+/// This will perform automated browser login and save new tokens to auth_tokens.json.
+///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 
 library;

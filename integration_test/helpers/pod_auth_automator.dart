@@ -13,9 +13,9 @@ import 'dart:convert';
 
 import 'package:puppeteer/puppeteer.dart';
 
-import '../test_constants.dart';
 import 'browser_automation_helpers.dart';
 import 'oauth_helpers.dart';
+import 'test_constants.dart';
 
 /// Result of POD authentication automation.
 class AuthResult {

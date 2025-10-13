@@ -162,8 +162,10 @@ class _AuthExtractionAppState extends State<_AuthExtractionApp> {
       print('\nAuth data structure:');
       print('  - web_id: ${authData['web_id']}');
       print('  - logout_url: ${authData['logout_url']}');
-      print('  - rsa_info: ${(authData['rsa_info'] as String).length} characters');
-      print('  - auth_response: ${(authData['auth_response'] as Map).length} keys');
+      print(
+          '  - rsa_info: ${(authData['rsa_info'] as String).length} characters');
+      print(
+          '  - auth_response: ${(authData['auth_response'] as Map).length} keys');
 
       print('\n✓ Extraction complete!');
       print('You can now close the app and run E2E tests.');

@@ -21,9 +21,15 @@ import 'test_constants.dart';
 class AuthResult {
   final bool success;
   final Map<String, dynamic>? tokens;
+  final Map<String, dynamic>? completeAuthData;
   final String? error;
 
-  AuthResult({required this.success, this.tokens, this.error});
+  AuthResult({
+    required this.success,
+    this.tokens,
+    this.completeAuthData,
+    this.error,
+  });
 }
 
 /// Automates Solid POD OAuth login flow using Puppeteer.
@@ -287,7 +293,31 @@ class PodAuthAutomator {
         }
       }
 
-      // Build final tokens map.
+      // Generate RSA keypair for DPoP token generation.
+      print('\nGenerating complete auth data structure...');
+      final rsaInfo = await generateRsaKeyPair();
+
+      // Build logout URL.
+      const issuer = 'https://pods.dev.solidcommunity.au';
+      const logoutUrl = '$issuer/logout';
+
+      // Build Credential JSON structure.
+      final credentialJson = buildCredentialJson(
+        oauthTokens: oauthTokens,
+        clientId: clientId,
+        issuer: issuer,
+        authorizationCode: authorizationCode,
+      );
+
+      // Build complete auth data in AuthDataManager format.
+      final completeAuthData = buildCompleteAuthData(
+        webId: webId ?? 'unknown',
+        logoutUrl: logoutUrl,
+        rsaInfo: rsaInfo,
+        credentialJson: credentialJson,
+      );
+
+      // Build legacy tokens map for backwards compatibility.
       final tokens = <String, dynamic>{
         'access_token': oauthTokens['access_token'],
         'refresh_token': oauthTokens['refresh_token'],
@@ -295,7 +325,7 @@ class PodAuthAutomator {
         'token_type': oauthTokens['token_type'] ?? 'Bearer',
         'expires_in': oauthTokens['expires_in'] ?? 3600,
         'webid': webId,
-        'issuer': 'https://pods.dev.solidcommunity.au',
+        'issuer': issuer,
         'client_id': clientId,
         'authorization_code': authorizationCode, // Keep for reference
         'code_verifier': codeVerifier, // Keep for reference
@@ -305,15 +335,15 @@ class PodAuthAutomator {
         tokens['state'] = capturedState;
       }
 
-      if (tokens.isEmpty) {
-        return AuthResult(
-          success: false,
-          error: 'No authentication tokens found in browser storage',
-        );
-      }
+      print('\n✓ Authentication successful!');
+      print('  - Basic tokens: ✓');
+      print('  - Complete auth data: ✓ (includes RSA keys for DPoP)');
 
-      print('Authentication successful!');
-      return AuthResult(success: true, tokens: tokens);
+      return AuthResult(
+        success: true,
+        tokens: tokens,
+        completeAuthData: completeAuthData,
+      );
     } catch (e, stackTrace) {
       print('Authentication failed: $e');
       print('Stack trace: $stackTrace');

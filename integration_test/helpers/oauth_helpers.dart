@@ -14,8 +14,11 @@ library;
 
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
+import 'package:asn1lib/asn1lib.dart';
 import 'package:crypto/crypto.dart';
+import 'package:pointycastle/export.dart';
 import 'package:puppeteer/puppeteer.dart';
 
 /// Registers an OAuth client dynamically with the Solid POD server.
@@ -235,4 +238,241 @@ String generateCodeChallenge(String verifier) {
   final bytes = utf8.encode(verifier);
   final digest = sha256.convert(bytes);
   return base64UrlEncode(digest.bytes).replaceAll('=', '');
+}
+
+/// Generates an RSA keypair for DPoP token generation.
+///
+/// Returns a map containing:
+/// - 'rsa': AsymmetricKeyPair object (from pointycastle)
+/// - 'pubKeyJwk': Public key in JWK format
+/// - 'prvKeyJwk': Private key in JWK format
+Future<Map<String, dynamic>> generateRsaKeyPair() async {
+  print('Generating RSA keypair for DPoP...');
+
+  // Generate 2048-bit RSA keypair using pointycastle.
+  final keyGen = RSAKeyGenerator()
+    ..init(
+      ParametersWithRandom(
+        RSAKeyGeneratorParameters(BigInt.parse('65537'), 2048, 64),
+        FortunaRandom()..seed(KeyParameter(_generateRandomBytes(32))),
+      ),
+    );
+
+  final keyPair = keyGen.generateKeyPair();
+  final publicKey = keyPair.publicKey as RSAPublicKey;
+  final privateKey = keyPair.privateKey as RSAPrivateKey;
+
+  // Convert to JWK format.
+  final publicKeyJwk = _rsaPublicKeyToJwk(publicKey);
+  final privateKeyJwk = _rsaPrivateKeyToJwk(privateKey);
+
+  // Add algorithm.
+  publicKeyJwk['alg'] = 'RS256';
+  privateKeyJwk['alg'] = 'RS256';
+
+  print('✓ RSA keypair generated');
+
+  return {
+    'rsa': keyPair,
+    'pubKeyJwk': publicKeyJwk,
+    'prvKeyJwk': privateKeyJwk,
+  };
+}
+
+/// Generates random bytes for seeding the random number generator.
+Uint8List _generateRandomBytes(int length) {
+  final random = Random.secure();
+  final bytes = Uint8List(length);
+  for (var i = 0; i < length; i++) {
+    bytes[i] = random.nextInt(256);
+  }
+  return bytes;
+}
+
+/// Converts an RSA public key to JWK format.
+Map<String, dynamic> _rsaPublicKeyToJwk(RSAPublicKey publicKey) {
+  return {
+    'kty': 'RSA',
+    'n': _base64UrlEncode(publicKey.modulus!),
+    'e': _base64UrlEncode(publicKey.exponent!),
+  };
+}
+
+/// Converts an RSA private key to JWK format.
+Map<String, dynamic> _rsaPrivateKeyToJwk(RSAPrivateKey privateKey) {
+  return {
+    'kty': 'RSA',
+    'n': _base64UrlEncode(privateKey.modulus!),
+    'e': _base64UrlEncode(privateKey.exponent!),
+    'd': _base64UrlEncode(privateKey.privateExponent!),
+    'p': _base64UrlEncode(privateKey.p!),
+    'q': _base64UrlEncode(privateKey.q!),
+  };
+}
+
+/// Encodes a BigInt to base64url format for JWK.
+String _base64UrlEncode(BigInt value) {
+  final bytes = _bigIntToBytes(value);
+  return base64UrlEncode(bytes).replaceAll('=', '');
+}
+
+/// Converts a BigInt to bytes.
+Uint8List _bigIntToBytes(BigInt value) {
+  final hex = value.toRadixString(16);
+  final paddedHex = hex.length.isOdd ? '0$hex' : hex;
+  final bytes = Uint8List(paddedHex.length ~/ 2);
+  for (var i = 0; i < paddedHex.length; i += 2) {
+    bytes[i ~/ 2] = int.parse(paddedHex.substring(i, i + 2), radix: 16);
+  }
+  return bytes;
+}
+
+/// Builds a Credential-compatible JSON structure from OAuth tokens.
+///
+/// This creates a minimal structure that matches what AuthDataManager expects
+/// when reconstructing a Credential from JSON.
+///
+/// Based on openid_client's Credential format.
+Map<String, dynamic> buildCredentialJson({
+  required Map<String, dynamic> oauthTokens,
+  required String clientId,
+  required String issuer,
+  required String authorizationCode,
+}) {
+  print('Building Credential JSON structure...');
+
+  // The Credential JSON needs to contain the OAuth response that can be
+  // used to reconstruct TokenResponse and other OAuth state.
+  //
+  // Based on Credential.toJson() from openid_client, we need:
+  // - response: The OAuth token response
+  // - client: Client information (issuer, clientId)
+
+  final credentialJson = {
+    'response': {
+      'access_token': oauthTokens['access_token'],
+      'token_type': oauthTokens['token_type'] ?? 'Bearer',
+      'expires_in': oauthTokens['expires_in'] ?? 3600,
+      'id_token': oauthTokens['id_token'],
+      'refresh_token': oauthTokens['refresh_token'],
+    },
+    'client': {
+      'issuer': issuer,
+      'client_id': clientId,
+      'client_secret': null, // Public client
+    },
+  };
+
+  print('✓ Credential JSON built');
+
+  return credentialJson;
+}
+
+/// Builds the complete auth data structure for AuthDataManager.
+///
+/// This creates the exact format that AuthDataManager stores in secure storage
+/// under the '_solid_auth_data' key.
+Map<String, dynamic> buildCompleteAuthData({
+  required String webId,
+  required String logoutUrl,
+  required Map<String, dynamic> rsaInfo,
+  required Map<String, dynamic> credentialJson,
+}) {
+  print('Building complete auth data structure...');
+
+  // AuthDataManager expects this format:
+  // {
+  //   'web_id': String,
+  //   'logout_url': String,
+  //   'rsa_info': jsonEncode({...}),
+  //   'auth_response': Credential.toJson(),
+  // }
+
+  // Extract RSA keypair and serialize it.
+  final keyPair = rsaInfo['rsa'] as AsymmetricKeyPair;
+  final publicKey = keyPair.publicKey as RSAPublicKey;
+  final privateKey = keyPair.privateKey as RSAPrivateKey;
+
+  final completeAuthData = {
+    'web_id': webId,
+    'logout_url': logoutUrl,
+    'rsa_info': jsonEncode({
+      ...rsaInfo,
+      // Override 'rsa' with serialized format compatible with fast_rsa.
+      'rsa': {
+        'public_key': _serializePublicKey(publicKey),
+        'private_key': _serializePrivateKey(privateKey),
+      },
+    }),
+    'auth_response': credentialJson,
+  };
+
+  print('✓ Complete auth data structure built');
+  print('  - WebID: $webId');
+  print('  - Logout URL: $logoutUrl');
+  print('  - RSA keys: included');
+  print('  - Auth response: included');
+
+  return completeAuthData;
+}
+
+/// Serializes an RSA public key to PEM format.
+String _serializePublicKey(RSAPublicKey publicKey) {
+  final algorithmSeq = ASN1Sequence();
+  // OID for rsaEncryption: 1.2.840.113549.1.1.1
+  algorithmSeq.add(ASN1ObjectIdentifier([1, 2, 840, 113549, 1, 1, 1]));
+  algorithmSeq.add(ASN1Null());
+
+  final publicKeySeq = ASN1Sequence();
+  publicKeySeq.add(ASN1Integer(publicKey.modulus!));
+  publicKeySeq.add(ASN1Integer(publicKey.exponent!));
+
+  final publicKeyBitString = ASN1BitString(publicKeySeq.encodedBytes);
+
+  final topLevelSeq = ASN1Sequence();
+  topLevelSeq.add(algorithmSeq);
+  topLevelSeq.add(publicKeyBitString);
+
+  final dataBase64 = base64.encode(topLevelSeq.encodedBytes);
+  final chunks = <String>[];
+  for (var i = 0; i < dataBase64.length; i += 64) {
+    final end = (i + 64 < dataBase64.length) ? i + 64 : dataBase64.length;
+    chunks.add(dataBase64.substring(i, end));
+  }
+
+  return '-----BEGIN PUBLIC KEY-----\n${chunks.join('\n')}\n-----END PUBLIC KEY-----';
+}
+
+/// Serializes an RSA private key to PEM format.
+String _serializePrivateKey(RSAPrivateKey privateKey) {
+  final version = ASN1Integer(BigInt.zero);
+  final modulus = ASN1Integer(privateKey.modulus!);
+  final publicExponent = ASN1Integer(privateKey.exponent!);
+  final privateExponent = ASN1Integer(privateKey.privateExponent!);
+  final p = ASN1Integer(privateKey.p!);
+  final q = ASN1Integer(privateKey.q!);
+
+  final dP = privateKey.privateExponent! % (privateKey.p! - BigInt.one);
+  final dQ = privateKey.privateExponent! % (privateKey.q! - BigInt.one);
+  final iQ = privateKey.q!.modInverse(privateKey.p!);
+
+  final seq = ASN1Sequence();
+  seq.add(version);
+  seq.add(modulus);
+  seq.add(publicExponent);
+  seq.add(privateExponent);
+  seq.add(p);
+  seq.add(q);
+  seq.add(ASN1Integer(dP));
+  seq.add(ASN1Integer(dQ));
+  seq.add(ASN1Integer(iQ));
+
+  final dataBase64 = base64.encode(seq.encodedBytes);
+  final chunks = <String>[];
+  for (var i = 0; i < dataBase64.length; i += 64) {
+    final end = (i + 64 < dataBase64.length) ? i + 64 : dataBase64.length;
+    chunks.add(dataBase64.substring(i, end));
+  }
+
+  return '-----BEGIN PRIVATE KEY-----\n${chunks.join('\n')}\n-----END PRIVATE KEY-----';
 }

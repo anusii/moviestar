@@ -1,9 +1,19 @@
 /// Standalone tool to extract POD authentication tokens.
 ///
-/// Run this script to perform automated POD login and save authentication
-/// tokens for use in E2E tests.
+/// ⚠️ DEPRECATED: This tool only extracts basic OAuth tokens, which is
+/// insufficient for reliable E2E testing. The solidpod package requires
+/// complete auth data including RSA keys for DPoP token generation.
 ///
-/// Usage:
+/// PLEASE USE INSTEAD:
+///   flutter run integration_test/tools/extract_complete_auth.dart -d windows
+///
+/// That tool extracts the COMPLETE auth data structure by performing a
+/// real login through the app, ensuring all necessary components (RSA keys,
+/// Credential object, Client metadata) are captured.
+///
+/// ---
+///
+/// Legacy usage (NOT RECOMMENDED):
 ///   dart run integration_test/tools/extract_tokens.dart [--headless]
 ///
 /// The tokens will be saved to integration_test/fixtures/auth_tokens.json
@@ -22,6 +32,21 @@ Future<void> main(List<String> args) async {
   final headless = !args.contains('--no-headless');
 
   print('=== POD Token Extraction Tool ===\n');
+  print('⚠️  DEPRECATION WARNING ⚠️');
+  print('This tool only extracts basic OAuth tokens, which is INSUFFICIENT');
+  print('for reliable E2E testing with the solidpod package.');
+  print('');
+  print('PLEASE USE THE NEW TOOL INSTEAD:');
+  print('  flutter run integration_test/tools/extract_complete_auth.dart -d windows');
+  print('');
+  print('The new tool extracts COMPLETE auth data including RSA keys for DPoP.');
+  print('Press Ctrl+C to cancel, or wait 5 seconds to continue with legacy extraction...');
+  print('');
+
+  // Give user time to read and cancel.
+  await Future.delayed(const Duration(seconds: 5));
+
+  print('Continuing with legacy token extraction...');
   print('This will perform automated POD login and extract auth tokens.');
   print('Headless mode: ${headless ? "ON" : "OFF"}');
   print('');
@@ -39,7 +64,7 @@ Future<void> main(List<String> args) async {
 
     print('\n✓ Authentication successful!\n');
 
-    // Save tokens to file.
+    // Save legacy tokens to file (for backwards compatibility).
     final tokensFile = File(
       'integration_test/fixtures/auth_tokens.json',
     );
@@ -47,11 +72,23 @@ Future<void> main(List<String> args) async {
     // Ensure directory exists.
     await tokensFile.parent.create(recursive: true);
 
-    // Write tokens.
-    final prettyJson = PodAuthAutomator.formatTokens(result.tokens!);
-    await tokensFile.writeAsString(prettyJson);
+    // Write legacy tokens.
+    final prettyTokensJson = PodAuthAutomator.formatTokens(result.tokens!);
+    await tokensFile.writeAsString(prettyTokensJson);
 
-    print('✓ Tokens saved to: ${tokensFile.path}\n');
+    print('✓ Legacy tokens saved to: ${tokensFile.path}');
+
+    // Save complete auth data (NEW - includes RSA keys).
+    final completeAuthFile = File(
+      'integration_test/fixtures/complete_auth_data.json',
+    );
+
+    // Write complete auth data.
+    final prettyAuthJson = PodAuthAutomator.formatTokens(result.completeAuthData!);
+    await completeAuthFile.writeAsString(prettyAuthJson);
+
+    print('✓ Complete auth data saved to: ${completeAuthFile.path}');
+    print('  (includes RSA keys for DPoP)\n');
     print('Token summary:');
     print(
       '  - sessionStorage keys: ${(result.tokens!['sessionStorage'] as Map?)?.length ?? 0}',

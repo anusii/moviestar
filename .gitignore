@@ -263,3 +263,8 @@ app.*.symbols
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+
+# Integration test auth data (contains sensitive tokens)
+integration_test/fixtures/auth_tokens.json
+integration_test/fixtures/complete_auth_data.json
+integration_test/fixtures/test_credentials.json

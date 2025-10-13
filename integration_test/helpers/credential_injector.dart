@@ -52,6 +52,11 @@ class CredentialInjector {
   static const _credentialsPath =
       'integration_test/fixtures/test_credentials.json';
   static const _authTokensPath = 'integration_test/fixtures/auth_tokens.json';
+  static const _completeAuthDataPath =
+      'integration_test/fixtures/complete_auth_data.json';
+
+  /// Storage key used by solidpod package to store complete auth data.
+  static const _authDataSecureStorageKey = '_solid_auth_data';
 
   /// Loads test credentials from fixture file.
   static Future<TestCredentials> loadCredentials() async {
@@ -216,42 +221,144 @@ class CredentialInjector {
     print('✓ All OAuth tokens injected successfully');
   }
 
-  /// Full authentication injection using extracted OAuth tokens.
+  /// Loads complete auth data from complete_auth_data.json file.
   ///
-  /// This is the recommended approach for E2E testing with real POD auth.
-  /// Run the token extraction tool first to generate auth_tokens.json.
+  /// This auth data is extracted using the complete auth extraction tool:
+  /// `flutter run integration_test/tools/extract_complete_auth.dart -d windows`
   ///
-  /// If [autoRegenerateOnFailure] is true, will automatically regenerate
-  /// tokens using browser automation if the stored tokens are invalid.
+  /// The complete auth data includes the full structure that solidpod's
+  /// AuthDataManager expects, including RSA keys for DPoP token generation.
+  static Future<Map<String, dynamic>> loadCompleteAuthData() async {
+    try {
+      final file = File(_completeAuthDataPath);
+      if (!await file.exists()) {
+        throw Exception(
+          'Complete auth data file not found. Run: flutter run integration_test/tools/extract_complete_auth.dart -d windows',
+        );
+      }
+
+      final contents = await file.readAsString();
+      return jsonDecode(contents) as Map<String, dynamic>;
+    } catch (e) {
+      throw Exception(
+        'Failed to load complete auth data from $_completeAuthDataPath: $e',
+      );
+    }
+  }
+
+  /// Injects complete auth data directly into secure storage.
+  ///
+  /// This method injects the COMPLETE auth data structure that was extracted
+  /// from a real login session. This includes:
+  /// - RSA keypair for DPoP token generation
+  /// - Complete Credential object
+  /// - Client metadata
+  /// - Logout URL
+  ///
+  /// This is stored under the '_solid_auth_data' key that solidpod's
+  /// AuthDataManager expects.
+  static Future<void> injectCompleteAuthData(
+    Map<String, dynamic> authData,
+  ) async {
+    const storage = FlutterSecureStorage(
+      aOptions: AndroidOptions(),
+      iOptions: IOSOptions(
+        accessibility: KeychainAccessibility.first_unlock,
+      ),
+      mOptions: MacOsOptions(synchronizable: false),
+    );
+
+    print('Injecting complete auth data into secure storage...');
+
+    // The auth data is already in the correct format from extraction.
+    // We just need to serialize it and store it under the correct key.
+    final authDataJson = jsonEncode(authData);
+
+    await storage.write(
+      key: _authDataSecureStorageKey,
+      value: authDataJson,
+    );
+
+    print('  ✓ Stored complete auth data under $_authDataSecureStorageKey');
+    print('  ✓ WebID: ${authData['web_id']}');
+    print('  ✓ Contains RSA keys: ${authData.containsKey('rsa_info')}');
+    print(
+      '  ✓ Contains auth response: ${authData.containsKey('auth_response')}',
+    );
+
+    print('✓ Complete auth data injected successfully');
+  }
+
+  /// Full authentication injection using complete auth data.
+  ///
+  /// This is the NEW recommended approach for E2E testing with real POD auth.
+  /// It injects the complete auth data structure including RSA keys for DPoP.
+  ///
+  /// To extract complete auth data:
+  /// 1. Run: flutter run integration_test/tools/extract_complete_auth.dart -d windows
+  /// 2. Log in through the app UI
+  /// 3. Click EXTRACT button to save auth data
+  /// 4. Run your E2E tests
+  ///
+  /// If [autoRegenerateOnFailure] is true, will fall back to the old
+  /// token-based approach using browser automation if complete auth data
+  /// is not available.
   static Future<void> injectFullAuth({
     bool autoRegenerateOnFailure = false,
   }) async {
-    print('Loading OAuth tokens...');
+    print('Loading complete auth data...');
 
-    Map<String, dynamic> tokens;
+    Map<String, dynamic> authData;
     try {
-      tokens = await loadAuthTokens();
+      // Try loading complete auth data first (NEW approach).
+      authData = await loadCompleteAuthData();
+      print('✓ Complete auth data loaded');
+
+      // Inject the complete auth data structure.
+      await injectCompleteAuthData(authData);
+
+      print('✓ Full authentication injected successfully');
+      return;
     } catch (e) {
+      print('⚠ Complete auth data not found: $e');
+
       if (autoRegenerateOnFailure) {
-        print('⚠ Auth tokens file not found, regenerating...');
-        tokens = await _regenerateTokens();
+        print('  Auto-regenerating with browser automation...');
+
+        // Regenerate auth data (this saves both complete auth data and tokens)
+        await _regenerateTokens();
+
+        // Now try loading and injecting the complete auth data
+        try {
+          authData = await loadCompleteAuthData();
+          await injectCompleteAuthData(authData);
+          print('✓ Complete auth data auto-regenerated and injected successfully');
+          return;
+        } catch (e) {
+          // If complete auth data still fails, fall back to legacy tokens
+          print('⚠ Failed to load complete auth data after regeneration: $e');
+          print('  Falling back to legacy token injection...');
+
+          final tokens = await loadAuthTokens();
+          await injectAuthTokens(tokens);
+
+          print('⚠ WARNING: Using legacy token injection. This may not work.');
+          print('   POD operations may fail due to missing RSA keys.');
+          return;
+        }
       } else {
         rethrow;
       }
     }
-
-    print('Injecting tokens into secure storage...');
-    await injectAuthTokens(tokens);
-
-    print('✓ Full authentication injected successfully');
   }
 
-  /// Automatically regenerates OAuth tokens using browser automation.
+  /// Automatically regenerates auth data using browser automation.
   ///
-  /// This performs automated login via Puppeteer and saves the tokens
-  /// to auth_tokens.json for future use.
+  /// This performs automated login via Puppeteer and saves BOTH:
+  /// - Complete auth data (with RSA keys) to complete_auth_data.json
+  /// - Legacy tokens to auth_tokens.json (for backwards compatibility)
   static Future<Map<String, dynamic>> _regenerateTokens() async {
-    print('🔄 Regenerating OAuth tokens using browser automation...');
+    print('🔄 Regenerating auth data using browser automation...');
 
     // Load test credentials
     final credentials = await loadCredentials();
@@ -265,22 +372,30 @@ class CredentialInjector {
       headless: true,
     );
 
-    if (!result.success || result.tokens == null) {
+    if (!result.success || result.completeAuthData == null) {
       throw Exception(
-        'Failed to regenerate OAuth tokens: ${result.error}',
+        'Failed to regenerate auth data: ${result.error}',
       );
     }
 
-    // Save tokens to file for future use
-    print('  Saving tokens to $_authTokensPath...');
-    final file = File(_authTokensPath);
-    await file.parent.create(recursive: true);
-    await file.writeAsString(
+    // Save complete auth data to file (NEW - includes RSA keys)
+    print('  Saving complete auth data to $_completeAuthDataPath...');
+    final completeAuthFile = File(_completeAuthDataPath);
+    await completeAuthFile.parent.create(recursive: true);
+    await completeAuthFile.writeAsString(
+      const JsonEncoder.withIndent('  ').convert(result.completeAuthData),
+    );
+
+    // Also save legacy tokens for backwards compatibility
+    print('  Saving legacy tokens to $_authTokensPath...');
+    final tokensFile = File(_authTokensPath);
+    await tokensFile.parent.create(recursive: true);
+    await tokensFile.writeAsString(
       const JsonEncoder.withIndent('  ').convert(result.tokens),
     );
 
-    print('✓ OAuth tokens regenerated and saved successfully');
-    return result.tokens!;
+    print('✓ Complete auth data regenerated and saved successfully');
+    return result.tokens!; // Return tokens for backwards compatibility
   }
 
   /// Performs programmatic login using test credentials.
@@ -312,7 +427,10 @@ class CredentialInjector {
       mOptions: MacOsOptions(synchronizable: false),
     );
 
-    // Clear OAuth tokens.
+    // Clear complete auth data (solidpod package's storage key).
+    await storage.delete(key: _authDataSecureStorageKey);
+
+    // Clear OAuth tokens (legacy).
     await storage.delete(key: 'webId');
     await storage.delete(key: 'accessToken');
     await storage.delete(key: 'idToken');

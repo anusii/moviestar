@@ -3,16 +3,26 @@
 /// This test uses injected test credentials to verify POD operations
 /// work correctly with a real Solid POD.
 ///
-/// ## Automatic Token Regeneration
+/// ## Complete Auth Data Injection
 ///
-/// This test automatically regenerates expired OAuth tokens using browser
-/// automation. If tokens are missing or invalid, the test will:
-/// 1. Perform automated browser login via Puppeteer
-/// 2. Extract fresh OAuth tokens
-/// 3. Save them to `integration_test/fixtures/auth_tokens.json`
-/// 4. Inject them into the app for testing
+/// This test uses COMPLETE authentication data that includes all components
+/// required by the solidpod package, including RSA keys for DPoP token
+/// generation. This ensures reliable token refresh and POD operations.
 ///
-/// This eliminates manual token refresh and makes tests more reliable.
+/// ### First-time Setup:
+/// 1. Run the auth extraction tool:
+///    ```
+///    flutter run integration_test/tools/extract_complete_auth.dart -d windows
+///    ```
+/// 2. Log in through the app UI with your test POD credentials
+/// 3. Click the EXTRACT button to save complete auth data
+/// 4. The data will be saved to `integration_test/fixtures/complete_auth_data.json`
+/// 5. Run this test: `flutter test integration_test/workflows/pod_favorites_real.dart -d windows`
+///
+/// ### Fallback to Browser Automation:
+/// If complete auth data is not available and `autoRegenerateOnFailure` is true,
+/// the test will fall back to browser automation to generate tokens. However,
+/// this legacy approach may not work reliably due to missing RSA keys.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 
@@ -79,6 +89,10 @@ void main() {
 
       // Wait for app to settle.
       await tester.pumpAndSettle(const Duration(seconds: 5));
+
+      // Add delay to let login styling fully load.
+      await Future.delayed(const Duration(seconds: 2));
+      await tester.pump();
 
       // Verify app loaded.
       expect(find.text('Movie Star'), findsWidgets);

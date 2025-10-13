@@ -5,7 +5,7 @@
 /// complete auth data including RSA keys for DPoP token generation.
 ///
 /// PLEASE USE INSTEAD:
-///   flutter run integration/tools/extract_complete_auth.dart -d windows
+///   flutter run integration_test/tools/extract_complete_auth.dart -d windows
 ///
 /// That tool extracts the COMPLETE auth data structure by performing a
 /// real login through the app, ensuring all necessary components (RSA keys,
@@ -14,9 +14,9 @@
 /// ---
 ///
 /// Legacy usage (NOT RECOMMENDED):
-///   dart run integration/tools/extract_tokens.dart [--headless]
+///   dart run integration_test/tools/extract_tokens.dart [--headless]
 ///
-/// The tokens will be saved to integration/fixtures/auth_tokens.json
+/// The tokens will be saved to integration_test/fixtures/auth_tokens.json
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 
@@ -38,7 +38,7 @@ Future<void> main(List<String> args) async {
   print('');
   print('PLEASE USE THE NEW TOOL INSTEAD:');
   print(
-    '  flutter run integration/tools/extract_complete_auth.dart -d windows',
+    '  flutter run integration_test/tools/extract_complete_auth.dart -d windows',
   );
   print('');
   print(
@@ -72,7 +72,7 @@ Future<void> main(List<String> args) async {
 
     // Save legacy tokens to file (for backwards compatibility).
     final tokensFile = File(
-      'integration/fixtures/auth_tokens.json',
+      'integration_test/fixtures/auth_tokens.json',
     );
 
     // Ensure directory exists.
@@ -86,7 +86,7 @@ Future<void> main(List<String> args) async {
 
     // Save complete auth data (NEW - includes RSA keys).
     final completeAuthFile = File(
-      'integration/fixtures/complete_auth_data.json',
+      'integration_test/fixtures/complete_auth_data.json',
     );
 
     // Write complete auth data.
@@ -124,7 +124,7 @@ Future<void> main(List<String> args) async {
     print('');
     print('Next steps:');
     print('  1. Review the tokens in ${tokensFile.path}');
-    print('  2. Run E2E tests: flutter test integration/');
+    print('  2. Run E2E tests: flutter test integration_test/');
     print('  3. The tokens will be automatically injected during test setup');
     print('');
   } catch (e, stackTrace) {

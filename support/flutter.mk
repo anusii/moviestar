@@ -78,7 +78,7 @@ CROSS=\033[31m❌\033[0m
 
 DART_CODE=lib \
 	$(if $(wildcard test/),test) \
-	$(if $(wildcard integration/),integration_test)
+	$(if $(wildcard integration_test/),integration_test)
 
 # Cater for the case where the support folder is one directory up.
 
@@ -346,7 +346,7 @@ test:
 		echo "No desktop device found. Please ensure you have the correct desktop platform enabled."; \
 		exit 1; \
 	fi; \
-	flutter test --dart-define=INTERACT=5 --device-id $$device_id integration/$*.dart
+	flutter test --dart-define=INTERACT=5 --device-id $$device_id integration_test/$*.dart
 
 # For a run over all tests interactively we INTERACT a little but not as
 # much as when running the individual tests.
@@ -358,7 +358,7 @@ itest:
 		echo "No desktop device found. Please ensure you have the correct desktop platform enabled."; \
 		exit 1; \
 	fi; \
-	for t in integration/*.dart; do flutter test --dart-define=INTERACT=2 --device-id $$device_id $$t; done
+	for t in integration_test/*.dart; do flutter test --dart-define=INTERACT=2 --device-id $$device_id $$t; done
 	@echo $(SEPARATOR)
 
 # For the quick tests we do not INTERACT at all. The aim is to quickly
@@ -371,7 +371,7 @@ qtest:
 		echo "No desktop device found. Please ensure you have the correct desktop platform enabled."; \
 		exit 1; \
 	fi; \
-	for t in $$(find integration_test -name "*.dart" -type f ! -path "*/helpers/*" ! -path "*/tools/*"); do \
+	for t in $$(find integration_test -name "*_test.dart"); do \
 		echo "========================================"; \
 		echo $$t; /bin/echo -n $$t >&2; \
 		echo "========================================"; \
@@ -389,7 +389,7 @@ qtest:
 		echo "No desktop device found. Please ensure you have the correct desktop platform enabled."; \
 		exit 1; \
 	fi; \
-	flutter test --dart-define=INTERACT=0 --device-id $$device_id --reporter failures-only integration/$*.dart 2>/dev/null
+	flutter test --dart-define=INTERACT=0 --device-id $$device_id --reporter failures-only integration_test/$*.dart 2>/dev/null
 
 .PHONY: qtest.all
 qtest.all:

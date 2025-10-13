@@ -3,7 +3,7 @@
 /// This test launches the app WITHOUT injecting credentials,
 /// so you can see the actual login screen for manual inspection.
 ///
-/// Run with: flutter test integration/workflows/visual_login_test.dart -d windows
+/// Run with: flutter test integration_test/workflows/visual_login_test.dart -d windows
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 

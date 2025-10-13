@@ -22,7 +22,7 @@
 /// Authors: Ashley Tang.
 ///
 /// This test uses standard integration_test and can run with:
-/// `flutter test integration/app_test.dart -d windows`
+/// `flutter test integration_test/app.dart`
 
 // ignore_for_file: invalid_use_of_visible_for_testing_member
 
@@ -46,22 +46,27 @@ void main() {
 
   testWidgets('app loads and initializes', (WidgetTester tester) async {
     // Initialize SharedPreferences with fake values
+
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 
     // Initialize cache settings service
+
     await CacheSettingsService.instance.initialize();
 
     // Initialize Hive for local caching
+
     await Hive.initFlutter();
 
     // Register Hive type adapters
+
     Hive.registerAdapter(MovieAdapter());
     Hive.registerAdapter(CustomListAdapter());
     Hive.registerAdapter(ContentItemAdapter());
     Hive.registerAdapter(ContentTypeAdapter());
 
     // Load the full app widget tree with providers
+
     await tester.pumpWidget(
       ProviderScope(
         overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
@@ -70,10 +75,12 @@ void main() {
     );
 
     // Wait for the app to settle
+
     await tester.pumpAndSettle(const Duration(seconds: 5));
 
     // Basic smoke test - verify the app builds without errors
     // The app should load successfully even if we can't interact with POD login
+
     expect(find.text('Movie Star'), findsWidgets);
   });
 }

@@ -4,7 +4,7 @@
 /// the OAuth callback when you manually login to the app.
 ///
 /// Usage:
-/// 1. Run this script: dart run integration/tools/discover_oauth_params.dart
+/// 1. Run this script: dart run integration_test/tools/discover_oauth_params.dart
 /// 2. Launch the MovieStar app manually (on emulator or device)
 /// 3. Click the Login button in the app
 /// 4. Complete the login in the browser

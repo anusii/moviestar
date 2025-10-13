@@ -38,12 +38,15 @@ Future<void> main(List<String> args) async {
   print('');
   print('PLEASE USE THE NEW TOOL INSTEAD:');
   print(
-      '  flutter run integration_test/tools/extract_complete_auth.dart -d windows',);
+    '  flutter run integration_test/tools/extract_complete_auth.dart -d windows',
+  );
   print('');
   print(
-      'The new tool extracts COMPLETE auth data including RSA keys for DPoP.',);
+    'The new tool extracts COMPLETE auth data including RSA keys for DPoP.',
+  );
   print(
-      'Press Ctrl+C to cancel, or wait 5 seconds to continue with legacy extraction...',);
+    'Press Ctrl+C to cancel, or wait 5 seconds to continue with legacy extraction...',
+  );
   print('');
 
   // Give user time to read and cancel.

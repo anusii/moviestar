@@ -333,7 +333,8 @@ class CredentialInjector {
           authData = await loadCompleteAuthData();
           await injectCompleteAuthData(authData);
           print(
-              '✓ Complete auth data auto-regenerated and injected successfully',);
+            '✓ Complete auth data auto-regenerated and injected successfully',
+          );
           return;
         } catch (e) {
           // If complete auth data still fails, fall back to legacy tokens

@@ -246,7 +246,7 @@ void main() {
         (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: _StatefulHomeScreen(),
+          home: StatefulHomeScreen(),
         ),
       );
 

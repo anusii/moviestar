@@ -74,7 +74,7 @@ class PodAuthAutomator {
       final page = await browser.newPage();
 
       // Set a reasonable viewport.
-      await page.setViewport(DeviceViewport(width: 1280, height: 720));
+      await page.setViewport(const DeviceViewport(width: 1280, height: 720));
 
       // Set up OAuth callback interception early (before navigating).
       String? capturedCode;

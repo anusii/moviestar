@@ -152,6 +152,9 @@ class PodAuthAutomator {
           'input[type="text"], input[name="email"]',
           timeout: _timeout,
         );
+
+        // Add delay to let the login screen fully render (cosmetic).
+        await Future.delayed(const Duration(seconds: 1));
       } catch (e) {
         return AuthResult(
           success: false,

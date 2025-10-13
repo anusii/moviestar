@@ -50,10 +50,10 @@ class TestCredentials {
 /// Injects test credentials for authenticated E2E testing.
 class CredentialInjector {
   static const _credentialsPath =
-      'integration_test/fixtures/test_credentials.json';
-  static const _authTokensPath = 'integration_test/fixtures/auth_tokens.json';
+      'integration/fixtures/test_credentials.json';
+  static const _authTokensPath = 'integration/fixtures/auth_tokens.json';
   static const _completeAuthDataPath =
-      'integration_test/fixtures/complete_auth_data.json';
+      'integration/fixtures/complete_auth_data.json';
 
   /// Storage key used by solidpod package to store complete auth data.
   static const _authDataSecureStorageKey = '_solid_auth_data';
@@ -121,13 +121,13 @@ class CredentialInjector {
   /// Loads OAuth tokens from auth_tokens.json file.
   ///
   /// These tokens are extracted using the token extraction tool:
-  /// `dart run integration_test/tools/extract_tokens.dart`
+  /// `dart run integration/tools/extract_tokens.dart`
   static Future<Map<String, dynamic>> loadAuthTokens() async {
     try {
       final file = File(_authTokensPath);
       if (!await file.exists()) {
         throw Exception(
-          'Auth tokens file not found. Run: dart run integration_test/tools/extract_tokens.dart',
+          'Auth tokens file not found. Run: dart run integration/tools/extract_tokens.dart',
         );
       }
 
@@ -224,7 +224,7 @@ class CredentialInjector {
   /// Loads complete auth data from complete_auth_data.json file.
   ///
   /// This auth data is extracted using the complete auth extraction tool:
-  /// `flutter run integration_test/tools/extract_complete_auth.dart -d windows`
+  /// `flutter run integration/tools/extract_complete_auth.dart -d windows`
   ///
   /// The complete auth data includes the full structure that solidpod's
   /// AuthDataManager expects, including RSA keys for DPoP token generation.
@@ -233,7 +233,7 @@ class CredentialInjector {
       final file = File(_completeAuthDataPath);
       if (!await file.exists()) {
         throw Exception(
-          'Complete auth data file not found. Run: flutter run integration_test/tools/extract_complete_auth.dart -d windows',
+          'Complete auth data file not found. Run: flutter run integration/tools/extract_complete_auth.dart -d windows',
         );
       }
 
@@ -295,7 +295,7 @@ class CredentialInjector {
   /// It injects the complete auth data structure including RSA keys for DPoP.
   ///
   /// To extract complete auth data:
-  /// 1. Run: flutter run integration_test/tools/extract_complete_auth.dart -d windows
+  /// 1. Run: flutter run integration/tools/extract_complete_auth.dart -d windows
   /// 2. Log in through the app UI
   /// 3. Click EXTRACT button to save auth data
   /// 4. Run your E2E tests

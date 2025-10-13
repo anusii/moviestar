@@ -4,14 +4,14 @@
 /// extracts the complete authentication data structure from secure storage.
 ///
 /// Usage:
-///   flutter run integration_test/tools/extract_complete_auth.dart -d windows
+///   flutter run integration/tools/extract_complete_auth.dart -d windows
 ///
 /// Instructions:
 ///   1. The app will launch and show the login screen
 ///   2. Manually log in with your POD credentials
 ///   3. Once logged in, press 'e' in the terminal to extract auth data
 ///   4. The complete auth data will be saved to:
-///      integration_test/fixtures/complete_auth_data.json
+///      integration/fixtures/complete_auth_data.json
 ///
 /// This approach ensures we capture the EXACT auth structure that the
 /// solidpod package creates and stores, including:
@@ -22,7 +22,7 @@
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, invalid_use_of_visible_for_testing_member
 
 library;
 
@@ -47,7 +47,7 @@ import 'package:moviestar/utils/is_logged_in.dart';
 const String _authDataKey = '_solid_auth_data';
 
 /// Output file for complete auth data.
-const String _outputPath = 'integration_test/fixtures/complete_auth_data.json';
+const String _outputPath = 'integration/fixtures/complete_auth_data.json';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

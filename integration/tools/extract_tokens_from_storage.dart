@@ -6,10 +6,10 @@
 /// Usage:
 /// 1. First, manually login to the app using the emulator/device
 /// 2. Keep the app open and authenticated
-/// 3. Run this tool: flutter test integration_test/tools/extract_tokens_from_storage.dart
+/// 3. Run this tool: flutter test integration/tools/extract_tokens_from_storage.dart
 ///
 /// The tool will extract all auth-related data and save it to:
-/// integration_test/fixtures/auth_tokens.json
+/// integration/fixtures/auth_tokens.json
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 
@@ -101,7 +101,7 @@ void main() {
     }
 
     // Save to auth_tokens.json.
-    final outputFile = File('integration_test/fixtures/auth_tokens.json');
+    final outputFile = File('integration/fixtures/auth_tokens.json');
 
     // Ensure directory exists.
     await outputFile.parent.create(recursive: true);

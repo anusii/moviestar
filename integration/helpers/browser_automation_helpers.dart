@@ -104,8 +104,10 @@ Future<bool> handleSecurityKey(Page page, String securityKey) async {
 
     for (final selector in securityKeySelectors) {
       try {
-        await page.waitForSelector(selector,
-            timeout: const Duration(seconds: 2));
+        await page.waitForSelector(
+          selector,
+          timeout: const Duration(seconds: 2),
+        );
         await page.type(selector, securityKey);
 
         // Click submit button.

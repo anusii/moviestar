@@ -12,12 +12,12 @@
 /// ### First-time Setup:
 /// 1. Run the auth extraction tool:
 ///    ```
-///    flutter run integration_test/tools/extract_complete_auth.dart -d windows
+///    flutter run integration/tools/extract_complete_auth.dart -d windows
 ///    ```
 /// 2. Log in through the app UI with your test POD credentials
 /// 3. Click the EXTRACT button to save complete auth data
-/// 4. The data will be saved to `integration_test/fixtures/complete_auth_data.json`
-/// 5. Run this test: `flutter test integration_test/workflows/pod_favorites_real.dart -d windows`
+/// 4. The data will be saved to `integration/fixtures/complete_auth_data.json`
+/// 5. Run this test: `flutter test integration/workflows/pod_favorites_real.dart -d windows`
 ///
 /// ### Fallback to Browser Automation:
 /// If complete auth data is not available and `autoRegenerateOnFailure` is true,
@@ -25,6 +25,8 @@
 /// this legacy approach may not work reliably due to missing RSA keys.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
+
+// ignore_for_file: invalid_use_of_visible_for_testing_member
 
 library;
 

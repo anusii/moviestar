@@ -265,6 +265,6 @@ app.*.symbols
 !/dev/ci/**/Gemfile.lock
 
 # Integration test auth data (contains sensitive tokens)
-integration_test/fixtures/auth_tokens.json
-integration_test/fixtures/complete_auth_data.json
-integration_test/fixtures/test_credentials.json
+integration/fixtures/auth_tokens.json
+integration/fixtures/complete_auth_data.json
+integration/fixtures/test_credentials.json

@@ -1,6 +1,6 @@
 {
   "_comment": "This is a template file. To generate real OAuth tokens, run:",
-  "_command": "dart run integration_test/tools/extract_tokens.dart",
+  "_command": "dart run integration/tools/extract_tokens.dart",
   "_note": "The generated auth_tokens.json file should NOT be committed to git (tokens expire in 1 hour)",
   "access_token": "GENERATED_BY_EXTRACT_TOKENS_TOOL",
   "refresh_token": null,

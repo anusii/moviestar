@@ -29,22 +29,22 @@ Run `flutter pub get` to install dependencies.
 
 ```bash
 # Run all tests
-flutter test integration_test/
+flutter test integration/
 
 # Run specific test
-flutter test integration_test/app_test.dart
+flutter test integration/app_test.dart
 
 # Run on specific device (Windows)
-flutter test integration_test/ -d windows
+flutter test integration/ -d windows
 
 # Run workflow tests
-flutter test integration_test/workflows/pod_favorites_real_test.dart
+flutter test integration/workflows/pod_favorites_real_test.dart
 ```
 
 ## Test Organization
 
 ```text
-integration_test/
+integration/
 ├── fixtures/               # Test data and auth tokens
 │   ├── test_credentials.json
 │   └── auth_tokens.json
@@ -69,7 +69,7 @@ injection. This allows E2E tests to run authenticated automatically.
 ### Credential Setup
 
 1. **Create test credentials file** at
-   `integration_test/fixtures/test_credentials.json`:
+   `integration/fixtures/test_credentials.json`:
 
 ```json
 {
@@ -89,7 +89,7 @@ injection. This allows E2E tests to run authenticated automatically.
 
 ```gitignore
 # Test credentials
-integration_test/fixtures/test_credentials.json
+integration/fixtures/test_credentials.json
 ```
 
 ### Usage in Tests
@@ -199,10 +199,10 @@ After running the token extraction tool, you'll have a complete OAuth token set:
 
    ```bash
    # Headless mode (default)
-   dart run integration_test/tools/extract_tokens.dart
+   dart run integration/tools/extract_tokens.dart
 
    # With visible browser (for debugging)
-   dart run integration_test/tools/extract_tokens.dart --no-headless
+   dart run integration/tools/extract_tokens.dart --no-headless
    ```
 
    This will:
@@ -247,13 +247,13 @@ void main() {
 
 #### Files Created
 
-- `integration_test/helpers/pod_auth_automator.dart` - Browser
+- `integration/helpers/pod_auth_automator.dart` - Browser
   automation logic
-- `integration_test/tools/extract_tokens.dart` - Standalone token
+- `integration/tools/extract_tokens.dart` - Standalone token
   extraction tool
-- `integration_test/fixtures/auth_tokens.json` - Extracted OAuth tokens
+- `integration/fixtures/auth_tokens.json` - Extracted OAuth tokens
   (gitignored)
-- `integration_test/fixtures/auth_tokens.json.template` - Template file
+- `integration/fixtures/auth_tokens.json.template` - Template file
 
 #### Token Refresh
 
@@ -261,10 +261,10 @@ Tokens may expire after some time. If tests start failing with auth errors:
 
 ```bash
 # Re-extract fresh tokens
-dart run integration_test/tools/extract_tokens.dart
+dart run integration/tools/extract_tokens.dart
 
 # Run tests again
-flutter test integration_test/
+flutter test integration/
 ```
 
 #### CI/CD Integration
@@ -292,7 +292,7 @@ If browser automation doesn't work for your use case:
 Tests that verify app loads and basic functionality without authentication:
 
 ```dart
-// integration_test/app_test.dart
+// integration/app_test.dart
 testWidgets('app loads and initializes', (WidgetTester tester) async {
   await tester.pumpWidget(const ProviderScope(child: MovieStar()));
   await tester.pumpAndSettle();
@@ -305,7 +305,7 @@ testWidgets('app loads and initializes', (WidgetTester tester) async {
 Tests that verify POD operations with injected credentials:
 
 ```dart
-// integration_test/workflows/pod_favorites_real_test.dart
+// integration/workflows/pod_favorites_real_test.dart
 testWidgets('can add movie to favorites on POD', (tester) async {
   final credentials = await CredentialInjector.loadCredentials();
   await CredentialInjector.injectCredentials(credentials);

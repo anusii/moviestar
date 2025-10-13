@@ -16,8 +16,10 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
+// ignore: depend_on_referenced_packages
 import 'package:asn1lib/asn1lib.dart';
 import 'package:crypto/crypto.dart';
+// ignore: depend_on_referenced_packages
 import 'package:pointycastle/export.dart';
 import 'package:puppeteer/puppeteer.dart';
 
@@ -259,8 +261,8 @@ Future<Map<String, dynamic>> generateRsaKeyPair() async {
     );
 
   final keyPair = keyGen.generateKeyPair();
-  final publicKey = keyPair.publicKey as RSAPublicKey;
-  final privateKey = keyPair.privateKey as RSAPrivateKey;
+  final publicKey = keyPair.publicKey;
+  final privateKey = keyPair.privateKey;
 
   // Convert to JWK format.
   final publicKeyJwk = _rsaPublicKeyToJwk(publicKey);

@@ -49,7 +49,8 @@ class TestCredentials {
 
 /// Injects test credentials for authenticated E2E testing.
 class CredentialInjector {
-  static const _credentialsPath = 'integration_test/fixtures/test_credentials.json';
+  static const _credentialsPath =
+      'integration_test/fixtures/test_credentials.json';
   static const _authTokensPath = 'integration_test/fixtures/auth_tokens.json';
   static const _completeAuthDataPath =
       'integration_test/fixtures/complete_auth_data.json';

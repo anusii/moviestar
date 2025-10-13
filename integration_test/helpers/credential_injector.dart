@@ -15,6 +15,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solidpod/solidpod.dart';
 
+import 'pod_auth_automator.dart';
+
 /// Credentials loaded from test fixture file.
 class TestCredentials {
   final String email;
@@ -218,14 +220,67 @@ class CredentialInjector {
   ///
   /// This is the recommended approach for E2E testing with real POD auth.
   /// Run the token extraction tool first to generate auth_tokens.json.
-  static Future<void> injectFullAuth() async {
+  ///
+  /// If [autoRegenerateOnFailure] is true, will automatically regenerate
+  /// tokens using browser automation if the stored tokens are invalid.
+  static Future<void> injectFullAuth({
+    bool autoRegenerateOnFailure = false,
+  }) async {
     print('Loading OAuth tokens...');
-    final tokens = await loadAuthTokens();
+
+    Map<String, dynamic> tokens;
+    try {
+      tokens = await loadAuthTokens();
+    } catch (e) {
+      if (autoRegenerateOnFailure) {
+        print('⚠ Auth tokens file not found, regenerating...');
+        tokens = await _regenerateTokens();
+      } else {
+        rethrow;
+      }
+    }
 
     print('Injecting tokens into secure storage...');
     await injectAuthTokens(tokens);
 
     print('✓ Full authentication injected successfully');
+  }
+
+  /// Automatically regenerates OAuth tokens using browser automation.
+  ///
+  /// This performs automated login via Puppeteer and saves the tokens
+  /// to auth_tokens.json for future use.
+  static Future<Map<String, dynamic>> _regenerateTokens() async {
+    print('🔄 Regenerating OAuth tokens using browser automation...');
+
+    // Load test credentials
+    final credentials = await loadCredentials();
+
+    // Perform automated browser login
+    print('  Authenticating with POD provider...');
+    final result = await PodAuthAutomator.authenticate(
+      email: credentials.email,
+      password: credentials.password,
+      securityKey: credentials.securityKey,
+      headless: true,
+    );
+
+    if (!result.success || result.tokens == null) {
+      throw Exception(
+        'Failed to regenerate OAuth tokens: ${result.error}',
+      );
+    }
+
+    // Save tokens to file for future use
+    print('  Saving tokens to $_authTokensPath...');
+    final file = File(_authTokensPath);
+    await file.parent.create(recursive: true);
+    await file.writeAsString(
+      const JsonEncoder.withIndent('  ').convert(result.tokens),
+    );
+
+    print('✓ OAuth tokens regenerated and saved successfully');
+    return result.tokens!;
   }
 
   /// Performs programmatic login using test credentials.

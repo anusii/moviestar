@@ -3,18 +3,16 @@
 /// This test uses injected test credentials to verify POD operations
 /// work correctly with a real Solid POD.
 ///
-/// ## Token Expiration Issue
+/// ## Automatic Token Regeneration
 ///
-/// If you see `OpenIdException(invalid_grant)` errors, it means the OAuth tokens
-/// in `integration_test/fixtures/auth_tokens.json` have expired. OAuth access
-/// tokens typically expire after 1 hour, and refresh tokens may also expire.
+/// This test automatically regenerates expired OAuth tokens using browser
+/// automation. If tokens are missing or invalid, the test will:
+/// 1. Perform automated browser login via Puppeteer
+/// 2. Extract fresh OAuth tokens
+/// 3. Save them to `integration_test/fixtures/auth_tokens.json`
+/// 4. Inject them into the app for testing
 ///
-/// To fix this, regenerate fresh tokens by running:
-/// ```bash
-/// dart run integration_test/tools/extract_tokens.dart
-/// ```
-///
-/// This will perform automated browser login and save new tokens to auth_tokens.json.
+/// This eliminates manual token refresh and makes tests more reliable.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 
@@ -40,14 +38,11 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('POD Favorites E2E Tests with Real Credentials', () {
-    late TestCredentials credentials;
-
     setUpAll(() async {
-      // Load test credentials from fixture.
-      credentials = await CredentialInjector.loadCredentials();
-
-      // Inject credentials before tests run.
-      await CredentialInjector.injectCredentials(credentials);
+      // Inject full authentication with automatic token regeneration.
+      // If tokens are expired or missing, they will be automatically
+      // regenerated using browser automation.
+      await CredentialInjector.injectFullAuth(autoRegenerateOnFailure: true);
 
       // Verify injection was successful.
       final injected = await CredentialInjector.verifyInjection();

@@ -245,8 +245,8 @@ void main() {
     testWidgets('maintains widget state after navigation',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: const StatefulHomeScreen(),
+        const MaterialApp(
+          home: _StatefulHomeScreen(),
         ),
       );
 

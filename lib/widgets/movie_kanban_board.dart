@@ -252,7 +252,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
             },
             loading: () => KanbanStreamBuilder(
               favoritesService: widget.favoritesService,
-              recommendedCacheResult: CacheResult<List<Movie>>(
+              recommendedCacheResult: const CacheResult<List<Movie>>(
                 data: <Movie>[],
                 fromCache: false,
               ),
@@ -405,18 +405,18 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
 
     if (loadingData.showSkeletonColumns) {
       return [
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
+        const AnimatedSwitcher(
+          duration: Duration(milliseconds: 300),
           child: KanbanColumnSkeleton(
-            key: const ValueKey('skeleton_1'),
+            key: ValueKey('skeleton_1'),
             title: 'Loading Lists...',
             itemCount: 2,
           ),
         ),
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
+        const AnimatedSwitcher(
+          duration: Duration(milliseconds: 300),
           child: KanbanColumnSkeleton(
-            key: const ValueKey('skeleton_2'),
+            key: ValueKey('skeleton_2'),
             title: 'Loading Lists...',
             itemCount: 1,
           ),

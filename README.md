@@ -2,6 +2,12 @@
 
 # Movie Star - Movie Rating and Sharing
 
+[![GitHub License](https://img.shields.io/github/license/anusii/moviestar)](https://github.com/anusii/moviestar/blob/dev/LICENSE)
+[![Flutter Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/anusii/moviestar/master/pubspec.yaml&query=$.version&label=version)](https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md)
+[![Last Updated](https://img.shields.io/github/last-commit/anusii/moviestar?label=last%20updated)](https://github.com/anusii/moviestar/commits/dev/)
+[![GitHub commit activity (dev)](https://img.shields.io/github/commit-activity/w/anusii/moviestar/dev)](https://github.com/anusii/moviestar/commits/dev/)
+[![GitHub Issues](https://img.shields.io/github/issues/anusii/moviestar)](https://github.com/anusii/moviestar/issues)
+
 An app to collect your movie and tv show ratings and commentary, to
 share that with others, selectively, and to recommend what to watch,
 with all data stored on your own encrypted personal online data store
@@ -18,24 +24,28 @@ the app online at
 The latest version of the app can be downloaded and installed from the
 [Solid Community AU](https://solidcommunity.au):
 
-**Android** [apk](https://solidcommunity.au/installers/moviestar.apk);
-**GNU/Linux**
-[snap](https://solidcommunity.au/installers/moviestar_amd64.snap) or
-[deb](https://solidcommunity.au/installers/moviestar_amd64.deb) or
-[zip](https://solidcommunity.au/installers/moviestar-dev-linux.zip);
-**macOS**
-[dmg](https://solidcommunity.au/installers/moviestar-dev-macos-unsigned.dmg)
-or
-[zip](https://solidcommunity.au/installers/moviestar-dev-macos.zip);
-**Windows**
-[zip](https://solidcommunity.au/installers/moviestar-dev-windows.zip)
-or
-[inno](https://solidcommunity.au/installers/moviestar-dev-windows-inno.exe).
++ **Android**
+  [apk](https://solidcommunity.au/installers/moviestar.apk);
++ **GNU/Linux**
+  [snap](https://solidcommunity.au/installers/moviestar_amd64.snap) or
+  [deb](https://solidcommunity.au/installers/moviestar_amd64.deb) or
+  [zip](https://solidcommunity.au/installers/moviestar-dev-linux.zip);
++ **macOS**
+  [dmg](https://solidcommunity.au/installers/moviestar-dev-macos-unsigned.dmg)
+  or
+  [zip](https://solidcommunity.au/installers/moviestar-dev-macos.zip);
++ **Windows**
+  [zip](https://solidcommunity.au/installers/moviestar-dev-windows.zip)
+  or
+  [inno](https://solidcommunity.au/installers/moviestar-dev-windows-inno.exe).
 
 Contributions are welcome. Visit
 [github](https://github.com/gjwgit/moviestar) to submit an issue or,
 even better, fork the repository yourself, update the code, and submit
-a Pull Request. Thanks.
+a Pull Request. The app is implemented in
+[Flutter](https://flutter.dev) using
+[solidpod](https://pub.dev/packages/solidpod) for Flutter to manage
+the Solid Pod interactions. Thank you.
 
 ## Introduction
 
@@ -62,58 +72,52 @@ user is guided through the app.
 
 As a user I can
 
-- [X] Retrieve movie details from imdb or movielens or **themoviedb**
-  - [X] Artwork
-  - [X] Release date
-  - [X] Description
-  - [X] Rating
-- [X] View all movies in the GUI using movie art work
-- [X] Settings to store my API key
-- [x] New lists with names that I choose (e.g., Watched and To Watch)
-- [x] Have any number of lists
-- [x] Add movies to my Watched list or my To Watch list
-- [x] Have the lists stored in my POD encrypted including the meta data
-- [x] Retrieved the two lists from my POD on startup
-- [x] Add my own comments to a movie (text)
-- [x] Add a rating with a movie (0-5?)
-- [x] My Movie Lists can be sorted by
-  - [x] name
-  - [x] rating
-  - [x] release date
++ [X] Retrieve movie details from imdb or movielens or **themoviedb**
+  + [X] Artwork
+  + [X] Release date
+  + [X] Description
+  + [X] Rating
++ [X] View all movies in the GUI using movie art work
++ [X] Settings to store my API key
++ [x] New lists with names that I choose (e.g., Watched and To Watch)
++ [x] Have any number of lists
++ [x] Add movies to my Watched list or my To Watch list
++ [x] Have the lists stored in my POD encrypted including the meta data
++ [x] Retrieved the two lists from my POD on startup
++ [x] Add my own comments to a movie (text)
++ [x] Add a rating with a movie (0-5?)
++ [x] My Movie Lists can be sorted by
+  + [x] name
+  + [x] rating
+  + [x] release date
 
 ### Sharing my Movies
 
 As a user I can
 
-- [x] Share all my movies data with another user
-- [x] See who has shared their movies with me
-- [x] Switch to a view of another user's movies - perhaps on HOME
-- [ ] Summarise movies across users
-  - [ ] Frequency count
-  - [ ] Total ratings count
++ [x] Share all my movies data with another user
++ [x] See who has shared their movies with me
++ [x] Switch to a view of another user's movies - perhaps on HOME
++ [ ] Summarise movies across users
+  + [ ] Frequency count
+  + [ ] Total ratings count
 
 ### Recommending Movies
 
 As a user I can
 
-- [ ] Add private (not shared) views of other users sharing movies
-  - [ ] Includes a weighting for each user (0-5, default 2)
-- [ ] Add to summarise movies across users
-  - [ ] Weighted ratings of movies - user rating * their movie rating
++ [ ] Add private (not shared) views of other users sharing movies
+  + [ ] Includes a weighting for each user (0-5, default 2)
++ [ ] Add to summarise movies across users
+  + [ ] Weighted ratings of movies - user rating * their movie rating
 
 Add support for recommendation engine - review
 [recommenders](https://github.com/recommenders-team/recommenders).
 
-[![GitHub License](https://img.shields.io/github/license/anusii/moviestar)](https://github.com/anusii/moviestar/blob/dev/LICENSE)
-[![Flutter Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/anusii/moviestar/master/pubspec.yaml&query=$.version&label=version)](https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md)
-[![Last Updated](https://img.shields.io/github/last-commit/anusii/moviestar?label=last%20updated)](https://github.com/anusii/moviestar/commits/dev/)
-[![GitHub commit activity (dev)](https://img.shields.io/github/commit-activity/w/anusii/moviestar/dev)](https://github.com/anusii/moviestar/commits/dev/)
-[![GitHub Issues](https://img.shields.io/github/issues/anusii/moviestar)](https://github.com/anusii/moviestar/issues)
-
 [![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
 
-Time-stamp: <Thursday 2025-10-09 05:25:28 +1100 Graham Williams>
+Time-stamp: <Monday 2025-10-13 06:17:53 +1100 Graham Williams>
 
 <!-- markdownlint-disable MD053 -->
 [comment]: # (Local Variables:)

@@ -66,7 +66,7 @@ class ContentBuilders {
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.star,
                   color: Colors.amber,
                   size: 16,

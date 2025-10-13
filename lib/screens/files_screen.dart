@@ -64,8 +64,8 @@ class _FilesScreenState extends State<FilesScreen> with ScreenStateMixin {
               );
             }
 
-            return Padding(
-              padding: const EdgeInsets.all(Dimensions.xl),
+            return const Padding(
+              padding: EdgeInsets.all(Dimensions.xl),
               child: SolidFile(
                 basePath: basePath,
               ),

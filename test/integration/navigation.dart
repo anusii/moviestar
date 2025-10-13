@@ -14,7 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:moviestar/widgets/movie_sharing_ui.dart';
 
-import 'helpers/navigation_test_widgets.dart';
+import 'helpers/navigation_widgets.dart';
 
 void main() {
   group('Navigation Integration Tests', () {

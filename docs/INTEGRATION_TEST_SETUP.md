@@ -1,75 +1,79 @@
 # Integration Test Setup
 
-This document describes the E2E testing infrastructure for Movie Star
-using Flutter's integration_test package.
+This document describes the initial setup for E2E testing infrastructure for Movie Star using Flutter's integration_test package.
+
+**For day-to-day testing usage, see [TESTING_GUIDE.md](TESTING_GUIDE.md).**
 
 ## Overview
 
-Movie Star uses **integration_test** for cross-platform E2E testing
-on Windows, Linux, macOS, web, Android, and iOS.
+Movie Star uses **integration_test** for cross-platform E2E testing on Windows, Linux, macOS, web, Android, and iOS.
 
 ## Installation
 
 ### Dependencies
 
-The `integration_test` package is included in `pubspec.yaml`:
+Add the following to `pubspec.yaml`:
 
 ```yaml
 dev_dependencies:
   integration_test:
     sdk: flutter
   puppeteer: ^3.19.0  # Browser automation for POD OAuth testing
+  pointycastle: ^3.9.1  # RSA key generation for DPoP
 ```
 
 Run `flutter pub get` to install dependencies.
 
-## Running Tests
+### Platform-Specific Setup
 
-### Running All Integration Tests
-
+#### Linux
 ```bash
-# Run all tests
-flutter test integration/
+flutter config --enable-linux-desktop
+flutter create --platforms=linux .
+```
 
-# Run specific test
-flutter test integration/app_test.dart
+#### Windows
+```bash
+flutter config --enable-windows-desktop
+flutter create --platforms=windows .
+```
 
-# Run on specific device (Windows)
-flutter test integration/ -d windows
-
-# Run workflow tests
-flutter test integration/workflows/pod_favorites_real_test.dart
+#### macOS
+```bash
+flutter config --enable-macos-desktop
+flutter create --platforms=macos .
 ```
 
 ## Test Organization
 
 ```text
-integration/
-├── fixtures/               # Test data and auth tokens
+integration_test/
+├── fixtures/               # Test data and auth tokens (gitignored)
 │   ├── test_credentials.json
-│   └── auth_tokens.json
+│   ├── auth_tokens.json
+│   └── complete_auth_data.json
 ├── helpers/                # Test utilities
 │   ├── credential_injector.dart
-│   └── pod_auth_automator.dart
-├── tools/                  # Development tools
+│   ├── pod_auth_automator.dart
+│   ├── oauth_helpers.dart
+│   └── test_constants.dart
+├── utils/                  # Development tools
+│   ├── delays.dart
 │   ├── extract_tokens.dart
+│   ├── extract_complete_auth.dart
 │   └── discover_oauth_params.dart
 ├── workflows/              # E2E workflow tests
-│   └── pod_favorites_real_test.dart
-└── app_test.dart          # Basic integration test
+│   ├── pod_favorites_real_test.dart
+│   └── visual_login_test.dart
+├── app_test.dart          # Basic integration test
+└── app_hive_test.dart     # Hive initialization test
 ```
 
-## Credential Injection for POD Testing
+## Initial Credential Setup
 
-### POD Testing Overview
+### 1. Create Test Credentials File
 
-To test real POD operations without manual login, we use credential
-injection. This allows E2E tests to run authenticated automatically.
-
-### Credential Setup
-
-1. **Create test credentials file** at
-   `integration/fixtures/test_credentials.json`:
+Create `integration_test/fixtures/test_credentials.json`:
 
 ```json
 {
@@ -82,273 +86,203 @@ injection. This allows E2E tests to run authenticated automatically.
 }
 ```
 
-1. **Update the password** in the credentials file with the actual test
-   account password.
+### 2. Update Credentials
 
-1. **Add to .gitignore** to prevent committing real credentials:
+- Replace `YOUR_TEST_PASSWORD` with your actual test account password
+- Update `email`, `webId`, and `podUrl` if using a different test account
+
+### 3. Verify .gitignore
+
+Ensure these files are **NOT** committed:
 
 ```gitignore
-# Test credentials
-integration/fixtures/test_credentials.json
+# Integration test auth data (contains sensitive tokens)
+integration_test/fixtures/auth_tokens.json
+integration_test/fixtures/complete_auth_data.json
+integration_test/fixtures/test_credentials.json
 ```
 
-### Usage in Tests
+## Extract Authentication Data
 
-```dart
-import '../helpers/credential_injector.dart';
+### First-Time Setup
 
-void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+Before running POD-authenticated tests, extract complete auth data:
 
-  setUpAll(() async {
-    // Load and inject credentials
-    final credentials = await CredentialInjector.loadCredentials();
-    await CredentialInjector.injectCredentials(credentials);
+```bash
+# Automated extraction (recommended)
+dart run integration_test/utils/extract_tokens.dart
 
-    // Verify injection
-    final injected = await CredentialInjector.verifyInjection();
-    expect(injected, isTrue);
-  });
-
-  tearDownAll(() async {
-    // Clean up
-    await CredentialInjector.clearCredentials();
-  });
-
-  testWidgets('test with authentication', (tester) async {
-    // Your test code here
-  });
-}
+# Manual extraction (if automation fails)
+flutter run integration_test/utils/extract_complete_auth.dart -d linux
 ```
 
-### Credential Injection Process
+This generates:
+- `integration_test/fixtures/complete_auth_data.json` - Complete auth data with RSA keys
+- `integration_test/fixtures/auth_tokens.json` - Legacy tokens (for backwards compatibility)
 
-1. **Load credentials** from `test_credentials.json`
-2. **Inject into FlutterSecureStorage** - stores WebID and POD info
-3. **App starts authenticated** - `isLoggedIn()` returns true
-4. **Tests can use POD operations** - favorites, lists, etc.
+**Token Expiration**: OAuth tokens expire after 1 hour. Re-run extraction if tests fail with `invalid_grant` errors.
 
-### Limitations
+## Complete Auth Data vs Legacy Tokens
 
-- **Internal solidpod storage**: The `solidpod` package uses internal
-  `AuthDataManager` class with private keys for storing authentication
-  data, which makes direct credential injection challenging
-- **OAuth tokens**: Solid POD uses OAuth with short-lived tokens obtained
-  through browser authentication. The solidpod package manages these
-  tokens internally.
-- **Current implementation**: The credential injector attempts to inject
-  WebID, POD URL, and issuer, but this may not be sufficient for the
-  solidpod package to consider the user authenticated
-- **Test POD required**: Credentials must be for a real test POD account
-- **Security**: Never commit real passwords to version control
+### Why Complete Auth Data?
 
-### Browser Automation Solution (Recommended)
+The solidpod package requires **complete authentication data** including:
+- **RSA keypair** for DPoP (Demonstration of Proof-of-Possession)
+- **Full OAuth2 Credential object**
+- **Client metadata** and logout URL
 
-We've implemented **Puppeteer-based browser automation** with full
-OAuth support to extract real POD tokens automatically! **Zero manual
-input required.**
+**Legacy token injection** (basic access_token/id_token only) will fail with:
+```
+OpenIdException(invalid_grant): grant request is invalid
+```
 
-#### OAuth Flow Automation
+### What Gets Generated
 
-1. **Dynamic Client Registration**: Automatically registers an OAuth
-   client with the Solid POD server
-2. **PKCE Support**: Implements Proof Key for Code Exchange (PKCE) for
-   secure public client authentication
-3. **Automated OAuth Flow**:
-   - Navigates to OAuth authorization endpoint
-   - Enters email and password automatically
-   - Handles consent screen ("Yes" button)
-   - Intercepts OAuth callback to localhost:44007
-4. **Token Exchange**: Exchanges authorization code for OAuth tokens
-   (access_token, id_token, refresh_token)
-5. **WebID Extraction**: Decodes JWT ID token to extract user's WebID
-6. **Token Injection**: Injects all tokens into FlutterSecureStorage
-   for E2E tests
-
-#### What You Get
-
-After running the token extraction tool, you'll have a complete OAuth token set:
+The extraction tools generate RSA keypairs and build the complete auth structure:
 
 ```json
 {
-  "access_token": "eyJhbGc...",      // Bearer token for POD API requests
-  "id_token": "eyJhbGc...",          // JWT with user identity
-  "refresh_token": null,             // For token renewal (if provided)
-  "webid": "https://pods.dev.solidcommunity.au/healthpod-test/profile/card#me",
-  "token_type": "Bearer",
-  "expires_in": 3600,
-  "issuer": "https://pods.dev.solidcommunity.au",
-  "client_id": "...",
-  ...
+  "web_id": "https://pods.dev.solidcommunity.au/healthpod-test/profile/card#me",
+  "logout_url": "https://pods.dev.solidcommunity.au/logout",
+  "rsa_info": "{...RSA keypair in PEM format...}",
+  "auth_response": {
+    "access_token": "eyJhbGc...",
+    "id_token": "eyJhbGc...",
+    "token_type": "DPoP",
+    ...
+  }
 }
 ```
 
-#### Browser Automation Setup
+## Browser Automation Details
 
-1. **Install dependencies** (already in `pubspec.yaml`):
+### OAuth Flow Automation
 
-   ```yaml
-   dev_dependencies:
-     puppeteer: ^3.19.0
-     crypto: ^3.0.6  # For PKCE
-   ```
+The automated extraction performs:
 
-   Run: `flutter pub get`
+1. **Dynamic Client Registration** - Registers OAuth client with POD server
+2. **PKCE Generation** - Creates Proof Key for Code Exchange challenge
+3. **Browser Navigation** - Opens Chrome/Chromium in headless mode
+4. **Form Automation** - Fills email, password, security key
+5. **Consent Handling** - Clicks "Yes" on consent screen
+6. **Callback Interception** - Captures OAuth callback on localhost:44007
+7. **Token Exchange** - Exchanges authorization code for tokens
+8. **RSA Key Generation** - Generates 2048-bit RSA keypair using pointycastle
+9. **Auth Data Assembly** - Builds complete auth data structure
+10. **File Storage** - Saves to `complete_auth_data.json`
 
-1. **Extract OAuth tokens** (one-time or when tokens expire):
+**Duration**: ~15-20 seconds
 
-   ```bash
-   # Headless mode (default)
-   dart run integration/tools/extract_tokens.dart
+### Requirements
 
-   # With visible browser (for debugging)
-   dart run integration/tools/extract_tokens.dart --no-headless
-   ```
+- **Chrome/Chromium** installed on system
+- **Network access** to POD server
+- **Valid test credentials** in `test_credentials.json`
 
-   This will:
-   - Register OAuth client dynamically
-   - Generate PKCE challenge
-   - Navigate to OAuth authorization endpoint
-   - Enter test credentials automatically (email, password)
-   - Click "Yes" on consent screen
-   - Intercept OAuth callback
-   - Exchange authorization code for tokens
-   - Extract WebID from ID token JWT
-   - Save complete token set to `auth_tokens.json`
+## CI/CD Integration
 
-   Duration: ~15-20 seconds
+For continuous integration environments:
 
-#### Using Automated OAuth Tokens
+### Option A: Pre-Generated Tokens
+1. Generate tokens locally
+2. Encrypt `complete_auth_data.json`
+3. Store as CI secret
+4. Decrypt before running tests
 
-```dart
-import '../helpers/credential_injector.dart';
+### Option B: On-Demand Extraction
+1. Install Chrome in CI environment
+2. Store test credentials as CI secrets
+3. Run `dart run integration_test/utils/extract_tokens.dart` before tests
 
-void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+### Option C: Mock POD Service
+1. Create mock POD service for CI
+2. Bypass real authentication
+3. Fastest option but doesn't test real POD integration
 
-  setUpAll(() async {
-    // Inject real OAuth tokens (extracted via browser automation)
-    await CredentialInjector.injectFullAuth();
-
-    // Verify injection
-    final injected = await CredentialInjector.verifyInjection();
-    expect(injected, isTrue);
-  });
-
-  tearDownAll(() async {
-    await CredentialInjector.clearCredentials();
-  });
-
-  testWidgets('test with real POD authentication', (tester) async {
-    // Your test code here - fully authenticated!
-  });
-}
-```
-
-#### Files Created
-
-- `integration/helpers/pod_auth_automator.dart` - Browser
-  automation logic
-- `integration/tools/extract_tokens.dart` - Standalone token
-  extraction tool
-- `integration/fixtures/auth_tokens.json` - Extracted OAuth tokens
-  (gitignored)
-- `integration/fixtures/auth_tokens.json.template` - Template file
-
-#### Token Refresh
-
-Tokens may expire after some time. If tests start failing with auth errors:
-
-```bash
-# Re-extract fresh tokens
-dart run integration/tools/extract_tokens.dart
-
-# Run tests again
-flutter test integration/
-```
-
-#### CI/CD Integration
-
-For continuous integration:
-
-1. **Option A**: Store encrypted tokens as CI secrets
-2. **Option B**: Run token extraction in CI before tests
-3. **Option C**: Use mock POD service for CI
-
-### Alternative Approaches
-
-If browser automation doesn't work for your use case:
-
-1. **Manual token extraction**: Login manually once, extract tokens from
-   FlutterSecureStorage
-2. **Mock POD service**: Create a mock POD for testing (fastest for CI/CD)
-3. **Test without auth**: Test features that don't require POD
-   authentication
-
-## Test Types
-
-### Basic App Tests
-
-Tests that verify app loads and basic functionality without authentication:
-
-```dart
-// integration/app_test.dart
-testWidgets('app loads and initializes', (WidgetTester tester) async {
-  await tester.pumpWidget(const ProviderScope(child: MovieStar()));
-  await tester.pumpAndSettle();
-  expect(find.text('Movie Star'), findsWidgets);
-});
-```
-
-### POD Operation Tests
-
-Tests that verify POD operations with injected credentials:
-
-```dart
-// integration/workflows/pod_favorites_real_test.dart
-testWidgets('can add movie to favorites on POD', (tester) async {
-  final credentials = await CredentialInjector.loadCredentials();
-  await CredentialInjector.injectCredentials(credentials);
-
-  // Test POD operations
-});
-```
-
-## Troubleshooting
-
-### Windows .exe Lock
-
-If tests fail with "cannot open moviestar.exe for writing":
-
-```bash
-# Kill the process
-taskkill /F /IM moviestar.exe
-
-# Clean build
-flutter clean
-flutter pub get
-```
-
-### Credential Injection Not Working
-
-1. Verify `test_credentials.json` exists and has correct format
-2. Check that password is filled in (not placeholder)
-3. Verify test POD account is valid
-4. Check FlutterSecureStorage platform configuration
-
-## Security Notes
+## Security Best Practices
 
 **IMPORTANT:**
 
-- ✅ Use dedicated test POD accounts only
-- ✅ Add `test_credentials.json` to `.gitignore`
-- ✅ Never commit real passwords to version control
-- ✅ Use different credentials for production vs testing
-- ❌ Never use personal POD credentials in tests
-- ❌ Never commit test credentials file with real passwords
+✅ **DO:**
+- Use dedicated test POD accounts only
+- Add credential files to `.gitignore`
+- Rotate test account passwords regularly
+- Use different credentials for staging vs production testing
+- Store CI credentials encrypted
+
+❌ **DON'T:**
+- Commit `test_credentials.json` with real passwords
+- Use personal POD credentials in tests
+- Share test credentials in public repositories
+- Reuse production credentials for testing
+
+## Troubleshooting Setup Issues
+
+### Chrome/Chromium Not Found
+
+**Problem**: `extract_tokens.dart` fails to find browser
+
+**Solution**:
+```bash
+# Linux
+sudo apt install chromium-browser
+
+# macOS
+brew install chromium
+
+# Windows
+# Download Chrome from https://www.google.com/chrome/
+```
+
+### Token Extraction Timeout
+
+**Problem**: Browser automation times out
+
+**Solution**:
+```bash
+# Run with visible browser to debug
+dart run integration_test/utils/extract_tokens.dart --no-headless
+```
+
+### Invalid Credentials
+
+**Problem**: Login fails during extraction
+
+**Solution**:
+1. Verify credentials in `test_credentials.json`
+2. Test manual login at https://pods.dev.solidcommunity.au/
+3. Check if security key is correct
+4. Ensure test account is active
+
+### Platform Not Enabled
+
+**Problem**: `flutter test` fails with "No device found"
+
+**Solution**:
+```bash
+# Check enabled platforms
+flutter config
+
+# Enable desktop platform
+flutter config --enable-linux-desktop  # or --enable-windows-desktop
+
+# Verify devices available
+flutter devices
+```
+
+## Next Steps
+
+After completing setup:
+
+1. **Read [TESTING_GUIDE.md](TESTING_GUIDE.md)** for comprehensive testing documentation
+2. **Run basic test**: `flutter test integration_test/app_test.dart -d linux`
+3. **Run POD test**: `flutter test integration_test/workflows/pod_favorites_real_test.dart -d linux`
+4. **Use qtest mode**: `make qtest.all` for quick automated testing
 
 ## References
 
+- [TESTING_GUIDE.md](TESTING_GUIDE.md) - Comprehensive testing guide
 - [Flutter Integration Testing](https://docs.flutter.dev/testing/integration-tests)
 - [Solid POD Authentication](https://solidproject.org/TR/protocol#authentication)
 - [OAuth 2.0 with PKCE](https://datatracker.ietf.org/doc/html/rfc7636)
+- [DPoP RFC 9449](https://datatracker.ietf.org/doc/html/rfc9449)

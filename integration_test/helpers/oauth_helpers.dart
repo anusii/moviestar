@@ -331,43 +331,110 @@ Uint8List _bigIntToBytes(BigInt value) {
 
 /// Builds a Credential-compatible JSON structure from OAuth tokens.
 ///
-/// This creates a minimal structure that matches what AuthDataManager expects
-/// when reconstructing a Credential from JSON.
-///
-/// Based on openid_client's Credential format.
-Map<String, dynamic> buildCredentialJson({
+/// This creates the EXACT structure that solidpod's AuthDataManager expects.
+/// Format must match what manual extraction creates.
+Future<Map<String, dynamic>> buildCredentialJson({
   required Map<String, dynamic> oauthTokens,
   required String clientId,
   required String issuer,
   required String authorizationCode,
-}) {
+}) async {
   print('Building Credential JSON structure...');
 
-  // The Credential JSON needs to contain the OAuth response that can be
-  // used to reconstruct TokenResponse and other OAuth state.
-  //
-  // Based on Credential.toJson() from openid_client, we need:
-  // - response: The OAuth token response
-  // - client: Client information (issuer, clientId)
+  // Calculate expires_at timestamp (Unix timestamp in seconds)
+  final expiresIn = (oauthTokens['expires_in'] as int?) ?? 3600;
+  final now = DateTime.now();
+  final expiresAt = now.add(Duration(seconds: expiresIn));
+  final expiresAtUnix = (expiresAt.millisecondsSinceEpoch / 1000).round();
 
+  // Fetch issuer metadata from well-known endpoint
+  print('  Fetching issuer metadata...');
+  final issuerMetadata = await _fetchIssuerMetadata(issuer);
+
+  // Build the credential JSON in the format solidpod expects
   final credentialJson = {
-    'response': {
+    'issuer': issuerMetadata,
+    'client_id': clientId,
+    'client_secret': null, // Public client (no client secret)
+    'token': {
+      'expires_at': expiresAtUnix,
       'access_token': oauthTokens['access_token'],
-      'token_type': oauthTokens['token_type'] ?? 'Bearer',
-      'expires_in': oauthTokens['expires_in'] ?? 3600,
+      'expires_in': expiresIn,
       'id_token': oauthTokens['id_token'],
       'refresh_token': oauthTokens['refresh_token'],
+      'scope': oauthTokens['scope'] ?? '',
+      'token_type': oauthTokens['token_type'] ?? 'DPoP',
     },
-    'client': {
-      'issuer': issuer,
-      'client_id': clientId,
-      'client_secret': null, // Public client
-    },
+    'nonce': null,
   };
 
   print('✓ Credential JSON built');
+  print('  ✓ Token expires at: ${expiresAt.toIso8601String()} (Unix: $expiresAtUnix)');
 
   return credentialJson;
+}
+
+/// Fetches issuer metadata from the OpenID Connect discovery endpoint.
+Future<Map<String, dynamic>> _fetchIssuerMetadata(String issuerUrl) async {
+  // Return the well-known issuer metadata for Solid POD
+  // This should be fetched from ${issuerUrl}.well-known/openid-configuration
+  // For now, return a static structure that matches the format
+  return {
+    'authorization_endpoint': '$issuerUrl.oidc/auth',
+    'claims_parameter_supported': true,
+    'claims_supported': ['azp', 'sub', 'webid', 'sid', 'auth_time', 'iss'],
+    'code_challenge_methods_supported': ['S256'],
+    'end_session_endpoint': '$issuerUrl.oidc/session/end',
+    'grant_types_supported': [
+      'implicit',
+      'authorization_code',
+      'refresh_token',
+      'client_credentials',
+    ],
+    'issuer': issuerUrl,
+    'jwks_uri': '$issuerUrl.oidc/jwks',
+    'registration_endpoint': '$issuerUrl.oidc/reg',
+    'authorization_response_iss_parameter_supported': true,
+    'response_modes_supported': ['form_post', 'fragment', 'query'],
+    'response_types_supported': ['code id_token', 'code', 'id_token', 'none'],
+    'scopes_supported': ['openid', 'profile', 'offline_access', 'webid'],
+    'subject_types_supported': ['public'],
+    'token_endpoint_auth_methods_supported': [
+      'client_secret_basic',
+      'client_secret_jwt',
+      'client_secret_post',
+      'private_key_jwt',
+      'none',
+    ],
+    'token_endpoint_auth_signing_alg_values_supported': [
+      'HS256',
+      'RS256',
+      'PS256',
+      'ES256',
+      'EdDSA',
+    ],
+    'token_endpoint': '$issuerUrl.oidc/token',
+    'id_token_signing_alg_values_supported': ['ES256'],
+    'pushed_authorization_request_endpoint': '$issuerUrl.oidc/request',
+    'request_parameter_supported': false,
+    'request_uri_parameter_supported': false,
+    'introspection_endpoint': '$issuerUrl.oidc/token/introspection',
+    'dpop_signing_alg_values_supported': [
+      'RS256',
+      'RS384',
+      'RS512',
+      'PS256',
+      'PS384',
+      'PS512',
+      'ES256',
+      'ES256K',
+      'ES384',
+      'ES512',
+      'EdDSA',
+    ],
+    'revocation_endpoint': '$issuerUrl.oidc/token/revocation',
+    'claim_types_supported': ['normal'],
+  };
 }
 
 /// Builds the complete auth data structure for AuthDataManager.

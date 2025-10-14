@@ -1,10 +1,10 @@
 {
   "web_id": "https://pods.dev.solidcommunity.au/healthpod-test/profile/card#me",
-  "logout_url": "https://pods.dev.solidcommunity.au/.oidc/session/end?id_token_hint=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNQQVFiMml6VllyRm82ZnVlNk4tVjJfY0VoYTFoSDA1WVVJYkJtTEZiUHcifQ.eyJhenAiOiJzbFJFVzJhQm9qVmRHQVYyak1kZXgiLCJzdWIiOiJodHRwczovL3BvZHMuZGV2LnNvbGlkY29tbXVuaXR5LmF1L2hlYWx0aHBvZC10ZXN0L3Byb2ZpbGUvY2FyZCNtZSIsIndlYmlkIjoiaHR0cHM6Ly9wb2RzLmRldi5zb2xpZGNvbW11bml0eS5hdS9oZWFsdGhwb2QtdGVzdC9wcm9maWxlL2NhcmQjbWUiLCJhdF9oYXNoIjoiRElGT1d1YkFsbDRBMF9iWWNWRjVkQSIsImF1ZCI6InNsUkVXMmFCb2pWZEdBVjJqTWRleCIsImV4cCI6MTc2MDM1ODQyMiwiaWF0IjoxNzYwMzU0ODIyLCJpc3MiOiJodHRwczovL3BvZHMuZGV2LnNvbGlkY29tbXVuaXR5LmF1LyJ9.Ttf69ekUt2SvrsttSRY11j-HBKzpLwvsooWp5qdkewf5-oX_F_1iDm2qB2IPrCCncNs1vax89NwXmX5U7lYfew",
-  "rsa_info": "{\"rsa\":{\"public_key\":\"-----BEGIN RSA PUBLIC KEY-----\\nMIIBCgKCAQEAwWcsHpx9nPLXWXpsvrk5Xgt0AVevS5s3gDo+Odaayk9IWhnRoXEo\\nDRLy7HUjeXvY+rPaWCPBPBo6avGmFpvgALpFz7RZKl8juXQAgyghjeCY+o8Q9Z+S\\n9XmGkphdyFnJASIJv7bd0Y3XQQEFWS/3VRRzYx+qBGSm3cTpLU1j124kLB9qSS/F\\nbH5WWco4Kc1q9f87jc/D+nchedK+xQ2dVv/DQ7pGceNCqtmvHv+/hlQgxFNTOgNU\\nO4HgO5c8q3doImhmI7eA+jg3xTavFfJuVz2L+PSN3SLZwHsXqjGZAuoHkods5Jy2\\nHUFURdJv+jDCi2gwWYrxhgLlGJeSD+gTmQIDAQAB\\n-----END RSA PUBLIC KEY-----\\n\",\"private_key\":\"-----BEGIN RSA PRIVATE KEY-----\\nMIIEowIBAAKCAQEAwWcsHpx9nPLXWXpsvrk5Xgt0AVevS5s3gDo+Odaayk9IWhnR\\noXEoDRLy7HUjeXvY+rPaWCPBPBo6avGmFpvgALpFz7RZKl8juXQAgyghjeCY+o8Q\\n9Z+S9XmGkphdyFnJASIJv7bd0Y3XQQEFWS/3VRRzYx+qBGSm3cTpLU1j124kLB9q\\nSS/FbH5WWco4Kc1q9f87jc/D+nchedK+xQ2dVv/DQ7pGceNCqtmvHv+/hlQgxFNT\\nOgNUO4HgO5c8q3doImhmI7eA+jg3xTavFfJuVz2L+PSN3SLZwHsXqjGZAuoHkods\\n5Jy2HUFURdJv+jDCi2gwWYrxhgLlGJeSD+gTmQIDAQABAoIBAChWgYA8+YITsFDM\\nVQQOk+WGlAJ3rGsji5bmDvZ3ST+q+5c3TV7TwBvB+QLSh7yd1Sqs+nxpsLL9cXO+\\nxPpwNm9QaqEgp3xL7aKPjE/OvfjegGm6Dzp7tuYWG7hVqTHRcDgZRllDJc7AO8Ym\\nFVx9waNwKYTiJM7Xw2n72PqG6q0SwaNZnhHsCRLkJH43LhbSdfdkvJFkKO572Pm9\\nyzdMqb/cRqHqd72MSx9bcmBy9Xxq6MJwgzyaTtNRlaMkzZ5ihfXucWQC1YZDYFMy\\nWfSI/TjYFFZXdybyHycFNpqjHfwGGURzm+FdKbDWkJHZQtAHe+Vzalv88yO1PeNz\\n718YrIUCgYEAyoDSbBeEUhs6XCaaHLYScUqOa1ubSw5xKqMss398JPwGYUfpRAId\\n6JEfdMpC8VhZfs/yWLs8+coxGip7k9C+G3CNjDTAbj6lPZrS0uIuhEFVkKlgb1uT\\n0lgW9cajjw3cLL2o+9klh1F02BRrwwRRmjehfyRon8UM7EEBXP62qF8CgYEA9H7o\\nzmhRSp8sDciENhV/N3BlLv9X61weGL6pZbD1tEbb+EHz7QeVZPg2JAIx10/jkxPg\\nBSF/I7TJYtkoYXUxpHxIpoivPUNp82TUP0Jpep3ZzQGPLy98OUKqQkrBD/w09Fkh\\nyHhQmd3xIRIvDuyAfH6QoGaIuXW9cC+YZt2dJwcCgYEAtP3ElKXEN1pso9ZAoe69\\ntxJLDntW5hOnY9Np7ZjBDZFP5nzOaWF299lVgx4QDQPJIYWcdmALVLq5fkiAIRJO\\nB9pmOO0hHKfTKqeJTMCpkL2QS3aHYaA5E6R2CP+cSgy6QCbXtRlU6IgOZd6Cnk/q\\n22pjZm7VMA9/yF0lacei3AMCgYBb+6L6hKSQvnGEffu/nTbPVKm8lLQvB+kKxjBU\\n4c6OlFoNfEKY2lGKOxejVHAL4TJtEv0k8QU0Gb/qQGjAwaZ7i4aJoMLM+Z/SwgxY\\nAFROnTRjvEJyLhs+L6Z+akFYEjqZ8y6SjTFFsgoVtxGdO7zbGYKv1eN6YqFyo3Vi\\nvd1x4QKBgCOFHtfiPOiL1gyzIsfgvRDBQ1V4c2tjpSCbJXGVpQ52o0yEEA3hBwHj\\n3FQWwhZO5CLpw0vE4W3p1aS4TtB1Y8rEEGupoDV6a2i3cwpZQgadHSr4qAcbtgk6\\nNcnXOdASqAn1B1FQue/N55+0uYSSgYo7eF01Wv7u2vsrwHTnhdYl\\n-----END RSA PRIVATE KEY-----\\n\"},\"privKeyJwk\":{\"d\":\"KFaBgDz5ghOwUMxVBA6T5YaUAnesayOLluYO9ndJP6r7lzdNXtPAG8H5AtKHvJ3VKqz6fGmwsv1xc77E-nA2b1BqoSCnfEvtoo-MT869-N6AaboPOnu25hYbuFWpMdFwOBlGWUMlzsA7xiYVXH3Bo3AphOIkztfDafvY-obqrRLBo1meEewJEuQkfjcuFtJ192S8kWQo7nvY-b3LN0ypv9xGoep3vYxLH1tyYHL1fGrownCDPJpO01GVoyTNnmKF9e5xZALVhkNgUzJZ9Ij9ONgUVld3JvIfJwU2mqMd_AYZRHOb4V0psNaQkdlC0Ad75XNqW_zzI7U943PvXxishQ\",\"dp\":\"tP3ElKXEN1pso9ZAoe69txJLDntW5hOnY9Np7ZjBDZFP5nzOaWF299lVgx4QDQPJIYWcdmALVLq5fkiAIRJOB9pmOO0hHKfTKqeJTMCpkL2QS3aHYaA5E6R2CP-cSgy6QCbXtRlU6IgOZd6Cnk_q22pjZm7VMA9_yF0lacei3AM\",\"dq\":\"W_ui-oSkkL5xhH37v502z1SpvJS0LwfpCsYwVOHOjpRaDXxCmNpRijsXo1RwC-EybRL9JPEFNBm_6kBowMGme4uGiaDCzPmf0sIMWABUTp00Y7xCci4bPi-mfmpBWBI6mfMuko0xRbIKFbcRnTu82xmCr9XjemKhcqN1Yr3dceE\",\"e\":\"AQAB\",\"kty\":\"RSA\",\"n\":\"wWcsHpx9nPLXWXpsvrk5Xgt0AVevS5s3gDo-Odaayk9IWhnRoXEoDRLy7HUjeXvY-rPaWCPBPBo6avGmFpvgALpFz7RZKl8juXQAgyghjeCY-o8Q9Z-S9XmGkphdyFnJASIJv7bd0Y3XQQEFWS_3VRRzYx-qBGSm3cTpLU1j124kLB9qSS_FbH5WWco4Kc1q9f87jc_D-nchedK-xQ2dVv_DQ7pGceNCqtmvHv-_hlQgxFNTOgNUO4HgO5c8q3doImhmI7eA-jg3xTavFfJuVz2L-PSN3SLZwHsXqjGZAuoHkods5Jy2HUFURdJv-jDCi2gwWYrxhgLlGJeSD-gTmQ\",\"p\":\"yoDSbBeEUhs6XCaaHLYScUqOa1ubSw5xKqMss398JPwGYUfpRAId6JEfdMpC8VhZfs_yWLs8-coxGip7k9C-G3CNjDTAbj6lPZrS0uIuhEFVkKlgb1uT0lgW9cajjw3cLL2o-9klh1F02BRrwwRRmjehfyRon8UM7EEBXP62qF8\",\"q\":\"9H7ozmhRSp8sDciENhV_N3BlLv9X61weGL6pZbD1tEbb-EHz7QeVZPg2JAIx10_jkxPgBSF_I7TJYtkoYXUxpHxIpoivPUNp82TUP0Jpep3ZzQGPLy98OUKqQkrBD_w09FkhyHhQmd3xIRIvDuyAfH6QoGaIuXW9cC-YZt2dJwc\",\"qi\":\"I4Ue1-I86IvWDLMix-C9EMFDVXhza2OlIJslcZWlDnajTIQQDeEHAePcVBbCFk7kIunDS8ThbenVpLhO0HVjysQQa6mgNXpraLdzCllCBp0dKvioBxu2CTo1ydc50BKoCfUHUVC5783nn7S5hJKBijt4XTVa_u7a-yvAdOeF1iU\"},\"pubKeyJwk\":{\"e\":\"AQAB\",\"kty\":\"RSA\",\"n\":\"wWcsHpx9nPLXWXpsvrk5Xgt0AVevS5s3gDo-Odaayk9IWhnRoXEoDRLy7HUjeXvY-rPaWCPBPBo6avGmFpvgALpFz7RZKl8juXQAgyghjeCY-o8Q9Z-S9XmGkphdyFnJASIJv7bd0Y3XQQEFWS_3VRRzYx-qBGSm3cTpLU1j124kLB9qSS_FbH5WWco4Kc1q9f87jc_D-nchedK-xQ2dVv_DQ7pGceNCqtmvHv-_hlQgxFNTOgNUO4HgO5c8q3doImhmI7eA-jg3xTavFfJuVz2L-PSN3SLZwHsXqjGZAuoHkods5Jy2HUFURdJv-jDCi2gwWYrxhgLlGJeSD-gTmQ\",\"alg\":\"RS256\"}}",
+  "logout_url": "https://pods.dev.solidcommunity.au/logout",
+  "rsa_info": "{\"rsa\":{\"public_key\":\"-----BEGIN PUBLIC KEY-----\\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAox31zrH6XBIDo8ELOmGj\\n8hG7D9uWCMTPtDVgJmVwKZiiTn7WOXhWTPFtyxsoYw30Vl7EmiHMAMcA81TIOBFT\\n+iTAMVMMlI51SbD6kGUszbJpKnAelgITXocBB9lym/L1UV3QD4niSMoKLNZT8ADO\\nKmSwJCg9hwxFw7TGerGViPbwu9Wri0suP7AqHg1sMVZXER+bakTWuQ8qU6LUa6rR\\nDTsq9a6qkQCeHm8QxBj/v831VnBQN3d5wakfDEUzbfHGebqczPPgVgIbsrop2zR0\\nvhLPuQ4TNA3GGfDJacSwzbIdKZCMveo2VyF1aSg5LZBwMhVVEIZG4hHPE7OAl8LC\\nmwIDAQAB\\n-----END PUBLIC KEY-----\",\"private_key\":\"-----BEGIN PRIVATE KEY-----\\n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\\nmcOGj+sZ\\n-----END PRIVATE KEY-----\"},\"pubKeyJwk\":{\"kty\":\"RSA\",\"n\":\"ox31zrH6XBIDo8ELOmGj8hG7D9uWCMTPtDVgJmVwKZiiTn7WOXhWTPFtyxsoYw30Vl7EmiHMAMcA81TIOBFT-iTAMVMMlI51SbD6kGUszbJpKnAelgITXocBB9lym_L1UV3QD4niSMoKLNZT8ADOKmSwJCg9hwxFw7TGerGViPbwu9Wri0suP7AqHg1sMVZXER-bakTWuQ8qU6LUa6rRDTsq9a6qkQCeHm8QxBj_v831VnBQN3d5wakfDEUzbfHGebqczPPgVgIbsrop2zR0vhLPuQ4TNA3GGfDJacSwzbIdKZCMveo2VyF1aSg5LZBwMhVVEIZG4hHPE7OAl8LCmw\",\"e\":\"AQAB\",\"alg\":\"RS256\"},\"prvKeyJwk\":{\"kty\":\"RSA\",\"n\":\"ox31zrH6XBIDo8ELOmGj8hG7D9uWCMTPtDVgJmVwKZiiTn7WOXhWTPFtyxsoYw30Vl7EmiHMAMcA81TIOBFT-iTAMVMMlI51SbD6kGUszbJpKnAelgITXocBB9lym_L1UV3QD4niSMoKLNZT8ADOKmSwJCg9hwxFw7TGerGViPbwu9Wri0suP7AqHg1sMVZXER-bakTWuQ8qU6LUa6rRDTsq9a6qkQCeHm8QxBj_v831VnBQN3d5wakfDEUzbfHGebqczPPgVgIbsrop2zR0vhLPuQ4TNA3GGfDJacSwzbIdKZCMveo2VyF1aSg5LZBwMhVVEIZG4hHPE7OAl8LCmw\",\"e\":\"SAjdGtDCbZKPBOwllzyzeB2YbKJembTAvSatNYeqhtQfKWceF_cqtYQRJpbxuPzaoKHtVNwECXvY0ZzpZslQOrGsJpw0fA6FgWuk28uyg4x8oP8uorR79UzNibffwzsCV1KEpbgQtHB1GeP04ZKZeWNJ3k3fDhq_XHQjCuAN15PxH3gZgh0BVx_nZt7Z3rDw2B4UqF23A6c5WNNCqGoDxw20Orbfbm6nPJft-qDn8P_DhVVdLSRzTQdlKnQztRSXFPyqf9Y_eyI7u62UwiZXAJ5_-c_qD6Udkdq3BX-2s5jGXms4020hh3bIifsDfsQY-_4a-sC58-KkYfVImr5BwQ\",\"d\":\"SAjdGtDCbZKPBOwllzyzeB2YbKJembTAvSatNYeqhtQfKWceF_cqtYQRJpbxuPzaoKHtVNwECXvY0ZzpZslQOrGsJpw0fA6FgWuk28uyg4x8oP8uorR79UzNibffwzsCV1KEpbgQtHB1GeP04ZKZeWNJ3k3fDhq_XHQjCuAN15PxH3gZgh0BVx_nZt7Z3rDw2B4UqF23A6c5WNNCqGoDxw20Orbfbm6nPJft-qDn8P_DhVVdLSRzTQdlKnQztRSXFPyqf9Y_eyI7u62UwiZXAJ5_-c_qD6Udkdq3BX-2s5jGXms4020hh3bIifsDfsQY-_4a-sC58-KkYfVImr5BwQ\",\"p\":\"3Vse7w0JaOtpiCOf6tYLGIyGRQJ3z33G32aIqqFzsAmYbXudJ27M2aFkJoNlYs7QqUNN83SXYOTmzCTJpH2zTHzIx0KYy2SFqpCXFAdz9lGOnPSxka0DvYLXcSUjqK-koB2kMmYtPFPaTdqLmAX9mp5L_-9mWAQEyQ0VMWUCuqs\",\"q\":\"vKVuSOs-bqBsOHJ9xijDNT0e9xEvRPWh8Ibqi3rijHmQxdvDelj4rxtzg6SA_s5subGCipfNW-D2mQNi4Ow-TFUd2k_88E_HfsqOo9TkYLaFOBbRaAEBUa3UL0b1Koyfj0Zk5yvmwNTogpF2xr-7zs0PD2K5UlYBWGxTB_VJF9E\",\"alg\":\"RS256\"}}",
   "auth_response": {
     "issuer": {
-      "authorization_endpoint": "https://pods.dev.solidcommunity.au/.oidc/auth",
+      "authorization_endpoint": "https://pods.dev.solidcommunity.au.oidc/auth",
       "claims_parameter_supported": true,
       "claims_supported": [
         "azp",
@@ -17,16 +17,16 @@
       "code_challenge_methods_supported": [
         "S256"
       ],
-      "end_session_endpoint": "https://pods.dev.solidcommunity.au/.oidc/session/end",
+      "end_session_endpoint": "https://pods.dev.solidcommunity.au.oidc/session/end",
       "grant_types_supported": [
         "implicit",
         "authorization_code",
         "refresh_token",
         "client_credentials"
       ],
-      "issuer": "https://pods.dev.solidcommunity.au/",
-      "jwks_uri": "https://pods.dev.solidcommunity.au/.oidc/jwks",
-      "registration_endpoint": "https://pods.dev.solidcommunity.au/.oidc/reg",
+      "issuer": "https://pods.dev.solidcommunity.au",
+      "jwks_uri": "https://pods.dev.solidcommunity.au.oidc/jwks",
+      "registration_endpoint": "https://pods.dev.solidcommunity.au.oidc/reg",
       "authorization_response_iss_parameter_supported": true,
       "response_modes_supported": [
         "form_post",
@@ -62,14 +62,14 @@
         "ES256",
         "EdDSA"
       ],
-      "token_endpoint": "https://pods.dev.solidcommunity.au/.oidc/token",
+      "token_endpoint": "https://pods.dev.solidcommunity.au.oidc/token",
       "id_token_signing_alg_values_supported": [
         "ES256"
       ],
-      "pushed_authorization_request_endpoint": "https://pods.dev.solidcommunity.au/.oidc/request",
+      "pushed_authorization_request_endpoint": "https://pods.dev.solidcommunity.au.oidc/request",
       "request_parameter_supported": false,
       "request_uri_parameter_supported": false,
-      "introspection_endpoint": "https://pods.dev.solidcommunity.au/.oidc/token/introspection",
+      "introspection_endpoint": "https://pods.dev.solidcommunity.au.oidc/token/introspection",
       "dpop_signing_alg_values_supported": [
         "RS256",
         "RS384",
@@ -83,21 +83,21 @@
         "ES512",
         "EdDSA"
       ],
-      "revocation_endpoint": "https://pods.dev.solidcommunity.au/.oidc/token/revocation",
+      "revocation_endpoint": "https://pods.dev.solidcommunity.au.oidc/token/revocation",
       "claim_types_supported": [
         "normal"
       ]
     },
-    "client_id": "slREW2aBojVdGAV2jMdex",
-    "client_secret": "BCLzQ2DNYG-aI2zUCzIR4j1lWh3Kaof9QHtDe35zTJAujlng08vRyNm_Tt0vcAB60SC9RTRE5TD5vEp2Dr5NzQ",
+    "client_id": "SAmm6Sa-JwUk-ZFwe0IlB",
+    "client_secret": null,
     "token": {
-      "expires_at": 1760358422,
-      "access_token": "eyJhbGciOiJFUzI1NiIsInR5cCI6ImF0K2p3dCIsImtpZCI6IjNQQVFiMml6VllyRm82ZnVlNk4tVjJfY0VoYTFoSDA1WVVJYkJtTEZiUHcifQ.eyJ3ZWJpZCI6Imh0dHBzOi8vcG9kcy5kZXYuc29saWRjb21tdW5pdHkuYXUvaGVhbHRocG9kLXRlc3QvcHJvZmlsZS9jYXJkI21lIiwianRpIjoiWmJxQThyWFRxbUxhdWdPazhlWDI0Iiwic3ViIjoiaHR0cHM6Ly9wb2RzLmRldi5zb2xpZGNvbW11bml0eS5hdS9oZWFsdGhwb2QtdGVzdC9wcm9maWxlL2NhcmQjbWUiLCJpYXQiOjE3NjAzNTQ4MjIsImV4cCI6MTc2MDM1ODQyMiwic2NvcGUiOiIiLCJjbGllbnRfaWQiOiJzbFJFVzJhQm9qVmRHQVYyak1kZXgiLCJpc3MiOiJodHRwczovL3BvZHMuZGV2LnNvbGlkY29tbXVuaXR5LmF1LyIsImF1ZCI6InNvbGlkIiwiY25mIjp7ImprdCI6Im9zMnI5WXNYOVQyT3BVZVhTUDhiVXU4MGQ0X3ZfOVBTcjM2aEZFNkJpbE0ifX0.N9l_3_tCIR551_E9oz7MwOlgLRSsy21L0vbTGpq6YLxysNNUbn06nSbcBrrkdqmE_KWYg4vqM19zbJTISWajLA",
+      "expires_at": 1760461294,
+      "access_token": "eyJhbGciOiJFUzI1NiIsInR5cCI6ImF0K2p3dCIsImtpZCI6IjNQQVFiMml6VllyRm82ZnVlNk4tVjJfY0VoYTFoSDA1WVVJYkJtTEZiUHcifQ.eyJ3ZWJpZCI6Imh0dHBzOi8vcG9kcy5kZXYuc29saWRjb21tdW5pdHkuYXUvaGVhbHRocG9kLXRlc3QvcHJvZmlsZS9jYXJkI21lIiwianRpIjoiUzhpUUJtVDFydjdXbWs2SXFmaENsIiwic3ViIjoiaHR0cHM6Ly9wb2RzLmRldi5zb2xpZGNvbW11bml0eS5hdS9oZWFsdGhwb2QtdGVzdC9wcm9maWxlL2NhcmQjbWUiLCJpYXQiOjE3NjA0NTc2OTMsImV4cCI6MTc2MDQ2MTI5Mywic2NvcGUiOiIiLCJjbGllbnRfaWQiOiJTQW1tNlNhLUp3VWstWkZ3ZTBJbEIiLCJpc3MiOiJodHRwczovL3BvZHMuZGV2LnNvbGlkY29tbXVuaXR5LmF1LyIsImF1ZCI6InNvbGlkIn0.VTQ4fuDghXk-eS62uGaYdGD8ld14yvGuv0U2OcMv8yGZY2rehRI2yZ4gge1Rm6yTD1DJa6wvnRGCpDXU_Ld6Lw",
       "expires_in": 3600,
-      "id_token": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNQQVFiMml6VllyRm82ZnVlNk4tVjJfY0VoYTFoSDA1WVVJYkJtTEZiUHcifQ.eyJhenAiOiJzbFJFVzJhQm9qVmRHQVYyak1kZXgiLCJzdWIiOiJodHRwczovL3BvZHMuZGV2LnNvbGlkY29tbXVuaXR5LmF1L2hlYWx0aHBvZC10ZXN0L3Byb2ZpbGUvY2FyZCNtZSIsIndlYmlkIjoiaHR0cHM6Ly9wb2RzLmRldi5zb2xpZGNvbW11bml0eS5hdS9oZWFsdGhwb2QtdGVzdC9wcm9maWxlL2NhcmQjbWUiLCJhdF9oYXNoIjoiRElGT1d1YkFsbDRBMF9iWWNWRjVkQSIsImF1ZCI6InNsUkVXMmFCb2pWZEdBVjJqTWRleCIsImV4cCI6MTc2MDM1ODQyMiwiaWF0IjoxNzYwMzU0ODIyLCJpc3MiOiJodHRwczovL3BvZHMuZGV2LnNvbGlkY29tbXVuaXR5LmF1LyJ9.Ttf69ekUt2SvrsttSRY11j-HBKzpLwvsooWp5qdkewf5-oX_F_1iDm2qB2IPrCCncNs1vax89NwXmX5U7lYfew",
-      "refresh_token": "sMpGdRW2GVO5MMJ5015cw4D7pLV5NOHi9eDJVVKW6tw",
+      "id_token": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNQQVFiMml6VllyRm82ZnVlNk4tVjJfY0VoYTFoSDA1WVVJYkJtTEZiUHcifQ.eyJhenAiOiJTQW1tNlNhLUp3VWstWkZ3ZTBJbEIiLCJzdWIiOiJodHRwczovL3BvZHMuZGV2LnNvbGlkY29tbXVuaXR5LmF1L2hlYWx0aHBvZC10ZXN0L3Byb2ZpbGUvY2FyZCNtZSIsImF0X2hhc2giOiJ1WXkyb0lEZFlyZTd1LS1ES0VsU2xnIiwiYXVkIjoiU0FtbTZTYS1Kd1VrLVpGd2UwSWxCIiwiZXhwIjoxNzYwNDYxMjkzLCJpYXQiOjE3NjA0NTc2OTMsImlzcyI6Imh0dHBzOi8vcG9kcy5kZXYuc29saWRjb21tdW5pdHkuYXUvIn0.3X8WC7PC12FE8Lln3XRqLZrSs83xTokZCnt7jsc0mXjDbCC_VGbdC_fZ8BDVf32_VLkXYFIR1m7VspItOaNOfQ",
+      "refresh_token": null,
       "scope": "",
-      "token_type": "DPoP"
+      "token_type": "Bearer"
     },
     "nonce": null
   }

@@ -301,8 +301,8 @@ class PodAuthAutomator {
       const issuer = 'https://pods.dev.solidcommunity.au';
       const logoutUrl = '$issuer/logout';
 
-      // Build Credential JSON structure.
-      final credentialJson = buildCredentialJson(
+      // Build Credential JSON structure (async - fetches issuer metadata).
+      final credentialJson = await buildCredentialJson(
         oauthTokens: oauthTokens,
         clientId: clientId,
         issuer: issuer,

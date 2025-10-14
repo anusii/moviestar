@@ -373,6 +373,10 @@ class CredentialInjector {
   /// Checks if the auth token is expired.
   ///
   /// Returns true if the token has expired or will expire within the next minute.
+  ///
+  /// This method handles auth data formats:
+  /// 1. Correct format: auth_response.token.expires_at (Unix timestamp)
+  /// 2. Old browser automation: auth_response.response.expires_in (seconds) - deprecated
   static bool _isTokenExpired(Map<String, dynamic> authData) {
     try {
       final authResponse = authData['auth_response'] as Map<String, dynamic>?;
@@ -381,20 +385,40 @@ class CredentialInjector {
         return true;
       }
 
+      DateTime? expiryTime;
+
+      // Try CORRECT format: auth_response.token.expires_at
       final token = authResponse['token'] as Map<String, dynamic>?;
-      if (token == null) {
-        print('  ⚠ No token found in auth_response');
-        return true;
+      if (token != null) {
+        final expiresAt = token['expires_at'] as int?;
+        if (expiresAt != null) {
+          expiryTime = DateTime.fromMillisecondsSinceEpoch(expiresAt * 1000);
+        }
       }
 
-      final expiresAt = token['expires_at'] as int?;
-      if (expiresAt == null) {
-        print('  ⚠ No expires_at found in token');
+      // Fallback for old broken format: auth_response.response.expires_in
+      if (expiryTime == null) {
+        final response = authResponse['response'] as Map<String, dynamic>?;
+        if (response != null) {
+          final expiresAt = response['expires_at'] as int?;
+          if (expiresAt != null) {
+            expiryTime = DateTime.fromMillisecondsSinceEpoch(expiresAt * 1000);
+          } else {
+            final expiresIn = response['expires_in'] as int?;
+            if (expiresIn != null) {
+              expiryTime = DateTime.now().add(Duration(seconds: expiresIn));
+              print('  ℹ Using expires_in ($expiresIn seconds) to estimate expiry');
+            }
+          }
+        }
+      }
+
+      if (expiryTime == null) {
+        print('  ⚠ No expiry info found in token');
         return true;
       }
 
       // Check if token is expired or expires within the next minute.
-      final expiryTime = DateTime.fromMillisecondsSinceEpoch(expiresAt * 1000);
       final now = DateTime.now();
       final bufferTime = now.add(const Duration(minutes: 1));
 

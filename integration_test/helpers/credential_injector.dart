@@ -300,57 +300,115 @@ class CredentialInjector {
   /// 3. Click EXTRACT button to save auth data
   /// 4. Run your E2E tests
   ///
-  /// If [autoRegenerateOnFailure] is true, will fall back to the old
-  /// token-based approach using browser automation if complete auth data
-  /// is not available.
+  /// If [autoRegenerateOnFailure] is true, will automatically regenerate tokens
+  /// if they are expired or if the auth data file is missing.
   static Future<void> injectFullAuth({
     bool autoRegenerateOnFailure = false,
   }) async {
     print('Loading complete auth data...');
 
-    Map<String, dynamic> authData;
+    Map<String, dynamic>? authData;
+    bool needsRegeneration = false;
+
     try {
       // Try loading complete auth data first (NEW approach).
       authData = await loadCompleteAuthData();
       print('✓ Complete auth data loaded');
 
-      // Inject the complete auth data structure.
-      await injectCompleteAuthData(authData);
-
-      print('✓ Full authentication injected successfully');
-      return;
+      // Check if tokens are expired.
+      if (_isTokenExpired(authData)) {
+        print('⚠ Auth tokens have expired');
+        if (autoRegenerateOnFailure) {
+          needsRegeneration = true;
+        } else {
+          throw Exception(
+            'Auth tokens expired. Run: dart run integration_test/utils/extract_tokens.dart',
+          );
+        }
+      }
     } catch (e) {
-      print('⚠ Complete auth data not found: $e');
+      print('⚠ Complete auth data not found or invalid: $e');
 
       if (autoRegenerateOnFailure) {
-        print('  Auto-regenerating with browser automation...');
-
-        // Regenerate auth data (this saves both complete auth data and tokens)
-        await _regenerateTokens();
-
-        // Now try loading and injecting the complete auth data
-        try {
-          authData = await loadCompleteAuthData();
-          await injectCompleteAuthData(authData);
-          print(
-            '✓ Complete auth data auto-regenerated and injected successfully',
-          );
-          return;
-        } catch (e) {
-          // If complete auth data still fails, fall back to legacy tokens
-          print('⚠ Failed to load complete auth data after regeneration: $e');
-          print('  Falling back to legacy token injection...');
-
-          final tokens = await loadAuthTokens();
-          await injectAuthTokens(tokens);
-
-          print('⚠ WARNING: Using legacy token injection. This may not work.');
-          print('   POD operations may fail due to missing RSA keys.');
-          return;
-        }
+        needsRegeneration = true;
       } else {
         rethrow;
       }
+    }
+
+    // Regenerate tokens if needed.
+    if (needsRegeneration) {
+      print('🔄 Auto-regenerating tokens with browser automation...');
+
+      // Regenerate auth data (this saves both complete auth data and tokens)
+      await _regenerateTokens();
+
+      // Load the freshly generated auth data
+      try {
+        authData = await loadCompleteAuthData();
+        print('✓ Complete auth data auto-regenerated and loaded');
+      } catch (e) {
+        // If complete auth data still fails, fall back to legacy tokens
+        print('⚠ Failed to load complete auth data after regeneration: $e');
+        print('  Falling back to legacy token injection...');
+
+        final tokens = await loadAuthTokens();
+        await injectAuthTokens(tokens);
+
+        print('⚠ WARNING: Using legacy token injection. This may not work.');
+        print('   POD operations may fail due to missing RSA keys.');
+        return;
+      }
+    }
+
+    // Inject the complete auth data structure.
+    if (authData != null) {
+      await injectCompleteAuthData(authData);
+      print('✓ Full authentication injected successfully');
+    } else {
+      throw Exception('Auth data is null after loading');
+    }
+  }
+
+  /// Checks if the auth token is expired.
+  ///
+  /// Returns true if the token has expired or will expire within the next minute.
+  static bool _isTokenExpired(Map<String, dynamic> authData) {
+    try {
+      final authResponse = authData['auth_response'] as Map<String, dynamic>?;
+      if (authResponse == null) {
+        print('  ⚠ No auth_response found in auth data');
+        return true;
+      }
+
+      final token = authResponse['token'] as Map<String, dynamic>?;
+      if (token == null) {
+        print('  ⚠ No token found in auth_response');
+        return true;
+      }
+
+      final expiresAt = token['expires_at'] as int?;
+      if (expiresAt == null) {
+        print('  ⚠ No expires_at found in token');
+        return true;
+      }
+
+      // Check if token is expired or expires within the next minute.
+      final expiryTime = DateTime.fromMillisecondsSinceEpoch(expiresAt * 1000);
+      final now = DateTime.now();
+      final bufferTime = now.add(const Duration(minutes: 1));
+
+      if (expiryTime.isBefore(bufferTime)) {
+        print('  ⚠ Token expired at: ${expiryTime.toIso8601String()}');
+        print('  ⚠ Current time: ${now.toIso8601String()}');
+        return true;
+      }
+
+      print('  ✓ Token valid until: ${expiryTime.toIso8601String()}');
+      return false;
+    } catch (e) {
+      print('  ⚠ Error checking token expiry: $e');
+      return true;
     }
   }
 

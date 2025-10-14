@@ -401,6 +401,29 @@ flutter test --list
 
 ## Additional Resources
 
-- [INTEGRATION_TEST_SETUP.md](INTEGRATION_TEST_SETUP.md) - Initial setup instructions
-- [Flutter Integration Testing](https://docs.flutter.dev/testing/integration-tests)
-- [Solid POD Documentation](https://solidproject.org/)
+### Documentation
+- [INTEGRATION_TEST_SETUP.md](INTEGRATION_TEST_SETUP.md) - Initial setup instructions for POD authentication
+- [Flutter Integration Testing](https://docs.flutter.dev/testing/integration-tests) - Official Flutter E2E testing guide
+- [Solid POD Documentation](https://solidproject.org/) - Solid Project overview and specifications
+- [Solid OIDC Primer](https://solid.github.io/solid-oidc/) - Solid-OIDC authentication specification
+
+### Packages & Tools
+- [puppeteer](https://pub.dev/packages/puppeteer) - Headless Chrome/Chromium automation for Dart
+- [pointycastle](https://pub.dev/packages/pointycastle) - Pure Dart cryptography library for RSA key generation
+- [fast_rsa](https://pub.dev/packages/fast_rsa) - Flutter RSA encryption library (used by solidpod)
+- [solidpod](https://pub.dev/packages/solidpod) - Solid POD client library for Flutter
+- [integration_test](https://pub.dev/packages/integration_test) - Flutter's official E2E testing package
+- [flutter_test](https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html) - Flutter's widget testing framework
+
+### Cryptography & Security
+- [DPoP (RFC 9449)](https://datatracker.ietf.org/doc/html/rfc9449) - OAuth 2.0 Demonstrating Proof of Possession
+- [OAuth 2.0 (RFC 6749)](https://datatracker.ietf.org/doc/html/rfc6749) - OAuth 2.0 Authorization Framework
+- [OpenID Connect](https://openid.net/specs/openid-connect-core-1_0.html) - OpenID Connect Core specification
+- [PKCE (RFC 7636)](https://datatracker.ietf.org/doc/html/rfc7636) - Proof Key for Code Exchange
+- [JWK (RFC 7517)](https://datatracker.ietf.org/doc/html/rfc7517) - JSON Web Key specification
+- [ASN.1](https://en.wikipedia.org/wiki/ASN.1) - Abstract Syntax Notation for PEM encoding
+
+### Browser Automation
+- [Puppeteer API Documentation](https://pptr.dev/) - Official Puppeteer documentation
+- [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) - Protocol used by Puppeteer
+- [Chromium Download](https://www.chromium.org/getting-involved/download-chromium/) - Download Chromium for testing

@@ -12,12 +12,12 @@
 /// ### First-time Setup:
 /// 1. Run the auth extraction tool:
 ///    ```
-///    flutter run integration_test/tools/extract_complete_auth.dart -d windows
+///    flutter run integration_test/utils/extract_complete_auth.dart -d linux
 ///    ```
 /// 2. Log in through the app UI with your test POD credentials
 /// 3. Click the EXTRACT button to save complete auth data
 /// 4. The data will be saved to `integration_test/fixtures/complete_auth_data.json`
-/// 5. Run this test: `flutter test integration_test/workflows/pod_favorites_real.dart -d windows`
+/// 5. Run this test: `flutter test integration_test/workflows/pod_favorites_real_test.dart -d linux`
 ///
 /// ### Fallback to Browser Automation:
 /// If complete auth data is not available and `autoRegenerateOnFailure` is true,
@@ -45,6 +45,7 @@ import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 
 import '../helpers/credential_injector.dart';
+import '../utils/delays.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -92,9 +93,12 @@ void main() {
       // Wait for app to settle.
       await tester.pumpAndSettle(const Duration(seconds: 5));
 
-      // Add delay to let login styling fully load.
-      await Future.delayed(const Duration(seconds: 2));
+      // Add delay to let login styling fully load (required for styling).
+      await Future.delayed(delay);
       await tester.pump();
+
+      // Interactive delay for visual inspection (0s in qtest, 5s in itest)
+      await tester.pump(interact);
 
       // Verify app loaded.
       expect(find.text('Movie Star'), findsWidgets);

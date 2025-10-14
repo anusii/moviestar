@@ -24,6 +24,8 @@ import 'package:moviestar/moviestar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 
+import '../utils/delays.dart';
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -49,16 +51,14 @@ void main() {
     // Wait for app to settle and show login screen
     await tester.pumpAndSettle(const Duration(seconds: 2));
 
-    // Add a delay to let login styling fully load
-    print('Waiting for login styling to fully load...');
-    await Future.delayed(const Duration(seconds: 2));
+    // Add a delay to let login styling fully load (required for styling)
+    await Future.delayed(delay);
 
     // Pump to render the fully styled login screen
     await tester.pump();
 
-    // Add a delay so you can inspect the login screen
-    print('Login screen is now visible. Inspect it for 5 seconds...');
-    await tester.pump(const Duration(seconds: 5));
+    // Interactive delay for visual inspection (0s in qtest, 5s in itest)
+    await tester.pump(interact);
 
     // Verify we see the login screen (not the home page)
     expect(find.text('Movie Star'), findsWidgets);

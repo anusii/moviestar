@@ -41,6 +41,8 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 
+import 'utils/delays.dart';
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -77,6 +79,10 @@ void main() {
     // Wait for the app to settle
 
     await tester.pumpAndSettle(const Duration(seconds: 5));
+
+    // Interactive delay for visual inspection (0s in qtest, 5s in itest)
+
+    await tester.pump(interact);
 
     // Basic smoke test - verify the app builds without errors
     // The app should load successfully even if we can't interact with POD login

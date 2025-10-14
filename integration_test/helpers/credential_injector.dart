@@ -407,7 +407,9 @@ class CredentialInjector {
             final expiresIn = response['expires_in'] as int?;
             if (expiresIn != null) {
               expiryTime = DateTime.now().add(Duration(seconds: expiresIn));
-              print('  ℹ Using expires_in ($expiresIn seconds) to estimate expiry');
+              print(
+                '  ℹ Using expires_in ($expiresIn seconds) to estimate expiry',
+              );
             }
           }
         }

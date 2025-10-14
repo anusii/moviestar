@@ -7,6 +7,8 @@
 
 // ignore_for_file: avoid_print
 
+library;
+
 import 'dart:convert';
 import 'dart:io';
 

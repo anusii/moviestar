@@ -369,7 +369,9 @@ Future<Map<String, dynamic>> buildCredentialJson({
   };
 
   print('✓ Credential JSON built');
-  print('  ✓ Token expires at: ${expiresAt.toIso8601String()} (Unix: $expiresAtUnix)');
+  print(
+    '  ✓ Token expires at: ${expiresAt.toIso8601String()} (Unix: $expiresAtUnix)',
+  );
 
   return credentialJson;
 }

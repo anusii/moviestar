@@ -5,7 +5,9 @@
 /// complete auth data including RSA keys for DPoP token generation.
 ///
 /// PLEASE USE INSTEAD:
-///   flutter run integration_test/tools/extract_complete_auth.dart -d windows
+///   flutter run integration_test/tools/extract_complete_auth.dart -d <platform>
+///
+/// Where <platform> is one of: windows, linux, macos
 ///
 /// That tool extracts the COMPLETE auth data structure by performing a
 /// real login through the app, ensuring all necessary components (RSA keys,
@@ -38,8 +40,9 @@ Future<void> main(List<String> args) async {
   print('');
   print('PLEASE USE THE NEW TOOL INSTEAD:');
   print(
-    '  flutter run integration_test/tools/extract_complete_auth.dart -d windows',
+    '  flutter run integration_test/tools/extract_complete_auth.dart -d <platform>',
   );
+  print('  where <platform> is one of: windows, linux, macos');
   print('');
   print(
     'The new tool extracts COMPLETE auth data including RSA keys for DPoP.',

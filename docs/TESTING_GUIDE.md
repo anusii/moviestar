@@ -24,6 +24,32 @@ End-to-end tests that run the complete application and verify functionality:
 - **Workflow Tests**: `workflows/pod_favorites_real_test.dart` - Full user workflows with POD authentication
 - **Visual Tests**: `workflows/visual_login_test.dart` - Manual visual inspection of UI
 
+#### Visual Rendering Pattern
+
+All integration tests follow a consistent pattern to ensure UI is fully rendered before testing:
+
+1. **Initial Render**: `await tester.pumpAndSettle()` - Wait for animations and microtasks
+2. **Styling Delay**: `await Future.delayed(delay)` - Allow styling/theming to load (2s)
+3. **Visual Inspection**: `await tester.pump(interact)` - Interactive delay for manual review
+
+**Example from `app_hive_test.dart` (lines 79-85):**
+```dart
+await tester.pumpWidget(...);
+await tester.pumpAndSettle(const Duration(seconds: 5));  // Initial render
+await tester.pump(interact);  // Visual inspection (0s in qtest, 5s in itest)
+```
+
+**Example from `pod_favorites_real_test.dart` (lines 94-101):**
+```dart
+await tester.pumpWidget(...);
+await tester.pumpAndSettle(const Duration(seconds: 5));  // Initial render
+await Future.delayed(delay);  // Allow styling to load (2s)
+await tester.pump();  // Apply styling
+await tester.pump(interact);  // Visual inspection
+```
+
+This ensures tests work reliably in both quick (`INTERACT=0`) and interactive (`INTERACT>0`) modes.
+
 ### Unit Tests (`test/`)
 
 Component-level tests for individual widgets, services, and state management.

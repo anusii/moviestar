@@ -383,6 +383,39 @@ flutter config --enable-linux-desktop
 flutter test integration_test/app_test.dart --device-id linux
 ```
 
+### Batch Test Failures with "Log Reader Stopped Unexpectedly"
+
+**Problem:**
+When running `flutter test integration_test/`, the first test passes but subsequent tests fail with:
+```
+Error waiting for a debug connection: The log reader stopped unexpectedly, or never started.
+Failed to load "...": Unable to start the app on the device.
+```
+
+**Root Cause:**
+The `pod_favorites_real_test.dart` has auto-regeneration enabled (`autoRegenerateOnFailure: true`). If auth tokens are expired when running tests in batch mode, it triggers browser automation (Puppeteer) which conflicts with the Flutter test runner trying to start the app.
+
+**Solution:**
+Generate fresh auth tokens **before** running batch tests:
+
+```bash
+# Step 1: Generate fresh tokens (valid for 1 hour)
+flutter run integration_test/tools/extract_complete_auth.dart -d linux
+
+# Step 2: Run all tests (within 1 hour)
+flutter test integration_test/ -d linux --dart-define=INTERACT=0
+```
+
+**Alternative:** Run tests individually (auto-regeneration works fine for single tests):
+```bash
+flutter test integration_test/app_hive_test.dart -d linux
+flutter test integration_test/app_test.dart -d linux
+flutter test integration_test/workflows/visual_login_test.dart -d linux
+flutter test integration_test/workflows/pod_favorites_real_test.dart -d linux --dart-define=INTERACT=0
+```
+
+**Note:** This issue occurs on all platforms (Linux, macOS, Windows) when running tests in batch mode with expired tokens.
+
 ---
 
 ## Best Practices

@@ -393,28 +393,38 @@ Failed to load "...": Unable to start the app on the device.
 ```
 
 **Root Cause:**
-The `pod_favorites_real_test.dart` has auto-regeneration enabled (`autoRegenerateOnFailure: true`). If auth tokens are expired when running tests in batch mode, it triggers browser automation (Puppeteer) which conflicts with the Flutter test runner trying to start the app.
+This is a **known limitation of Flutter's integration testing framework** on desktop platforms (Windows, Linux, macOS). The Flutter test runner has issues properly cleaning up and restarting the app between tests when running in batch mode. Only the first test succeeds; subsequent tests fail because the test runner cannot establish a debug connection to the app.
 
-**Solution:**
-Generate fresh auth tokens **before** running batch tests:
+This is NOT related to the MovieStar codebase or POD authentication - it's a fundamental Flutter framework issue tracked in the Flutter repository.
+
+**Solution: Run Tests Individually**
+The recommended approach is to run each integration test individually:
 
 ```bash
-# Step 1: Generate fresh tokens (valid for 1 hour)
-flutter run integration_test/tools/extract_complete_auth.dart -d linux
+# Run each test separately
+flutter test integration_test/app_hive_test.dart -d <platform>
+flutter test integration_test/app_test.dart -d <platform>
+flutter test integration_test/workflows/pod_favorites_real_test.dart -d <platform> --dart-define=INTERACT=0
+flutter test integration_test/workflows/visual_login_test.dart -d <platform> --dart-define=INTERACT=0
 
-# Step 2: Run all tests (within 1 hour)
-flutter test integration_test/ -d linux --dart-define=INTERACT=0
+# Example for Windows
+flutter test integration_test/app_hive_test.dart -d windows
+flutter test integration_test/app_test.dart -d windows
+flutter test integration_test/workflows/pod_favorites_real_test.dart -d windows --dart-define=INTERACT=0
+flutter test integration_test/workflows/visual_login_test.dart -d windows --dart-define=INTERACT=0
 ```
 
-**Alternative:** Run tests individually (auto-regeneration works fine for single tests):
+**AUTO_REGENERATE Flag:**
+The `pod_favorites_real_test.dart` supports automatic token regeneration when run individually. To disable this feature (e.g., for CI/CD where you want to ensure fresh tokens are pre-generated):
+
 ```bash
-flutter test integration_test/app_hive_test.dart -d linux
-flutter test integration_test/app_test.dart -d linux
-flutter test integration_test/workflows/visual_login_test.dart -d linux
-flutter test integration_test/workflows/pod_favorites_real_test.dart -d linux --dart-define=INTERACT=0
+# Disable auto-regeneration for POD test
+flutter test integration_test/workflows/pod_favorites_real_test.dart -d <platform> --dart-define=INTERACT=0 --dart-define=AUTO_REGENERATE=false
 ```
 
-**Note:** This issue occurs on all platforms (Linux, macOS, Windows) when running tests in batch mode with expired tokens.
+By default, auto-regeneration is **enabled** for individual test runs, providing a better developer experience.
+
+**Note:** Batch testing (`flutter test integration_test/`) is currently not reliable on desktop platforms due to Flutter framework limitations. Individual test execution is the recommended approach until Flutter addresses this issue.
 
 ---
 

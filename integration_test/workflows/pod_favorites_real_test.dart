@@ -24,6 +24,14 @@
 /// the test will fall back to browser automation to generate tokens. However,
 /// this legacy approach may not work reliably due to missing RSA keys.
 ///
+/// ### Batch Test Mode:
+/// When running tests in batch mode (`flutter test integration_test/`), disable
+/// auto-regeneration to avoid Puppeteer conflicts with the Flutter test runner:
+/// ```
+/// flutter test integration_test/ -d <platform> --dart-define=AUTO_REGENERATE=false
+/// ```
+/// For individual tests, auto-regeneration is enabled by default.
+///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 
 // ignore_for_file: invalid_use_of_visible_for_testing_member
@@ -47,6 +55,12 @@ import 'package:moviestar/utils/is_logged_in.dart';
 import '../helpers/credential_injector.dart';
 import '../utils/delays.dart';
 
+// Control auto-regeneration via dart-define flag for batch test compatibility.
+// Default: true (auto-regenerate enabled for individual tests).
+// Batch mode: flutter test integration_test/ --dart-define=AUTO_REGENERATE=false
+const autoRegenerate =
+    bool.fromEnvironment('AUTO_REGENERATE', defaultValue: true);
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -54,8 +68,9 @@ void main() {
     setUpAll(() async {
       // Inject full authentication with automatic token regeneration.
       // If tokens are expired or missing, they will be automatically
-      // regenerated using browser automation.
-      await CredentialInjector.injectFullAuth(autoRegenerateOnFailure: true);
+      // regenerated using browser automation (unless AUTO_REGENERATE=false).
+      await CredentialInjector.injectFullAuth(
+          autoRegenerateOnFailure: autoRegenerate);
 
       // Verify injection was successful.
       final injected = await CredentialInjector.verifyInjection();

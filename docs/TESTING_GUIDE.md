@@ -58,19 +58,18 @@ Component-level tests for individual widgets, services, and state management.
 
 ## Running Tests
 
-### Quick Test Mode (qtest)
+⚠️ **IMPORTANT:** Do not use `flutter test integration_test/` (batch mode) on desktop platforms - it fails due to a Flutter framework limitation. Use `make qtest` instead, which runs tests individually.
+
+### Quick Test Mode (qtest) - Recommended
 
 Run all tests quickly without visual interaction:
 
 ```bash
-# Run all integration tests
-make qtest.all
+# Run all integration tests (recommended)
+make qtest
 
 # Run specific test
 make workflows/pod_favorites_real_test.qtest
-
-# Or use flutter test directly
-flutter test integration_test/workflows/pod_favorites_real_test.dart -d linux --dart-define=INTERACT=0
 ```
 
 **Features:**

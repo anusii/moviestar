@@ -66,6 +66,20 @@ manage the Solid Pod interactions. Using
 [markdown_tooltip](https://pub.dev/packages/markdown_tooltip)s the
 user is guided through the app.
 
+## Testing
+
+Run integration tests using:
+
+```bash
+# Run all integration tests
+make qtest
+
+# Run specific test
+make workflows/pod_favorites_real_test.qtest
+```
+
+See [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md) for complete testing documentation.
+
 ## User Stories
 
 ### Personal Movie Data Store

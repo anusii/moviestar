@@ -70,7 +70,8 @@ void main() {
       // If tokens are expired or missing, they will be automatically
       // regenerated using browser automation (unless AUTO_REGENERATE=false).
       await CredentialInjector.injectFullAuth(
-          autoRegenerateOnFailure: autoRegenerate);
+        autoRegenerateOnFailure: autoRegenerate,
+      );
 
       // Verify injection was successful.
       final injected = await CredentialInjector.verifyInjection();

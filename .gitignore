@@ -38,6 +38,14 @@ installers/*-windows.zip
 # each test run.
 #
 # git update-index --assume-unchanged integration_test/fixtures/auth_tokens.json integration_test/fixtures/complete_auth_data.json
+#
+# To undo this:
+#
+# git update-index --no-assume-unchanged integration_test/fixtures/auth_tokens.json integration_test/fixtures/complete_auth_data.json
+#
+# To see which files are marked this way:
+#
+# git ls-files -v | grep '^h'
 
 ########################################################################
 # From https://github.com/flutter/flutter/blob/master/.gitignore

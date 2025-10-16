@@ -11,6 +11,8 @@ ARCHIVE
 ignore
 pubspec.yaml.*
 
+qtest_*.txt
+
 installers/*.apk
 installers/*.exe
 installers/*.snap

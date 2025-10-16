@@ -1,8 +1,12 @@
 # Pull Request Details
 
-## What Issue does this PR address
+## What issue does this PR address
 
-- #
+- [Description]
+
+## Associated Issue
+
+- This PR relates to issue #
 
 ## Type of Change
 
@@ -36,8 +40,8 @@ Complete the check-list below to ensure your branch is ready for PR.
   - [ ] MacOS
   - [ ] Windows
   - [ ] Web
-- [ ] I have identified two reviewers
-- [ ] The PR has been approved by two reviewers
+- [ ] I have identified reviewers
+- [ ] The PR has been approved by reviewers
 
 ## Finalising
 

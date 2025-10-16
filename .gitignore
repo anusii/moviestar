@@ -37,12 +37,6 @@ installers/*-windows.zip
 #
 # git update-index --skip-worktree integration_test/fixtures/auth_tokens.json integration_test/fixtures/complete_auth_data.json
 
-# Integration test auth data (contains sensitive tokens)
-
-#integration/fixtures/auth_tokens.json
-#integration/fixtures/complete_auth_data.json
-#integration/fixtures/test_credentials.json
-
 ########################################################################
 # From https://github.com/flutter/flutter/blob/master/.gitignore
 # Combined with the github flutter .gitignore
@@ -279,3 +273,8 @@ app.*.symbols
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+
+# Integration test auth data (contains sensitive tokens)
+integration/fixtures/auth_tokens.json
+integration/fixtures/complete_auth_data.json
+integration/fixtures/test_credentials.json

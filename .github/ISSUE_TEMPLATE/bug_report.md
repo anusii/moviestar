@@ -54,6 +54,4 @@ Flutter Version:
 
 Checklist for closing the issue:
 
-- [ ] `make test`
-- [ ] `make qtest`
-- [ ] [Task specific requirements.]
+- [ ] All tests pass

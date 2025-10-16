@@ -32,20 +32,10 @@ installers/*-windows.zip
 # auto-regenerated when tests are run.  These are test-only
 # credentials for a dev POD server, not production.
 #
-# Because the files are already in the repo we need to tell our
-# particular clone of the repository (i.e., for each developer) to
-# assume the files are unchanged, even though they will be updated for
-# each test run.
+# Because the files are already in the repo we need to tell git to
+# skip these files from the work tree so local chenges don't get committed
 #
-# git update-index --assume-unchanged integration_test/fixtures/auth_tokens.json integration_test/fixtures/complete_auth_data.json
-#
-# To undo this:
-#
-# git update-index --no-assume-unchanged integration_test/fixtures/auth_tokens.json integration_test/fixtures/complete_auth_data.json
-#
-# To see which files are marked this way:
-#
-# git ls-files -v | grep '^h'
+# git update-index --skip-worktree integration_test/fixtures/auth_tokens.json integration_test/fixtures/complete_auth_data.json
 
 ########################################################################
 # From https://github.com/flutter/flutter/blob/master/.gitignore

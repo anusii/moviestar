@@ -27,8 +27,17 @@ installers/*-windows.zip
 
 .local-chrome/
 
-# Note: test_credentials.json and auth_tokens.json are committed for CI/CD
-# These are test-only credentials for a dev POD server, not production
+# Note: test_credentials.json and auth_tokens.json can be committed
+# for CI/CD as baseline/templates that are "stale" tokens that get
+# auto-regenerated when tests are run.  These are test-only
+# credentials for a dev POD server, not production.
+#
+# Because the files are already in the repo we need to tell our
+# particular clone of the repository (i.e., for each developer) to
+# assume the files are unchanged, even though they will be updated for
+# each test run.
+#
+# git update-index --assume-unchanged integration_test/fixtures/auth_tokens.json integration_test/fixtures/complete_auth_data.json
 
 ########################################################################
 # From https://github.com/flutter/flutter/blob/master/.gitignore

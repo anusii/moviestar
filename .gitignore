@@ -23,7 +23,8 @@ installers/*-windows.zip
 
 .Rhistory
 
-# Puppeteer browser cache
+# Puppeteer browser cache used in testing solidui apps
+
 .local-chrome/
 
 # Note: test_credentials.json and auth_tokens.json are committed for CI/CD

@@ -41,6 +41,7 @@ dependencies:
   window_manager: ^0.5.0
 
 dev_dependencies:
+  asn1lib: ^1.6.5
   flutter_launcher_icons: ^0.14.2
   flutter_lints: ^5.0.0
   flutter_test:
@@ -54,6 +55,7 @@ dev_dependencies:
   comment_lint: ^0.1.0
   test: ^1.25.15
   ubuntu_lints: ^0.4.0
+  pointycastle: ^4.0.0
   puppeteer: ^3.19.0  # Browser automation for POD OAuth testing
   crypto: ^3.0.6  # For PKCE in OAuth automation
 

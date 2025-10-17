@@ -46,7 +46,7 @@ flutter:
   license	  Look for missing top license in source code.
 
   test	    Run `flutter test` for testing.
-  itest	    Run `flutter test integration_test` for interation testing.
+  itest	    Run `flutter test` on the integration_test folder.
   qtest	    Run above test with PAUSE=0.
   coverage  Run with `--coverage`.
     coview  View the generated html coverage in browser.

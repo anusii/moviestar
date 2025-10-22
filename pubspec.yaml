@@ -55,6 +55,10 @@ dev_dependencies:
   test: ^1.25.15
   ubuntu_lints: ^0.4.0
   puppeteer: ^3.19.0  # Browser automation for POD OAuth testing
+  # OAuth test helper dependencies
+  crypto: ^3.0.6
+  asn1lib: ^1.6.5
+  pointycastle: ^4.0.0
 
 dependency_overrides:
   rxdart: ^0.28.0

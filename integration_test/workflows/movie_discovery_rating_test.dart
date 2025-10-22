@@ -125,6 +125,28 @@ void main() {
         await Future.delayed(const Duration(seconds: 2));
         await tester.pumpAndSettle();
 
+        // Handle API Key Required dialog if it appears.
+        // This can show if the API key wasn't loaded from SharedPreferences.
+
+        final apiKeyDialog = find.text('API Key Required');
+        if (apiKeyDialog.evaluate().isNotEmpty) {
+          // Find the TextField in the dialog and enter the API key.
+          final apiKeyField = find.byWidgetPredicate(
+            (widget) => widget is TextField,
+          );
+          if (apiKeyField.evaluate().isNotEmpty) {
+            await tester.enterText(apiKeyField.first, apiKey);
+            await tester.pumpAndSettle(const Duration(milliseconds: 500));
+          }
+
+          // Tap the "Save API Key" button.
+          final saveButton = find.text('Save API Key');
+          if (saveButton.evaluate().isNotEmpty) {
+            await tester.tap(saveButton);
+            await tester.pumpAndSettle(const Duration(seconds: 2));
+          }
+        }
+
         // Verify user is logged in.
 
         final loggedIn = await isLoggedIn();
@@ -337,6 +359,24 @@ void main() {
         await Future.delayed(const Duration(seconds: 2));
         await tester.pumpAndSettle();
 
+        // Handle API Key Required dialog if it appears.
+
+        final apiKeyDialog = find.text('API Key Required');
+        if (apiKeyDialog.evaluate().isNotEmpty) {
+          final apiKeyField = find.byWidgetPredicate(
+            (widget) => widget is TextField,
+          );
+          if (apiKeyField.evaluate().isNotEmpty) {
+            await tester.enterText(apiKeyField.first, apiKey);
+            await tester.pumpAndSettle(const Duration(milliseconds: 500));
+          }
+          final saveButton = find.text('Save API Key');
+          if (saveButton.evaluate().isNotEmpty) {
+            await tester.tap(saveButton);
+            await tester.pumpAndSettle(const Duration(seconds: 2));
+          }
+        }
+
         // Open search.
 
         final searchIconButtons = find.byWidgetPredicate(
@@ -410,6 +450,24 @@ void main() {
         }
         await Future.delayed(const Duration(seconds: 2));
         await tester.pumpAndSettle();
+
+        // Handle API Key Required dialog if it appears.
+
+        final apiKeyDialog = find.text('API Key Required');
+        if (apiKeyDialog.evaluate().isNotEmpty) {
+          final apiKeyField = find.byWidgetPredicate(
+            (widget) => widget is TextField,
+          );
+          if (apiKeyField.evaluate().isNotEmpty) {
+            await tester.enterText(apiKeyField.first, apiKey);
+            await tester.pumpAndSettle(const Duration(milliseconds: 500));
+          }
+          final saveButton = find.text('Save API Key');
+          if (saveButton.evaluate().isNotEmpty) {
+            await tester.tap(saveButton);
+            await tester.pumpAndSettle(const Duration(seconds: 2));
+          }
+        }
 
         // Navigate to search and find a movie.
 

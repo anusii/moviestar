@@ -174,7 +174,8 @@ void main() {
 
         if (searchFinder == null || searchFinder.evaluate().isEmpty) {
           markTestSkipped(
-              'Search icon not found - app may not be fully loaded or API key missing',);
+            'Search icon not found - app may not be fully loaded or API key missing',
+          );
           return;
         }
 
@@ -193,13 +194,17 @@ void main() {
         // Step 2: Enter search query in the search field.
 
         final searchField = find.byType(TextField);
-        expect(searchField, findsOneWidget,
-            reason: 'Search field should be visible',);
+        expect(
+          searchField,
+          findsOneWidget,
+          reason: 'Search field should be visible',
+        );
         await tester.enterText(searchField, 'spider man');
         await tester
             .pump(const Duration(milliseconds: 500)); // Trigger debounce.
         await tester.pumpAndSettle(
-            const Duration(seconds: 3),); // Wait for search results.
+          const Duration(seconds: 3),
+        ); // Wait for search results.
 
         // Step 3: Verify search results appear.
         // Look for "Titles" section header which appears when results are loaded.

@@ -143,9 +143,10 @@ void main() {
         // Approach 1: Look for search IconButton.
 
         final searchIconButtons = find.byWidgetPredicate(
-          (widget) => widget is IconButton &&
-                      widget.icon is Icon &&
-                      (widget.icon as Icon).icon == Icons.search,
+          (widget) =>
+              widget is IconButton &&
+              widget.icon is Icon &&
+              (widget.icon as Icon).icon == Icons.search,
         );
         if (searchIconButtons.evaluate().isNotEmpty) {
           searchFinder = searchIconButtons;
@@ -172,7 +173,8 @@ void main() {
         // If still not found, skip this test - it needs the UI to be fully loaded.
 
         if (searchFinder == null || searchFinder.evaluate().isEmpty) {
-          markTestSkipped('Search icon not found - app may not be fully loaded or API key missing');
+          markTestSkipped(
+              'Search icon not found - app may not be fully loaded or API key missing');
           return;
         }
 
@@ -191,10 +193,13 @@ void main() {
         // Step 2: Enter search query in the search field.
 
         final searchField = find.byType(TextField);
-        expect(searchField, findsOneWidget, reason: 'Search field should be visible');
+        expect(searchField, findsOneWidget,
+            reason: 'Search field should be visible');
         await tester.enterText(searchField, 'spider man');
-        await tester.pump(const Duration(milliseconds: 500)); // Trigger debounce.
-        await tester.pumpAndSettle(const Duration(seconds: 3)); // Wait for search results.
+        await tester
+            .pump(const Duration(milliseconds: 500)); // Trigger debounce.
+        await tester.pumpAndSettle(
+            const Duration(seconds: 3)); // Wait for search results.
 
         // Step 3: Verify search results appear.
         // Look for "Titles" section header which appears when results are loaded.
@@ -277,7 +282,6 @@ void main() {
         );
 
         // Success! All workflow steps completed.
-
       },
       timeout: const Timeout(Duration(minutes: 5)),
     );
@@ -331,9 +335,10 @@ void main() {
         // Open search.
 
         final searchIconButtons = find.byWidgetPredicate(
-          (widget) => widget is IconButton &&
-                      widget.icon is Icon &&
-                      (widget.icon as Icon).icon == Icons.search,
+          (widget) =>
+              widget is IconButton &&
+              widget.icon is Icon &&
+              (widget.icon as Icon).icon == Icons.search,
         );
         final searchFinder = searchIconButtons.evaluate().isNotEmpty
             ? searchIconButtons
@@ -404,9 +409,10 @@ void main() {
         // Navigate to search and find a movie.
 
         final searchIconButtons = find.byWidgetPredicate(
-          (widget) => widget is IconButton &&
-                      widget.icon is Icon &&
-                      (widget.icon as Icon).icon == Icons.search,
+          (widget) =>
+              widget is IconButton &&
+              widget.icon is Icon &&
+              (widget.icon as Icon).icon == Icons.search,
         );
         final searchFinder = searchIconButtons.evaluate().isNotEmpty
             ? searchIconButtons
@@ -432,8 +438,9 @@ void main() {
         expect(find.byType(Slider), findsOneWidget);
 
         // Verify bookmark icon exists (either filled or unfilled).
-        
-        final hasBookmarkBorder = find.byIcon(Icons.bookmark_border).evaluate().isNotEmpty;
+
+        final hasBookmarkBorder =
+            find.byIcon(Icons.bookmark_border).evaluate().isNotEmpty;
         final hasBookmark = find.byIcon(Icons.bookmark).evaluate().isNotEmpty;
         expect(
           hasBookmarkBorder || hasBookmark,

@@ -13,8 +13,6 @@ pubspec.yaml.*
 
 qtest_*.txt
 
-qtest_*.txt
-
 installers/*.apk
 installers/*.exe
 installers/*.snap

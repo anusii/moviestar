@@ -8,16 +8,15 @@
 [![GitHub commit activity (dev)](https://img.shields.io/github/commit-activity/w/anusii/moviestar/dev)](https://github.com/anusii/moviestar/commits/dev/)
 [![GitHub Issues](https://img.shields.io/github/issues/anusii/moviestar)](https://github.com/anusii/moviestar/issues)
 
-An app to collect your movie and tv show ratings and commentary, to
-share that with others, selectively, and to recommend what to watch,
-with all data stored on your own encrypted personal online data store
-(Pod) hosted in your Data Vault on a Solid Server. The app was
-developed by the [ANU Software Innovation
-Institute](https://sii.anu.edu.au) and written by Kevin Wang, Ashley
-Tang, Zheyuan Xu, and [Graham
-Williams](https://togaware.com/Graham.Williams.html).
-You can also run
-the app online at
+A [solidui](https://github.com/anusii/solidui) based app to collect
+your movie and tv show ratings and commentary, to share that with
+others, selectively, and to recommend what to watch, with all data
+stored on your own encrypted personal online data store (Pod) hosted
+in your Data Vault on a Solid Server. The app was developed by the
+[ANU Software Innovation Institute](https://sii.anu.edu.au) and
+written by Kevin Wang, Ashley Tang, Zheyuan Xu, and [Graham
+Williams](https://togaware.com/Graham.Williams.html).  You can also
+run the app online at
 [innerpod.solidcommunity.au](https://moviestar.solidcommunity.au)
 &mdash; no installation required.
 
@@ -131,7 +130,7 @@ Add support for recommendation engine - review
 [![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
 
-Time-stamp: <Monday 2025-10-13 06:17:53 +1100 Graham Williams>
+Time-stamp: <Monday 2025-10-27 09:36:50 +1100 Graham Williams>
 
 <!-- markdownlint-disable MD053 -->
 [comment]: # (Local Variables:)

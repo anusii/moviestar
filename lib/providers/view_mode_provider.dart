@@ -49,7 +49,7 @@ enum HomeViewMode {
       case 'list':
         return HomeViewMode.list;
       default:
-        return HomeViewMode.grid; // Default fallback.
+        return HomeViewMode.kanban; // Default fallback.
     }
   }
 }
@@ -59,7 +59,7 @@ enum HomeViewMode {
 class ViewModeNotifier extends StateNotifier<HomeViewMode> {
   static const String _key = 'home_view_mode';
 
-  ViewModeNotifier() : super(HomeViewMode.grid) {
+  ViewModeNotifier() : super(HomeViewMode.kanban) {
     _loadViewMode();
   }
 

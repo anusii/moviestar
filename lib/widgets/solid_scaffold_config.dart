@@ -166,7 +166,7 @@ your movie data files.
   }) {
     return [
       SolidAppBarAction(
-        icon: _getViewModeIcon(ref.watch(viewModeProvider)),
+        icon: _getNextViewModeIcon(ref.watch(viewModeProvider)),
         onPressed: onViewModeToggle,
         tooltip:
             'View Mode: Tap here to cycle between different view modes (Grid, Kanban, List).',
@@ -222,5 +222,15 @@ your movie data files.
       case HomeViewMode.list:
         return Icons.view_list;
     }
+  }
+
+  /// Gets the icon for the next view mode (what will happen when button is tapped).
+
+  static IconData _getNextViewModeIcon(HomeViewMode currentViewMode) {
+    final modes = HomeViewMode.values;
+    final currentIndex = modes.indexOf(currentViewMode);
+    final nextIndex = (currentIndex + 1) % modes.length;
+    final nextViewMode = modes[nextIndex];
+    return _getViewModeIcon(nextViewMode);
   }
 }

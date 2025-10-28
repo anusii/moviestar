@@ -3,8 +3,8 @@
 Noted here are the high level changes for the MovieStar app.
 
 Guide: Each version update is noted here with a short user-oriented
-description of the update. Updates in the 0.1.n series are heading
-toward a 1.0 release. The `[version timestamp user]` string is
+description of the update. Updates in the 1.0.n series are heading
+toward a 1.1 release. The `[version timestamp user]` string is
 utilised by the flutter version_widget package.
 
 Run the app online: [**web**](https://moviestar.solidcommunity.au).
@@ -24,8 +24,9 @@ Windows
 Coding documentation is available from [solid community
 au](https://solidcommunity.au/docs/moviestar)
 
-## 1.0 Review, Test, and Consolidate
+## 1.1 Review, Test, and Consolidate
 
++ Default to kanban view. Update button. [1.0.0 20251028 atangster]
 + Add support for snap build [0.1.0 20251007 gjw]
 
 ## 0.1 First stable release

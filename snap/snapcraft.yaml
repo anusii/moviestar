@@ -1,5 +1,5 @@
 name: moviestar
-version: 0.1.0
+version: 1.0.0
 summary: Privacy preserving movie rating and recommendations.
 description: |
   MovieStar is a movie and tv show recommender. You can provide your

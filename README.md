@@ -1,27 +1,31 @@
-<!-- markdownlint-disable MD041 -->
+# Movie Star &mdash; Movie Rating and Sharing
 
-# Movie Star - Movie Rating and Sharing
+[![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
 
-[![GitHub License](https://img.shields.io/github/license/anusii/moviestar)](https://github.com/anusii/moviestar/blob/dev/LICENSE)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/anusii/moviestar)
+[![GitHub License](https://img.shields.io/github/license/anusii/moviestar)](https://github.com/anusii/moviestar?tab=GPL-3.0-1-ov-file)
 [![Flutter Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/anusii/moviestar/master/pubspec.yaml&query=$.version&label=version)](https://github.com/anusii/moviestar/blob/dev/CHANGELOG.md)
 [![Last Updated](https://img.shields.io/github/last-commit/anusii/moviestar?label=last%20updated)](https://github.com/anusii/moviestar/commits/dev/)
 [![GitHub commit activity (dev)](https://img.shields.io/github/commit-activity/w/anusii/moviestar/dev)](https://github.com/anusii/moviestar/commits/dev/)
 [![GitHub Issues](https://img.shields.io/github/issues/anusii/moviestar)](https://github.com/anusii/moviestar/issues)
 
-A [solidui](https://github.com/anusii/solidui) based app to collect
-your movie and tv show ratings and commentary, to share that with
+A [solidui](https://github.com/anusii/solidui) based app to support
+the secure and private storage of your movie and tv show ratings and commentary, to share that with
 others, selectively, and to recommend what to watch, with all data
 stored on your own encrypted personal online data store (Pod) hosted
 in your Data Vault on a Solid Server. The app was developed by the
 [ANU Software Innovation Institute](https://sii.anu.edu.au) and
 written by Kevin Wang, Ashley Tang, Zheyuan Xu, and [Graham
-Williams](https://togaware.com/Graham.Williams.html).  You can also
-run the app online at
-[innerpod.solidcommunity.au](https://moviestar.solidcommunity.au)
-&mdash; no installation required.
+Williams](https://togaware.com/Graham.Williams.html).
 
-The latest version of the app can be downloaded and installed from the
-[Solid Community AU](https://solidcommunity.au):
+If you appreciate the app then please show some ❤️ and star the GitHub
+Repository to support the project.
+
+The latest version of the app can be run online at
+[innerpod.solidcommunity.au](https://moviestar.solidcommunity.au)
+&mdash; no installation required, or downloaded and installed for your
+platform from the [Solid Community AU](https://solidcommunity.au):
 
 + **Android**
   [apk](https://solidcommunity.au/installers/moviestar.apk);
@@ -127,10 +131,9 @@ As a user I can
 Add support for recommendation engine - review
 [recommenders](https://github.com/recommenders-team/recommenders).
 
-[![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
-
-Time-stamp: <Monday 2025-10-27 09:36:50 +1100 Graham Williams>
+<!-- markdownlint-disable MD036 -->
+*Time-stamp: <Tuesday 2025-10-28 11:59:35 +1100 Graham Williams>*
+<!-- markdownlint-enable MD036 -->
 
 <!-- markdownlint-disable MD053 -->
 [comment]: # (Local Variables:)

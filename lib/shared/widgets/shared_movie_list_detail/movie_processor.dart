@@ -16,7 +16,7 @@ class SharedListMovieProcessor {
     if (webId.isEmpty) return 'Unknown';
 
     try {
-      // For WebIDs like: https://pods.dev.solidcommunity.au/my-moviestar/profile/card#me.
+      // For WebIDs like: https://pods.solidcommunity.au/my-moviestar/profile/card#me.
 
       final match = RegExp(r'://[^/]+/([^/]+)/').firstMatch(webId);
       if (match != null) {

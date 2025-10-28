@@ -21,7 +21,7 @@ class UrlHandlers {
     if (webIdOrUsername.isEmpty) return null;
 
     try {
-      // Case 1: Full WebID like: https://pods.dev.solidcommunity.au/my-moviestar/profile/card#me.
+      // Case 1: Full WebID like: https://pods.solidcommunity.au/my-moviestar/profile/card#me.
 
       if (webIdOrUsername.startsWith('http')) {
         final match = RegExp(
@@ -35,7 +35,7 @@ class UrlHandlers {
       // Case 2: Simple username like: my-moviestar.
       // Construct the base URL with the default provider.
 
-      return 'https://pods.dev.solidcommunity.au' '/$webIdOrUsername/';
+      return 'https://pods.solidcommunity.au' '/$webIdOrUsername/';
     } catch (e) {
       return null;
     }

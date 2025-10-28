@@ -1,6 +1,6 @@
 /// Create Solid Login Widget.
 //
-// Time-stamp: <Monday 2025-09-29 20:06:28 +1000 Graham Williams>
+// Time-stamp: <Saturday 2025-10-25 06:05:41 +1100 Graham Williams>
 //
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -29,7 +29,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:solidpod/solidpod.dart';
+import 'package:solidui/solidui.dart';
 
 import 'package:moviestar/my_home_page.dart';
 
@@ -75,7 +75,7 @@ Widget _buildNormalLogin(String serverUrl, SharedPreferences prefs) {
                 appDirectory: 'moviestar',
                 webID: serverUrl.isNotEmpty
                     ? serverUrl
-                    : 'https://pods.dev.solidcommunity.au',
+                    : 'https://pods.solidcommunity.au',
                 image: const AssetImage('assets/images/app_image.jpg'),
                 logo: const AssetImage('assets/images/app_icon.png'),
                 link: 'https://github.com/anusii/moviestar/blob/dev/README.md',

@@ -1,4 +1,4 @@
-# Movie Star &mdash; Movie Rating and Sharing
+# Video Rating and Sharing
 
 [![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
@@ -132,7 +132,7 @@ Add support for recommendation engine - review
 [recommenders](https://github.com/recommenders-team/recommenders).
 
 <!-- markdownlint-disable MD036 -->
-*Time-stamp: <Tuesday 2025-10-28 11:59:35 +1100 Graham Williams>*
+*Time-stamp: <Tuesday 2025-10-28 20:33:05 +1100 Graham Williams>*
 <!-- markdownlint-enable MD036 -->
 
 <!-- markdownlint-disable MD053 -->

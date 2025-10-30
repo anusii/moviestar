@@ -81,14 +81,14 @@ class ShareOperationHandler {
       // Grant permission using actual solidpod call.
 
       final result = await grantPermission(
-        request.fileName,
-        true, // fileFlag - this is a file, not a folder
-        request.permissions,
-        request.recipientType,
-        [request.recipientWebId],
-        ownerWebId,
-        context,
-        widget,
+        fileName: request.fileName,
+        isFile: true, // fileFlag - this is a file, not a folder
+        permissionList: request.permissions,
+        recipientType: request.recipientType,
+        recipientWebIdList: [request.recipientWebId],
+        ownerWebId: ownerWebId,
+        context: context,
+        child: widget,
         isExternalRes: false,
       );
 
@@ -191,14 +191,14 @@ class ShareOperationHandler {
       // Grant permission using actual solidpod call.
 
       final result = await grantPermission(
-        request.fileName,
-        true, // fileFlag
-        request.permissions,
-        request.recipientType,
-        [request.webId],
-        ownerWebId,
-        context,
-        widget,
+        fileName: request.fileName,
+        isFile: true, // fileFlag
+        permissionList: request.permissions,
+        recipientType: request.recipientType,
+        recipientWebIdList: [request.webId],
+        ownerWebId: ownerWebId,
+        context: context,
+        child: widget,
         isExternalRes: false,
       );
 

@@ -11,12 +11,13 @@
 [![GitHub Issues](https://img.shields.io/github/issues/anusii/moviestar)](https://github.com/anusii/moviestar/issues)
 
 A [solidui](https://github.com/anusii/solidui) based app to support
-the secure and private storage of your movie and tv show ratings and commentary, to share that with
-others, selectively, and to recommend what to watch, with all data
-stored on your own encrypted personal online data store (Pod) hosted
-in your Data Vault on a Solid Server. The app was developed by the
-[ANU Software Innovation Institute](https://sii.anu.edu.au) and
-written by Kevin Wang, Ashley Tang, Zheyuan Xu, and [Graham
+the secure and private storage of your movie and tv show ratings as
+well as your own commentary, to share that with others, selectively,
+and to recommend what to watch, with all data stored on your own
+encrypted personal online data store (Pod) hosted in your Data Vault
+on a Solid Server. The app was developed by the [ANU Software
+Innovation Institute](https://sii.anu.edu.au) and written by Kevin
+Wang, Ashley Tang, Zheyuan Xu, and [Graham
 Williams](https://togaware.com/Graham.Williams.html).
 
 If you appreciate the app then please show some ❤️ and star the GitHub
@@ -134,7 +135,7 @@ Add support for recommendation engine - review
 [recommenders](https://github.com/recommenders-team/recommenders).
 
 <!-- markdownlint-disable MD036 -->
-*Time-stamp: <Thursday 2025-10-30 14:04:32 +1100 Graham Williams>*
+*Time-stamp: <Friday 2025-10-31 08:33:32 +1100 Graham Williams>*
 <!-- markdownlint-enable MD036 -->
 
 <!-- markdownlint-disable MD053 -->

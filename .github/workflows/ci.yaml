@@ -104,11 +104,11 @@ jobs:
         uses: lycheeverse/lychee-action@v2
         with: # Don't fail for now but then create an issue - useful?
           args:
-            --verbose
             --no-progress
+            '*.md'
+            './**/*.dart'
             'assets/**/*.md'
             'assets/**/*.html'
-            'lib/**/*.dart'
           fail: false
 
       # 20251030 gjw Remove the automatic creation of an issue for

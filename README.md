@@ -27,6 +27,8 @@ The latest version of the app can be run online at
 &mdash; no installation required, or downloaded and installed for your
 platform from the [Solid Community AU](https://solidcommunity.au):
 
++ **Web**
+  [solidcommunity](https://healthpod.solidcommunity.au/);
 + **Android**
   [apk](https://solidcommunity.au/installers/moviestar.apk);
 + **GNU/Linux**
@@ -132,7 +134,7 @@ Add support for recommendation engine - review
 [recommenders](https://github.com/recommenders-team/recommenders).
 
 <!-- markdownlint-disable MD036 -->
-*Time-stamp: <Tuesday 2025-10-28 20:33:05 +1100 Graham Williams>*
+*Time-stamp: <Thursday 2025-10-30 14:04:32 +1100 Graham Williams>*
 <!-- markdownlint-enable MD036 -->
 
 <!-- markdownlint-disable MD053 -->

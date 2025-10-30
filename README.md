@@ -46,7 +46,7 @@ platform from the [Solid Community AU](https://solidcommunity.au):
   [inno](https://solidcommunity.au/installers/moviestar-dev-windows-inno.exe).
 
 Contributions are welcome. Visit
-[github](https://github.com/gjwgit/moviestar) to submit an issue or,
+[github](https://github.com/anusii/moviestar) to submit an issue or,
 even better, fork the repository yourself, update the code, and submit
 a Pull Request. The app is implemented in
 [Flutter](https://flutter.dev) using
@@ -135,7 +135,7 @@ Add support for recommendation engine - review
 [recommenders](https://github.com/recommenders-team/recommenders).
 
 <!-- markdownlint-disable MD036 -->
-*Time-stamp: <Friday 2025-10-31 08:33:32 +1100 Graham Williams>*
+*Time-stamp: <Friday 2025-10-31 08:40:44 +1100 Graham Williams>*
 <!-- markdownlint-enable MD036 -->
 
 <!-- markdownlint-disable MD053 -->

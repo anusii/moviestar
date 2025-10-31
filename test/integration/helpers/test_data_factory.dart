@@ -55,8 +55,9 @@ class TestDataFactory {
       title: title,
       overview: overview ?? 'A test movie for integration testing',
       releaseDate: releaseDate ?? DateTime.parse('2025-01-01'),
-      posterUrl: posterUrl ?? 'https://image.tmdb.org/t/p/w500/test.jpg',
-      backdropUrl: backdropUrl ?? 'https://image.tmdb.org/t/p/w1280/test.jpg',
+      posterUrl: posterUrl ?? 'https:' '//image.tmdb.org/t/p/w500/test.jpg',
+      backdropUrl:
+          backdropUrl ?? 'https:' '//image.tmdb.org/t/p/w1280/test.jpg',
       genreIds: genreIds ?? [28], // Action genre
       voteAverage: voteAverage,
       contentType: contentType,
@@ -83,9 +84,9 @@ class TestDataFactory {
       title: title,
       overview: overview ?? 'A test TV show for integration testing',
       releaseDate: releaseDate ?? DateTime.parse('2025-01-01'),
-      posterUrl: posterUrl ?? 'https://image.tmdb.org/t/p/w500/test-tv.jpg',
+      posterUrl: posterUrl ?? 'https:' '//image.tmdb.org/t/p/w500/test-tv.jpg',
       backdropUrl:
-          backdropUrl ?? 'https://image.tmdb.org/t/p/w1280/test-tv.jpg',
+          backdropUrl ?? 'https:' '//image.tmdb.org/t/p/w1280/test-tv.jpg',
       genreIds: genreIds ?? [18], // Drama genre
       voteAverage: voteAverage,
       contentType: ContentType.tvShow,

@@ -519,7 +519,7 @@ unused_files:
 .PHONY: lychee
 lychee:
 	@echo "Lychee: CHECK LINKS."
-	-lychee --no-progress --format compact *.md ./**/*.dart $(if $(wildcard ./**/*.md),./**/*.md) $(if $(wildcard ./**/*.html),./**/*.html)
+	-lychee --no-progress --format compact '*.md' './**/*.dart' $(if $(wildcard ./**/*.md),./**/*.md) $(if $(wildcard ./**/*.html),./**/*.html)
 	@echo $(SEPARATOR)
 
 ### TODO THESE SHOULD BE CHECKED AND CLEANED UP

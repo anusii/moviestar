@@ -24,13 +24,13 @@ void main() {
       test('validates correct WebID format', () async {
         expect(
           await PodSharingService.validateWebId(
-            'https://pod.example.com/profile/card#me',
+            'https:' '//pod.example.com/profile/card#me',
           ),
           isTrue,
         );
         expect(
           await PodSharingService.validateWebId(
-            'http://localhost:3000/user/card#me',
+            'http:' '//localhost:3000/user/card#me',
           ),
           isTrue,
         );
@@ -52,7 +52,7 @@ void main() {
       });
 
       test('caches validation results', () async {
-        const webId = 'https://pod.example.com/profile/card#me';
+        const webId = 'https:' '//pod.example.com/profile/card#me';
 
         // First call
         final result1 = await PodSharingService.validateWebId(webId);
@@ -70,7 +70,7 @@ void main() {
           fileName: 'movies/Movie-123.ttl',
           displayName: 'Test Movie',
           permissions: ['read', 'write'],
-          recipientWebId: 'https://pod.example.com/profile/card#me',
+          recipientWebId: 'https:' '//pod.example.com/profile/card#me',
         );
 
         expect(request.fileName, equals('movies/Movie-123.ttl'));

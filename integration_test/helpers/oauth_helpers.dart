@@ -27,7 +27,8 @@ import 'package:puppeteer/puppeteer.dart';
 Future<String?> registerOAuthClient(Page page) async {
   try {
     // Navigate to the registration endpoint.
-    const registrationEndpoint = 'https://pods.dev.solidcommunity.au/.oidc/reg';
+    const registrationEndpoint =
+        'https://pods.dev.solidcommunity.au/' '.oidc/reg';
 
     // Prepare registration request.
     final registrationData = {

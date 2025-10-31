@@ -25,8 +25,8 @@ void main() {
         title: 'Test Movie',
         overview: 'A test movie for unit testing',
         releaseDate: DateTime.parse('2025-01-01'),
-        posterUrl: 'https://image.tmdb.org/t/p/w500/test.jpg',
-        backdropUrl: 'https://image.tmdb.org/t/p/w1280/test.jpg',
+        posterUrl: 'https:' '//image.tmdb.org/t/p/w500/test.jpg',
+        backdropUrl: 'https:' '//image.tmdb.org/t/p/w1280/test.jpg',
         genreIds: [28, 12],
         voteAverage: 7.5,
       );

@@ -62,11 +62,13 @@ void main() {
   group('Navigation and State Persistence Tests', () {
     setUpAll(() async {
       // Inject full authentication with automatic token regeneration.
+
       await CredentialInjector.injectFullAuth(
         autoRegenerateOnFailure: autoRegenerate,
       );
 
       // Verify injection was successful.
+
       final injected = await CredentialInjector.verifyInjection();
       expect(
         injected,
@@ -77,23 +79,27 @@ void main() {
 
     tearDownAll(() async {
       // Clean up credentials and Hive boxes after tests.
+
       await CredentialInjector.clearCredentials();
       await Hive.close();
     });
 
-    /// Helper function to initialize the app with fresh state
+    /// Helper function to initialize the app with fresh state.
     Future<void> initializeApp(
       WidgetTester tester, {
       Map<String, Object>? prefValues,
     }) async {
-      // Set up SharedPreferences with test values
+      // Set up SharedPreferences with test values.
+
       SharedPreferences.setMockInitialValues(prefValues ?? {});
       final prefs = await SharedPreferences.getInstance();
 
-      // Initialize cache settings service
+      // Initialize cache settings service.
+
       await CacheSettingsService.instance.initialize();
 
-      // Initialize Hive with safe adapter registration
+      // Initialize Hive with safe adapter registration.
+
       await Hive.initFlutter();
 
       if (!Hive.isAdapterRegistered(0)) {
@@ -106,7 +112,8 @@ void main() {
         Hive.registerAdapter(ContentItemAdapter());
       }
 
-      // Pump the app with ProviderScope
+      // Pump the app with ProviderScope.
+
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -116,7 +123,8 @@ void main() {
         ),
       );
 
-      // Wait for app to settle
+      // Wait for app to settle.
+
       await tester.pumpAndSettle(const Duration(seconds: 5));
     }
 
@@ -124,7 +132,8 @@ void main() {
       testWidgets('app loads with injected credentials', (tester) async {
         await initializeApp(tester);
 
-        // Verify app loaded - look for MovieStar widget itself
+        // Verify app loaded - look for MovieStar widget itself.
+
         expect(
           find.byType(MovieStar),
           findsOneWidget,
@@ -135,7 +144,8 @@ void main() {
       testWidgets('navigation menu is present', (tester) async {
         await initializeApp(tester);
 
-        // Look for common menu items by text
+        // Look for common menu items by text.
+
         final menuItems = [
           'Home',
           'To Watch',
@@ -144,7 +154,8 @@ void main() {
         ];
 
         for (final item in menuItems) {
-          // At least one menu item should be visible
+          // At least one menu item should be visible.
+
           if (find.text(item).evaluate().isNotEmpty) {
             expect(
               find.text(item),
@@ -157,11 +168,82 @@ void main() {
       });
     });
 
+    group('Navigation Between Pages', () {
+      testWidgets('can navigate to To Watch page', (tester) async {
+        await initializeApp(tester);
+
+        // Find and tap the To Watch menu item.
+
+        final toWatchFinder = find.text('To Watch');
+        if (toWatchFinder.evaluate().isNotEmpty) {
+          await tester.tap(toWatchFinder.first);
+          await tester.pumpAndSettle();
+
+          // Verify we're on the To Watch page.
+
+          expect(
+            find.text('To Watch'),
+            findsWidgets,
+            reason: 'To Watch page should be displayed',
+          );
+        }
+      });
+
+      testWidgets('can navigate to Watched page', (tester) async {
+        await initializeApp(tester);
+
+        // Find and tap the Watched menu item.
+
+        final watchedFinder = find.text('Watched');
+        if (watchedFinder.evaluate().isNotEmpty) {
+          await tester.tap(watchedFinder.first);
+          await tester.pumpAndSettle();
+
+          // Verify we're on the Watched page.
+
+          expect(
+            find.text('Watched'),
+            findsWidgets,
+            reason: 'Watched page should be displayed',
+          );
+        }
+      });
+
+      testWidgets('can navigate between multiple pages', (tester) async {
+        await initializeApp(tester);
+
+        // Navigate to To Watch.
+
+        final toWatchFinder = find.text('To Watch');
+        if (toWatchFinder.evaluate().isNotEmpty) {
+          await tester.tap(toWatchFinder.first);
+          await tester.pumpAndSettle();
+
+          // Then navigate to My Movies.
+
+          final myMoviesFinder = find.text('My Movies');
+          if (myMoviesFinder.evaluate().isNotEmpty) {
+            await tester.tap(myMoviesFinder.first);
+            await tester.pumpAndSettle();
+
+            // Verify we're on My Movies page.
+
+            expect(
+              find.text('My Movies'),
+              findsWidgets,
+              reason: 'Should be on My Movies page',
+            );
+          }
+        }
+      });
+    });
+
     group('View Mode Persistence', () {
       testWidgets('view mode is a valid HomeViewMode', (tester) async {
         await initializeApp(tester);
 
-        // Get the current view mode from provider
+        // Get the current view mode from provider.
+
         final container = ProviderScope.containerOf(
           tester.element(find.byType(MovieStar)),
         );
@@ -173,7 +255,8 @@ void main() {
           reason: 'View mode should be a valid HomeViewMode',
         );
 
-        // Verify it's one of the valid values
+        // Verify it's one of the valid values.
+
         expect(
           [HomeViewMode.grid, HomeViewMode.kanban, HomeViewMode.list],
           contains(viewMode),
@@ -184,27 +267,32 @@ void main() {
       testWidgets('view mode can be read from provider', (tester) async {
         await initializeApp(tester);
 
-        // Get the view mode from provider
+        // Get the view mode from provider.
+
         final container = ProviderScope.containerOf(
           tester.element(find.byType(MovieStar)),
         );
         container.read(viewModeProvider);
 
-        // Restart the app
+        // Restart the app.
+
         await tester.pumpWidget(Container());
         await tester.pumpAndSettle();
 
-        // Reinitialize the app
+        // Reinitialize the app.
+
         await initializeApp(tester);
 
-        // Get the view mode again
+        // Get the view mode again.
+
         final containerAfterRestart = ProviderScope.containerOf(
           tester.element(find.byType(MovieStar)),
         );
         final viewModeAfterRestart =
             containerAfterRestart.read(viewModeProvider);
 
-        // View mode should be consistent (either the same or a valid value)
+        // View mode should be consistent (either the same or a valid value).
+
         expect(
           viewModeAfterRestart,
           isA<HomeViewMode>(),
@@ -215,12 +303,14 @@ void main() {
       testWidgets('view mode provider is properly initialized', (tester) async {
         await initializeApp(tester);
 
-        // Get the view mode from provider
+        // Get the view mode from provider.
+
         final container = ProviderScope.containerOf(
           tester.element(find.byType(MovieStar)),
         );
 
-        // Verify provider can be accessed without errors
+        // Verify provider can be accessed without errors.
+
         expect(
           () => container.read(viewModeProvider),
           returnsNormally,
@@ -229,7 +319,8 @@ void main() {
 
         final viewMode = container.read(viewModeProvider);
 
-        // Verify the returned value is one of the valid enum values
+        // Verify the returned value is one of the valid enum values.
+
         expect(
           HomeViewMode.values,
           contains(viewMode),
@@ -238,11 +329,12 @@ void main() {
       });
     });
 
-    group('Basic Navigation', () {
+    group('Basic Navigation Elements', () {
       testWidgets('can find refresh button', (tester) async {
         await initializeApp(tester);
 
-        // Look for refresh icon which is a common app bar action
+        // Look for refresh icon which is a common app bar action.
+
         final refreshFinder = find.byIcon(Icons.refresh);
 
         if (refreshFinder.evaluate().isNotEmpty) {
@@ -257,7 +349,8 @@ void main() {
       testWidgets('can find search button', (tester) async {
         await initializeApp(tester);
 
-        // Look for search icon which is a common app bar action
+        // Look for search icon which is a common app bar action.
+
         final searchFinder = find.byIcon(Icons.search);
 
         if (searchFinder.evaluate().isNotEmpty) {
@@ -272,7 +365,8 @@ void main() {
       testWidgets('app bar contains overflow menu', (tester) async {
         await initializeApp(tester);
 
-        // Look for the more_vert icon which typically indicates overflow menu
+        // Look for the more_vert icon which typically indicates overflow menu.
+
         final overflowFinder = find.byIcon(Icons.more_vert);
 
         if (overflowFinder.evaluate().isNotEmpty) {
@@ -289,7 +383,8 @@ void main() {
       testWidgets('SharedPreferences provider is initialized', (tester) async {
         await initializeApp(tester);
 
-        // Verify provider is accessible
+        // Verify provider is accessible.
+
         final container = ProviderScope.containerOf(
           tester.element(find.byType(MovieStar)),
         );
@@ -305,7 +400,8 @@ void main() {
       testWidgets('ViewMode provider is accessible', (tester) async {
         await initializeApp(tester);
 
-        // Verify provider is accessible
+        // Verify provider is accessible.
+
         final container = ProviderScope.containerOf(
           tester.element(find.byType(MovieStar)),
         );

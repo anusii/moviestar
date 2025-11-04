@@ -53,6 +53,7 @@ import 'package:moviestar/providers/view_mode_provider.dart';
 import '../helpers/credential_injector.dart';
 
 // Control auto-regeneration via dart-define flag for batch test compatibility.
+
 const autoRegenerate =
     bool.fromEnvironment('AUTO_REGENERATE', defaultValue: true);
 
@@ -84,7 +85,8 @@ void main() {
       await Hive.close();
     });
 
-    /// Helper function to initialize the app with fresh state.
+    /// Helper function to initialise the app with fresh state.
+
     Future<void> initializeApp(
       WidgetTester tester, {
       Map<String, Object>? prefValues,
@@ -94,11 +96,11 @@ void main() {
       SharedPreferences.setMockInitialValues(prefValues ?? {});
       final prefs = await SharedPreferences.getInstance();
 
-      // Initialize cache settings service.
+      // Initialise cache settings service.
 
       await CacheSettingsService.instance.initialize();
 
-      // Initialize Hive with safe adapter registration.
+      // Initialise Hive with safe adapter registration.
 
       await Hive.initFlutter();
 

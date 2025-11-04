@@ -11,12 +11,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:solidpod/solidpod.dart'
-    show
-        SolidFunctionCallStatus,
-        getWebId,
-        grantPermission,
-        loginIfRequired,
-        getKeyFromUserIfRequired;
+    show SolidFunctionCallStatus, getWebId, grantPermission;
 
 import 'package:moviestar/models/sharing_models.dart';
 import 'package:moviestar/services/webid_validator.dart';
@@ -45,18 +40,6 @@ class ShareOperationHandler {
     try {
       // Check if context is still mounted before async operations.
 
-      if (!context.mounted) {
-        return ShareResult.failure('Context no longer mounted');
-      }
-
-      // Ensure user is logged in and has proper keys.
-
-      await loginIfRequired(context);
-      if (!context.mounted) {
-        return ShareResult.failure('Context no longer mounted');
-      }
-
-      await getKeyFromUserIfRequired(context, widget);
       if (!context.mounted) {
         return ShareResult.failure('Context no longer mounted');
       }
@@ -146,24 +129,6 @@ class ShareOperationHandler {
     try {
       // Check if context is still mounted before async operations.
 
-      if (!context.mounted) {
-        return const PermissionResult(
-          granted: false,
-          error: 'Context no longer mounted',
-        );
-      }
-
-      // Ensure user is logged in and has proper keys.
-
-      await loginIfRequired(context);
-      if (!context.mounted) {
-        return const PermissionResult(
-          granted: false,
-          error: 'Context no longer mounted',
-        );
-      }
-
-      await getKeyFromUserIfRequired(context, widget);
       if (!context.mounted) {
         return const PermissionResult(
           granted: false,

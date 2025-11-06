@@ -15,7 +15,7 @@ import 'package:gap/gap.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:moviestar/core/services/api/key_service.dart';
-import 'package:moviestar/providers/cached_movie_service_provider.dart';
+import 'package:moviestar/utils/api_key_save_helper.dart';
 
 class ApiSettingsPanel extends ConsumerStatefulWidget {
   final Function(String title, List<Widget> children) buildSection;
@@ -102,75 +102,37 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
   }
 
   Future<void> _saveApiKey() async {
-    await widget.apiKeyService.setApiKey(_apiKeyController.text);
+    final apiKey = _apiKeyController.text.trim();
 
-    if (!context.mounted) return;
+    // Use the shared helper function to save the API key
+    // with proper provider invalidation
+    final success = await saveApiKeyWithProviderInvalidation(
+      apiKeyService: widget.apiKeyService,
+      apiKey: apiKey,
+      ref: ref,
+      mounted: () => mounted,
+    );
 
-    if (mounted) {
-      // Invalidate providers in correct order for immediate effect.
-      // IMPORTANT: Invalidate core providers first, then dependent ones.
+    if (!success || !mounted) return;
 
-      ref.invalidate(directApiKeyProvider);
-      ref.invalidate(apiKeyProvider);
+    // Show success message.
 
-      // Allow time for core providers to refresh.
+    if (context.mounted) {
+      showApiKeySaveSuccessMessage(
+        context,
+        isEmpty: apiKey.isEmpty,
+      );
 
-      await Future.delayed(const Duration(milliseconds: 50));
+      // If we navigated here from the API key prompt, navigate back to home.
 
-      if (!mounted) return;
-
-      // Clear cache to force fresh data with new API key.
-
-      try {
-        final cachedService = ref.read(configuredCachedMovieServiceProvider);
-        await cachedService.clearAllCache();
-      } catch (e) {
-        // Log but don't fail - provider invalidation will still work.
+      if (widget.fromApiKeyPrompt) {
+        _navigateToHomeScreen();
       }
 
-      // Now invalidate all dependent movie providers.
+      // Trigger app reinitialization after API key is set.
+      // This will properly initialize POD folders and data loading.
 
-      ref.invalidate(movieServiceProvider);
-      ref.invalidate(contentServiceProvider);
-      ref.invalidate(recommendedMoviesWithCacheInfoProvider);
-      ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
-      ref.invalidate(topRatedMoviesWithCacheInfoProvider);
-      ref.invalidate(upcomingMoviesWithCacheInfoProvider);
-      ref.invalidate(configuredCachedMovieServiceProvider);
-
-      // Give providers time to refresh for immediate UI update.
-
-      await Future.delayed(const Duration(milliseconds: 150));
-
-      if (!mounted) return;
-
-      // Show success message.
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              _apiKeyController.text.trim().isEmpty
-                  ? 'API key cleared - movie data will no longer load'
-                  : 'API key saved - movie data will now refresh',
-            ),
-            backgroundColor: _apiKeyController.text.trim().isEmpty
-                ? Colors.orange
-                : Colors.green,
-          ),
-        );
-
-        // If we navigated here from the API key prompt, navigate back to home.
-
-        if (widget.fromApiKeyPrompt) {
-          _navigateToHomeScreen();
-        }
-
-        // Trigger app reinitialization after API key is set.
-        // This will properly initialize POD folders and data loading.
-
-        _triggerAppReinitialization();
-      }
+      _triggerAppReinitialization();
     }
   }
 

@@ -64,6 +64,7 @@ final directApiKeyProvider = FutureProvider<String?>((ref) async {
         accessibility: KeychainAccessibility.first_unlock_this_device,
       ),
       mOptions: MacOsOptions(synchronizable: false),
+      webOptions: WebOptions(),
     );
 
     // Try multiple storage keys to find the API key.

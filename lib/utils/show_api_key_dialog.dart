@@ -26,9 +26,11 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:moviestar/core/services/api/key_service.dart';
+import 'package:moviestar/utils/api_key_save_helper.dart';
 
 /// Shows the API key setup dialog.
 /// Returns true if API key was successfully set, false otherwise.
@@ -37,6 +39,7 @@ Future<bool> showApiKeyDialog(
   BuildContext context,
   ApiKeyService apiKeyService, {
   required VoidCallback onApiKeySet,
+  required WidgetRef ref,
 }) async {
   final TextEditingController apiKeyController = TextEditingController();
   bool isLoading = false;
@@ -172,38 +175,44 @@ Future<bool> showApiKeyDialog(
                                     });
 
                                     try {
-                                      await apiKeyService.setApiKey(apiKey);
+                                      // Use the shared helper function to save the API key
+                                      // with proper provider invalidation
+                                      final success =
+                                          await saveApiKeyWithProviderInvalidation(
+                                        apiKeyService: apiKeyService,
+                                        apiKey: apiKey,
+                                        ref: ref,
+                                        mounted: () => context.mounted,
+                                      );
 
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'API key saved successfully',
-                                            ),
-                                            backgroundColor: Colors.green,
-                                          ),
+                                      if (success && context.mounted) {
+                                        showApiKeySaveSuccessMessage(
+                                          context,
+                                          isEmpty: apiKey.isEmpty,
                                         );
 
+                                        // Call the callback for any additional actions
                                         onApiKeySet.call();
                                         Navigator.of(dialogContext).pop(true);
+                                      } else if (!success && context.mounted) {
+                                        showApiKeySaveErrorMessage(
+                                          context,
+                                          'Unknown error',
+                                        );
                                       }
                                     } catch (e) {
                                       if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              'Failed to save API key: $e',
-                                            ),
-                                            backgroundColor: Colors.red,
-                                          ),
+                                        showApiKeySaveErrorMessage(
+                                          context,
+                                          e.toString(),
                                         );
                                       }
                                     } finally {
-                                      setState(() {
-                                        isLoading = false;
-                                      });
+                                      if (context.mounted) {
+                                        setState(() {
+                                          isLoading = false;
+                                        });
+                                      }
                                     }
                                   },
                             child: isLoading

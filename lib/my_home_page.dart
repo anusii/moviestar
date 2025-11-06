@@ -244,6 +244,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               final apiKeySet = await showApiKeyDialog(
                 context,
                 _apiKeyService,
+                ref: ref,
                 onApiKeySet: () {
                   // Reinitialize after API key is set.
 

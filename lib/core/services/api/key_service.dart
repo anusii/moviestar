@@ -25,6 +25,7 @@ class ApiKeyService extends BasePodService {
       accessibility: KeychainAccessibility.first_unlock_this_device,
     ),
     mOptions: MacOsOptions(synchronizable: false),
+    webOptions: WebOptions(),
   );
 
   String? _cachedApiKey;

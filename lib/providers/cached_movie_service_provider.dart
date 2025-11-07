@@ -26,8 +26,6 @@
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:solidpod/solidpod.dart' show getWebId;
 
 import 'package:moviestar/core/services/api/content_service.dart';
 import 'package:moviestar/core/services/api/key_service.dart';
@@ -45,70 +43,57 @@ export 'package:moviestar/providers/cached_movie_service_provider/provider_defin
 export 'package:moviestar/providers/cached_movie_service_provider/state_notifiers.dart';
 
 /// Provider for the API key service.
-/// Note: Context needs to be set manually via updateContext() for POD operations.
+/// Note: This should be overridden with a proper instance from MyHomePage.
+/// Use ProviderScope.overrideWithValue() to provide the actual service instance.
 
 final apiKeyServiceProvider = Provider<ApiKeyService?>((ref) {
-  // ApiKeyService requires BuildContext and Widget, so return null here.
-  // Services should create their own instance with proper context.
+  // This will be overridden by MyHomePage with the actual service instance.
+  // If not overridden, it returns null.
 
   return null;
 });
 
-/// Direct API key provider that accesses secure storage without service dependency.
+/// Direct API key provider - deprecated, returns null to force use of ApiKeyService.
+/// API keys are now stored in POD only, which requires ApiKeyService for access.
 
 final directApiKeyProvider = FutureProvider<String?>((ref) async {
-  try {
-    const storage = FlutterSecureStorage(
-      aOptions: AndroidOptions(),
-      iOptions: IOSOptions(
-        accessibility: KeychainAccessibility.first_unlock_this_device,
-      ),
-      mOptions: MacOsOptions(synchronizable: false),
-      webOptions: WebOptions(),
-    );
+  // Always return null to force the app to use ApiKeyService.
+  // ApiKeyService properly reads from POD storage which is shared across devices.
+  // This provider is kept for backward compatibility but no longer reads from local storage.
 
-    // Try multiple storage keys to find the API key.
-
-    String? apiKey;
-
-    // Try user-specific key first (current approach).
-
-    try {
-      final webId = await getWebId();
-      if (webId != null && webId.isNotEmpty) {
-        final userKey = 'user_api_key_$webId';
-        apiKey = await storage.read(key: userKey);
-      }
-    } catch (e) {
-      // Failed to read API key from storage.
-    }
-
-    // Try legacy key if user key not found.
-
-    if (apiKey == null || apiKey.isEmpty) {
-      apiKey = await storage.read(key: 'movie_db_api_key');
-    }
-
-    return apiKey;
-  } catch (e) {
-    return null;
-  }
+  return null;
 });
 
 /// Provider for the API key state that watches for changes.
 
-final apiKeyProvider = StateNotifierProvider<ApiKeyNotifier, String?>((ref) {
-  final apiKeyService = ref.watch(apiKeyServiceProvider);
-  return ApiKeyNotifier(apiKeyService);
-});
+final apiKeyProvider = StateNotifierProvider<ApiKeyNotifier, String?>(
+  (ref) {
+    final apiKeyService = ref.watch(apiKeyServiceProvider);
+    return ApiKeyNotifier(apiKeyService);
+  },
+  dependencies: [apiKeyServiceProvider],
+);
 
-/// Provider for the movie service using direct API key access.
+/// FutureProvider that waits for the API key to be loaded.
+/// Use this in movie providers to ensure they wait for the key to be fetched.
+
+final apiKeyFutureProvider = FutureProvider<String?>(
+  (ref) async {
+    final apiKeyService = ref.watch(apiKeyServiceProvider);
+    if (apiKeyService == null) return null;
+
+    final apiKey = await apiKeyService.getApiKey();
+    return apiKey;
+  },
+  dependencies: [apiKeyServiceProvider],
+);
+
+/// Provider for the movie service using API key from POD.
 
 final movieServiceProvider = Provider.autoDispose<MovieService>((ref) {
-  // Watch the direct API key to trigger recreation when it changes.
+  // Watch the API key notifier to trigger recreation when it changes.
 
-  final apiKeyAsync = ref.watch(directApiKeyProvider);
-  final apiKey = apiKeyAsync.valueOrNull;
+  final apiKey = ref.watch(apiKeyProvider);
 
   // Create a DirectMovieService that uses the API key directly.
 
@@ -121,7 +106,10 @@ final movieServiceProvider = Provider.autoDispose<MovieService>((ref) {
   });
 
   return movieService;
-});
+}, dependencies: [
+  apiKeyProvider,
+  apiKeyServiceProvider,
+],);
 
 /// Provider for the content service (handles both movies and TV shows).
 
@@ -251,4 +239,8 @@ final configuredCachedMovieServiceProvider =
   });
 
   return cachedService;
-});
+}, dependencies: [
+  movieServiceProvider,
+  apiKeyProvider,
+  apiKeyServiceProvider,
+],);

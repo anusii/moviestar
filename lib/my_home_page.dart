@@ -89,6 +89,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   late final ApiKeyService _apiKeyService;
 
+  /// Flag to track if apiKeyProvider has been initialized with the service.
+
+  bool _apiKeyProviderInitialized = false;
+
   @override
   void initState() {
     super.initState();
@@ -459,6 +463,17 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Ensure apiKeyProvider is refreshed once after the override is in place.
+
+    if (!_apiKeyProviderInitialized) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ref.invalidate(apiKeyProvider);
+          _apiKeyProviderInitialized = true;
+        }
+      });
+    }
+
     // Create user info for the solid navigation.
 
     final userInfo = SolidNavUserInfo(
@@ -547,15 +562,15 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     );
 
     // Return appropriate widget with proper loading overlay.
+    // Wrap with ProviderScope to override apiKeyServiceProvider with our instance.
 
-    if (_showSettings) {
-      return _buildSettingsOverlay(solidScaffold);
-    }
-
-    // Individual components handle their own loading states.
-    // Removed full-screen loading overlay to prevent sudden loading indicator.
-
-    return solidScaffold;
+    return ProviderScope(
+      overrides: [
+        apiKeyServiceProvider.overrideWithValue(_apiKeyService),
+      ],
+      child:
+          _showSettings ? _buildSettingsOverlay(solidScaffold) : solidScaffold,
+    );
   }
 
   /// Builds the Settings screen as an overlay on top of the SolidScaffold.

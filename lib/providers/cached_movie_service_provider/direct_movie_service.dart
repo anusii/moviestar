@@ -44,6 +44,11 @@ class DirectMovieService extends MovieService {
 
   @override
   Future<List<Movie>> getRecommendedMovies() async {
+    // Return empty list if API key is not set to avoid 401 errors.
+    if (_apiKey == null || _apiKey.isEmpty) {
+      return [];
+    }
+
     await _ensureDirectClientInitialized();
 
     // Fetch both recommended movies and TV shows directly.
@@ -73,6 +78,11 @@ class DirectMovieService extends MovieService {
 
   @override
   Future<List<Movie>> getNowPlayingMovies() async {
+    // Return empty list if API key is not set to avoid 401 errors.
+    if (_apiKey == null || _apiKey.isEmpty) {
+      return [];
+    }
+
     await _ensureDirectClientInitialized();
 
     // Fetch both now playing movies and on the air TV shows directly.
@@ -98,6 +108,11 @@ class DirectMovieService extends MovieService {
 
   @override
   Future<List<Movie>> getTopRatedMovies() async {
+    // Return empty list if API key is not set to avoid 401 errors.
+    if (_apiKey == null || _apiKey.isEmpty) {
+      return [];
+    }
+
     await _ensureDirectClientInitialized();
 
     // Fetch both top rated movies and TV shows directly.
@@ -123,6 +138,11 @@ class DirectMovieService extends MovieService {
 
   @override
   Future<List<Movie>> getUpcomingMovies() async {
+    // Return empty list if API key is not set to avoid 401 errors.
+    if (_apiKey == null || _apiKey.isEmpty) {
+      return [];
+    }
+
     await _ensureDirectClientInitialized();
 
     // Fetch both upcoming movies and airing today TV shows directly.

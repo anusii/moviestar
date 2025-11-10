@@ -90,26 +90,29 @@ final apiKeyFutureProvider = FutureProvider<String?>(
 
 /// Provider for the movie service using API key from POD.
 
-final movieServiceProvider = Provider.autoDispose<MovieService>((ref) {
-  // Watch the API key notifier to trigger recreation when it changes.
+final movieServiceProvider = Provider.autoDispose<MovieService>(
+  (ref) {
+    // Watch the API key notifier to trigger recreation when it changes.
 
-  final apiKey = ref.watch(apiKeyProvider);
+    final apiKey = ref.watch(apiKeyProvider);
 
-  // Create a DirectMovieService that uses the API key directly.
+    // Create a DirectMovieService that uses the API key directly.
 
-  final movieService = DirectMovieService(apiKey);
+    final movieService = DirectMovieService(apiKey);
 
-  // Ensure proper disposal.
+    // Ensure proper disposal.
 
-  ref.onDispose(() {
-    movieService.dispose();
-  });
+    ref.onDispose(() {
+      movieService.dispose();
+    });
 
-  return movieService;
-}, dependencies: [
-  apiKeyProvider,
-  apiKeyServiceProvider,
-],);
+    return movieService;
+  },
+  dependencies: [
+    apiKeyProvider,
+    apiKeyServiceProvider,
+  ],
+);
 
 /// Provider for the content service (handles both movies and TV shows).
 
@@ -219,28 +222,31 @@ final localApiKeyCachingProvider =
 /// Provider for configured cached movie service (with settings).
 
 final configuredCachedMovieServiceProvider =
-    Provider.autoDispose<CachedMovieService>((ref) {
-  final movieService = ref.watch(movieServiceProvider);
-  final cacheService = ref.watch(hiveCacheServiceProvider);
-  final cachingEnabled = ref.watch(cachingEnabledProvider);
-  final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
+    Provider.autoDispose<CachedMovieService>(
+  (ref) {
+    final movieService = ref.watch(movieServiceProvider);
+    final cacheService = ref.watch(hiveCacheServiceProvider);
+    final cachingEnabled = ref.watch(cachingEnabledProvider);
+    final cacheOnlyMode = ref.watch(cacheOnlyModeProvider);
 
-  final cachedService = CachedMovieService(
-    movieService,
-    cacheService,
-    cachingEnabled: cachingEnabled,
-    cacheOnlyMode: cacheOnlyMode,
-  );
+    final cachedService = CachedMovieService(
+      movieService,
+      cacheService,
+      cachingEnabled: cachingEnabled,
+      cacheOnlyMode: cacheOnlyMode,
+    );
 
-  // Ensure proper disposal.
+    // Ensure proper disposal.
 
-  ref.onDispose(() {
-    cachedService.dispose();
-  });
+    ref.onDispose(() {
+      cachedService.dispose();
+    });
 
-  return cachedService;
-}, dependencies: [
-  movieServiceProvider,
-  apiKeyProvider,
-  apiKeyServiceProvider,
-],);
+    return cachedService;
+  },
+  dependencies: [
+    movieServiceProvider,
+    apiKeyProvider,
+    apiKeyServiceProvider,
+  ],
+);

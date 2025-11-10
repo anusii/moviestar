@@ -11,12 +11,9 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:solidpod/solidpod.dart'
-    show
-        SolidFunctionCallStatus,
-        getWebId,
-        grantPermission,
-        loginIfRequired,
-        getKeyFromUserIfRequired;
+    show SolidFunctionCallStatus, getWebId, grantPermission;
+import 'package:solidui/solidui.dart'
+    show getKeyFromUserIfRequired, loginIfRequired;
 
 import 'package:moviestar/models/sharing_models.dart';
 import 'package:moviestar/services/webid_validator.dart';

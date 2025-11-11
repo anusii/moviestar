@@ -198,7 +198,7 @@ OpenIdException(invalid_grant): grant request is invalid
 Uses browser automation with Puppeteer:
 
 ```bash
-dart run integration_test/utils/extract_tokens.dart
+dart run integration_test/tools/generate_auth_data.dart
 ```
 
 **What it does:**
@@ -218,7 +218,7 @@ dart run integration_test/utils/extract_tokens.dart
 For visual login or when automation fails:
 
 ```bash
-flutter run integration_test/utils/extract_complete_auth.dart -d linux
+flutter run integration_test/tools/generate_auth_data.dart -d linux
 ```
 
 **Steps:**
@@ -291,7 +291,7 @@ AuthDataManager => _getTokenResponse() failed: OpenIdException(invalid_grant)
 **Solutions:**
 ```bash
 # Re-extract complete auth data
-dart run integration_test/utils/extract_tokens.dart
+dart run integration_test/tools/generate_auth_data.dart
 
 # Or enable auto-regeneration in test
 await CredentialInjector.injectFullAuth(autoRegenerateOnFailure: true);
@@ -340,12 +340,12 @@ await Future.delayed(hack);  // TODO: Fix R script async architecture
 
 ### Browser Automation Failures
 
-**Problem:** `extract_tokens.dart` fails with timeout or login errors
+**Problem:** `generate_auth_data.dart` fails with timeout or login errors
 
 **Debug Steps:**
 1. Run in non-headless mode to see browser:
    ```bash
-   dart run integration_test/utils/extract_tokens.dart --no-headless
+   dart run integration_test/tools/generate_auth_data.dart --no-headless
    ```
 
 2. Check credentials file exists and is correct:
@@ -453,10 +453,10 @@ make workflows/pod_favorites_real_test.qtest
 make workflows/pod_favorites_real_test.itest
 
 # Extract auth data (automated)
-dart run integration_test/utils/extract_tokens.dart
+dart run integration_test/tools/generate_auth_data.dart
 
 # Extract auth data (manual)
-flutter run integration_test/utils/extract_complete_auth.dart -d linux
+flutter run integration_test/tools/generate_auth_data.dart -d linux
 
 # Run with custom INTERACT
 flutter test integration_test/app_test.dart -d linux --dart-define=INTERACT=5

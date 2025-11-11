@@ -12,19 +12,31 @@ library;
 import 'dart:convert';
 import 'dart:io';
 
+import '../helpers/credential_injector.dart';
 import '../helpers/pod_auth_automator.dart';
 
 Future<void> main() async {
   print('=== POD Auth Data Generation Tool ===\n');
   print('This tool will:');
-  print('  1. Run browser automation to authenticate');
-  print('  2. Generate complete auth data structure');
-  print('  3. Save to integration_test/fixtures/complete_auth_data.json\n');
+  print('  1. Load test credentials from integration_test/fixtures/test_credentials.json');
+  print('  2. Run browser automation to authenticate');
+  print('  3. Generate complete auth data structure');
+  print('  4. Save to integration_test/fixtures/complete_auth_data.json\n');
 
   try {
+    // Load test credentials.
+    print('Loading test credentials...');
+    final credentials = await CredentialInjector.loadCredentials();
+    print('✓ Credentials loaded for: ${credentials.email}\n');
+
     // Run browser automation.
     print('Starting browser automation...');
-    final result = await PodAuthAutomator.authenticate(headless: false);
+    final result = await PodAuthAutomator.authenticate(
+      email: credentials.email,
+      password: credentials.password,
+      securityKey: credentials.securityKey,
+      headless: false,
+    );
 
     if (!result.success) {
       print('\n❌ Authentication failed: ${result.error}');

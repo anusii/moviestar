@@ -50,7 +50,6 @@ flutter create --platforms=macos .
 integration_test/
 ├── fixtures/               # Test data and auth tokens (gitignored)
 │   ├── test_credentials.json
-│   ├── auth_tokens.json
 │   └── complete_auth_data.json
 ├── helpers/                # Test utilities
 │   ├── credential_injector.dart
@@ -59,8 +58,8 @@ integration_test/
 │   └── test_constants.dart
 ├── utils/                  # Development tools
 │   ├── delays.dart
-│   ├── extract_tokens.dart
-│   ├── extract_complete_auth.dart
+│   ├── generate_auth_data.dart
+│   ├── generate_auth_data.dart
 │   └── discover_oauth_params.dart
 ├── workflows/              # E2E workflow tests
 │   ├── pod_favorites_real_test.dart
@@ -97,7 +96,6 @@ Ensure these files are **NOT** committed:
 
 ```gitignore
 # Integration test auth data (contains sensitive tokens)
-integration_test/fixtures/auth_tokens.json
 integration_test/fixtures/complete_auth_data.json
 integration_test/fixtures/test_credentials.json
 ```
@@ -110,15 +108,14 @@ Before running POD-authenticated tests, extract complete auth data:
 
 ```bash
 # Automated extraction (recommended)
-dart run integration_test/utils/extract_tokens.dart
+dart run integration_test/tools/generate_auth_data.dart
 
 # Manual extraction (if automation fails)
-flutter run integration_test/utils/extract_complete_auth.dart -d linux
+flutter run integration_test/tools/generate_auth_data.dart -d linux
 ```
 
 This generates:
 - `integration_test/fixtures/complete_auth_data.json` - Complete auth data with RSA keys
-- `integration_test/fixtures/auth_tokens.json` - Legacy tokens (for backwards compatibility)
 
 **Token Expiration**: OAuth tokens expire after 1 hour. Re-run extraction if tests fail with `invalid_grant` errors.
 
@@ -192,7 +189,7 @@ For continuous integration environments:
 ### Option B: On-Demand Extraction
 1. Install Chrome in CI environment
 2. Store test credentials as CI secrets
-3. Run `dart run integration_test/utils/extract_tokens.dart` before tests
+3. Run `dart run integration_test/tools/generate_auth_data.dart` before tests
 
 ### Option C: Mock POD Service
 1. Create mock POD service for CI
@@ -220,7 +217,7 @@ For continuous integration environments:
 
 ### Chrome/Chromium Not Found
 
-**Problem**: `extract_tokens.dart` fails to find browser
+**Problem**: `generate_auth_data.dart` fails to find browser
 
 **Solution**:
 ```bash
@@ -241,7 +238,7 @@ brew install chromium
 **Solution**:
 ```bash
 # Run with visible browser to debug
-dart run integration_test/utils/extract_tokens.dart --no-headless
+dart run integration_test/tools/generate_auth_data.dart --no-headless
 ```
 
 ### Invalid Credentials

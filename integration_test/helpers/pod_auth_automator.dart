@@ -53,7 +53,6 @@ class PodAuthAutomator {
     required String securityKey,
     bool headless = true,
   }) async {
-
     Browser? browser;
     try {
       // Launch browser.

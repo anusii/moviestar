@@ -118,7 +118,6 @@ class CredentialInjector {
     // or perform actual login and extract the keys it uses.
   }
 
-
   /// Loads complete auth data from complete_auth_data.json file.
   ///
   /// This auth data is extracted using the complete auth extraction tool:
@@ -354,7 +353,6 @@ class CredentialInjector {
     await completeAuthFile.writeAsString(
       const JsonEncoder.withIndent('  ').convert(result.completeAuthData),
     );
-
 
     print('✓ Complete auth data regenerated and saved successfully');
     return result.tokens!; // Return tokens for backwards compatibility

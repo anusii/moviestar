@@ -19,7 +19,8 @@ Future<void> main() async {
   print('=== POD Auth Data Generation Tool ===\n');
   print('This tool will:');
   print(
-      '  1. Load test credentials from integration_test/fixtures/test_credentials.json');
+    '  1. Load test credentials from integration_test/fixtures/test_credentials.json',
+  );
   print('  2. Run browser automation to authenticate');
   print('  3. Generate complete auth data structure');
   print('  4. Save to integration_test/fixtures/complete_auth_data.json\n');

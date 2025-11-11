@@ -1,8 +1,18 @@
 # MovieStar E2E Testing Guide
 
+> **New to POD authentication?** Read [Understanding POD Authentication](authentication.md) first to learn why OAuth, DPoP, and browser automation are necessary.
+>
+> **Documentation index:** See [README.md](README.md) for complete documentation navigation.
+
 ## Overview
 
 This guide explains how to write, run, and debug end-to-end (E2E) integration tests for the MovieStar application. The testing framework supports both quick automated testing and interactive visual testing.
+
+For conceptual background and architecture details, see:
+- [Understanding POD Authentication](authentication.md) - OAuth, DPoP, and why browser automation
+- [Architecture Overview](architecture.md) - Component diagrams and data flow
+- [JSON Files Reference](json-files.md) - Credential file structures
+- [Adapting for Your App](adapting.md) - Reusability guide for other POD applications
 
 ## Table of Contents
 
@@ -470,7 +480,7 @@ flutter test --list
 ## Additional Resources
 
 ### Documentation
-- [INTEGRATION_TEST_SETUP.md](INTEGRATION_TEST_SETUP.md) - Initial setup instructions for POD authentication
+- [Setup Guide](setup-guide.md) - Initial setup instructions for POD authentication
 - [Flutter Integration Testing](https://docs.flutter.dev/testing/integration-tests) - Official Flutter E2E testing guide
 - [Solid POD Documentation](https://solidproject.org/) - Solid Project overview and specifications
 - [Solid OIDC Primer](https://solid.github.io/solid-oidc/) - Solid-OIDC authentication specification

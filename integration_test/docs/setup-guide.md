@@ -1,8 +1,12 @@
 # Integration Test Setup
 
+> **New to POD authentication?** Read [Understanding POD Authentication](authentication.md) first to learn why OAuth, DPoP, and browser automation are necessary.
+>
+> **Documentation index:** See [README.md](README.md) for complete documentation navigation.
+
 This document describes the initial setup for E2E testing infrastructure for Movie Star using Flutter's integration_test package.
 
-**For day-to-day testing usage, see [TESTING_GUIDE.md](TESTING_GUIDE.md).**
+**For day-to-day testing usage, see [Testing Guide](testing-guide.md).**
 
 ## Overview
 

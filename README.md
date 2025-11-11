@@ -84,7 +84,10 @@ make qtest
 make workflows/pod_favorites_real_test.qtest
 ```
 
-See [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md) for complete testing documentation.
+See [integration_test/docs/](integration_test/docs/) for complete testing documentation including:
+- [Testing Guide](integration_test/docs/testing-guide.md) - How to run tests
+- [Understanding POD Authentication](integration_test/docs/authentication.md) - OAuth, DPoP concepts
+- [Setup Guide](integration_test/docs/setup-guide.md) - Initial setup instructions
 
 ## User Stories
 

@@ -6,10 +6,10 @@
 > visual testing.
 >
 > **New to POD authentication?** Read [Understanding POD
-> Authentication](authentication.md) first to learn why OAuth, DPoP,
+> Authentication](../concepts/authentication.md) first to learn why OAuth, DPoP,
 > and browser automation are necessary.
 >
-> **Documentation index:** See [README.md](README.md) for complete
+> **Documentation index:** See [README.md](../README.md) for complete
 > documentation navigation.
 
 ## Quick Start
@@ -349,14 +349,14 @@ flutter test --list
 
 ## See Also
 
-+ [Troubleshooting](testing-troubleshooting.md) - Common issues and
++ [Troubleshooting](troubleshooting.md) - Common issues and
   solutions
 + [Setup Guide](setup-guide.md) - Initial setup instructions for POD
   authentication
-+ [Authentication Guide](authentication.md) - OAuth/DPoP concepts
-+ [Architecture](architecture.md) - Component overview and execution
++ [Authentication Guide](../concepts/authentication.md) - OAuth/DPoP concepts
++ [Architecture](../concepts/architecture.md) - Component overview and execution
   flows
-+ [JSON Files Reference](json-files.md) - Credential file structures
++ [JSON Files Reference](../reference/json-files.md) - Credential file structures
 + [Adapting for Your App](adapting.md) - Reusability guide for other
   POD applications
 

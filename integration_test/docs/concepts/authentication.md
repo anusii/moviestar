@@ -254,7 +254,7 @@ use case.
 + Cannot run in environments without browser support
 
 **Alternative:** For CI/CD, pre-generate tokens and inject them. See
-[Testing Guide](testing-guide.md#ci-cd-integration) for details.
+[Testing Guide](../guides/testing-guide.md#ci-cd-integration) for details.
 
 ## Summary
 
@@ -273,6 +273,6 @@ server, not a centralized app backend.
 ## Next Steps
 
 + [Architecture Overview](architecture.md) - See how components fit together
-+ [JSON Files Reference](json-files.md) - Understand credential file
++ [JSON Files Reference](../reference/json-files.md) - Understand credential file
   structure
-+ [Testing Guide](testing-guide.md) - Run tests with POD authentication
++ [Testing Guide](../guides/testing-guide.md) - Run tests with POD authentication

@@ -4,7 +4,7 @@
 > tests and their solutions. For general testing information, see
 > [Testing Guide](testing-guide.md).
 >
-> **Documentation index:** See [README.md](README.md) for complete
+> **Documentation index:** See [README.md](../README.md) for complete
 > documentation navigation.
 
 ## Test Discovery Issues
@@ -270,9 +270,9 @@ mv integration_test/my_test.dart integration_test/my_test_test.dart
 If troubleshooting doesn't resolve your issue:
 
 + Check [Testing Guide](testing-guide.md) for usage patterns
-+ Review [Authentication Guide](authentication.md) for OAuth concepts
++ Review [Authentication Guide](../concepts/authentication.md) for OAuth concepts
 + Check [Setup Guide](setup-guide.md) for initial configuration
-+ Review [Architecture](architecture.md) for component interactions
++ Review [Architecture](../concepts/architecture.md) for component interactions
 + Check Flutter integration test logs for stack traces
 + Verify POD server is accessible
 + Try manual auth extraction to isolate automation issues
@@ -281,5 +281,5 @@ If troubleshooting doesn't resolve your issue:
 
 + [Testing Guide](testing-guide.md) - Running and writing tests
 + [Setup Guide](setup-guide.md) - Initial setup instructions
-+ [Authentication Guide](authentication.md) - OAuth/DPoP concepts
-+ [Architecture](architecture.md) - Component overview
++ [Authentication Guide](../concepts/authentication.md) - OAuth/DPoP concepts
++ [Architecture](../concepts/architecture.md) - Component overview

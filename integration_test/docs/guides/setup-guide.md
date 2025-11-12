@@ -1,10 +1,10 @@
 # Integration Test Setup
 
 > **New to POD authentication?** Read
-> [Understanding POD Authentication](authentication.md) first to learn why
+> [Understanding POD Authentication](../concepts/authentication.md) first to learn why
 > OAuth, DPoP, and browser automation are necessary.
 >
-> **Documentation index:** See [README.md](README.md) for complete
+> **Documentation index:** See [README.md](../README.md) for complete
 > documentation navigation.
 
 This document describes the initial setup for E2E testing infrastructure
@@ -300,7 +300,7 @@ flutter devices
 
 After completing setup:
 
-+ **Read [TESTING_GUIDE.md](TESTING_GUIDE.md)** for comprehensive testing
++ **Read [Testing Guide](testing-guide.md)** for comprehensive testing
   documentation
 + **Run basic test**: `flutter test integration_test/app_test.dart -d linux`
 + **Run POD test**:
@@ -309,7 +309,7 @@ After completing setup:
 
 ## References
 
-+ [TESTING_GUIDE.md](TESTING_GUIDE.md) - Comprehensive testing guide
++ [Testing Guide](testing-guide.md) - Comprehensive testing guide
 + [Flutter Integration Testing](https://docs.flutter.dev/testing/integration-tests)
 + [Solid POD Authentication](https://solidproject.org/TR/protocol#authentication)
 + [OAuth 2.0 with PKCE](https://datatracker.ietf.org/doc/html/rfc7636)

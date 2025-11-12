@@ -8,7 +8,7 @@
 >
 > **For CI/CD setup:** See [CI/CD Integration](adapting-cicd.md)
 >
-> **Documentation index:** See [README.md](README.md) for complete
+> **Documentation index:** See [README.md](../README.md) for complete
 > documentation navigation.
 
 ## Quick Start Checklist
@@ -370,8 +370,8 @@ flutter test integration_test/workflows/your_app_test.dart \
 
 **Questions about adaptation:**
 
-+ Check [Authentication Guide](authentication.md) for concepts
-+ Review [Architecture](architecture.md) for component details
++ Check [Authentication Guide](../concepts/authentication.md) for concepts
++ Review [Architecture](../concepts/architecture.md) for component details
 + See [Testing Guide](testing-guide.md) for troubleshooting
 + Open an issue with `adaptation-question` label
 
@@ -404,6 +404,6 @@ need customization.
 + [CI/CD Integration](adapting-cicd.md) - Setting up continuous
   integration
 + [Testing Guide](testing-guide.md) - Running your adapted tests
-+ [Architecture](architecture.md) - Understanding component
++ [Architecture](../concepts/architecture.md) - Understanding component
   interactions
-+ [JSON Files Reference](json-files.md) - Credential file structure
++ [JSON Files Reference](../reference/json-files.md) - Credential file structure

@@ -3,7 +3,7 @@
 > This document describes the detailed execution flows for integration
 > tests. For component overview, see [Architecture](architecture.md).
 >
-> **Documentation index:** See [README.md](README.md) for complete
+> **Documentation index:** See [README.md](../README.md) for complete
 > documentation navigation.
 
 ## Test Execution Scenarios
@@ -398,5 +398,5 @@ auth flows
 
 + [Architecture Overview](architecture.md) - Component diagrams
 + [Authentication Guide](authentication.md) - OAuth/DPoP concepts
-+ [Testing Guide](testing-guide.md) - Running tests
-+ [Troubleshooting](testing-troubleshooting.md) - Common issues
++ [Testing Guide](../guides/testing-guide.md) - Running tests
++ [Troubleshooting](../guides/troubleshooting.md) - Common issues

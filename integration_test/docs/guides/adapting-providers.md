@@ -4,7 +4,7 @@
 > approach for different POD providers. For general adaptation, see
 > [Adapting for Your App](adapting.md).
 >
-> **Documentation index:** See [README.md](README.md) for complete
+> **Documentation index:** See [README.md](../README.md) for complete
 > documentation navigation.
 
 ## Solid POD Providers
@@ -371,6 +371,6 @@ flutter test integration_test/workflows/your_test.dart \
 ## See Also
 
 + [Adapting for Your App](adapting.md) - General adaptation guide
-+ [Authentication Guide](authentication.md) - OAuth/DPoP concepts
-+ [Architecture](architecture.md) - Component interactions
++ [Authentication Guide](../concepts/authentication.md) - OAuth/DPoP concepts
++ [Architecture](../concepts/architecture.md) - Component interactions
 + [Testing Guide](testing-guide.md) - Running adapted tests

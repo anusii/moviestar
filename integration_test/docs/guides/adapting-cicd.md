@@ -4,7 +4,7 @@
 > continuous integration and deployment pipelines. For general
 > adaptation, see [Adapting for Your App](adapting.md).
 >
-> **Documentation index:** See [README.md](README.md) for complete
+> **Documentation index:** See [README.md](../README.md) for complete
 > documentation navigation.
 
 ## Overview
@@ -383,4 +383,4 @@ final browser = await puppeteer.launch(
 + [Adapting for Your App](adapting.md) - General adaptation guide
 + [Provider Compatibility](adapting-providers.md) - POD provider setup
 + [Testing Guide](testing-guide.md) - Running tests locally
-+ [Troubleshooting](testing-troubleshooting.md) - Common issues
++ [Troubleshooting](troubleshooting.md) - Common issues

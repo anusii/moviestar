@@ -230,7 +230,7 @@ dart run integration_test/tools/generate_auth_data.dart
 ```
 
 **Pre-generate for CI** (see
-[Testing Guide](testing-guide.md#ci-cd-integration))
+[Testing Guide](../guides/testing-guide.md#ci-cd-integration))
 
 ### Token Lifecycle
 
@@ -341,8 +341,8 @@ dart run integration_test/tools/generate_auth_data.dart
 
 ## Next Steps
 
-+ [Authentication Guide](authentication.md) - Understand OAuth and DPoP
++ [Authentication Guide](../concepts/authentication.md) - Understand OAuth and DPoP
   concepts
-+ [Architecture Overview](architecture.md) - See how files are used in
++ [Architecture Overview](../concepts/architecture.md) - See how files are used in
   testing
-+ [Testing Guide](testing-guide.md) - Run tests with these credentials
++ [Testing Guide](../guides/testing-guide.md) - Run tests with these credentials

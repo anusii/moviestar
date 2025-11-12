@@ -6,7 +6,7 @@
 > **For test execution flows:** See [Test Execution
 > Flows](architecture-flows.md)
 >
-> **Documentation index:** See [README.md](README.md) for complete
+> **Documentation index:** See [README.md](../README.md) for complete
 > documentation navigation.
 
 ## Component Overview
@@ -289,7 +289,7 @@ be found by the app.
 **Breaking this contract:** If structure changes, solidpod won't parse
 auth data correctly.
 
-See [JSON Files Reference](json-files.md) for complete structure
+See [JSON Files Reference](../reference/json-files.md) for complete structure
 documentation.
 
 ## Timing and Synchronization
@@ -359,14 +359,14 @@ For CI environments:
 + **Dedicated test POD** - Use separate POD account for CI
 + **Token rotation** - Regenerate CI tokens weekly
 
-See [CI/CD Integration](adapting-cicd.md) for CI setup details.
+See [CI/CD Integration](../guides/adapting-cicd.md) for CI setup details.
 
 ## See Also
 
 + [Test Execution Flows](architecture-flows.md) - Detailed execution
   diagrams
-+ [JSON Files Reference](json-files.md) - Detailed file structure
++ [JSON Files Reference](../reference/json-files.md) - Detailed file structure
   documentation
-+ [Adapting for Your App](adapting.md) - Reusability guide
-+ [Testing Guide](testing-guide.md) - Run tests and troubleshoot
++ [Adapting for Your App](../guides/adapting.md) - Reusability guide
++ [Testing Guide](../guides/testing-guide.md) - Run tests and troubleshoot
 + [Authentication Guide](authentication.md) - OAuth/DPoP concepts

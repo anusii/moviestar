@@ -1,51 +1,89 @@
 # Adapting for Your Solid POD Application
 
-This guide helps you adapt MovieStar's POD authentication testing approach for your own Solid POD application.
+> This guide helps you adapt MovieStar's POD authentication testing
+> approach for your own Solid POD application.
+>
+> **For provider-specific details:** See [Provider
+> Compatibility](adapting-providers.md)
+>
+> **For CI/CD setup:** See [CI/CD Integration](adapting-cicd.md)
+>
+> **Documentation index:** See [README.md](README.md) for complete
+> documentation navigation.
 
 ## Quick Start Checklist
 
-- [ ] Copy reusable helper files to your project
-- [ ] Update POD provider configuration
-- [ ] Modify OAuth client settings
-- [ ] Create test credentials file
-- [ ] Write application-specific test assertions
-- [ ] Update CI/CD configuration
+**Setup Phase:**
+
++ [ ] Copy reusable helper files to your project
++ [ ] Add required dependencies to pubspec.yaml
++ [ ] Update POD provider configuration
++ [ ] Modify OAuth client settings
++ [ ] Create test credentials file
+
+**Testing Phase:**
+
++ [ ] Write application-specific test assertions
++ [ ] Test auth injection with your app
++ [ ] Verify POD operations in tests
++ [ ] Run tests with INTERACT=0 to ensure they pass
+
+**CI/CD Phase:**
+
++ [ ] Update CI/CD configuration (see
+  [CI/CD Integration](adapting-cicd.md))
++ [ ] Set up encrypted credentials in CI
++ [ ] Verify tests pass in CI environment
 
 ## Reusable Components
 
-These files can be copied directly to your project with minimal changes:
+These files can be copied directly to your project with minimal
+changes:
 
 ### Core Helpers (Copy As-Is)
 
-```
+```text
 integration_test/helpers/
-├── credential_injector.dart       # ✓ Reusable
-├── pod_auth_automator.dart        # ✓ Reusable
-└── test_credentials.dart          # ✗ Deleted (legacy)
+├── credential_injector.dart       # Reusable
+└── pod_auth_automator.dart        # Reusable
 
 integration_test/tools/
-└── generate_auth_data.dart        # ✓ Reusable
+└── generate_auth_data.dart        # Reusable
 
 integration_test/utils/
-└── delays.dart                    # ✓ Reusable
+└── delays.dart                    # Reusable
 ```
 
 **What these provide:**
-- OAuth 2.0 + PKCE flow implementation
-- DPoP token generation with RSA keys
-- Puppeteer browser automation
-- Secure storage injection
-- Token expiry checking and auto-regeneration
+
++ OAuth 2.0 + PKCE flow implementation
++ DPoP token generation with RSA keys
++ Puppeteer browser automation
++ Secure storage injection
++ Token expiry checking and auto-regeneration
 
 ### Application-Specific Files (Customize)
 
-```
+```text
 integration_test/workflows/
-└── pod_favorites_real_test.dart   # ✗ MovieStar-specific
+└── your_app_test.dart             # Write your own tests
 
 integration_test/fixtures/
-├── test_credentials.json          # ✗ Your POD credentials
-└── complete_auth_data.json        # ✗ Auto-generated
+├── test_credentials.json          # Your POD credentials
+└── complete_auth_data.json        # Auto-generated
+```
+
+### Required Dependencies
+
+Add to your `pubspec.yaml`:
+
+```yaml
+dev_dependencies:
+  integration_test:
+    sdk: flutter
+  puppeteer: ^3.19.0  # Browser automation for OAuth
+  pointycastle: ^3.9.1  # RSA key generation for DPoP
+  flutter_secure_storage: ^9.0.0  # Secure credential storage
 ```
 
 ## Configuration Changes
@@ -55,22 +93,24 @@ integration_test/fixtures/
 **Location:** Multiple files reference the POD provider
 
 **MovieStar default:**
+
 ```dart
 'https://pods.dev.solidcommunity.au'
 ```
 
 **Change to:**
-- Your POD provider URL
-- Or make it configurable via environment variable
+
++ Your POD provider URL
++ Or make it configurable via environment variable
 
 **Files to update:**
 
-```dart
+```json
 // integration_test/fixtures/test_credentials.json
 {
-  "issuer": "https://your-pod-provider.com",  // ← Change this
-  "podUrl": "https://your-pod-provider.com/your-username/",
-  "webId": "https://your-pod-provider.com/your-username/profile/card#me"
+  "issuer": "https://your-pod-provider.com",
+  "podUrl": "https://your-pod-provider.com/username/",
+  "webId": "https://your-pod-provider.com/username/profile/card#me"
 }
 ```
 
@@ -91,35 +131,41 @@ static String getPodProvider() {
 **Location:** `integration_test/helpers/pod_auth_automator.dart`
 
 **MovieStar default:**
+
 ```dart
 final redirectUri = 'http://localhost:44007/';
 ```
 
 **Change to:**
-- Match your app's registered redirect URI
-- Must be `http://localhost:<port>/` for desktop apps
-- Different ports for different apps to avoid conflicts
+
++ Match your app's registered redirect URI
++ Must be `http://localhost:<port>/` for desktop apps
++ Different ports for different apps to avoid conflicts
 
 **Example:**
+
 ```dart
 // Your app uses port 45000
 final redirectUri = 'http://localhost:45000/';
 ```
 
 **Note:** Update in both:
-1. `pod_auth_automator.dart` - Puppeteer automation
-2. Your app's OAuth configuration
+
++ `pod_auth_automator.dart` - Puppeteer automation
++ Your app's OAuth configuration
 
 ### 3. OAuth Client Name
 
 **Location:** `integration_test/helpers/pod_auth_automator.dart`
 
 **MovieStar default:**
+
 ```dart
 'client_name': 'MovieStar E2E Test Client',
 ```
 
 **Change to:**
+
 ```dart
 'client_name': 'YourApp E2E Test Client',
 ```
@@ -138,8 +184,8 @@ cat > integration_test/fixtures/test_credentials.json <<'EOF'
   "email": "your-test-account",
   "password": "your-test-password",
   "securityKey": "your-2fa-key",
-  "webId": "https://your-pod-provider.com/your-test-account/profile/card#me",
-  "podUrl": "https://your-pod-provider.com/your-test-account/",
+  "webId": "https://your-pod-provider.com/test/profile/card#me",
+  "podUrl": "https://your-pod-provider.com/test/",
   "issuer": "https://your-pod-provider.com"
 }
 EOF
@@ -149,10 +195,10 @@ EOF
 
 ## Writing Application-Specific Tests
 
-### Template Structure
+### Test Template
 
 ```dart
-/// E2E test for [YourApp] POD operations.
+/// E2E test for YourApp POD operations.
 ///
 /// Copyright (C) 2025, Your Organization.
 
@@ -190,17 +236,6 @@ void main() {
       // Your app-specific assertions
       expect(find.text('Logged In'), findsOneWidget);
     });
-
-    testWidgets('can access POD data', (tester) async {
-      app.main();
-      await tester.pumpAndSettle(const Duration(seconds: 5));
-
-      // Test your app's POD operations
-      await tester.tap(find.byIcon(Icons.cloud));
-      await tester.pumpAndSettle();
-
-      expect(find.text('POD Connected'), findsOneWidget);
-    });
   });
 }
 ```
@@ -222,7 +257,6 @@ testWidgets('loads public profile from POD', (tester) async {
 
   // Verify data loaded from POD
   expect(find.text('Name: Test User'), findsOneWidget);
-  expect(find.text('Email: test@example.com'), findsOneWidget);
 });
 ```
 
@@ -254,16 +288,17 @@ For apps that work with multiple PODs:
 
 ```dart
 testWidgets('shares data between PODs', (tester) async {
-  // Inject credentials for POD A
   await CredentialInjector.injectFullAuth();
 
   app.main();
   await tester.pumpAndSettle();
 
-  // Share data with POD B
+  // Share data with another POD
   await tester.tap(find.text('Share'));
-  await tester.enterText(find.byKey(const Key('recipient_webid')),
-      'https://pod-b.example.com/user/profile/card#me');
+  await tester.enterText(
+    find.byKey(const Key('recipient_webid')),
+    'https://pod-b.example.com/user/profile/card#me'
+  );
   await tester.tap(find.text('Send'));
   await tester.pumpAndSettle();
 
@@ -271,253 +306,104 @@ testWidgets('shares data between PODs', (tester) async {
 });
 ```
 
-## POD Provider Compatibility
+## Migration Steps
 
-### Supported POD Servers
+### Step 1: Copy Files
 
-This testing approach works with any Solid POD server implementing:
+Copy the reusable components to your project:
 
-- **Solid-OIDC specification** - OAuth 2.0 with DPoP
-- **OAuth 2.0 + PKCE** - Authorization Code Flow
-- **DPoP (RFC 9449)** - Proof-of-Possession tokens
-
-### Tested Providers
-
-| Provider | Status | Notes |
-|----------|--------|-------|
-| **Community Solid Server (CSS)** | ✓ Tested | Used in MovieStar tests |
-| **Node Solid Server (NSS)** | ✓ Compatible | Implements Solid-OIDC |
-| **Enterprise Solid Server (ESS)** | ✓ Compatible | Commercial offering |
-| **Custom implementations** | ? Unknown | Must implement Solid-OIDC |
-
-### Provider-Specific Considerations
-
-#### Community Solid Server (CSS)
-
-**Login flow:**
-- Email + Password
-- Optional security key (2FA)
-- Consent screen with "Yes" button
-
-**Token expiry:** 3600 seconds (1 hour)
-
-**Refresh tokens:** Supported but not always returned
-
-#### Node Solid Server (NSS)
-
-**Login flow:**
-- Username + Password
-- May have different consent screen UI
-
-**Modify for NSS:**
-```dart
-// In pod_auth_automator.dart, update button selector
-final consentButton = await page.waitForSelector(
-  'button[name="approve"]',  // NSS uses 'approve' instead of 'yes'
-);
-```
-
-#### Enterprise Solid Server (ESS)
-
-**Login flow:**
-- May use enterprise SSO
-- Different consent screen branding
-
-**Requires:** Custom Puppeteer selectors for your ESS instance
-
-## Troubleshooting Adaptation
-
-### Different Login Form Selectors
-
-**Symptom:** Puppeteer timeout waiting for login form
-
-**Solution:** Update selectors in `pod_auth_automator.dart`:
-
-```dart
-// Find your POD's selectors using Chrome DevTools
-final emailInput = await page.waitForSelector('#your-email-field-id');
-final passwordInput = await page.waitForSelector('#your-password-field-id');
-```
-
-**Debugging technique:**
-1. Run with `headless: false` to see browser
-2. Inspect elements in Chrome DevTools
-3. Update selectors to match your POD's HTML
-
-### Different Consent Screen
-
-**Symptom:** Puppeteer can't find consent button
-
-**Solution:** Update button selector:
-
-```dart
-// Original (CSS)
-final consentButton = await page.$('button:has-text("Yes")');
-
-// Try alternative selectors
-final consentButton = await page.$('button[value="consent"]');
-// OR
-final consentButton = await page.$('input[type="submit"][name="authorize"]');
-```
-
-### OAuth Client Registration Differences
-
-**Symptom:** Client registration fails with 400/401 error
-
-**Solution:** Check your POD's client registration requirements:
-
-```dart
-// Some providers require additional fields
-final clientMetadata = {
-  'client_name': 'YourApp E2E Test Client',
-  'redirect_uris': [redirectUri],
-  'grant_types': ['authorization_code', 'refresh_token'],  // ← May be required
-  'response_types': ['code'],  // ← May be required
-  'token_endpoint_auth_method': 'none',  // ← For public clients
-};
-```
-
-### Token Format Differences
-
-**Symptom:** solidpod package can't parse tokens
-
-**Solution:** Verify token structure matches expectations:
-
-```dart
-// Log the token response for debugging
-print('Token response: ${jsonEncode(tokenResponse)}');
-
-// Ensure it contains required fields:
-// - access_token
-// - id_token
-// - token_type: "DPoP"
-// - expires_in or expires_at
-```
-
-## CI/CD Integration
-
-### GitHub Actions Example
-
-```yaml
-name: Integration Tests
-
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-
-      - name: Install Chrome
-        run: |
-          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-          sudo apt-get update
-          sudo apt-get install google-chrome-stable
-
-      - name: Setup test credentials
-        run: |
-          mkdir -p integration_test/fixtures
-          echo '${{ secrets.TEST_CREDENTIALS }}' > integration_test/fixtures/test_credentials.json
-
-      - name: Generate auth data
-        run: dart run integration_test/tools/generate_auth_data.dart
-
-      - name: Run integration tests
-        run: flutter test integration_test/ -d linux --dart-define=INTERACT=0
-```
-
-### Storing Credentials Securely
-
-**GitHub Secrets:**
-1. Go to repository Settings → Secrets → Actions
-2. Add `TEST_CREDENTIALS` secret with your JSON content
-3. Reference in workflow: `${{ secrets.TEST_CREDENTIALS }}`
-
-**Encrypt auth data:**
 ```bash
-# Generate encrypted auth data for CI
-gpg --symmetric --cipher-algo AES256 integration_test/fixtures/complete_auth_data.json
+# Copy helpers
+cp -r integration_test/helpers your-project/integration_test/
 
-# Commit encrypted version
-git add integration_test/fixtures/complete_auth_data.json.gpg
+# Copy tools
+cp -r integration_test/tools your-project/integration_test/
+
+# Copy utils
+cp -r integration_test/utils your-project/integration_test/
+
+# Optional: Copy docs for reference
+cp -r integration_test/docs your-project/integration_test/
 ```
 
-## Migration Checklist
+### Step 2: Update Configuration
 
-When adapting for your app:
++ Update POD provider URL in `pod_auth_automator.dart`
++ Change OAuth redirect URI (use different port)
++ Update OAuth client name
++ Create `test_credentials.json` with your POD account
 
-**Phase 1: Setup**
-- [ ] Copy `integration_test/helpers/` to your project
-- [ ] Copy `integration_test/tools/` to your project
-- [ ] Copy `integration_test/utils/` to your project
-- [ ] Copy `integration_test/docs/` for reference
-- [ ] Add dependencies: `puppeteer`, `pointycastle`, `flutter_secure_storage`
+### Step 3: Test Authentication
 
-**Phase 2: Configuration**
-- [ ] Update POD provider URL in test_credentials.json
-- [ ] Change OAuth redirect URI in pod_auth_automator.dart
-- [ ] Update OAuth client name
-- [ ] Test browser automation with `dart run integration_test/tools/generate_auth_data.dart`
+Generate auth data to verify setup:
 
-**Phase 3: Testing**
-- [ ] Write app-specific test file in `integration_test/workflows/`
-- [ ] Test auth injection works with your app
-- [ ] Verify POD operations in tests
-- [ ] Run with `flutter test integration_test/ -d <platform>`
+```bash
+dart run integration_test/tools/generate_auth_data.dart
+```
 
-**Phase 4: CI/CD**
-- [ ] Set up encrypted credentials in CI
-- [ ] Install Chrome in CI environment
-- [ ] Configure test execution in workflow
-- [ ] Verify tests pass in CI
+Should complete in 15-20 seconds and create
+`complete_auth_data.json`.
 
-## Example Projects
+### Step 4: Write App Tests
 
-Looking for complete examples?
+Create your first test in `integration_test/workflows/`:
 
-**MovieStar** - This project
-- POD favorites storage
-- Read and write operations
-- Auto-regeneration enabled
+```bash
+touch integration_test/workflows/your_app_test.dart
+```
 
-**Future examples:**
-- Solid Community contributions welcome
-- Share your adapted implementation
+Use the template above and add your app-specific assertions.
+
+### Step 5: Run Tests
+
+```bash
+# Quick test
+flutter test integration_test/workflows/your_app_test.dart \
+  -d linux --dart-define=INTERACT=0
+
+# Interactive test (for debugging)
+flutter test integration_test/workflows/your_app_test.dart \
+  -d linux --dart-define=INTERACT=5
+```
 
 ## Getting Help
 
 **Questions about adaptation:**
-1. Check [Authentication Guide](authentication.md) for concepts
-2. Review [Architecture Overview](architecture.md) for component details
-3. See [Testing Guide](testing-guide.md) for troubleshooting
-4. Open an issue on GitHub with `adaptation-question` label
+
++ Check [Authentication Guide](authentication.md) for concepts
++ Review [Architecture](architecture.md) for component details
++ See [Testing Guide](testing-guide.md) for troubleshooting
++ Open an issue with `adaptation-question` label
 
 **Contributing improvements:**
-- Submit PRs to make helpers more reusable
-- Share your adapted selectors for different POD providers
-- Contribute example projects
+
++ Submit PRs to make helpers more reusable
++ Share your adapted selectors for different POD providers
++ Contribute example projects
 
 ## Summary
 
 To adapt for your app:
 
-1. **Copy reusable helpers** - OAuth, DPoP, Puppeteer automation
-2. **Update configuration** - POD provider, redirect URI, client name
-3. **Create test credentials** - Use dedicated test POD account
-4. **Write app-specific tests** - Focus on your POD operations
-5. **Set up CI/CD** - Encrypt credentials, install Chrome
-6. **Debug selectors** - Adjust for your POD provider's UI
++ **Copy reusable helpers** - OAuth, DPoP, Puppeteer automation
++ **Update configuration** - POD provider, redirect URI, client name
++ **Create test credentials** - Use dedicated test POD account
++ **Write app-specific tests** - Focus on your POD operations
++ **Set up CI/CD** - See [CI/CD Integration](adapting-cicd.md)
++ **Debug selectors** - See [Provider
+  Compatibility](adapting-providers.md)
 
-The core OAuth + DPoP + Puppeteer approach is fully reusable. Only application-specific test assertions and POD provider configuration need customization.
+The core OAuth + DPoP + Puppeteer approach is fully reusable. Only
+application-specific test assertions and POD provider configuration
+need customization.
 
-## Next Steps
+## See Also
 
-- [Testing Guide](testing-guide.md) - Run your adapted tests
-- [Architecture Overview](architecture.md) - Understand component interactions
-- [JSON Files Reference](json-files.md) - Credential file structure
++ [Provider Compatibility](adapting-providers.md) - POD provider
+  configuration
++ [CI/CD Integration](adapting-cicd.md) - Setting up continuous
+  integration
++ [Testing Guide](testing-guide.md) - Running your adapted tests
++ [Architecture](architecture.md) - Understanding component
+  interactions
++ [JSON Files Reference](json-files.md) - Credential file structure

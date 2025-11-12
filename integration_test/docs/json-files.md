@@ -1,6 +1,7 @@
 # JSON Files Reference
 
-This guide explains the structure and purpose of JSON files used in the integration test framework.
+This guide explains the structure and purpose of JSON files used in the
+integration test framework.
 
 ## Overview
 
@@ -15,11 +16,12 @@ The test framework uses two JSON files for authentication:
 
 ### Purpose
 
-Contains your POD account credentials that Puppeteer uses to automate the login flow. This file is created manually and remains stable.
+Contains your POD account credentials that Puppeteer uses to automate the
+login flow. This file is created manually and remains stable.
 
 ### Location
 
-```
+```text
 integration_test/fixtures/test_credentials.json
 ```
 
@@ -49,9 +51,10 @@ integration_test/fixtures/test_credentials.json
 
 ### Setup
 
-1. Create an account on a Solid POD provider (e.g., https://pods.dev.solidcommunity.au)
-2. Note your credentials and WebID
-3. Create the file:
++ Create an account on a Solid POD provider (e.g.,
+  https://pods.dev.solidcommunity.au)
++ Note your credentials and WebID
++ Create the file:
 
 ```bash
 cat > integration_test/fixtures/test_credentials.json <<'EOF'
@@ -68,7 +71,8 @@ EOF
 
 ### Security
 
-**CRITICAL:** This file contains sensitive credentials and is git-ignored. Never commit it to version control.
+**CRITICAL:** This file contains sensitive credentials and is git-ignored.
+Never commit it to version control.
 
 ```gitignore
 # .gitignore already includes:
@@ -79,17 +83,20 @@ integration_test/fixtures/test_credentials.json
 
 ### Purpose
 
-Contains the **complete authentication data structure** extracted from a real OAuth login session, including:
-- DPoP-bound OAuth tokens (access_token, id_token, refresh_token)
-- RSA keypair for DPoP proof signing
-- OAuth client metadata
-- Logout URL
+Contains the **complete authentication data structure** extracted from a
+real OAuth login session, including:
 
-This file is **automatically generated** by the Puppeteer automation and expires after 1 hour.
++ DPoP-bound OAuth tokens (access_token, id_token, refresh_token)
++ RSA keypair for DPoP proof signing
++ OAuth client metadata
++ Logout URL
+
+This file is **automatically generated** by the Puppeteer automation and
+expires after 1 hour.
 
 ### Location
 
-```
+```text
 integration_test/fixtures/complete_auth_data.json
 ```
 
@@ -191,34 +198,39 @@ flutter test integration_test/workflows/pod_favorites_real_test.dart \
 ```
 
 The generation process:
-1. Loads credentials from `test_credentials.json`
-2. Launches Puppeteer browser automation
-3. Performs OAuth login flow
-4. Generates RSA keypair
-5. Exchanges authorization code for DPoP-bound tokens
-6. Saves complete structure to this file
+
++ Loads credentials from `test_credentials.json`
++ Launches Puppeteer browser automation
++ Performs OAuth login flow
++ Generates RSA keypair
++ Exchanges authorization code for DPoP-bound tokens
++ Saves complete structure to this file
 
 ### Token Expiration
 
-OAuth access tokens expire after **3600 seconds (1 hour)**. When tokens expire, you'll see:
+OAuth access tokens expire after **3600 seconds (1 hour)**. When tokens
+expire, you'll see:
 
-```
+```text
 OpenIdException(invalid_grant): grant request is invalid
 ```
 
 **Solutions:**
 
-1. **Auto-regeneration** (recommended for local testing):
-   ```dart
-   await CredentialInjector.injectFullAuth(autoRegenerateOnFailure: true);
-   ```
+**Auto-regeneration** (recommended for local testing):
 
-2. **Manual regeneration**:
-   ```bash
-   dart run integration_test/tools/generate_auth_data.dart
-   ```
+```dart
+await CredentialInjector.injectFullAuth(autoRegenerateOnFailure: true);
+```
 
-3. **Pre-generate for CI** (see [Testing Guide](testing-guide.md#ci-cd-integration))
+**Manual regeneration**:
+
+```bash
+dart run integration_test/tools/generate_auth_data.dart
+```
+
+**Pre-generate for CI** (see
+[Testing Guide](testing-guide.md#ci-cd-integration))
 
 ### Token Lifecycle
 
@@ -266,7 +278,8 @@ flowchart LR
 ### File Not Found
 
 **Error:**
-```
+
+```text
 Exception: Test credentials file not found: integration_test/fixtures/test_credentials.json
 ```
 
@@ -275,11 +288,13 @@ Exception: Test credentials file not found: integration_test/fixtures/test_crede
 ### Invalid JSON Format
 
 **Error:**
-```
+
+```text
 FormatException: Unexpected character
 ```
 
 **Solution:** Validate JSON syntax with:
+
 ```bash
 cat integration_test/fixtures/test_credentials.json | jq .
 ```
@@ -287,11 +302,13 @@ cat integration_test/fixtures/test_credentials.json | jq .
 ### Token Expired
 
 **Error:**
-```
+
+```text
 OpenIdException(invalid_grant)
 ```
 
 **Solution:** Regenerate `complete_auth_data.json`:
+
 ```bash
 dart run integration_test/tools/generate_auth_data.dart
 ```
@@ -299,13 +316,15 @@ dart run integration_test/tools/generate_auth_data.dart
 ### Missing RSA Keys
 
 **Error:**
-```
+
+```text
 NoSuchMethodError: The getter 'rsa_info' was called on null
 ```
 
 **Cause:** File was manually edited or generated with old tool version.
 
 **Solution:** Delete and regenerate:
+
 ```bash
 rm integration_test/fixtures/complete_auth_data.json
 dart run integration_test/tools/generate_auth_data.dart
@@ -313,14 +332,17 @@ dart run integration_test/tools/generate_auth_data.dart
 
 ## Security Best Practices
 
-1. **Never commit credential files** - Both files are git-ignored by default
-2. **Use test accounts** - Don't use production POD accounts for testing
-3. **Rotate credentials regularly** - Change test account passwords periodically
-4. **Limit POD data** - Test PODs should contain only non-sensitive test data
-5. **Encrypt in CI/CD** - Use GitHub Secrets or similar for CI environments
++ **Never commit credential files** - Both files are git-ignored by default
++ **Use test accounts** - Don't use production POD accounts for testing
++ **Rotate credentials regularly** - Change test account passwords
+  periodically
++ **Limit POD data** - Test PODs should contain only non-sensitive test data
++ **Encrypt in CI/CD** - Use GitHub Secrets or similar for CI environments
 
 ## Next Steps
 
-- [Authentication Guide](authentication.md) - Understand OAuth and DPoP concepts
-- [Architecture Overview](architecture.md) - See how files are used in testing
-- [Testing Guide](testing-guide.md) - Run tests with these credentials
++ [Authentication Guide](authentication.md) - Understand OAuth and DPoP
+  concepts
++ [Architecture Overview](architecture.md) - See how files are used in
+  testing
++ [Testing Guide](testing-guide.md) - Run tests with these credentials

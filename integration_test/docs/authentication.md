@@ -1,18 +1,22 @@
 # Understanding POD Authentication
 
-This guide explains why Solid POD authentication requires browser automation and specialized token handling instead of traditional Flutter UI testing.
+This guide explains why Solid POD authentication requires browser
+automation and specialized token handling instead of traditional Flutter UI
+testing.
 
 ## Table of Contents
 
-1. [Why Can't We Use Normal Flutter Testing?](#why-cant-we-use-normal-flutter-testing)
-2. [OAuth 2.0 Authorization Code Flow](#oauth-20-authorization-code-flow)
-3. [DPoP: Proof-of-Possession Tokens](#dpop-proof-of-possession-tokens)
-4. [RSA Keypairs for Token Signing](#rsa-keypairs-for-token-signing)
-5. [Why Puppeteer Browser Automation?](#why-puppeteer-browser-automation)
++ [Why Can't We Use Normal Flutter Testing?](#why-cant-we-use-normal-flutter-testing)
++ [OAuth 2.0 Authorization Code Flow](#oauth-20-authorization-code-flow)
++ [DPoP: Proof-of-Possession Tokens](#dpop-proof-of-possession-tokens)
++ [RSA Keypairs for Token Signing](#rsa-keypairs-for-token-signing)
++ [Why Puppeteer Browser Automation?](#why-puppeteer-browser-automation)
 
 ## Why Can't We Use Normal Flutter Testing?
 
-Flutter integration tests can tap through UI elements in your app, but Solid POD authentication requires an **external OAuth flow** that leaves your app's context:
+Flutter integration tests can tap through UI elements in your app, but
+Solid POD authentication requires an **external OAuth flow** that leaves
+your app's context:
 
 ```mermaid
 sequenceDiagram
@@ -33,18 +37,24 @@ sequenceDiagram
     POD-->>App: Return access + ID tokens
 ```
 
-**The problem:** Flutter tests cannot control the external browser or intercept the OAuth callback URL. This is why we need Puppeteer to automate the browser separately.
+**The problem:** Flutter tests cannot control the external browser or
+intercept the OAuth callback URL. This is why we need Puppeteer to automate
+the browser separately.
 
 ## OAuth 2.0 Authorization Code Flow
 
-Solid POD uses the **Authorization Code Flow with PKCE** (Proof Key for Code Exchange), designed for public clients like mobile and desktop apps that can't securely store client secrets.
+Solid POD uses the **Authorization Code Flow with PKCE** (Proof Key for
+Code Exchange), designed for public clients like mobile and desktop apps
+that can't securely store client secrets.
 
 ### Why OAuth?
 
-OAuth separates **authentication** (proving who you are) from **authorization** (what you can access). This enables:
-- Users control their data on their own POD server
-- Apps request permission to access specific resources
-- No passwords stored in apps - tokens are used instead
+OAuth separates **authentication** (proving who you are) from
+**authorization** (what you can access). This enables:
+
++ Users control their data on their own POD server
++ Apps request permission to access specific resources
++ No passwords stored in apps - tokens are used instead
 
 ### Key Components
 
@@ -61,21 +71,24 @@ OAuth separates **authentication** (proving who you are) from **authorization** 
 
 PKCE prevents authorization code interception attacks:
 
-1. App generates random `code_verifier`
-2. App hashes it to create `code_challenge`
-3. POD server stores challenge during authorization
-4. When exchanging code for tokens, app sends original verifier
-5. Server verifies `SHA256(verifier) == challenge`
++ App generates random `code_verifier`
++ App hashes it to create `code_challenge`
++ POD server stores challenge during authorization
++ When exchanging code for tokens, app sends original verifier
++ Server verifies `SHA256(verifier) == challenge`
 
-This proves the app that started the flow is completing it, even without a client secret.
+This proves the app that started the flow is completing it, even without a
+client secret.
 
 **Learn more:** [RFC 7636 - Proof Key for Code Exchange](https://datatracker.ietf.org/doc/html/rfc7636)
 
 ## DPoP: Proof-of-Possession Tokens
 
-Standard OAuth uses **Bearer tokens** - anyone who possesses the token can use it. If stolen, the token can be used by attackers.
+Standard OAuth uses **Bearer tokens** - anyone who possesses the token can
+use it. If stolen, the token can be used by attackers.
 
-**DPoP (Demonstration of Proof-of-Possession)** adds cryptographic proof that you own the private key associated with the token.
+**DPoP (Demonstration of Proof-of-Possession)** adds cryptographic proof
+that you own the private key associated with the token.
 
 ### Bearer vs DPoP Comparison
 
@@ -103,14 +116,16 @@ sequenceDiagram
 ```
 
 Each API request includes:
-1. **Access token** - DPoP-bound token from OAuth flow
-2. **DPoP proof** - JWT signed with your private key containing:
-   - HTTP method (GET, POST, etc.)
-   - Target URL
-   - Timestamp (prevents replay attacks)
-   - Unique request ID (jti claim)
 
-The POD server verifies the signature matches the public key bound to the token.
++ **Access token** - DPoP-bound token from OAuth flow
++ **DPoP proof** - JWT signed with your private key containing:
+  + HTTP method (GET, POST, etc.)
+  + Target URL
+  + Timestamp (prevents replay attacks)
+  + Unique request ID (jti claim)
+
+The POD server verifies the signature matches the public key bound to the
+token.
 
 **Learn more:** [RFC 9449 - OAuth 2.0 Demonstrating Proof of Possession](https://datatracker.ietf.org/doc/html/rfc9449)
 
@@ -121,14 +136,16 @@ DPoP requires an **RSA keypair** (public + private key) for cryptographic signin
 ### Why RSA?
 
 RSA is an **asymmetric encryption algorithm**:
-- **Private key** - Signs DPoP proofs, never leaves the app
-- **Public key** - POD server uses this to verify signatures
+
++ **Private key** - Signs DPoP proofs, never leaves the app
++ **Public key** - POD server uses this to verify signatures
 
 ### Key Formats
 
 The test framework generates and stores RSA keys in two formats:
 
 **JWK (JSON Web Key)** - Used by solidpod package for token signing:
+
 ```json
 {
   "kty": "RSA",
@@ -142,7 +159,8 @@ The test framework generates and stores RSA keys in two formats:
 ```
 
 **PEM (Privacy Enhanced Mail)** - Standard format for key storage:
-```
+
+```text
 -----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEA...
 -----END RSA PRIVATE KEY-----
@@ -150,7 +168,8 @@ MIIEowIBAAKCAQEA...
 
 ### Key Generation
 
-The integration test framework generates 2048-bit RSA keys using the `pointycastle` package:
+The integration test framework generates 2048-bit RSA keys using the
+`pointycastle` package:
 
 ```dart
 // Generate keypair
@@ -163,7 +182,9 @@ final jwk = convertToJWK(keyPair);
 final pem = convertToPEM(keyPair);
 ```
 
-**Security note:** Test RSA keys are stored in `complete_auth_data.json` (git-ignored). For production apps, keys should be stored in secure device storage (iOS Keychain, Android Keystore, etc.).
+**Security note:** Test RSA keys are stored in `complete_auth_data.json`
+(git-ignored). For production apps, keys should be stored in secure device
+storage (iOS Keychain, Android Keystore, etc.).
 
 **Learn more:** [RFC 7517 - JSON Web Key (JWK)](https://datatracker.ietf.org/doc/html/rfc7517)
 
@@ -173,12 +194,15 @@ Puppeteer allows us to automate the OAuth browser flow that Flutter tests cannot
 
 ### What Puppeteer Does
 
-1. **Launches headless Chrome** - Browser instance controlled programmatically
-2. **Navigates to POD login** - Fills email, password, security key
-3. **Intercepts OAuth callback** - Captures authorization code from redirect URL
-4. **Generates RSA keypair** - Creates DPoP keys programmatically
-5. **Exchanges code for tokens** - Completes OAuth flow
-6. **Saves complete auth data** - Stores tokens + RSA keys for test injection
++ **Launches headless Chrome** - Browser instance controlled
+  programmatically
++ **Navigates to POD login** - Fills email, password, security key
++ **Intercepts OAuth callback** - Captures authorization code from redirect
+  URL
++ **Generates RSA keypair** - Creates DPoP keys programmatically
++ **Exchanges code for tokens** - Completes OAuth flow
++ **Saves complete auth data** - Stores tokens + RSA keys for test
+  injection
 
 ### The Complete Flow
 
@@ -210,35 +234,45 @@ sequenceDiagram
 
 ### Why Not Flutter WebView?
 
-Flutter's `webview_flutter` package **cannot intercept OAuth callbacks** reliably across platforms (Windows, Linux, macOS). Puppeteer provides consistent cross-platform browser automation specifically designed for this use case.
+Flutter's `webview_flutter` package **cannot intercept OAuth callbacks**
+reliably across platforms (Windows, Linux, macOS). Puppeteer provides
+consistent cross-platform browser automation specifically designed for this
+use case.
 
 ### Trade-offs
 
 **Pros:**
-- Generates real, valid tokens with proper DPoP binding
-- Tests authenticate exactly like production
-- Consistent behavior across platforms
+
++ Generates real, valid tokens with proper DPoP binding
++ Tests authenticate exactly like production
++ Consistent behavior across platforms
 
 **Cons:**
-- Requires Chrome/Chromium installation
-- Takes 15-20 seconds to complete OAuth flow
-- Cannot run in environments without browser support
 
-**Alternative:** For CI/CD, pre-generate tokens and inject them. See [Testing Guide](testing-guide.md#ci-cd-integration) for details.
++ Requires Chrome/Chromium installation
++ Takes 15-20 seconds to complete OAuth flow
++ Cannot run in environments without browser support
+
+**Alternative:** For CI/CD, pre-generate tokens and inject them. See
+[Testing Guide](testing-guide.md#ci-cd-integration) for details.
 
 ## Summary
 
 Solid POD authentication requires:
 
-1. **OAuth 2.0 with PKCE** - Secure authorization for public clients
-2. **DPoP tokens** - Cryptographically bound to client keypair
-3. **RSA keypairs** - For signing proof-of-possession tokens
-4. **Browser automation** - To complete OAuth flow Flutter tests can't intercept
++ **OAuth 2.0 with PKCE** - Secure authorization for public clients
++ **DPoP tokens** - Cryptographically bound to client keypair
++ **RSA keypairs** - For signing proof-of-possession tokens
++ **Browser automation** - To complete OAuth flow Flutter tests can't
+  intercept
 
-This complexity enables the Solid vision of **decentralized, user-controlled data storage** where users authenticate with their own POD server, not a centralized app backend.
+This complexity enables the Solid vision of **decentralized,
+user-controlled data storage** where users authenticate with their own POD
+server, not a centralized app backend.
 
 ## Next Steps
 
-- [Architecture Overview](architecture.md) - See how components fit together
-- [JSON Files Reference](json-files.md) - Understand credential file structure
-- [Testing Guide](testing-guide.md) - Run tests with POD authentication
++ [Architecture Overview](architecture.md) - See how components fit together
++ [JSON Files Reference](json-files.md) - Understand credential file
+  structure
++ [Testing Guide](testing-guide.md) - Run tests with POD authentication

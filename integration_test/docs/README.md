@@ -5,30 +5,52 @@ This directory contains comprehensive documentation for MovieStar's integration 
 ## Quick Navigation
 
 **New to POD authentication?** Start here:
-1. [Authentication Guide](authentication.md) - Understanding OAuth, DPoP, and why browser automation is needed
-2. [Architecture Overview](architecture.md) - Component diagrams and testing flow
-3. [JSON Files Reference](json-files.md) - Structure and purpose of credential files
+
++ [Authentication Guide](authentication.md) - Understanding OAuth,
+  DPoP, and why browser automation is needed
++ [Architecture Overview](architecture.md) - Component diagrams and
+  responsibilities
++ [Test Execution Flows](architecture-flows.md) - Detailed test
+  execution scenarios
++ [JSON Files Reference](json-files.md) - Structure and purpose of
+  credential files
 
 **Running tests:**
-- [Testing Guide](testing-guide.md) - How to run tests, INTERACT pattern, troubleshooting
+
++ [Testing Guide](testing-guide.md) - How to run and write tests with
+  INTERACT pattern
++ [Troubleshooting](testing-troubleshooting.md) - Common issues and
+  solutions
 
 **Setting up from scratch:**
-- [Setup Guide](setup-guide.md) - Initial platform setup and credential extraction
+
++ [Setup Guide](setup-guide.md) - Initial platform setup and
+  credential extraction
 
 **Adapting for your app:**
-- [Reusability Guide](adapting.md) - How to use this testing approach in other Solid POD applications
+
++ [Reusability Guide](adapting.md) - How to use this testing approach
+  in other apps
++ [Provider Compatibility](adapting-providers.md) - POD provider
+  configuration
++ [CI/CD Integration](adapting-cicd.md) - Setting up continuous
+  integration
 
 ## Documentation Structure
 
-```
+```text
 integration_test/docs/
-├── README.md              # This file - documentation overview
-├── authentication.md      # OAuth/DPoP concepts and why browser automation
-├── architecture.md        # Component diagrams and testing flow
-├── json-files.md          # JSON file structures and token lifecycle
-├── adapting.md            # Guide for other Solid POD applications
-├── testing-guide.md       # Operational guide (moved from docs/)
-└── setup-guide.md         # Setup instructions (moved from docs/)
+├── README.md                      # This file - navigation
+├── authentication.md              # OAuth/DPoP concepts
+├── architecture.md                # Component diagrams
+├── architecture-flows.md          # Test execution flows
+├── json-files.md                  # JSON file structures
+├── adapting.md                    # Reusability guide
+├── adapting-providers.md          # POD provider compatibility
+├── adapting-cicd.md               # CI/CD integration
+├── testing-guide.md               # How to run and write tests
+├── testing-troubleshooting.md     # Common issues
+└── setup-guide.md                 # Initial setup
 ```
 
 ## Quick Start
@@ -46,7 +68,8 @@ make qtest
 dart run integration_test/tools/generate_auth_data.dart
 ```
 
-For troubleshooting, see [Testing Guide - Troubleshooting](testing-guide.md#troubleshooting).
+For troubleshooting, see
+[Troubleshooting](testing-troubleshooting.md).
 
 ## Why This Documentation Exists
 
@@ -82,6 +105,7 @@ When updating this documentation:
 
 If this documentation doesn't answer your question, please:
 
-1. Check the [Troubleshooting section](testing-guide.md#troubleshooting)
-2. Search existing [GitHub issues](https://github.com/anusii/moviestar/issues)
-3. Create a new issue with the `documentation` label
++ Check the [Troubleshooting](testing-troubleshooting.md) guide
++ Search existing [GitHub
+  issues](https://github.com/anusii/moviestar/issues)
++ Create a new issue with the `documentation` label

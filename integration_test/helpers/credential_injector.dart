@@ -52,7 +52,6 @@ class TestCredentials {
 class CredentialInjector {
   static const _credentialsPath =
       'integration_test/fixtures/test_credentials.json';
-  static const _authTokensPath = 'integration_test/fixtures/auth_tokens.json';
   static const _completeAuthDataPath =
       'integration_test/fixtures/complete_auth_data.json';
 
@@ -119,113 +118,10 @@ class CredentialInjector {
     // or perform actual login and extract the keys it uses.
   }
 
-  /// Loads OAuth tokens from auth_tokens.json file.
-  ///
-  /// These tokens are extracted using the token extraction tool:
-  /// `dart run integration_test/utils/extract_tokens.dart`
-  static Future<Map<String, dynamic>> loadAuthTokens() async {
-    try {
-      final file = File(_authTokensPath);
-      if (!await file.exists()) {
-        throw Exception(
-          'Auth tokens file not found. Run: dart run integration_test/utils/extract_tokens.dart',
-        );
-      }
-
-      final contents = await file.readAsString();
-      return jsonDecode(contents) as Map<String, dynamic>;
-    } catch (e) {
-      throw Exception('Failed to load auth tokens from $_authTokensPath: $e');
-    }
-  }
-
-  /// Injects real OAuth tokens from browser automation into storage.
-  ///
-  /// This uses tokens extracted by running the token extraction tool,
-  /// which performs automated browser login to obtain real OAuth tokens.
-  static Future<void> injectAuthTokens(Map<String, dynamic> tokens) async {
-    const storage = FlutterSecureStorage(
-      aOptions: AndroidOptions(),
-      iOptions: IOSOptions(
-        accessibility: KeychainAccessibility.first_unlock,
-      ),
-      mOptions: MacOsOptions(synchronizable: false),
-    );
-
-    print('Injecting OAuth tokens into secure storage...');
-
-    // Inject core authentication data.
-    final webId = tokens['webid'] as String?;
-    if (webId != null && webId.isNotEmpty) {
-      await storage.write(key: 'webId', value: webId);
-      print('  ✓ webId: $webId');
-    }
-
-    final accessToken = tokens['access_token'] as String?;
-    if (accessToken != null && accessToken.isNotEmpty) {
-      await storage.write(key: 'accessToken', value: accessToken);
-      print('  ✓ accessToken: ${accessToken.substring(0, 20)}...');
-    }
-
-    final idToken = tokens['id_token'] as String?;
-    if (idToken != null && idToken.isNotEmpty) {
-      await storage.write(key: 'idToken', value: idToken);
-      print('  ✓ idToken: ${idToken.substring(0, 20)}...');
-    }
-
-    final refreshToken = tokens['refresh_token'] as String?;
-    if (refreshToken != null && refreshToken.isNotEmpty) {
-      await storage.write(key: 'refreshToken', value: refreshToken);
-      print('  ✓ refreshToken: ${refreshToken.substring(0, 20)}...');
-    }
-
-    final tokenType = tokens['token_type'] as String? ?? 'Bearer';
-    await storage.write(key: 'tokenType', value: tokenType);
-
-    final issuer = tokens['issuer'] as String?;
-    if (issuer != null && issuer.isNotEmpty) {
-      await storage.write(key: 'issuer', value: issuer);
-      print('  ✓ issuer: $issuer');
-    }
-
-    // Calculate and store token expiry.
-    final expiresIn = tokens['expires_in'] as int? ?? 3600;
-    final expiresAt = DateTime.now().add(Duration(seconds: expiresIn));
-    await storage.write(key: 'expiresAt', value: expiresAt.toIso8601String());
-    print('  ✓ Token expires at: ${expiresAt.toIso8601String()}');
-
-    // Store client_id for token refresh (if needed).
-    final clientId = tokens['client_id'] as String?;
-    if (clientId != null && clientId.isNotEmpty) {
-      await storage.write(key: 'clientId', value: clientId);
-    }
-
-    // Extract POD URL from webId (everything before /profile/).
-    if (webId != null && webId.contains('/profile/')) {
-      final podUrl = webId.substring(0, webId.indexOf('/profile/'));
-      await storage.write(key: 'podUrl', value: podUrl);
-      print('  ✓ podUrl: $podUrl');
-    }
-
-    // Legacy support: handle old format with sessionStorage/localStorage.
-    final sessionStorage = tokens['sessionStorage'] as Map<String, dynamic>?;
-    if (sessionStorage != null) {
-      final authResponse = sessionStorage['openidconnect_auth_response_info'];
-      if (authResponse != null) {
-        await storage.write(
-          key: 'openidconnect_auth_response_info',
-          value: authResponse.toString(),
-        );
-      }
-    }
-
-    print('✓ All OAuth tokens injected successfully');
-  }
-
   /// Loads complete auth data from complete_auth_data.json file.
   ///
   /// This auth data is extracted using the complete auth extraction tool:
-  /// `flutter run integration_test/utils/extract_complete_auth.dart -d windows`
+  /// `flutter run integration_test/tools/generate_auth_data.dart -d windows`
   ///
   /// The complete auth data includes the full structure that solidpod's
   /// AuthDataManager expects, including RSA keys for DPoP token generation.
@@ -234,7 +130,7 @@ class CredentialInjector {
       final file = File(_completeAuthDataPath);
       if (!await file.exists()) {
         throw Exception(
-          'Complete auth data file not found. Run: flutter run integration_test/utils/extract_complete_auth.dart -d windows',
+          'Complete auth data file not found. Run: flutter run integration_test/tools/generate_auth_data.dart -d windows',
         );
       }
 
@@ -296,7 +192,7 @@ class CredentialInjector {
   /// It injects the complete auth data structure including RSA keys for DPoP.
   ///
   /// To extract complete auth data:
-  /// 1. Run: flutter run integration_test/utils/extract_complete_auth.dart -d windows
+  /// 1. Run: flutter run integration_test/tools/generate_auth_data.dart -d windows
   /// 2. Log in through the app UI
   /// 3. Click EXTRACT button to save auth data
   /// 4. Run your E2E tests
@@ -323,7 +219,7 @@ class CredentialInjector {
           needsRegeneration = true;
         } else {
           throw Exception(
-            'Auth tokens expired. Run: dart run integration_test/utils/extract_tokens.dart',
+            'Auth tokens expired. Run: dart run integration_test/tools/generate_auth_data.dart',
           );
         }
       }
@@ -340,26 +236,11 @@ class CredentialInjector {
     // Regenerate tokens if needed.
     if (needsRegeneration) {
       print('🔄 Auto-regenerating tokens with browser automation...');
-
-      // Regenerate auth data (this saves both complete auth data and tokens)
       await _regenerateTokens();
 
-      // Load the freshly generated auth data
-      try {
-        authData = await loadCompleteAuthData();
-        print('✓ Complete auth data auto-regenerated and loaded');
-      } catch (e) {
-        // If complete auth data still fails, fall back to legacy tokens
-        print('⚠ Failed to load complete auth data after regeneration: $e');
-        print('  Falling back to legacy token injection...');
-
-        final tokens = await loadAuthTokens();
-        await injectAuthTokens(tokens);
-
-        print('⚠ WARNING: Using legacy token injection. This may not work.');
-        print('   POD operations may fail due to missing RSA keys.');
-        return;
-      }
+      // Load the freshly generated auth data.
+      authData = await loadCompleteAuthData();
+      print('✓ Complete auth data auto-regenerated and loaded');
     }
 
     // Inject the complete auth data structure.
@@ -471,14 +352,6 @@ class CredentialInjector {
     await completeAuthFile.parent.create(recursive: true);
     await completeAuthFile.writeAsString(
       const JsonEncoder.withIndent('  ').convert(result.completeAuthData),
-    );
-
-    // Also save legacy tokens for backwards compatibility
-    print('  Saving legacy tokens to $_authTokensPath...');
-    final tokensFile = File(_authTokensPath);
-    await tokensFile.parent.create(recursive: true);
-    await tokensFile.writeAsString(
-      const JsonEncoder.withIndent('  ').convert(result.tokens),
     );
 
     print('✓ Complete auth data regenerated and saved successfully');

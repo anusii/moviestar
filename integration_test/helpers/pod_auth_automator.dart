@@ -15,7 +15,6 @@ import 'package:puppeteer/puppeteer.dart';
 
 import 'browser_automation_helpers.dart';
 import 'oauth_helpers.dart';
-import 'test_constants.dart';
 
 /// Result of POD authentication automation.
 class AuthResult {
@@ -49,16 +48,11 @@ class PodAuthAutomator {
   ///
   /// Returns [AuthResult] with success status and tokens/error.
   static Future<AuthResult> authenticate({
-    String? email,
-    String? password,
-    String? securityKey,
+    required String email,
+    required String password,
+    required String securityKey,
     bool headless = true,
   }) async {
-    // Use test constants if not provided.
-    final authEmail = email ?? TestConstants.testEmail;
-    final authPassword = password ?? TestConstants.testPassword;
-    final authSecurityKey = securityKey ?? TestConstants.testSecurityKey;
-
     Browser? browser;
     try {
       // Launch browser.
@@ -172,14 +166,14 @@ class PodAuthAutomator {
       print('Entering email...');
       await page.type(
         'input[type="text"], input[name="email"]',
-        authEmail,
+        email,
       );
 
       // Fill in password.
       print('Entering password...');
       await page.type(
         'input[type="password"], input[name="password"]',
-        authPassword,
+        password,
       );
 
       // Click login button.
@@ -222,7 +216,7 @@ class PodAuthAutomator {
 
       // Handle security key input if present.
       print('Checking for security key prompt...');
-      final hasSecurityKey = await handleSecurityKey(page, authSecurityKey);
+      final hasSecurityKey = await handleSecurityKey(page, securityKey);
       if (hasSecurityKey) {
         print('Security key entered, waiting for callback...');
       }

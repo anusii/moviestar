@@ -11,5 +11,8 @@ https://pods.dev.solidcommunity.au/.oidc/token
 # Example POD URLs that are protected resources
 https://pods.solidcommunity.au/my-moviestar/profile/card#me
 
+# ANU Software Innovation Institute website (frequent timeouts in CI)
+https://sii.anu.edu.au/
+
 # POD server base URL - may have temporary availability issues
 https://pods.solidcommunity.au/

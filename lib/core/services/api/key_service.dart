@@ -25,6 +25,7 @@ class ApiKeyService extends BasePodService {
       accessibility: KeychainAccessibility.first_unlock_this_device,
     ),
     mOptions: MacOsOptions(synchronizable: false),
+    webOptions: WebOptions(),
   );
 
   String? _cachedApiKey;
@@ -51,18 +52,14 @@ class ApiKeyService extends BasePodService {
     return apiKey;
   }
 
-  /// Sets the API key in both POD and secure storage.
+  /// Sets the API key in POD storage only.
 
   Future<void> setApiKey(String apiKey) async {
     await executePodOperation(
       operation: () async {
-        // Save to POD first.
+        // Save to POD only - API keys are shared across devices.
 
         await _saveApiKeyToPod(apiKey);
-
-        // Always save to local storage as backup.
-
-        await _saveApiKeyToLocalStorage(apiKey);
 
         // Update cache.
 
@@ -76,13 +73,12 @@ class ApiKeyService extends BasePodService {
     );
   }
 
-  /// Clears the API key from all storages.
+  /// Clears the API key from POD storage.
 
   Future<void> clearApiKey() async {
     await executePodOperation(
       operation: () async {
         await _clearApiKeyFromPod();
-        await _clearApiKeyFromLocalStorage();
 
         _cachedApiKey = null;
         _lastCacheTime = null;
@@ -95,31 +91,18 @@ class ApiKeyService extends BasePodService {
     );
   }
 
-  /// Fetches API key from multiple sources with fallback.
+  /// Fetches API key from POD only.
 
   Future<String?> _fetchApiKey() async {
     return await executePodOperation(
       operation: () async {
-        // Check if migration needed.
+        // Check if migration needed (migrate from legacy local storage to POD).
 
         await _handleLegacyMigration();
 
-        // Try POD first.
+        // Read from POD only.
 
-        String? apiKey = await _getApiKeyFromPod();
-        if (apiKey != null) return apiKey;
-
-        // Fallback to local storage.
-
-        apiKey = await _getApiKeyFromLocalStorage();
-        if (apiKey != null) {
-          // Sync to POD for future use.
-
-          await _saveApiKeyToPod(apiKey);
-          return apiKey;
-        }
-
-        return null;
+        return await _getApiKeyFromPod();
       },
       operationName: 'fetchApiKey',
       requiresLogin: false,
@@ -184,16 +167,6 @@ class ApiKeyService extends BasePodService {
     return null;
   }
 
-  /// Saves API key to secure local storage.
-
-  Future<void> _saveApiKeyToLocalStorage(String apiKey) async {
-    final webId = await _getCurrentUserWebId();
-    if (webId != null) {
-      final userKey = '$_userApiKeyPrefix$webId';
-      await _secureStorage.write(key: userKey, value: apiKey);
-    }
-  }
-
   /// Clears API key from POD storage.
 
   Future<void> _clearApiKeyFromPod() async {
@@ -214,27 +187,37 @@ class ApiKeyService extends BasePodService {
     }
   }
 
-  /// Handles migration from legacy API key storage.
+  /// Handles migration from legacy local storage to POD-only storage.
 
   Future<void> _handleLegacyMigration() async {
     final migrationComplete =
         await _secureStorage.read(key: _migrationCompleteKey);
     if (migrationComplete == 'true') return;
 
+    // Migrate from old legacy key.
+
     final legacyApiKey = await _secureStorage.read(key: _legacyApiKeySecureKey);
     if (legacyApiKey != null) {
       await _migrateLegacyApiKey(legacyApiKey);
-      await _secureStorage.write(key: _migrationCompleteKey, value: 'true');
     }
+
+    // Also migrate from user-specific local storage key.
+
+    final userApiKey = await _getApiKeyFromLocalStorage();
+    if (userApiKey != null) {
+      await _migrateLegacyApiKey(userApiKey);
+    }
+
+    await _secureStorage.write(key: _migrationCompleteKey, value: 'true');
   }
 
-  /// Migrates legacy API key to new user-specific storage.
+  /// Migrates legacy API key from local storage to POD.
 
   Future<void> _migrateLegacyApiKey(String apiKey) async {
-    await _saveApiKeyToLocalStorage(apiKey);
     await _saveApiKeyToPod(apiKey);
     await _secureStorage.delete(key: _legacyApiKeySecureKey);
-    logDebug('Legacy API key migrated successfully');
+    await _clearApiKeyFromLocalStorage();
+    logDebug('Legacy API key migrated to POD successfully');
   }
 
   /// Extracts API key value from TTL content.

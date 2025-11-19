@@ -10,3 +10,6 @@ https://pods.dev.solidcommunity.au/.oidc/token
 
 # Example POD URLs that are protected resources
 https://pods.solidcommunity.au/my-moviestar/profile/card#me
+
+# POD server base URL - may have temporary availability issues
+https://pods.solidcommunity.au/

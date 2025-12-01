@@ -1,6 +1,6 @@
 /// MovieStar SolidScaffold Configuration.
 ///
-// Time-stamp: <Wednesday 2025-08-27 11:42:58 +1000 Graham Williams>
+// Time-stamp: <Sunday 2025-11-23 20:09:02 +1100 Graham Williams>
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -169,19 +169,19 @@ your movie data files.
         icon: _getNextViewModeIcon(ref.watch(viewModeProvider)),
         onPressed: onViewModeToggle,
         tooltip:
-            'View Mode: Tap here to cycle between different view modes (Grid, Kanban, List).',
+            '**View Mode:** Tap here to cycle between different view modes (Grid, Kanban, List).',
       ),
       SolidAppBarAction(
         icon: Icons.refresh,
         onPressed: onRefresh,
         tooltip:
-            'Refresh: Tap here to refresh all movie data and reload the latest information from the movie database.',
+            '**Refresh:** Tap here to refresh all movie data and reload the latest information from the movie database.',
       ),
       SolidAppBarAction(
         icon: Icons.search,
         onPressed: onSearch,
         tooltip:
-            'Search: Tap here to search for movies by title, genre, or other criteria.',
+            '**Search:** Tap here to search for movies by title, genre, or other criteria.',
       ),
     ];
   }

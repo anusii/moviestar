@@ -25,6 +25,7 @@ flutter:
   emu	    Run with the android emulator;
   linux     Run with the linux device;
   qlinux    Run with the linux device and debugPrint() turned off;
+  macos     Run with the macos device;
 
   prep      Prep for PR by running tests, checks, docs.
   push      Do a git push and bump the build number if there is one.
@@ -45,11 +46,12 @@ flutter:
   ignore          Look for usage of ignore directives.
   license	  Look for missing top license in source code.
 
-  test	    Run flutter testing.
-  itest	    Run flutter interation testing.
-  qtest	    Run above test with PAUSE=0.
-  coverage  Run with `--coverage`.
-    coview  View the generated html coverage in browser.
+  test	    	  Run flutter testing.
+  itest	    	  Run flutter interation testing.
+  qtest	   	  Run above test with PAUSE=0.
+    qtest.all	  Run qtest with output redirected - good running all tests.
+  coverage  	  Run with `--coverage`.
+    coview  	  View the generated html coverage in browser.
 
   riverpod  Setup `pubspec.yaml` to support riverpod.
   runner    Build the auto generated code as *.g.dart files.
@@ -57,8 +59,12 @@ flutter:
   desktops  Set up for all desktop platforms (linux, windows, macos)
 
   distributions
-    apk	    Builds installers/$(APP).apk
-    tgz     Builds installers/$(APP).tar.gz
+    apk	          Builds installers/$(APP).apk.
+    tgz           Builds installers/$(APP).tar.gz.
+    dmg-unsigned  Builds unsigned macos app.
+    dmg-dev       Builds macos app with development certificate.
+    dmg-staging   Builds macos app with distribution certificate.
+                  (TODO convert to dmg).
 
   publish   Publish a package to pub.dev
 
@@ -220,7 +226,7 @@ locmax:
 		| egrep -v '^ *$$' \
 		| egrep -v '^ *[)},]+, *$$' \
 		| wc -l \
-		| numfmt --grouping); \
+		| numfmt --format "%'f"); \
 	numf=$$(find lib -name "*.dart" -type f | wc -l); \
 	output=$$(find lib -name "*.dart" -exec sh -c ' \
 		lines=$$(bash $(LOC) "$$1"); \
@@ -459,6 +465,25 @@ realclean::
 	flutter clean
 	flutter pub get
 
+# Create a macos app
+# [20251029 jesscmoore] TODO: add converting to dmg
+# Build unsigned macos app
+dmg-unsigned::
+	flutter clean
+	flutter build macos --release --flavor unsigned
+
+# Build macos app signed with development certificate for testing
+# by App Developer Program togaware registered devices
+dmg-dev::
+	flutter clean
+	flutter build macos --release --flavor dev
+
+# Build macos app signed with app store distribution for testing
+# on Testflight or publishing
+dmg-staging:
+	flutter clean
+	flutter build macos --release --flavor staging
+
 # For the `dev` branch only, update the version sequence number prior
 # to a push (relies on the git.mk being loaded after this
 # flutter.mk). This is only undertaken through `make push` rather than
@@ -519,7 +544,7 @@ unused_files:
 .PHONY: lychee
 lychee:
 	@echo "Lychee: CHECK LINKS."
-	-lychee --no-progress --format compact '*.md' './**/*.dart' $(if $(wildcard ./**/*.md),./**/*.md) $(if $(wildcard ./**/*.html),./**/*.html)
+	-lychee --no-progress --format compact *.md ./**/*.dart $(if $(wildcard ./**/*.md),./**/*.md) $(if $(wildcard ./**/*.html),./**/*.html)
 	@echo $(SEPARATOR)
 
 ### TODO THESE SHOULD BE CHECKED AND CLEANED UP

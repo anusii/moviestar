@@ -240,8 +240,8 @@ void main() {
         // Either API key dialog should be present, or we're already on home screen
         // (meaning API key was already set from a previous test/session).
 
-        final hasDialog =
-            apiKeyDialog.evaluate().isNotEmpty || tmdbText.evaluate().isNotEmpty;
+        final hasDialog = apiKeyDialog.evaluate().isNotEmpty ||
+            tmdbText.evaluate().isNotEmpty;
         final onHomeScreen = homeText.evaluate().isNotEmpty;
 
         expect(
@@ -329,7 +329,7 @@ void main() {
         await initializeApp(tester);
 
         // Wait for full initialisation.
-        
+
         await tester.pumpAndSettle(const Duration(seconds: 5));
 
         // Handle API key dialog if present.
@@ -390,7 +390,7 @@ void main() {
         await initializeApp(tester);
 
         // Wait for app to fully load.
-        
+
         await tester.pumpAndSettle(const Duration(seconds: 5));
 
         // Find and tap the search icon.
@@ -453,7 +453,8 @@ void main() {
             // Search results should appear (exact UI depends on results).
             // At minimum, the search field should still contain the query.
 
-            final searchFieldWidget = tester.widget<TextField>(searchField.first);
+            final searchFieldWidget =
+                tester.widget<TextField>(searchField.first);
             expect(
               searchFieldWidget.controller?.text,
               equals('Inception'),
@@ -537,7 +538,7 @@ void main() {
         );
 
         // 6. Navigate to search.
-        
+
         final searchIcon = find.byIcon(Icons.search);
         if (searchIcon.evaluate().isNotEmpty) {
           await tester.tap(searchIcon.first);
@@ -553,15 +554,14 @@ void main() {
           );
 
           // 8. Perform a search.
-    
+
           await tester.enterText(searchField.first, 'Star Wars');
           await tester.pump(const Duration(milliseconds: 600));
           await tester.pumpAndSettle(const Duration(seconds: 5));
 
           // 9. Verify search completed.
-          
-          final searchFieldWidget =
-              tester.widget<TextField>(searchField.first);
+
+          final searchFieldWidget = tester.widget<TextField>(searchField.first);
           expect(
             searchFieldWidget.controller?.text,
             equals('Star Wars'),

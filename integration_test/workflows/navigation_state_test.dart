@@ -36,103 +36,33 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:integration_test/integration_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:moviestar/core/services/cache/settings_service.dart';
-import 'package:moviestar/models/content_item.dart';
-import 'package:moviestar/models/custom_list.dart';
-import 'package:moviestar/models/movie.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:integration_test/integration_test.dart';
+
 import 'package:moviestar/moviestar.dart';
 import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/providers/view_mode_provider.dart';
 
-import '../helpers/credential_injector.dart';
-
-// Control auto-regeneration via dart-define flag for batch test compatibility.
-
-const autoRegenerate =
-    bool.fromEnvironment('AUTO_REGENERATE', defaultValue: true);
+import '../helpers/auth_test_setup.dart';
+import '../helpers/test_app_helper.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Navigation and State Persistence Tests', () {
     setUpAll(() async {
-      // Inject full authentication with automatic token regeneration.
-
-      await CredentialInjector.injectFullAuth(
-        autoRegenerateOnFailure: autoRegenerate,
-      );
-
-      // Verify injection was successful.
-
-      final injected = await CredentialInjector.verifyInjection();
-      expect(
-        injected,
-        isTrue,
-        reason: 'Credential injection failed - WebID not found',
-      );
+      await AuthTestSetup.setUpAuth();
     });
 
     tearDownAll(() async {
-      // Clean up credentials and Hive boxes after tests.
-
-      await CredentialInjector.clearCredentials();
-      await Hive.close();
+      await AuthTestSetup.tearDownAuth();
     });
-
-    /// Helper function to initialise the app with fresh state.
-
-    Future<void> initializeApp(
-      WidgetTester tester, {
-      Map<String, Object>? prefValues,
-    }) async {
-      // Set up SharedPreferences with test values.
-
-      SharedPreferences.setMockInitialValues(prefValues ?? {});
-      final prefs = await SharedPreferences.getInstance();
-
-      // Initialise cache settings service.
-
-      await CacheSettingsService.instance.initialize();
-
-      // Initialise Hive with safe adapter registration.
-
-      await Hive.initFlutter();
-
-      if (!Hive.isAdapterRegistered(0)) {
-        Hive.registerAdapter(MovieAdapter());
-      }
-      if (!Hive.isAdapterRegistered(1)) {
-        Hive.registerAdapter(CustomListAdapter());
-      }
-      if (!Hive.isAdapterRegistered(2)) {
-        Hive.registerAdapter(ContentItemAdapter());
-      }
-
-      // Pump the app with ProviderScope.
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            sharedPreferencesProvider.overrideWithValue(prefs),
-          ],
-          child: const MovieStar(),
-        ),
-      );
-
-      // Wait for app to settle.
-
-      await tester.pumpAndSettle(const Duration(seconds: 5));
-    }
 
     group('App Initialization', () {
       testWidgets('app loads with injected credentials', (tester) async {
-        await initializeApp(tester);
+        await TestAppHelper.initializeApp(tester);
 
         // Verify app loaded - look for MovieStar widget itself.
 
@@ -144,7 +74,7 @@ void main() {
       });
 
       testWidgets('navigation menu is present', (tester) async {
-        await initializeApp(tester);
+        await TestAppHelper.initializeApp(tester);
 
         // Look for common menu items by text.
 
@@ -172,7 +102,7 @@ void main() {
 
     group('Navigation Between Pages', () {
       testWidgets('can navigate to To Watch page', (tester) async {
-        await initializeApp(tester);
+        await TestAppHelper.initializeApp(tester);
 
         // Find and tap the To Watch menu item.
 
@@ -192,7 +122,7 @@ void main() {
       });
 
       testWidgets('can navigate to Watched page', (tester) async {
-        await initializeApp(tester);
+        await TestAppHelper.initializeApp(tester);
 
         // Find and tap the Watched menu item.
 
@@ -212,7 +142,7 @@ void main() {
       });
 
       testWidgets('can navigate between multiple pages', (tester) async {
-        await initializeApp(tester);
+        await TestAppHelper.initializeApp(tester);
 
         // Navigate to To Watch.
 
@@ -242,7 +172,7 @@ void main() {
 
     group('View Mode Persistence', () {
       testWidgets('view mode is a valid HomeViewMode', (tester) async {
-        await initializeApp(tester);
+        await TestAppHelper.initializeApp(tester);
 
         // Get the current view mode from provider.
 
@@ -267,7 +197,7 @@ void main() {
       });
 
       testWidgets('view mode can be read from provider', (tester) async {
-        await initializeApp(tester);
+        await TestAppHelper.initializeApp(tester);
 
         // Get the view mode from provider.
 
@@ -283,7 +213,7 @@ void main() {
 
         // Reinitialize the app.
 
-        await initializeApp(tester);
+        await TestAppHelper.initializeApp(tester);
 
         // Get the view mode again.
 
@@ -303,7 +233,7 @@ void main() {
       });
 
       testWidgets('view mode provider is properly initialized', (tester) async {
-        await initializeApp(tester);
+        await TestAppHelper.initializeApp(tester);
 
         // Get the view mode from provider.
 
@@ -333,7 +263,7 @@ void main() {
 
     group('Basic Navigation Elements', () {
       testWidgets('can find refresh button', (tester) async {
-        await initializeApp(tester);
+        await TestAppHelper.initializeApp(tester);
 
         // Look for refresh icon which is a common app bar action.
 
@@ -349,7 +279,7 @@ void main() {
       });
 
       testWidgets('can find search button', (tester) async {
-        await initializeApp(tester);
+        await TestAppHelper.initializeApp(tester);
 
         // Look for search icon which is a common app bar action.
 
@@ -365,7 +295,7 @@ void main() {
       });
 
       testWidgets('app bar contains overflow menu', (tester) async {
-        await initializeApp(tester);
+        await TestAppHelper.initializeApp(tester);
 
         // Look for the more_vert icon which typically indicates overflow menu.
 
@@ -383,7 +313,7 @@ void main() {
 
     group('State Management', () {
       testWidgets('SharedPreferences provider is initialized', (tester) async {
-        await initializeApp(tester);
+        await TestAppHelper.initializeApp(tester);
 
         // Verify provider is accessible.
 
@@ -400,7 +330,7 @@ void main() {
       });
 
       testWidgets('ViewMode provider is accessible', (tester) async {
-        await initializeApp(tester);
+        await TestAppHelper.initializeApp(tester);
 
         // Verify provider is accessible.
 

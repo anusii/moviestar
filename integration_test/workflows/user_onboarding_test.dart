@@ -50,110 +50,40 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:integration_test/integration_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:moviestar/core/services/cache/settings_service.dart';
-import 'package:moviestar/models/content_item.dart';
-import 'package:moviestar/models/custom_list.dart';
-import 'package:moviestar/models/movie.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:integration_test/integration_test.dart';
+
 import 'package:moviestar/moviestar.dart';
-import 'package:moviestar/providers/theme_provider.dart';
 import 'package:moviestar/screens/enhanced_search_screen.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 
-import '../helpers/credential_injector.dart';
+import '../helpers/auth_test_setup.dart';
+import '../helpers/test_app_helper.dart';
 import '../utils/delays.dart';
-
-// Control auto-regeneration via dart-define flag for batch test compatibility.
-
-const autoRegenerate =
-    bool.fromEnvironment('AUTO_REGENERATE', defaultValue: true);
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('New User Onboarding Workflow', () {
     setUpAll(() async {
-      // Inject full authentication with automatic token regeneration.
-
-      await CredentialInjector.injectFullAuth(
-        autoRegenerateOnFailure: autoRegenerate,
-      );
-
-      // Verify injection was successful.
-
-      final injected = await CredentialInjector.verifyInjection();
-      expect(
-        injected,
-        isTrue,
-        reason: 'Credential injection failed - WebID not found',
-      );
+      await AuthTestSetup.setUpAuth();
     });
 
     tearDownAll(() async {
-      // Clean up credentials and Hive boxes after tests.
-
-      await CredentialInjector.clearCredentials();
-      await Hive.close();
+      await AuthTestSetup.tearDownAuth();
     });
 
     /// Helper function to initialize the app with fresh state.
 
-    Future<void> initializeApp(
-      WidgetTester tester, {
-      Map<String, Object>? prefValues,
-    }) async {
-      // Set up SharedPreferences with test values.
-
-      SharedPreferences.setMockInitialValues(prefValues ?? {});
-      final prefs = await SharedPreferences.getInstance();
-
-      // Initialize cache settings service.
-
-      await CacheSettingsService.instance.initialize();
-
-      // Initialize Hive with safe adapter registration.
-
-      await Hive.initFlutter();
-
-      if (!Hive.isAdapterRegistered(0)) {
-        Hive.registerAdapter(MovieAdapter());
-      }
-      if (!Hive.isAdapterRegistered(1)) {
-        Hive.registerAdapter(CustomListAdapter());
-      }
-      if (!Hive.isAdapterRegistered(2)) {
-        Hive.registerAdapter(ContentItemAdapter());
-      }
-      if (!Hive.isAdapterRegistered(3)) {
-        Hive.registerAdapter(ContentTypeAdapter());
-      }
-
-      // Pump the app with ProviderScope.
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            sharedPreferencesProvider.overrideWithValue(prefs),
-          ],
-          child: const MovieStar(),
-        ),
-      );
-
-      // Wait for app to settle.
-
-      await tester.pumpAndSettle(const Duration(seconds: 5));
+    Future<void> initializeApp(WidgetTester tester) async {
+      await TestAppHelper.initializeApp(tester);
 
       // Add delay to let login styling fully load.
       await Future.delayed(delay);
       await tester.pump();
 
       // Interactive delay for visual inspection (0s in qtest, 5s in itest).
-
       await tester.pump(interact);
     }
 

@@ -543,12 +543,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           onTap: _handleLogout,
         ),
         onLogin: _handleLogin,
-        securityKeyStatus: SolidSecurityKeyStatus(
+        securityKeyStatus: const SolidSecurityKeyStatus(
           isKeySaved: true,
-          onTap: () => {
-            // Handle security key tap - could show key management dialog.
-            //print('Security key status tapped').
-          },
         ),
         showOnNarrowScreens: false,
       ),

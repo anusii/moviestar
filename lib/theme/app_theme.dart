@@ -56,16 +56,20 @@ class AppTheme {
   /// Creates the light theme for the application.
 
   static ThemeData get lightTheme {
-    return SolidTheme.lightTheme(
-      primaryColor: primaryColor,
+    final baseTheme = SolidTheme.lightTheme(primaryColor: primaryColor);
+
+    return baseTheme.copyWith(
+      appBarTheme: baseTheme.appBarTheme.copyWith(centerTitle: false),
     );
   }
 
   /// Creates the dark theme for the application.
 
   static ThemeData get darkTheme {
-    return SolidTheme.darkTheme(
-      primaryColor: primaryColor,
+    final baseTheme = SolidTheme.darkTheme(primaryColor: primaryColor);
+
+    return baseTheme.copyWith(
+      appBarTheme: baseTheme.appBarTheme.copyWith(centerTitle: false),
     );
   }
 }

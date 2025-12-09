@@ -86,7 +86,7 @@ class PodFileOperationsService {
 
         // Attempt to read the file.
 
-        final result = await solidpod.readPod(fileName, context, child);
+        final result = await solidpod.readPod(fileName);
 
         if (result.isNotEmpty) {
           return PodFileOperationResult.success(result);

@@ -347,7 +347,7 @@ Recipients will be able to:
 
       try {
         if (!mounted) return;
-        final existingContent = await readPod(movieFileName, context, widget);
+        final existingContent = await readPod(movieFileName);
         if (existingContent.isNotEmpty) {
           return;
         }

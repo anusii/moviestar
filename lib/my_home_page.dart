@@ -107,6 +107,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     _apiKeyService = ApiKeyService(context, widget);
 
+    // Set the service in the provider after widget tree is done building.
+
+    Future(() {
+      ref.read(apiKeyServiceProvider.notifier).state = _apiKeyService;
+    });
+
     // Listen for API key changes.
 
     _apiKeyService.addListener(_onApiKeyChanged);
@@ -195,7 +201,11 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     }
 
     // Invalidate all movie providers to force refresh with new API key.
+    // IMPORTANT: apiKeyFutureProvider must be invalidated FIRST because movie
+    // providers watch it. If we don't invalidate it, they'll get the old cached
+    // null value when they re-run.
 
+    ref.invalidate(apiKeyFutureProvider);
     ref.invalidate(recommendedMoviesWithCacheInfoProvider);
     ref.invalidate(nowPlayingMoviesWithCacheInfoProvider);
     ref.invalidate(topRatedMoviesWithCacheInfoProvider);
@@ -558,15 +568,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     );
 
     // Return appropriate widget with proper loading overlay.
-    // Wrap with ProviderScope to override apiKeyServiceProvider with our instance.
 
-    return ProviderScope(
-      overrides: [
-        apiKeyServiceProvider.overrideWithValue(_apiKeyService),
-      ],
-      child:
-          _showSettings ? _buildSettingsOverlay(solidScaffold) : solidScaffold,
-    );
+    return _showSettings ? _buildSettingsOverlay(solidScaffold) : solidScaffold;
   }
 
   /// Builds the Settings screen as an overlay on top of the SolidScaffold.

@@ -46,9 +46,9 @@ export 'package:moviestar/providers/cached_movie_service_provider/state_notifier
 /// Note: This should be overridden with a proper instance from MyHomePage.
 /// Use ProviderScope.overrideWithValue() to provide the actual service instance.
 
-final apiKeyServiceProvider = Provider<ApiKeyService?>((ref) {
-  // This will be overridden by MyHomePage with the actual service instance.
-  // If not overridden, it returns null.
+final apiKeyServiceProvider = StateProvider<ApiKeyService?>((ref) {
+  // This will be set by MyHomePage with the actual service instance.
+  // If not set, it returns null.
 
   return null;
 });

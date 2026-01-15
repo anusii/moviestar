@@ -21,43 +21,59 @@ class TurtleParsingUtils {
   /// Extracts Movie object from RDF triples.
 
   static Movie? extractMovieFromTriples(
-    Map<String, List<dynamic>> predicates,
+    Map<String, dynamic> predicates,
   ) {
     try {
+      // Helper to convert dynamic value to list.
+
+      List<dynamic> toList(dynamic value) {
+        if (value == null) return [];
+        if (value is List) return value;
+        return [value];
+      }
+
       // Try different namespace variations for predicates.
 
-      final idValues = predicates['http://schema.org/identifier'] ??
-          predicates['identifier'] ??
-          predicates['#identifier'] ??
-          [];
-      final titleValues = predicates['http://schema.org/name'] ??
-          predicates['name'] ??
-          predicates['#name'] ??
-          [];
-      final overviewValues = predicates['http://schema.org/description'] ??
-          predicates['description'] ??
-          predicates['#description'] ??
-          [];
-      final posterValues = predicates['http://schema.org/image'] ??
-          predicates['image'] ??
-          predicates['#image'] ??
-          [];
-      final backdropValues = predicates['http://schema.org/thumbnailUrl'] ??
-          predicates['thumbnailUrl'] ??
-          predicates['#thumbnailUrl'] ??
-          [];
-      final ratingValues = predicates['http://schema.org/aggregateRating'] ??
-          predicates['aggregateRating'] ??
-          predicates['#aggregateRating'] ??
-          [];
-      final dateValues = predicates['http://schema.org/datePublished'] ??
-          predicates['datePublished'] ??
-          predicates['#datePublished'] ??
-          [];
-      final genreValues = predicates['http://schema.org/genre'] ??
-          predicates['genre'] ??
-          predicates['#genre'] ??
-          [];
+      final idValues = toList(
+        predicates['http://schema.org/identifier'] ??
+            predicates['identifier'] ??
+            predicates['#identifier'],
+      );
+      final titleValues = toList(
+        predicates['http://schema.org/name'] ??
+            predicates['name'] ??
+            predicates['#name'],
+      );
+      final overviewValues = toList(
+        predicates['http://schema.org/description'] ??
+            predicates['description'] ??
+            predicates['#description'],
+      );
+      final posterValues = toList(
+        predicates['http://schema.org/image'] ??
+            predicates['image'] ??
+            predicates['#image'],
+      );
+      final backdropValues = toList(
+        predicates['http://schema.org/thumbnailUrl'] ??
+            predicates['thumbnailUrl'] ??
+            predicates['#thumbnailUrl'],
+      );
+      final ratingValues = toList(
+        predicates['http://schema.org/aggregateRating'] ??
+            predicates['aggregateRating'] ??
+            predicates['#aggregateRating'],
+      );
+      final dateValues = toList(
+        predicates['http://schema.org/datePublished'] ??
+            predicates['datePublished'] ??
+            predicates['#datePublished'],
+      );
+      final genreValues = toList(
+        predicates['http://schema.org/genre'] ??
+            predicates['genre'] ??
+            predicates['#genre'],
+      );
 
       if (idValues.isEmpty || titleValues.isEmpty) {
         return null;
@@ -90,11 +106,11 @@ class TurtleParsingUtils {
       // Determine content type from RDF type in predicates.
 
       ContentType? contentType;
-      final typeValues =
-          predicates['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] ??
-              predicates['type'] ??
-              predicates['#type'] ??
-              [];
+      final typeValues = toList(
+        predicates['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] ??
+            predicates['type'] ??
+            predicates['#type'],
+      );
       if (typeValues.isNotEmpty) {
         final isTvShow = typeValues.any(
           (type) =>
@@ -183,7 +199,7 @@ class TurtleParsingUtils {
 
   /// Safely parses TTL content to triple map.
 
-  static Map<String, Map<String, List<dynamic>>>? safeParseTtl(
+  static Map<String, Map<String, dynamic>>? safeParseTtl(
     String ttlContent,
   ) {
     try {
@@ -196,11 +212,13 @@ class TurtleParsingUtils {
   /// Checks if a subject has a specific RDF type.
 
   static bool hasRdfType(
-    Map<String, List<dynamic>> predicates,
+    Map<String, dynamic> predicates,
     List<String> typeMatches,
   ) {
-    final typeValues =
-        predicates['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] ?? [];
+    final rawValue =
+        predicates['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'];
+    final List<dynamic> typeValues =
+        rawValue == null ? [] : (rawValue is List ? rawValue : [rawValue]);
     return typeValues.any(
       (type) => typeMatches.any(
         (match) => type.toString().contains(match) || type.toString() == match,
@@ -211,13 +229,17 @@ class TurtleParsingUtils {
   /// Extracts first value from predicate variations.
 
   static String extractFirstValue(
-    Map<String, List<dynamic>> predicates,
+    Map<String, dynamic> predicates,
     List<String> predicateVariations,
   ) {
     for (final variation in predicateVariations) {
-      final values = predicates[variation];
-      if (values != null && values.isNotEmpty) {
-        return values.first.toString();
+      final rawValue = predicates[variation];
+      if (rawValue != null) {
+        if (rawValue is List && rawValue.isNotEmpty) {
+          return rawValue.first.toString();
+        } else if (rawValue is! List) {
+          return rawValue.toString();
+        }
       }
     }
     return '';

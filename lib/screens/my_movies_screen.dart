@@ -372,17 +372,11 @@ Recipients will be able to:
       // Write the movie file to POD.
 
       if (!mounted) return;
-      final result = await writePod(
+      await writePod(
         movieFileName,
         ttlContent,
-        context,
-        widget,
         encrypted: false,
       );
-
-      if (result != SolidFunctionCallStatus.success) {
-        throw Exception('Failed to write movie file to POD');
-      }
     } catch (e) {
       rethrow;
     }

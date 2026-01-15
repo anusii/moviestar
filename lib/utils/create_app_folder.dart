@@ -110,17 +110,16 @@ Future<SolidFunctionCallStatus> createAppFolder({
 
     // Create the app folder structure with retry logic for encryption issues.
 
-    SolidFunctionCallStatus result = SolidFunctionCallStatus.fail;
+    bool folderCreated = false;
     for (int attempt = 1; attempt <= 3; attempt++) {
       try {
-        result = await writePod(
+        await writePod(
           '$folderName/.init',
           '',
-          context,
-          const Text('Creating folder'),
           encrypted: false,
         );
-        if (result == SolidFunctionCallStatus.success) break;
+        folderCreated = true;
+        break;
       } catch (e) {
         if (e.toString().contains('Duplicated encryption key') ||
             e.toString().contains('Invalid content in file') ||
@@ -135,9 +134,9 @@ Future<SolidFunctionCallStatus> createAppFolder({
       }
     }
 
-    // If folder creation was successful and initialization file is requested.
+    // If folder creation was successful and initialisation file is requested.
 
-    if (result == SolidFunctionCallStatus.success && createInitFile) {
+    if (folderCreated && createInitFile) {
       String initContent;
 
       // Initialisation content for all folders in Turtle format.
@@ -151,21 +150,22 @@ Future<SolidFunctionCallStatus> createAppFolder({
         :version "1.0" .
 ''';
 
-      if (!context.mounted) return result;
+      if (!context.mounted) {
+        return SolidFunctionCallStatus.fail;
+      }
 
-      // Create initialization file with retry logic for encryption issues.
+      // Create initialisation file with retry logic for encryption issues.
 
-      SolidFunctionCallStatus initResult = SolidFunctionCallStatus.fail;
+      bool initCreated = false;
       for (int attempt = 1; attempt <= 3; attempt++) {
         try {
-          initResult = await writePod(
+          await writePod(
             '$folderName/init.ttl',
             initContent,
-            context,
-            const Text('Creating initialization file'),
             encrypted: true,
           );
-          if (initResult == SolidFunctionCallStatus.success) break;
+          initCreated = true;
+          break;
         } catch (e) {
           if (e.toString().contains('Duplicated encryption key') ||
               e.toString().contains('Invalid content in file') ||
@@ -179,15 +179,12 @@ Future<SolidFunctionCallStatus> createAppFolder({
 
             if (attempt == 3) {
               if (!context.mounted) throw Exception('Context not mounted');
-              initResult = await writePod(
+              await writePod(
                 '$folderName/init.ttl',
                 initContent,
-                context,
-                const Text(
-                  'Creating initialization file (unencrypted fallback)',
-                ),
                 encrypted: false,
               );
+              initCreated = true;
             }
           } else {
             rethrow;
@@ -195,13 +192,15 @@ Future<SolidFunctionCallStatus> createAppFolder({
         }
       }
 
-      if (initResult == SolidFunctionCallStatus.success) {
+      if (initCreated) {
         onSuccess.call();
         return SolidFunctionCallStatus.success;
       }
     }
 
-    return result;
+    return folderCreated
+        ? SolidFunctionCallStatus.success
+        : SolidFunctionCallStatus.fail;
   } catch (e) {
     return SolidFunctionCallStatus.fail;
   } finally {

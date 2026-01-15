@@ -82,7 +82,6 @@ class _SharedMoviesScreenState extends State<SharedMoviesScreen>
     safeSetState(() {
       _sharedWithMeData = SharedMoviesDataFetcher.getMoviesSharedWithMe(
         context,
-        widget,
       );
     });
   }

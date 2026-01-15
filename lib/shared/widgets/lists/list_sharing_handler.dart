@@ -11,8 +11,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:solidpod/solidpod.dart'
-    show SolidFunctionCallStatus, readPod, writePod;
+import 'package:solidpod/solidpod.dart' show readPod, writePod;
 
 import 'package:moviestar/core/services/favorites/movie_list_service.dart';
 import 'package:moviestar/core/services/favorites/service.dart';
@@ -309,17 +308,11 @@ class ListSharingHandler {
       );
 
       if (!context.mounted) return;
-      final result = await writePod(
+      await writePod(
         movieFileName,
         ttlContent,
-        context,
-        widget,
         encrypted: false,
       );
-
-      if (result != SolidFunctionCallStatus.success) {
-        throw Exception('Failed to write movie file to POD');
-      }
     } catch (e) {
       rethrow;
     }

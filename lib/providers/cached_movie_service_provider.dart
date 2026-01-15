@@ -28,11 +28,9 @@ library;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moviestar/core/services/api/content_service.dart';
-import 'package:moviestar/core/services/api/key_service.dart';
 import 'package:moviestar/core/services/api/movie_service.dart';
 import 'package:moviestar/core/services/cache/cached_movie_service.dart';
 import 'package:moviestar/core/services/cache/hive_movie_cache_service.dart';
-import 'package:moviestar/core/services/cache/settings_service.dart';
 import 'package:moviestar/providers/cached_movie_service_provider/direct_movie_service.dart';
 import 'package:moviestar/providers/cached_movie_service_provider/state_notifiers.dart';
 
@@ -41,17 +39,6 @@ import 'package:moviestar/providers/cached_movie_service_provider/state_notifier
 export 'package:moviestar/providers/cached_movie_service_provider/direct_movie_service.dart';
 export 'package:moviestar/providers/cached_movie_service_provider/provider_definitions.dart';
 export 'package:moviestar/providers/cached_movie_service_provider/state_notifiers.dart';
-
-/// Provider for the API key service.
-/// Note: This should be overridden with a proper instance from MyHomePage.
-/// Use ProviderScope.overrideWithValue() to provide the actual service instance.
-
-final apiKeyServiceProvider = StateProvider<ApiKeyService?>((ref) {
-  // This will be set by MyHomePage with the actual service instance.
-  // If not set, it returns null.
-
-  return null;
-});
 
 /// Direct API key provider - deprecated, returns null to force use of ApiKeyService.
 /// API keys are now stored in POD only, which requires ApiKeyService for access.
@@ -66,12 +53,8 @@ final directApiKeyProvider = FutureProvider<String?>((ref) async {
 
 /// Provider for the API key state that watches for changes.
 
-final apiKeyProvider = StateNotifierProvider<ApiKeyNotifier, String?>(
-  (ref) {
-    final apiKeyService = ref.watch(apiKeyServiceProvider);
-    return ApiKeyNotifier(apiKeyService);
-  },
-  dependencies: [apiKeyServiceProvider],
+final apiKeyProvider = NotifierProvider<ApiKeyNotifier, String?>(
+  ApiKeyNotifier.new,
 );
 
 /// FutureProvider that waits for the API key to be loaded.
@@ -85,7 +68,6 @@ final apiKeyFutureProvider = FutureProvider<String?>(
     final apiKey = await apiKeyService.getApiKey();
     return apiKey;
   },
-  dependencies: [apiKeyServiceProvider],
 );
 
 /// Provider for the movie service using API key from POD.
@@ -108,10 +90,6 @@ final movieServiceProvider = Provider.autoDispose<MovieService>(
 
     return movieService;
   },
-  dependencies: [
-    apiKeyProvider,
-    apiKeyServiceProvider,
-  ],
 );
 
 /// Provider for the content service (handles both movies and TV shows).
@@ -189,35 +167,24 @@ final cachedMovieServiceProvider = Provider<CachedMovieService>((ref) {
   return cachedService;
 });
 
-/// Provider for the cache settings service.
-
-final cacheSettingsServiceProvider = Provider<CacheSettingsService>((ref) {
-  return CacheSettingsService.instance;
-});
-
 /// Provider for offline mode state with persistence.
 
-final cacheOnlyModeProvider =
-    StateNotifierProvider<CacheOnlyModeNotifier, bool>((ref) {
-  final settingsService = ref.watch(cacheSettingsServiceProvider);
-  return CacheOnlyModeNotifier(settingsService);
-});
+final cacheOnlyModeProvider = NotifierProvider<CacheOnlyModeNotifier, bool>(
+  CacheOnlyModeNotifier.new,
+);
 
 /// Provider for caching enabled state with persistence.
 
-final cachingEnabledProvider =
-    StateNotifierProvider<CachingEnabledNotifier, bool>((ref) {
-  final settingsService = ref.watch(cacheSettingsServiceProvider);
-  return CachingEnabledNotifier(settingsService);
-});
+final cachingEnabledProvider = NotifierProvider<CachingEnabledNotifier, bool>(
+  CachingEnabledNotifier.new,
+);
 
 /// Provider for local API key caching state with persistence.
 
 final localApiKeyCachingProvider =
-    StateNotifierProvider<LocalApiKeyCachingNotifier, bool>((ref) {
-  final settingsService = ref.watch(cacheSettingsServiceProvider);
-  return LocalApiKeyCachingNotifier(settingsService);
-});
+    NotifierProvider<LocalApiKeyCachingNotifier, bool>(
+  LocalApiKeyCachingNotifier.new,
+);
 
 /// Provider for configured cached movie service (with settings).
 
@@ -244,9 +211,4 @@ final configuredCachedMovieServiceProvider =
 
     return cachedService;
   },
-  dependencies: [
-    movieServiceProvider,
-    apiKeyProvider,
-    apiKeyServiceProvider,
-  ],
 );

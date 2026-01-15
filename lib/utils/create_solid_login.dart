@@ -137,6 +137,19 @@ class _ApiKeyCheckWrapperState extends State<ApiKeyCheckWrapper> {
   }
 }
 
+// Notifier for server URL state.
+
+class ServerURLNotifier extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void setServerURL(String url) {
+    state = url;
+  }
+}
+
 // Define provider for server URL.
 
-final serverURLProvider = StateProvider<String>((ref) => '');
+final serverURLProvider = NotifierProvider<ServerURLNotifier, String>(
+  ServerURLNotifier.new,
+);

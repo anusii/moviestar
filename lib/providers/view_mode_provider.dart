@@ -54,13 +54,15 @@ enum HomeViewMode {
   }
 }
 
-/// StateNotifier for managing view mode state with persistence.
+/// Notifier for managing view mode state with persistence.
 
-class ViewModeNotifier extends StateNotifier<HomeViewMode> {
+class ViewModeNotifier extends Notifier<HomeViewMode> {
   static const String _key = 'home_view_mode';
 
-  ViewModeNotifier() : super(HomeViewMode.kanban) {
+  @override
+  HomeViewMode build() {
     _loadViewMode();
+    return HomeViewMode.kanban;
   }
 
   // Load the view mode from shared preferences.
@@ -101,7 +103,6 @@ class ViewModeNotifier extends StateNotifier<HomeViewMode> {
 
 /// Provider for the view mode state.
 
-final viewModeProvider =
-    StateNotifierProvider<ViewModeNotifier, HomeViewMode>((ref) {
-  return ViewModeNotifier();
-});
+final viewModeProvider = NotifierProvider<ViewModeNotifier, HomeViewMode>(
+  ViewModeNotifier.new,
+);

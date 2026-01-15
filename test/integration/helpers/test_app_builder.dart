@@ -38,17 +38,10 @@ Widget buildTestApp({
   Map<String, WidgetBuilder>? routes,
   MockFavoritesService? favoritesService,
   MockMovieService? movieService,
-  List<Override>? additionalOverrides,
   ThemeData? theme,
 }) {
-  final overrides = <Override>[
-    // Add service provider overrides here as needed.
-
-    ...?additionalOverrides,
-  ];
-
   return ProviderScope(
-    overrides: overrides,
+    overrides: const [],
     child: MaterialApp(
       theme: theme,
       home: home,
@@ -77,12 +70,10 @@ Widget buildTestAppWithScaffold({
   AppBar? appBar,
   MockFavoritesService? favoritesService,
   MockMovieService? movieService,
-  List<Override>? additionalOverrides,
 }) {
   return buildTestApp(
     favoritesService: favoritesService,
     movieService: movieService,
-    additionalOverrides: additionalOverrides,
     home: Scaffold(
       appBar: appBar,
       body: body ?? Container(),
@@ -127,32 +118,6 @@ Future<FavoritesService> createTestFavoritesService([
   return FavoritesService(prefs);
 }
 
-/// Gets a list of provider overrides for common test scenarios.
-///
-/// Returns a list of provider overrides that can be used with ProviderScope.
-///
-/// Example usage:
-/// ```dart
-/// final overrides = getTestProviderOverrides(
-///   favoritesService: mockFavoritesService,
-/// );
-/// ```
-
-List<Override> getTestProviderOverrides({
-  MockFavoritesService? favoritesService,
-  MockMovieService? movieService,
-}) {
-  final overrides = <Override>[];
-
-  // Add provider overrides here as the app uses more providers
-  // For example:
-  // if (favoritesService != null) {
-  //   overrides.add(favoritesServiceProvider.overrideWithValue(favoritesService));
-  // }
-
-  return overrides;
-}
-
 /// Test app builder with navigation observer for tracking navigation events.
 ///
 /// Useful for testing navigation flows and verifying navigation state.
@@ -184,7 +149,6 @@ Widget buildTestAppWithNavigationObserver({
     routes: routes,
     favoritesService: favoritesService,
     movieService: movieService,
-    additionalOverrides: [],
   );
 }
 

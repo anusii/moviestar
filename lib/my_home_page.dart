@@ -110,7 +110,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     // Set the service in the provider after widget tree is done building.
 
     Future(() {
-      ref.read(apiKeyServiceProvider.notifier).state = _apiKeyService;
+      ref.read(apiKeyServiceProvider.notifier).setService(_apiKeyService);
     });
 
     // Listen for API key changes.

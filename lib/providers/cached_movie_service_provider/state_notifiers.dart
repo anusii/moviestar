@@ -13,62 +13,77 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moviestar/core/services/api/key_service.dart';
 import 'package:moviestar/core/services/cache/settings_service.dart';
 
-/// StateNotifier for managing caching enabled setting with persistence.
+/// Notifier for managing caching enabled setting with persistence.
 
-class CachingEnabledNotifier extends StateNotifier<bool> {
-  final CacheSettingsService _settingsService;
-
-  CachingEnabledNotifier(this._settingsService) : super(true) {
+class CachingEnabledNotifier extends Notifier<bool> {
+  @override
+  bool build() {
     _init();
+    return true;
   }
+
+  CacheSettingsService get _settingsService =>
+      ref.read(cacheSettingsServiceProvider);
 
   Future<void> _init() async {
     await _settingsService.initialize();
-    if (!mounted) return;
     state = _settingsService.cachingEnabled;
   }
 
   Future<void> setCachingEnabled(bool enabled) async {
     await _settingsService.setCachingEnabled(enabled);
-    if (!mounted) return;
     state = enabled;
   }
 }
 
-/// StateNotifier for managing offline mode setting with persistence.
+/// Provider for cache settings service.
 
-class CacheOnlyModeNotifier extends StateNotifier<bool> {
-  final CacheSettingsService _settingsService;
+final cacheSettingsServiceProvider = Provider<CacheSettingsService>((ref) {
+  return CacheSettingsService.instance;
+});
 
-  CacheOnlyModeNotifier(this._settingsService) : super(false) {
+/// Notifier for managing offline mode setting with persistence.
+
+class CacheOnlyModeNotifier extends Notifier<bool> {
+  @override
+  bool build() {
     _init();
+    return false;
   }
+
+  CacheSettingsService get _settingsService =>
+      ref.read(cacheSettingsServiceProvider);
 
   Future<void> _init() async {
     await _settingsService.initialize();
-    if (!mounted) return;
     state = _settingsService.cacheOnlyMode;
   }
 
   Future<void> setCacheOnlyMode(bool enabled) async {
     await _settingsService.setCacheOnlyMode(enabled);
-    if (!mounted) return;
     state = enabled;
   }
 }
 
-/// StateNotifier for managing API key state and changes.
+/// Notifier for managing API key state and changes.
 
-class ApiKeyNotifier extends StateNotifier<String?> {
-  final ApiKeyService? _apiKeyService;
+class ApiKeyNotifier extends Notifier<String?> {
+  ApiKeyService? _apiKeyService;
 
-  ApiKeyNotifier(this._apiKeyService) : super(null) {
+  @override
+  String? build() {
+    _apiKeyService = ref.watch(apiKeyServiceProvider);
     if (_apiKeyService != null) {
       _init();
+
       // Listen for API key changes.
 
-      _apiKeyService.addListener(_onApiKeyChanged);
+      _apiKeyService!.addListener(_onApiKeyChanged);
+      ref.onDispose(() {
+        _apiKeyService?.removeListener(_onApiKeyChanged);
+      });
     }
+    return null;
   }
 
   Future<void> _init() async {
@@ -76,8 +91,7 @@ class ApiKeyNotifier extends StateNotifier<String?> {
       return;
     }
     try {
-      final apiKey = await _apiKeyService.getApiKey();
-      if (!mounted) return;
+      final apiKey = await _apiKeyService!.getApiKey();
       state = apiKey;
     } catch (e) {
       // Failed to get API key.
@@ -85,41 +99,53 @@ class ApiKeyNotifier extends StateNotifier<String?> {
   }
 
   void _onApiKeyChanged() async {
-    if (!mounted || _apiKeyService == null) return;
+    if (_apiKeyService == null) return;
     try {
-      final apiKey = await _apiKeyService.getApiKey();
-      if (!mounted) return;
+      final apiKey = await _apiKeyService!.getApiKey();
       state = apiKey;
     } catch (e) {
-      if (mounted) {}
+      // Failed to update API key.
     }
-  }
-
-  @override
-  void dispose() {
-    _apiKeyService?.removeListener(_onApiKeyChanged);
-    super.dispose();
   }
 }
 
-/// StateNotifier for managing local API key caching setting with persistence.
+/// Notifier for managing the API key service instance.
 
-class LocalApiKeyCachingNotifier extends StateNotifier<bool> {
-  final CacheSettingsService _settingsService;
+class ApiKeyServiceNotifier extends Notifier<ApiKeyService?> {
+  @override
+  ApiKeyService? build() => null;
 
-  LocalApiKeyCachingNotifier(this._settingsService) : super(false) {
-    _init();
+  void setService(ApiKeyService? service) {
+    state = service;
   }
+}
+
+/// Provider for the API key service.
+
+final apiKeyServiceProvider =
+    NotifierProvider<ApiKeyServiceNotifier, ApiKeyService?>(
+  ApiKeyServiceNotifier.new,
+);
+
+/// Notifier for managing local API key caching setting with persistence.
+
+class LocalApiKeyCachingNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    _init();
+    return false;
+  }
+
+  CacheSettingsService get _settingsService =>
+      ref.read(cacheSettingsServiceProvider);
 
   Future<void> _init() async {
     await _settingsService.initialize();
-    if (!mounted) return;
     state = _settingsService.localApiKeyCachingEnabled;
   }
 
   Future<void> setLocalApiKeyCachingEnabled(bool enabled) async {
     await _settingsService.setLocalApiKeyCachingEnabled(enabled);
-    if (!mounted) return;
     state = enabled;
   }
 }

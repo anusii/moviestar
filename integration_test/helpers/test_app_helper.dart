@@ -33,13 +33,11 @@ class TestAppHelper {
   ///
   /// [tester] - The WidgetTester instance from the test.
   /// [prefValues] - Optional initial SharedPreferences values.
-  /// [additionalOverrides] - Optional additional Riverpod provider overrides.
   /// [settleDuration] - Duration to wait for app to settle (default 5 seconds).
 
   static Future<void> initializeApp(
     WidgetTester tester, {
     Map<String, Object>? prefValues,
-    List<Override>? additionalOverrides,
     Duration settleDuration = const Duration(seconds: 5),
   }) async {
     // Set up SharedPreferences with test values.
@@ -55,18 +53,13 @@ class TestAppHelper {
 
     await initializeHive();
 
-    // Build provider overrides list.
-
-    final overrides = <Override>[
-      sharedPreferencesProvider.overrideWithValue(prefs),
-      if (additionalOverrides != null) ...additionalOverrides,
-    ];
-
     // Pump the app with ProviderScope.
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: overrides,
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
         child: const MovieStar(),
       ),
     );

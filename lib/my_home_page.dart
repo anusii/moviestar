@@ -513,7 +513,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           onSearch: _handleSearch,
         ),
         overflowItems: SolidScaffoldConfig.createOverflowItems(
-          onLogout: _handleLogout,
           onSettings: _handleSettings,
         ),
       ),

@@ -61,18 +61,11 @@ class FetchOperations {
       if (actualSharedUrl != null) {
         if (!context.mounted) return {};
 
-        final movieFileContent = await readExternalPod(
-          actualSharedUrl,
-          context,
-          widget,
-        );
+        final movieFileContent = await readExternalPod(actualSharedUrl);
 
         if (!context.mounted) return {};
 
-        if (movieFileContent != null &&
-            movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
-            movieFileContent is String &&
-            movieFileContent.isNotEmpty) {
+        if (movieFileContent is String && movieFileContent.isNotEmpty) {
           final isTvShow =
               UrlHandlers.isTelevisionShow(providedFilePath, actualSharedUrl);
 
@@ -176,25 +169,24 @@ class FetchOperations {
     bool isTvShow = false;
 
     for (final resourceUrl in urlsToTry) {
-      movieFileContent = await readExternalPod(
-        resourceUrl,
-        context,
-        widget,
-      );
+      try {
+        movieFileContent = await readExternalPod(resourceUrl);
 
-      if (!context.mounted) return {};
+        if (!context.mounted) return {};
 
-      if (movieFileContent != null &&
-          movieFileContent != SolidFunctionCallStatus.notLoggedIn &&
-          movieFileContent is String &&
-          movieFileContent.isNotEmpty) {
-        isTvShow = UrlHandlers.isTelevisionShow(providedFilePath, resourceUrl);
-        break; // Success, stop trying other URLs
+        if (movieFileContent is String && movieFileContent.isNotEmpty) {
+          isTvShow =
+              UrlHandlers.isTelevisionShow(providedFilePath, resourceUrl);
+          break; // Success, stop trying other URLs
+        }
+      } catch (e) {
+        // Continue to next URL if this one fails.
+
+        continue;
       }
     }
 
     if (movieFileContent == null ||
-        movieFileContent == SolidFunctionCallStatus.notLoggedIn ||
         movieFileContent is! String ||
         movieFileContent.isEmpty) {
       return movieData;

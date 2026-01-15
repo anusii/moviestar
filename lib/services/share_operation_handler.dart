@@ -84,8 +84,7 @@ class ShareOperationHandler {
         recipientType: request.recipientType,
         recipientWebIdList: [request.recipientWebId],
         ownerWebId: ownerWebId,
-        context: context,
-        child: widget,
+        granterWebId: ownerWebId,
         isExternalRes: false,
       );
 
@@ -194,8 +193,7 @@ class ShareOperationHandler {
         recipientType: request.recipientType,
         recipientWebIdList: [request.webId],
         ownerWebId: ownerWebId,
-        context: context,
-        child: widget,
+        granterWebId: ownerWebId,
         isExternalRes: false,
       );
 

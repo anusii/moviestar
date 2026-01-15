@@ -13,7 +13,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:solidpod/solidpod.dart' as solidpod
-    show SolidFunctionCallStatus, writePod, readPod, deleteFile;
+    show writePod, readPod, deleteFile;
 
 import 'package:moviestar/utils/is_logged_in.dart';
 
@@ -170,19 +170,13 @@ class PodFileOperationsService {
 
         // Attempt to write the file.
 
-        final result = await solidpod.writePod(
+        await solidpod.writePod(
           fileName,
           content,
-          context,
-          child,
           encrypted: encrypted,
         );
 
-        if (result == solidpod.SolidFunctionCallStatus.success) {
-          return PodFileOperationResult.success();
-        } else {
-          throw Exception('WritePod failed with status: $result');
-        }
+        return PodFileOperationResult.success();
       } catch (e) {
         final errorMessage = e.toString();
 

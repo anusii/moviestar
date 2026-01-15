@@ -52,11 +52,7 @@ class UrlHandlers {
     try {
       // Get the shared resources to look for individual files.
 
-      final sharedResourcesResult = await sharedResources(context, widget);
-
-      if (sharedResourcesResult == SolidFunctionCallStatus.notLoggedIn) {
-        return null;
-      }
+      final sharedResourcesResult = await sharedResources();
 
       if (sharedResourcesResult is! Map) {
         return null;

@@ -118,6 +118,32 @@ Future<FavoritesService> createTestFavoritesService([
   return FavoritesService(prefs);
 }
 
+/// Gets a list of provider overrides for common test scenarios.
+///
+/// Returns a list of provider overrides that can be used with ProviderScope.
+///
+/// Example usage:
+/// ```dart
+/// final overrides = getTestProviderOverrides(
+///   favoritesService: mockFavoritesService,
+/// );
+/// ```
+
+List<dynamic> getTestProviderOverrides({
+  MockFavoritesService? favoritesService,
+  MockMovieService? movieService,
+}) {
+  final overrides = <dynamic>[];
+
+  // Add provider overrides here as the app uses more providers.
+  // For example:
+  // if (favoritesService != null) {
+  //   overrides.add(favoritesServiceProvider.overrideWithValue(favoritesService));
+  // }
+
+  return overrides;
+}
+
 /// Test app builder with navigation observer for tracking navigation events.
 ///
 /// Useful for testing navigation flows and verifying navigation state.

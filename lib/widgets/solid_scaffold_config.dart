@@ -192,16 +192,9 @@ your movie data files.
   /// application.
 
   static List<SolidOverflowMenuItem> createOverflowItems({
-    required VoidCallback onLogout,
     required VoidCallback onSettings,
   }) {
     return [
-      SolidOverflowMenuItem(
-        id: 'logout',
-        icon: Icons.logout,
-        label: 'Logout',
-        onSelected: onLogout,
-      ),
       SolidOverflowMenuItem(
         id: 'settings',
         icon: Icons.settings,

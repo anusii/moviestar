@@ -38,17 +38,10 @@ Widget buildTestApp({
   Map<String, WidgetBuilder>? routes,
   MockFavoritesService? favoritesService,
   MockMovieService? movieService,
-  List<Override>? additionalOverrides,
   ThemeData? theme,
 }) {
-  final overrides = <Override>[
-    // Add service provider overrides here as needed.
-
-    ...?additionalOverrides,
-  ];
-
   return ProviderScope(
-    overrides: overrides,
+    overrides: const [],
     child: MaterialApp(
       theme: theme,
       home: home,
@@ -77,12 +70,10 @@ Widget buildTestAppWithScaffold({
   AppBar? appBar,
   MockFavoritesService? favoritesService,
   MockMovieService? movieService,
-  List<Override>? additionalOverrides,
 }) {
   return buildTestApp(
     favoritesService: favoritesService,
     movieService: movieService,
-    additionalOverrides: additionalOverrides,
     home: Scaffold(
       appBar: appBar,
       body: body ?? Container(),
@@ -138,13 +129,13 @@ Future<FavoritesService> createTestFavoritesService([
 /// );
 /// ```
 
-List<Override> getTestProviderOverrides({
+List<dynamic> getTestProviderOverrides({
   MockFavoritesService? favoritesService,
   MockMovieService? movieService,
 }) {
-  final overrides = <Override>[];
+  final overrides = <dynamic>[];
 
-  // Add provider overrides here as the app uses more providers
+  // Add provider overrides here as the app uses more providers.
   // For example:
   // if (favoritesService != null) {
   //   overrides.add(favoritesServiceProvider.overrideWithValue(favoritesService));
@@ -184,7 +175,6 @@ Widget buildTestAppWithNavigationObserver({
     routes: routes,
     favoritesService: favoritesService,
     movieService: movieService,
-    additionalOverrides: [],
   );
 }
 

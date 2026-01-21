@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "MovieStar"
-#define MyAppVersion "dev-windows-inno"
+#define MyAppVersion "windows-inno"
 #define MyAppPublisher "ANU Software Innovation Institute"
 #define MyAppURL "https://github.com/anusii/moviestar
 #define MyAppExeName "moviestar.exe"

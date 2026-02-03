@@ -65,7 +65,7 @@ class FetchOperations {
 
         if (!context.mounted) return {};
 
-        if (movieFileContent is String && movieFileContent.isNotEmpty) {
+        if (movieFileContent.isNotEmpty) {
           final isTvShow =
               UrlHandlers.isTelevisionShow(providedFilePath, actualSharedUrl);
 

@@ -1,6 +1,6 @@
 /// Create Solid Login Widget.
 //
-// Time-stamp: <Saturday 2025-10-25 06:05:41 +1100 Graham Williams>
+// Time-stamp: <Wednesday 2026-02-04 08:25:19 +1100 Graham Williams>
 //
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -71,7 +71,7 @@ Widget _buildNormalLogin(String serverUrl, SharedPreferences prefs) {
                   : ThemeData.light(),
               child: SolidLogin(
                 required: false,
-                title: 'Movie Star',
+                title: 'MovieStar\nPrivate Ratings and Recommender',
                 appDirectory: 'moviestar',
                 webID: serverUrl.isNotEmpty
                     ? serverUrl

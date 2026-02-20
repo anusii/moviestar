@@ -125,7 +125,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
 
       // Only update state if this search is still relevant.
 
-      if (_searchController.text == query) {
+      if (_searchController.text.trim() == query) {
         safeSetState(() {
           _searchResults = results;
         });
@@ -134,7 +134,7 @@ class _EnhancedSearchScreenState extends State<EnhancedSearchScreen>
     } catch (e) {
       // Only update state if this search is still relevant.
 
-      if (_searchController.text == query && mounted) {
+      if (_searchController.text.trim() == query && mounted) {
         setLoadingState(false);
         showErrorSnackBar('Search failed: ${e.toString()}');
       }

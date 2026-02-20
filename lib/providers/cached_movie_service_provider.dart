@@ -111,13 +111,12 @@ final contentServiceProvider = Provider<ContentService>((ref) {
   return contentService;
 });
 
-/// Direct provider for the content service that uses the direct API key.
+/// Direct provider for the content service that retrieves the API key
+/// from ApiKeyService (POD storage).
 
 final directContentServiceProvider =
     FutureProvider<ContentService>((ref) async {
-  final apiKey = await ref.watch(directApiKeyProvider.future);
-
-  // Use the new constructor that accepts API key directly.
+  final apiKey = await ref.watch(apiKeyFutureProvider.future);
 
   final contentService = ContentService.withApiKey(apiKey);
 

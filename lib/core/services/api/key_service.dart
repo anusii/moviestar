@@ -96,9 +96,14 @@ class ApiKeyService extends BasePodService {
   Future<String?> _fetchApiKey() async {
     return await executePodOperation(
       operation: () async {
-        // Check if migration needed (migrate from legacy local storage to POD).
+        // Attempt legacy migration but do not let Keychain failures
+        // prevent reading the key from the POD.
 
-        await _handleLegacyMigration();
+        try {
+          await _handleLegacyMigration();
+        } catch (_) {
+          // Keychain may be unavailable (e.g. missing entitlement on macOS).
+        }
 
         // Read from POD only.
 

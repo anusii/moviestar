@@ -13,8 +13,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:solidpod/solidpod.dart' as solidpod
-    show writePod, readPod, deleteFile;
+    show writePod, readPod, deleteFile, getFileUrl;
 
+import 'package:moviestar/constants/paths.dart';
 import 'package:moviestar/utils/is_logged_in.dart';
 
 /// Result of a POD file operation.
@@ -50,6 +51,27 @@ class PodFileOperationsService {
 
   static const Duration _retryDelay = Duration(milliseconds: 500);
 
+  /// Strips the app data directory prefix from a path if present.
+  ///
+  /// solidpod's readPod/writePod default to PathType.relativeToData,
+  /// which automatically prepends the app data directory (e.g.
+  /// 'moviestar/data/'). Callers that already include this prefix
+  /// would otherwise produce a doubled path on the POD.
+
+  static String _toRelativeDataPath(String path) {
+    const prefix = '$basePath/';
+    if (path.startsWith(prefix)) {
+      return path.substring(prefix.length);
+    }
+    return path;
+  }
+
+  /// Whether [path] already contains the app data directory prefix.
+
+  static bool _hasDataPrefix(String path) {
+    return path.startsWith('$basePath/');
+  }
+
   /// Reads a file from POD storage with automatic retry on failure.
   ///
   /// [fileName] - The path to the file in POD storage.
@@ -84,23 +106,34 @@ class PodFileOperationsService {
           );
         }
 
-        // Attempt to read the file.
+        // Attempt to read the file from the correct (normalised) path.
 
-        final result = await solidpod.readPod(fileName);
+        final relativePath = _toRelativeDataPath(fileName);
+        final result = await solidpod.readPod(relativePath);
 
         if (result.isNotEmpty) {
           return PodFileOperationResult.success(result);
         } else {
-          // Empty result might be valid for some files.
-
           return PodFileOperationResult.success('');
         }
       } catch (e) {
         final errorMessage = e.toString();
 
-        // Don't retry if file doesn't exist - this is expected for new files.
+        // If the file was not found at the correct path and the caller
+        // supplied a path that included the data-dir prefix, attempt a
+        // legacy fallback read.
 
-        if (errorMessage.contains('does not exist')) {
+        if (errorMessage.contains('does not exist') &&
+            _hasDataPrefix(fileName)) {
+          try {
+            final legacy = await solidpod.readPod(fileName);
+            if (legacy.isNotEmpty) {
+              return PodFileOperationResult.success(legacy);
+            }
+          } catch (_) {
+            // Legacy path also missing.
+          }
+
           return PodFileOperationResult.failure('File does not exist');
         }
 
@@ -168,12 +201,16 @@ class PodFileOperationsService {
           );
         }
 
-        // Attempt to write the file.
+        // Attempt to write the file. overwrite is set to true so that
+        // existing files (e.g. updated movie lists) can be replaced.
+
+        final writePath = _toRelativeDataPath(fileName);
 
         await solidpod.writePod(
-          fileName,
+          writePath,
           content,
           encrypted: encrypted,
+          overwrite: true,
         );
 
         return PodFileOperationResult.success();
@@ -254,9 +291,11 @@ class PodFileOperationsService {
         );
       }
 
-      // Use SolidPOD's deleteFile function directly.
+      // Resolve the full POD URL. The incoming path is relative to the
+      // POD root (e.g. 'moviestar/data/user_lists/MovieList-xxx.ttl').
 
-      await solidpod.deleteFile(fileUrl: fileName);
+      final fileUrl = await solidpod.getFileUrl(fileName);
+      await solidpod.deleteFile(fileUrl: fileUrl);
 
       return PodFileOperationResult.success();
     } catch (e) {

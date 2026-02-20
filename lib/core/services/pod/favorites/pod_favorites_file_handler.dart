@@ -37,22 +37,13 @@ class PodFavoritesFileHandler {
 
           final fullMovie =
               await _fileManager.loadFullMovieDetails(placeholderMovie);
-          if (fullMovie != null) {
-            fullMovies.add(fullMovie);
-          } else {
-            // Fallback to placeholder if individual file doesn't exist.
-
-            fullMovies.add(placeholderMovie);
-          }
+          fullMovies.add(fullMovie ?? placeholderMovie);
         } catch (e) {
-          // Fallback to placeholder on error.
-
           fullMovies.add(placeholderMovie);
         }
       }
-
       return fullMovies;
-    } else {}
+    }
 
     return movieListData ?? [];
   }

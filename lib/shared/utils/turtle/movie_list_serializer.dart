@@ -159,7 +159,8 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
           // Extract MovieList metadata.
 
           for (final predicate in predicates.keys) {
-            final values = predicates[predicate]!;
+            final raw = predicates[predicate]!;
+            final values = raw is List ? raw : [raw];
             if (values.isNotEmpty) {
               final value = values.first.toString();
 
@@ -204,6 +205,7 @@ class MovieListTurtleSerializer extends TurtleBaseSerializer {
 
                 for (final movieRef in values) {
                   final movieRefStr = movieRef.toString();
+
                   // Extract movie ID from resource URI like "movie-12345".
 
                   final movieIdMatch =

@@ -26,7 +26,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:solidpod/solidpod.dart' show GrantPermissionUi;
+import 'package:solidui/solidui.dart' show GrantPermissionUi;
 
 import 'package:moviestar/widgets/sharing/components.dart';
 import 'package:moviestar/widgets/sharing/form_widgets.dart';

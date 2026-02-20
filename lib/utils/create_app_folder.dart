@@ -101,7 +101,7 @@ Future<SolidFunctionCallStatus> createAppFolder({
 
       // Full path for deletion needs to include basePath (e.g. moviestar/data).
 
-      await deleteFile('$basePath/$folderName');
+      await deleteFile(fileUrl: '$basePath/$folderName');
     }
 
     if (!context.mounted) {

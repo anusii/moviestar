@@ -256,7 +256,7 @@ class PodFileOperationsService {
 
       // Use SolidPOD's deleteFile function directly.
 
-      await solidpod.deleteFile(fileName);
+      await solidpod.deleteFile(fileUrl: fileName);
 
       return PodFileOperationResult.success();
     } catch (e) {

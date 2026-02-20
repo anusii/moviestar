@@ -112,7 +112,7 @@ final contentServiceProvider = Provider<ContentService>((ref) {
 });
 
 /// Direct provider for the content service that retrieves the API key
-/// from ApiKeyService (POD storage) rather than the deprecated local provider.
+/// from ApiKeyService (POD storage).
 
 final directContentServiceProvider =
     FutureProvider<ContentService>((ref) async {

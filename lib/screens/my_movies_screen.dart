@@ -40,6 +40,7 @@ import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 import 'package:moviestar/utils/movie_sort_util.dart';
 import 'package:moviestar/utils/serializer.dart';
+import 'package:moviestar/utils/sort_preference_service.dart';
 import 'package:moviestar/widgets/base_screen.dart';
 import 'package:moviestar/widgets/moviestar_batch_sharing_ui.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
@@ -62,9 +63,25 @@ class MyMoviesScreen extends StatefulWidget {
 /// State class for the my movies screen.
 
 class _MyMoviesScreenState extends State<MyMoviesScreen> with ScreenStateMixin {
-  /// Currently selected sort criteria.
+  static const String _sortKey = 'my_movies';
 
   MovieSortCriteria _sortCriteria = MovieSortCriteria.nameAsc;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSortPreference();
+  }
+
+  Future<void> _loadSortPreference() async {
+    final saved = await SortPreferenceService.load(
+      _sortKey,
+      fallback: MovieSortCriteria.nameAsc,
+    );
+    if (mounted) {
+      setState(() => _sortCriteria = saved);
+    }
+  }
 
   /// Gets movies that the user has rated (combines both to watch and watched movies with ratings).
 
@@ -152,6 +169,7 @@ Recipients will be able to:
               safeSetState(() {
                 _sortCriteria = criteria;
               });
+              SortPreferenceService.save(_sortKey, criteria);
             },
           ),
           Expanded(

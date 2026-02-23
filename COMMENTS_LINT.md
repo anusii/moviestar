@@ -1,19 +1,29 @@
 # Comment Linting
 
-The MovieStar project uses the `comment_lint` package for enforcing comment style guidelines in Dart/Flutter code. This package provides both detection and automatic fixing of comment style violations.
+The MovieStar project uses the `comment_lint` package for enforcing
+comment style guidelines in Dart/Flutter code. This package provides
+both detection and automatic fixing of comment style violations.
 
 ## Using the Comment Lint Package
 
-The `comment_lint` package is included as a dev dependency and provides command-line tools for comment style checking and fixing.
+The `comment_lint` package is included as a dev dependency and
+provides command-line tools for comment style checking and fixing.
 
 ### Comment Linter (Detection)
 
 **Purpose**: Detects comment style violations:
-1. All single-line comments (`//`) must end with a period (`.`), question mark (`?`), or exclamation mark (`!`)
-2. All doc comments (`///`) must end with a period (`.`), question mark (`?`), or exclamation mark (`!`)
-3. Comments must have a blank line between the comment and the following code
+
+1. All single-line comments (`//`) must end with a period (`.`),
+   question mark (`?`), or exclamation mark (`!`)
+
+2. All doc comments (`///`) must end with a period (`.`), question
+   mark (`?`), or exclamation mark (`!`)
+
+3. Comments must have a blank line between the comment and the
+   following code
 
 **Usage**:
+
 ```bash
 # Check a single file
 dart run comment_lint --check path/to/file.dart
@@ -28,11 +38,15 @@ dart run comment_lint --check --verbose lib/
 ### Comment Auto-Fix (Repair)
 
 **Purpose**: Automatically fixes comment style violations:
+
 1. Adds periods to single-line comments (`//`) missing them
+
 2. Adds periods to doc comments (`///`) missing them
+
 3. Adds blank lines between comments and code
 
 **Usage**:
+
 ```bash
 # Fix a single file (with preview)
 dart run comment_lint --dry-run path/to/file.dart
@@ -48,6 +62,7 @@ dart run comment_lint lib/
 ```
 
 **Features**:
+
 - ✅ Detects single-line comments (`//`) missing punctuation
 - ✅ Detects doc comments (`///`) missing punctuation
 - ✅ Detects missing blank lines after comments
@@ -65,6 +80,7 @@ dart run comment_lint lib/
 ## Example Output
 
 **Checking for violations**:
+
 ```bash
 $ dart run comment_lint --check lib/
 
@@ -87,6 +103,7 @@ Summary: 4 violation(s) in 2 file(s)
 ```
 
 **Auto-fixing violations** (dry-run):
+
 ```bash
 $ dart run comment_lint --dry-run lib/
 
@@ -113,12 +130,14 @@ Run without --dry-run to apply fixes
 ## Integration
 
 The comment_lint package can be integrated into:
+
 - **Pre-commit hooks** - Prevent commits with comment style violations
 - **CI/CD pipelines** - Fail builds on violations
 - **Development workflow** - Regular style checks
 - **IDE tasks** - Configure as custom tasks in VS Code, IntelliJ, etc.
 
 **Example pre-commit hook**:
+
 ```bash
 #!/bin/bash
 # Check for comment style violations before commit
@@ -131,6 +150,7 @@ dart run comment_lint --check lib/ || {
 ```
 
 **Example CI/CD integration**:
+
 ```yaml
 - name: Check comment style
   run: dart run comment_lint --check lib/
@@ -138,7 +158,7 @@ dart run comment_lint --check lib/ || {
 
 ## Package Information
 
-- **Repository**: https://github.com/anusii/comment_lint.git
+- **Repository**: [github](https://github.com/anusii/comment_lint.git)
 - **Package**: `comment_lint` (Git dependency)
 - **License**: GPL-3.0
 - **Cross-platform**: Windows, macOS, Linux
@@ -155,4 +175,5 @@ dart run comment_lint --check lib/ || {
 
 ---
 
-*This addresses GitHub issue #230: "Add lint to ensure all comments end in a fullstop and have blank line between comment and code"*
+*This addresses GitHub issue #230: "Add lint to ensure all comments
+end in a fullstop and have blank line between comment and code"*

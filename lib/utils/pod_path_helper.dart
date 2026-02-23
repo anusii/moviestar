@@ -27,14 +27,12 @@ library;
 
 import 'package:solidpod/solidpod.dart';
 
-/// Gets the correct path for reading files from POD.
+/// Gets the full POD data path for reading files from POD.
 ///
-/// Due to a discrepancy in solidpod:
-/// - writePod automatically prepends getDataDirPath() to the fileName.
-/// - readPod uses the filePath directly without preprocessing.
-///
-/// This function constructs the full path that readPod needs to match.
-/// what writePod actually writes.
+/// Both readPod and writePod default to PathType.relativeToData,
+/// automatically prepending getDataDirPath() to the fileName.
+/// PodFileOperationsService handles prefix normalisation centrally,
+/// so callers rarely need this helper directly.
 
 Future<String> getReadPath(String relativePath) async {
   final dataDir = await getDataDirPath();

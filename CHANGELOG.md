@@ -1,31 +1,36 @@
-# MovieStar Changelog
+# Movie Star Change Log
 
-Noted here are the high level changes for the MovieStar app.
+Noted here are the high level changes for the app.  Each update
+includes a short user-oriented description.  The next release is 1.1
+following incremental updates through the 1.0.n series.  The `[version
+timestamp user]` string is utilised by the flutter
+[version_widget](https://pub.dev/packages/version_widget) package.
 
-Guide: Each version update is noted here with a short user-oriented
-description of the update. Updates in the 1.0.n series are heading
-toward a 1.1 release. The `[version timestamp user]` string is
-utilised by the flutter version_widget package.
+You can run the app in your browser from the
+[**web**](https://moviestar.solidcommunity.au) or else download and
+locally install the latest version from the [Solid Community
+AU](https://solidcommunity.au) or directly: for
+**Android** as
+[apk](https://solidcommunity.au/installers/moviestar.apk); for
+**GNU/Linux** as
+[deb](https://solidcommunity.au/installers/moviestar_amd64.deb) or
+[zip](https://solidcommunity.au/installers/moviestar-dev-linux.zip); for
+**macOS** as
+[zip](https://solidcommunity.au/installers/moviestar-dev-macos.zip); for
+**Windows** as
+[zip](https://solidcommunity.au/installers/moviestar-dev-windows.zip) or
+[inno](https://solidcommunity.au/installers/moviestar-dev-windows-inno.exe).
 
-Run the app online: [**web**](https://moviestar.solidcommunity.au).
-
-Download the latest version:
-GNU/Linux
-[**deb**](https://solidcommunity.au/installers/moviestar_amd64.deb) or
-[**zip**](https://solidcommunity.au/installers/moviestar-dev-linux.zip) -
-Android
-[**apk**](https://solidcommunity.au/installers/moviestar.apk) -
-macOS
-[**zip**](https://solidcommunity.au/installers/moviestar-dev-macos.zip) -
-Windows
-[**zip**](https://solidcommunity.au/installers/moviestar-dev-windows.zip) or
-[**inno**](https://solidcommunity.au/installers/moviestar-dev-windows-inno.exe).
-
-Coding documentation is available from [solid community
-au](https://solidcommunity.au/docs/moviestar)
+Contributions are welcome. Visit
+[github](https://github.com/anusii/moviestar) to submit an issue or,
+even better, fork the repository yourself, update the code, and submit
+a Pull Request. Coding documentation is available from [solid
+community au](https://solidcommunity.au/docs/moviestar).
 
 ## 1.1 Review, Test, and Consolidate
 
++ Bug fix for saving/reading lists [1.0.2 20260223 tonypioneer]
++ Bug fix for the search functionality [1.0.1 20260223 tonypioneer]
 + Default to kanban view. Update button. [1.0.0 20251028 atangster]
 + Add support for snap build [0.1.0 20251007 gjw]
 

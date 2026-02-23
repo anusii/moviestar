@@ -5,6 +5,21 @@
 /// Licensed under the GNU General Public License, Version 3 (the "License").
 ///
 /// License: https://opensource.org/license/gpl-3-0.
+//
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+// details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <https://opensource.org/license/gpl-3-0>.
+///
+/// Authors: Kevin Wang.
 
 library;
 
@@ -12,6 +27,7 @@ import 'package:flutter/material.dart';
 
 import 'package:moviestar/constants/timing_constants.dart';
 import 'package:moviestar/models/movie.dart';
+import 'package:moviestar/utils/sort_preference_service.dart';
 import 'package:moviestar/widgets/sort_controls.dart';
 
 /// Enum for different column types in the kanban board.
@@ -93,9 +109,15 @@ class KanbanBoardController extends ChangeNotifier {
   // Sorting state for each column.
 
   final Map<String, MovieSortCriteria> _columnSortCriteria = {
-    'recommended': MovieSortCriteria.ratingDesc, // Default: by rating
-    'towatch': MovieSortCriteria.nameAsc, // Default: alphabetical
-    'watched': MovieSortCriteria.dateDesc, // Default: recent first
+    'recommended': MovieSortCriteria.ratingDesc,
+    'towatch': MovieSortCriteria.nameAsc,
+    'watched': MovieSortCriteria.dateDesc,
+  };
+
+  static const Map<String, MovieSortCriteria> _defaultSortCriteria = {
+    'recommended': MovieSortCriteria.ratingDesc,
+    'towatch': MovieSortCriteria.nameAsc,
+    'watched': MovieSortCriteria.dateDesc,
   };
 
   // Getters.
@@ -105,16 +127,29 @@ class KanbanBoardController extends ChangeNotifier {
   Map<String, MovieSortCriteria> get columnSortCriteria =>
       Map.unmodifiable(_columnSortCriteria);
 
+  /// Restores persisted sort preferences for every known column.
+
+  Future<void> loadSortPreferences() async {
+    for (final entry in _defaultSortCriteria.entries) {
+      _columnSortCriteria[entry.key] = await SortPreferenceService.load(
+        entry.key,
+        fallback: entry.value,
+      );
+    }
+    notifyListeners();
+  }
+
   /// Get the key for tracking operations.
 
   String _getOperationKey(KanbanColumnType type, String id) {
     return '${type.name}_$id';
   }
 
-  /// Handle sort change for a column.
+  /// Handle sort change for a column and persist the selection.
 
   void onSortChanged(String columnId, MovieSortCriteria criteria) {
     _columnSortCriteria[columnId] = criteria;
+    SortPreferenceService.save(columnId, criteria);
     notifyListeners();
   }
 

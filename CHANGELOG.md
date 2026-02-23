@@ -27,8 +27,13 @@ even better, fork the repository yourself, update the code, and submit
 a Pull Request. Coding documentation is available from [solid
 community au](https://solidcommunity.au/docs/moviestar).
 
+We make this project available for free so if you appreciate the app
+then please show some ❤️ and tap on the star at
+[GitHub](https://github.com/anusii/moviestar) to support our work.
+
 ## 1.1 Review, Test, and Consolidate
 
++ Remember sort order between sessions [1.0.3 20260224 tonypioneer]
 + Bug fix for saving/reading lists [1.0.2 20260223 tonypioneer]
 + Bug fix for the search functionality [1.0.1 20260223 tonypioneer]
 + Default to kanban view. Update button. [1.0.0 20251028 atangster]

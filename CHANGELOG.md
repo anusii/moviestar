@@ -2,13 +2,11 @@
 
 Noted here are the high level changes for the app.  Each update
 includes a short user-oriented description.  The next release is 1.1
-following incremental updates through the 1.0.n series.  The `[version
-timestamp user]` string is utilised by the flutter
-[version_widget](https://pub.dev/packages/version_widget) package.
+following incremental updates through the 1.0.n series.
 
 You can run the app in your browser from the
 [**web**](https://moviestar.solidcommunity.au) or else download and
-locally install the latest version from the [Solid Community
+install locally the latest version from the [Solid Community
 AU](https://solidcommunity.au) or directly: for
 **Android** as
 [apk](https://solidcommunity.au/installers/moviestar.apk); for
@@ -33,6 +31,7 @@ then please show some ❤️ and tap on the star at
 
 ## 1.1 Review, Test, and Consolidate
 
++ Update solidui/solidpo dependencies [1.0.4 20260703 gjw]
 + Remember sort order between sessions [1.0.3 20260224 tonypioneer]
 + Bug fix for saving/reading lists [1.0.2 20260223 tonypioneer]
 + Bug fix for the search functionality [1.0.1 20260223 tonypioneer]

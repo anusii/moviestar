@@ -2,7 +2,9 @@
 
 # set -x
 
-# 20241024 gjw After a github action has built the bundles and stored
+# 20260216 gjw Compare files.
+#
+# After a github action has built the bundles and stored
 # them as artefacts on github, we can upload them to the ${HOST} for
 # distribution.
 
@@ -10,7 +12,7 @@ APP=$(basename "$(dirname "$(pwd)")")
 REP=$(git remote get-url origin | sed -E 's#.*[/:]([^/]+)/[^/]+(\.git)?$#\1#')
 
 HOST=solidcommunity.au
-FLDR=/var/www/html/installers/
+FLDR=/var/www/html/web/installers/
 DEST=${HOST}:${FLDR}
 
 ssh ${HOST} 'if [ ! -d ${FLDR} ]; then mkdir ${FLDR}; chown gjw:gjw ${FLDR}; fi'
@@ -83,6 +85,10 @@ if [[ "${status}" == "completed" ]]; then
 
     TARGET="${APP}_amd64.deb"
 
+    # 20260123 gjw Note that this obtains the latest available
+    # linxu-deb artifact, which is not necessarily the one from the
+    # latest bumpId if it failed to be build for the latest bumpId.
+
     artifactId=$(gh api -H "Accept: application/vnd.github+json" /repos/${REP}/${APP}/actions/artifacts \
 		    --jq '.artifacts[] | select(.name | endswith("-linux-deb")) | .id' | head -n 1)
 
@@ -100,6 +106,8 @@ if [[ "${status}" == "completed" ]]; then
 	ssh ${HOST} "cd ${FLDR}; chmod 0644 ${TARGET}"
 	echo  "Archive as installers/ARCHIVE/${fname}"
 	mv -f ${fname} ARCHIVE/
+	echo  "Install locally from installers/ARCHIVE/${fname}"
+	wajig install ARCHIVE/${fname}
     fi
 
     echo ""
@@ -157,6 +165,7 @@ if [[ "${status}" == "completed" ]]; then
 
     artifactId=$(gh api -H "Accept: application/vnd.github+json" /repos/${REP}/${APP}/actions/artifacts \
 		    --jq '.artifacts[] | select(.name | endswith("-macos-zip")) | .id' | head -n 1)
+    echo "artifact id: $artifactId"
 
     if [[ -z "${artifactId}" ]]; then
 	echo "No artifact found."
@@ -344,6 +353,9 @@ if [[ "${status}" == "completed" ]]; then
     fi
 
     echo ""
+
+    echo '******************** FINISHED.'
+
 
 else
 

@@ -10,8 +10,10 @@
 ARCHIVE
 ignore
 pubspec.yaml.*
+!templates/solidpod/pubspec.yaml.tmpl
 
 qtest_*.txt
+/test/widget_test.dart
 
 installers/*.apk
 installers/*.exe
@@ -79,6 +81,7 @@ integration_test/fixtures/tmdb_api_key.json
 .svn/
 .swiftpm/
 migrate_working_dir/
+/.metadata
 
 #-----------------------------------------------------------------------
 # IntelliJ related
@@ -151,7 +154,8 @@ analysis_benchmark.json
 .pub-cache/
 .pub-preload-cache/
 .pub/
-build/
+/build/
+/coverage/
 flutter_*.png
 linked_*.ds
 unlinked.ds
@@ -252,10 +256,24 @@ ios/project-*.yml
 # ios/macos generated project files
 macos/Runner.xcodeproj/
 macos/Runner.xcworkspace/
+macos/Runner/Info.plist
 
 # Backups of ios/macos project config yml and Podfile
 macos/Podfile-*
 macos/project-*.yml
+
+/macos/Podfile.lock
+/macos/.gitignore
+/macos/Podfile
+/macos/Flutter/
+/macos/Runner.xcworkspace/
+/macos/RunnerTests/
+/macos/Runner/AppDelegate.swift
+/macos/Runner/Info.plist
+/macos/Runner/MainFlutterWindow.swift
+/macos/Runner/Assets.xcassets/
+/macos/Runner/Base.lproj/
+/macos/Runner/Configs/
 
 #-----------------------------------------------------------------------
 # Windows
@@ -272,7 +290,14 @@ macos/project-*.yml
 **/linux/flutter/generated_plugin_registrant.cc
 **/linux/flutter/generated_plugin_registrant.h
 **/linux/flutter/generated_plugins.cmake
-**/linux/runner
+
+# 20260224 gjw Should we ignore the linux/runner? It is needed when
+# building a linux binary. It can be automatically created with
+# `flutter create --platform=linux --org=com.togaware .` So perhaps
+# check it in for now to avoid having to run that extra flutter
+# command.
+#
+# **/linux/runner
 
 #-----------------------------------------------------------------------
 # Coverage
@@ -281,10 +306,14 @@ macos/project-*.yml
 coverage/
 
 #-----------------------------------------------------------------------
-# Symbols
+# Symbolication related
 #-----------------------------------------------------------------------
 
 app.*.symbols
+
+# Obfuscation related
+
+app.*.map.json
 
 #-----------------------------------------------------------------------
 # Exceptions to above rules.
@@ -296,3 +325,11 @@ app.*.symbols
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+
+#-----------------------------------------------------------------------
+# Claude related files
+#-----------------------------------------------------------------------
+
+CLAUDE.md
+Claude.md
+.claude/*

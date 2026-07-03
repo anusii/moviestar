@@ -31,6 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solidui/solidui.dart';
 
+import 'package:moviestar/constants/solid_client.dart';
 import 'package:moviestar/my_home_page.dart';
 
 /// Creates a Solid login widget for authentication.
@@ -79,6 +80,8 @@ Widget _buildNormalLogin(String serverUrl, SharedPreferences prefs) {
                 image: const AssetImage('assets/images/app_image.jpg'),
                 logo: const AssetImage('assets/images/app_icon.png'),
                 link: 'https://github.com/anusii/moviestar/blob/dev/README.md',
+                clientId: solidClientId,
+                redirectUris: solidRedirectUris,
 
                 // Use a wrapper widget to check for API key after login.
 

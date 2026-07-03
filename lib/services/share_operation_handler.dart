@@ -15,6 +15,7 @@ import 'package:solidpod/solidpod.dart'
 import 'package:solidui/solidui.dart'
     show getKeyFromUserIfRequired, loginIfRequired;
 
+import 'package:moviestar/constants/solid_client.dart';
 import 'package:moviestar/models/sharing_models.dart';
 import 'package:moviestar/services/webid_validator.dart';
 
@@ -48,7 +49,11 @@ class ShareOperationHandler {
 
       // Ensure user is logged in and has proper keys.
 
-      await loginIfRequired(context);
+      await loginIfRequired(
+        context: context,
+        clientId: solidClientId,
+        redirectUris: solidRedirectUris,
+      );
       if (!context.mounted) {
         return ShareResult.failure('Context no longer mounted');
       }
@@ -151,7 +156,11 @@ class ShareOperationHandler {
 
       // Ensure user is logged in and has proper keys.
 
-      await loginIfRequired(context);
+      await loginIfRequired(
+        context: context,
+        clientId: solidClientId,
+        redirectUris: solidRedirectUris,
+      );
       if (!context.mounted) {
         return const PermissionResult(
           granted: false,

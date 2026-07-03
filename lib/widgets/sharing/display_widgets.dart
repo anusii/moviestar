@@ -317,7 +317,7 @@ Future<bool?> navigateToGrantPermissionUi({
             ],
           ),
           body: GrantPermissionUi(
-            resourceName: fileName,
+            resourceNames: [fileName],
             title: '',
             accessModeList: accessModeList,
             recipientTypeList: recipientTypeList,

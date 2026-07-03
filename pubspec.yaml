@@ -42,14 +42,6 @@ dependencies:
 
 dependency_overrides:
   rxdart: ^0.28.0
-  solidpod:
-    git:
-      url: https://github.com/anusii/solidpod.git
-      ref: dev
-  solidui:
-    git:
-      url: https://github.com/anusii/solidui.git
-      ref: dev
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.2

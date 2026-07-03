@@ -1,16 +1,16 @@
 {
   "@context": "https://www.w3.org/ns/solid/oidc-context.jsonld",
-  "client_id": "https://anusii.github.io/todopod/client-profile.jsonld",
-  "client_name": "TodoPod",
+  "client_id": "https://anusii.github.io/moviepod/client-profile.jsonld",
+  "client_name": "Moviepod",
   "application_type": "native",
   "redirect_uris": [
-    "https://anusii.github.io/todopod/redirect.html",
-    "com.togaware.todopod://redirect",
+    "https://anusii.github.io/moviepod/redirect.html",
+    "com.togaware.moviepod://redirect",
     "http://localhost:4400/redirect"
   ],
   "post_logout_redirect_uris": [
-    "https://anusii.github.io/todopod/redirect.html",
-    "com.togaware.todopod://redirect",
+    "https://anusii.github.io/moviepod/redirect.html",
+    "com.togaware.moviepod://redirect",
     "http://localhost:4400/redirect"
   ],
   "scope": "openid profile offline_access webid",

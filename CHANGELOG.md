@@ -31,6 +31,7 @@ then please show some ❤️ and tap on the star at
 
 ## 1.1 Review, Test, and Consolidate
 
++ Migrate to oidc update [1.0.5 20260703 gjw]
 + Update solidui/solidpo dependencies [1.0.4 20260703 gjw]
 + Remember sort order between sessions [1.0.3 20260224 tonypioneer]
 + Bug fix for saving/reading lists [1.0.2 20260223 tonypioneer]

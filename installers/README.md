@@ -15,14 +15,14 @@ Run the app online: [**web**](https://moviestar.solidcommunity.au).
 Download the latest version:
 **GNU/Linux**
 [deb](https://solidcommunity.au/installers/moviestar_amd64.deb) or
-[zip](https://solidcommunity.au/installers/moviestar-dev-linux.zip);
+[zip](https://solidcommunity.au/installers/moviestar-linux.zip);
 **Android**
 [apk](https://solidcommunity.au/installers/moviestar.apk);
 **macOS**
-[zip](https://solidcommunity.au/installers/moviestar-dev-macos.zip);
+[zip](https://solidcommunity.au/installers/moviestar-macos.zip);
 **Windows**
-[zip](https://solidcommunity.au/installers/moviestar-dev-windows.zip) or
-[inno](https://solidcommunity.au/installers/moviestar-dev-windows-inno.exe).
+[zip](https://solidcommunity.au/installers/moviestar-windows.zip) or
+[inno](https://solidcommunity.au/installers/moviestar-windows-inno.exe).
 
 ## Prerequisite
 
@@ -51,13 +51,13 @@ sudo dpkg --install moviestar_amd64.deb
 
 ### Zip Install
 
-Download [moviestar-dev-linux.zip](https://solidcommunity.au/installers/moviestar-dev-linux.zip)
+Download [moviestar-linux.zip](https://solidcommunity.au/installers/moviestar-linux.zip)
 
 To try it out:
 
 ```bash
-wget https://solidcommunity.au/installers/moviestar-dev-linux.zip -O moviestar-dev-linux.zip
-unzip moviestar-dev-linux.zip -d moviestar
+wget https://solidcommunity.au/installers/moviestar-linux.zip -O moviestar-linux.zip
+unzip moviestar-linux.zip -d moviestar
 ./moviestar/moviestar
 ```
 
@@ -66,7 +66,7 @@ with a desktop icon for their desktop, begin by downloading the **zip** and
 installing that into a local folder:
 
 ```bash
-unzip moviestar-dev-linux.zip -d ${HOME}/.local/share/moviestar
+unzip moviestar-linux.zip -d ${HOME}/.local/share/moviestar
 ```
 
 Then set up your local installation (only required once):
@@ -84,7 +84,7 @@ wget https://github.com/anusii/moviestar/raw/dev/installers/app.png \
 To install for any user on the computer:
 
 ```bash
-sudo unzip moviestar-dev-linux.zip -d /opt/moviestar
+sudo unzip moviestar-linux.zip -d /opt/moviestar
 sudo ln -s /opt/moviestar/moviestar /usr/local/bin/
 wget https://raw.githubusercontent.com/anusii/moviestar/dev/installers/app. \
  desktop -O ${HOME}/usr/local/share/applications/com.togaware.moviestar.desktop
@@ -98,7 +98,7 @@ Alt-F2 and type `moviestar` then Enter.
 ## MacOS
 
 The zip file
-[moviestar-dev-macos.zip](https://solidcommunity.au/installers/moviestar-dev-macos.zip)
+[moviestar-macos.zip](https://solidcommunity.au/installers/moviestar-macos.zip)
 can be installed on MacOS. Download the file and open it on your
 Mac. Then, holding the Control key click on the app icon to display a
 menu. Choose `Open`. Then accept the warning to then run the app. The
@@ -117,5 +117,5 @@ the web-based app directly.
 ## Windows Installer
 
 Download and run the self extracting archive
-[moviestar-dev-windows-inno.exe](https://solidcommunity.au/installers/moviestar-dev-windows-inno.exe)
+[moviestar-windows-inno.exe](https://solidcommunity.au/installers/moviestar-windows-inno.exe)
 to self install the app on Windows.

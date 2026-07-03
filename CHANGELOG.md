@@ -12,12 +12,12 @@ AU](https://solidcommunity.au) or directly: for
 [apk](https://solidcommunity.au/installers/moviestar.apk); for
 **GNU/Linux** as
 [deb](https://solidcommunity.au/installers/moviestar_amd64.deb) or
-[zip](https://solidcommunity.au/installers/moviestar-dev-linux.zip); for
+[zip](https://solidcommunity.au/installers/moviestar-linux.zip); for
 **macOS** as
-[zip](https://solidcommunity.au/installers/moviestar-dev-macos.zip); for
+[zip](https://solidcommunity.au/installers/moviestar-macos.zip); for
 **Windows** as
-[zip](https://solidcommunity.au/installers/moviestar-dev-windows.zip) or
-[inno](https://solidcommunity.au/installers/moviestar-dev-windows-inno.exe).
+[zip](https://solidcommunity.au/installers/moviestar-windows.zip) or
+[inno](https://solidcommunity.au/installers/moviestar-windows-inno.exe).
 
 Contributions are welcome. Visit
 [github](https://github.com/anusii/moviestar) to submit an issue or,
@@ -45,7 +45,7 @@ then please show some ❤️ and tap on the star at
 + REFACTOR pod sharing [0.0.32 20250917 atangster]
 + Update SolidScaffold from solidui [0.0.31 20250913 tonypioneer]
 + Refactor code to reduce technical debt [0.0.30 20250910 atangster]
-+ BUGs: TV mis-coded as MOVIE, API key fixes, Secret key fixes [0.0.29 20250910 atangster]
++ BUGs: TV mis-coded as MOVIE, API keys, Secret fixes [0.0.29 20250910 atangster]
 + SHOWS supported in other lists [0.0.28 20250909 atangster]
 + WEB lists use busy icon [0.0.27 20250909 atangster]
 + SETTINGS mode to appbar [0.0.26 20250909 atangster]

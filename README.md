@@ -35,15 +35,15 @@ platform from the [Solid Community AU](https://solidcommunity.au):
 + **GNU/Linux**
   [snap](https://solidcommunity.au/installers/moviestar_amd64.snap) or
   [deb](https://solidcommunity.au/installers/moviestar_amd64.deb) or
-  [zip](https://solidcommunity.au/installers/moviestar-dev-linux.zip);
+  [zip](https://solidcommunity.au/installers/moviestar-linux.zip);
 + **macOS**
-  [dmg](https://solidcommunity.au/installers/moviestar-dev-macos-unsigned.dmg)
+  [dmg](https://solidcommunity.au/installers/moviestar-macos.dmg)
   or
-  [zip](https://solidcommunity.au/installers/moviestar-dev-macos.zip);
+  [zip](https://solidcommunity.au/installers/moviestar-macos.zip);
 + **Windows**
-  [zip](https://solidcommunity.au/installers/moviestar-dev-windows.zip)
+  [zip](https://solidcommunity.au/installers/moviestar-windows.zip)
   or
-  [inno](https://solidcommunity.au/installers/moviestar-dev-windows-inno.exe).
+  [inno](https://solidcommunity.au/installers/moviestar-windows-inno.exe).
 
 Contributions are welcome. Visit
 [github](https://github.com/anusii/moviestar) to submit an issue or,
@@ -144,7 +144,7 @@ Add support for recommendation engine - review
 [recommenders](https://github.com/recommenders-team/recommenders).
 
 <!-- markdownlint-disable MD036 -->
-*Time-stamp: <Friday 2025-10-31 08:40:44 +1100 Graham Williams>*
+*Time-stamp: <Friday 2026-07-03 16:14:03 +1000 Graham Williams>*
 <!-- markdownlint-enable MD036 -->
 
 <!-- markdownlint-disable MD053 -->

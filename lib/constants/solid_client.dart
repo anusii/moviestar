@@ -26,7 +26,7 @@ library;
 /// The app's Solid-OIDC client profile document URL.
 
 const String solidClientId =
-    'https://anusii.github.io/moviestar/client-profile.jsonld';
+    'https://moviestar.solidcommunity.au/client-profile.jsonld';
 
 /// Per-platform redirect URIs. solidpod's pickRedirectUri selects the right
 /// entry at runtime (web redirect, custom scheme for mobile/desktop, and the
@@ -35,5 +35,5 @@ const String solidClientId =
 const List<String> solidRedirectUris = [
   'https://moviestar.solidcommunity.au/redirect.html',
   'com.togaware.moviestar://redirect',
-  'http://localhost:4400/redirect',
+  'http://localhost:4400/redirect.html',
 ];

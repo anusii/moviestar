@@ -33,7 +33,7 @@ const String solidClientId =
 /// localhost entry for local development).
 
 const List<String> solidRedirectUris = [
-  'https://anusii.github.io/moviestar/redirect.html',
+  'https://moviestar.solidcommunity.au/redirect.html',
   'com.togaware.moviestar://redirect',
   'http://localhost:4400/redirect',
 ];

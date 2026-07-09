@@ -1,18 +1,16 @@
 {
   "@context": "https://www.w3.org/ns/solid/oidc-context.jsonld",
-  "client_id": "https://moviestar.solidcommunity.au/client-profile.jsonld",
+  "client_id": "https://anusii.github.io/moviestar/client-profile.jsonld",
   "client_name": "Moviestar",
   "application_type": "native",
   "redirect_uris": [
     "https://moviestar.solidcommunity.au/redirect.html",
     "com.togaware.moviestar://redirect",
-    "http://localhost:4400/redirect",
     "http://localhost:4400/redirect.html"
   ],
   "post_logout_redirect_uris": [
     "https://moviestar.solidcommunity.au/redirect.html",
     "com.togaware.moviestar://redirect",
-    "http://localhost:4400/redirect",
     "http://localhost:4400/redirect.html"
   ],
   "scope": "openid profile offline_access webid",

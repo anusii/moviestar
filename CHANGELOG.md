@@ -31,6 +31,8 @@ then please show some ❤️ and tap on the star at
 
 ## 1.1 Review, Test, and Consolidate
 
++ Updated oidc for chrom/web support [1.0.7 20260710 gjw]
++ Update oidc handling [1.0.6 20260710 gjw]
 + Migrate to oidc update [1.0.5 20260703 gjw]
 + Update solidui/solidpo dependencies [1.0.4 20260703 gjw]
 + Remember sort order between sessions [1.0.3 20260224 tonypioneer]

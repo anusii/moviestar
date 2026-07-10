@@ -23,17 +23,20 @@
 
 library;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 /// The app's Solid-OIDC client profile document URL.
 
 const String solidClientId =
     'https://anusii.github.io/moviestar/client-profile.jsonld';
 
 /// Per-platform redirect URIs. solidpod's pickRedirectUri selects the right
-/// entry at runtime (web redirect, custom scheme for mobile/desktop, and the
-/// localhost entry for local development).
+/// entry at runtime (custom scheme for mobile/desktop, and the localhost entry
+/// for local development).
 
-const List<String> solidRedirectUris = [
-  'https://anusii.github.io/moviestar/redirect.html',
-  'com.togaware.moviestar://redirect',
-  'http://localhost:4400/redirect',
-];
+List<String> get solidRedirectUris => kIsWeb
+    ? ['${Uri.base.origin}/redirect.html']
+    : const [
+        'com.togaware.moviestar://redirect',
+        'http://localhost:4400/redirect.html',
+      ];

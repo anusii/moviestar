@@ -343,7 +343,7 @@ jobs:
     # Later versions of macos (macos-15 and macos-latest) complain:
     # Error: Xcode failed to resolve Swift Package Manager dependencies
 
-    runs-on: macos-latest
+    runs-on: macos-14
 
     steps:
       - name: Display OS Information

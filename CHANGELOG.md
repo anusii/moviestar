@@ -17,7 +17,7 @@ AU](https://solidcommunity.au) or directly: for
 [zip](https://solidcommunity.au/installers/moviestar-macos.zip); for
 **Windows** as
 [zip](https://solidcommunity.au/installers/moviestar-windows.zip) or
-[inno](https://solidcommunity.au/installers/moviestar-windows-inno.exe).
+[exe](https://solidcommunity.au/installers/moviestar-windows-inno.exe).
 
 Contributions are welcome. Visit
 [github](https://github.com/anusii/moviestar) to submit an issue or,
@@ -31,7 +31,7 @@ then please show some ❤️ and tap on the star at
 
 ## 1.1 Review, Test, and Consolidate
 
-+ Updated oidc for chrom/web support [1.0.7 20260710 gjw]
++ Updated oidc for chrome/web support [1.0.7 20260710 gjw]
 + Update oidc handling [1.0.6 20260710 gjw]
 + Migrate to oidc update [1.0.5 20260703 gjw]
 + Update solidui/solidpo dependencies [1.0.4 20260703 gjw]

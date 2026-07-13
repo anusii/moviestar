@@ -22,7 +22,7 @@ Download the latest version:
 [zip](https://solidcommunity.au/installers/moviestar-macos.zip);
 **Windows**
 [zip](https://solidcommunity.au/installers/moviestar-windows.zip) or
-[inno](https://solidcommunity.au/installers/moviestar-windows-inno.exe).
+[exe](https://solidcommunity.au/installers/moviestar-windows-inno.exe).
 
 ## Prerequisite
 

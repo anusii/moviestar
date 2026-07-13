@@ -43,7 +43,7 @@ platform from the [Solid Community AU](https://solidcommunity.au):
 + **Windows**
   [zip](https://solidcommunity.au/installers/moviestar-windows.zip)
   or
-  [inno](https://solidcommunity.au/installers/moviestar-windows-inno.exe).
+  [exe](https://solidcommunity.au/installers/moviestar-windows-inno.exe).
 
 Contributions are welcome. Visit
 [github](https://github.com/anusii/moviestar) to submit an issue or,

@@ -58,7 +58,7 @@ class CacheSettingsService {
     _prefs = await SharedPreferences.getInstance();
     _initialized = true;
     developer.log(
-      'Cache settings service initialized',
+      'Cache settings service initialised',
       name: 'CacheSettingsService',
     );
   }

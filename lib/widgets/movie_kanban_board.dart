@@ -77,7 +77,7 @@ class _MovieKanbanBoardState extends ConsumerState<MovieKanbanBoard> {
     _searchController = KanbanSearchController();
     _settingsController = KanbanSettingsController();
 
-    // Initialize drag handler after context is available.
+    // Initialise drag handler after context is available.
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _dragHandler = KanbanDragHandler(

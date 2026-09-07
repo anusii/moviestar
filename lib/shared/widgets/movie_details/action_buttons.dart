@@ -35,7 +35,7 @@ class MovieActionButtons extends StatelessWidget {
 
   final bool hasMovieFile;
 
-  /// Service for managing favorite movies.
+  /// Service for managing favourite movies.
 
   final FavoritesService favoritesService;
 

@@ -23,7 +23,7 @@
 
 library;
 
-import 'package:rdflib/rdflib.dart';
+import 'package:rdf/rdf.dart';
 import 'package:solidpod/solidpod.dart' show tripleMapToTurtle;
 
 import 'package:moviestar/shared/utils/turtle/base_serializer.dart';

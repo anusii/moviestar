@@ -75,10 +75,10 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
     }
   }
 
-  /// Triggers app reinitialization after API key is set.
+  /// Triggers app reinitialisation after API key is set.
 
   void _triggerAppReinitialization() {
-    // The provider invalidations handle the reinitialization.
+    // The provider invalidations handle the reinitialisation.
     // No additional action needed since providers are already invalidated.
   }
 
@@ -129,8 +129,8 @@ class _ApiSettingsPanelState extends ConsumerState<ApiSettingsPanel> {
         _navigateToHomeScreen();
       }
 
-      // Trigger app reinitialization after API key is set.
-      // This will properly initialize POD folders and data loading.
+      // Trigger app reinitialisation after API key is set.
+      // This will properly initialise POD folders and data loading.
 
       _triggerAppReinitialization();
     }

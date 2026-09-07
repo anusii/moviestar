@@ -32,7 +32,7 @@ import 'package:moviestar/utils/is_logged_in.dart';
 
 /// Base class for services that interact with Solid POD storage.
 /// Provides common functionality for login validation, context checking,
-/// and POD file operations while preserving exact existing behavior.
+/// and POD file operations while preserving exact existing behaviour.
 
 abstract class BasePodService extends ChangeNotifier {
   final BuildContext _context;
@@ -51,7 +51,7 @@ abstract class BasePodService extends ChangeNotifier {
   Widget get child => _child;
 
   /// Executes a POD operation with standard validation and error handling.
-  /// Preserves exact behavior of existing services.
+  /// Preserves exact behaviour of existing services.
 
   @protected
   Future<T?> executePodOperation<T>({

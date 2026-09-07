@@ -105,7 +105,7 @@ class TimingConstants {
 
   /// Solid login redirect delay (1.5 seconds).
   ///
-  /// Delay before redirecting after login initialization.
+  /// Delay before redirecting after login initialisation.
 
   static const Duration loginRedirectDelay = Duration(milliseconds: 1500);
 

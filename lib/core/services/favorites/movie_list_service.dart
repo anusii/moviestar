@@ -220,7 +220,7 @@ class MovieListService extends BasePodService with PodOperationsMixin {
     return await _operationsHelper.getAllMovieLists();
   }
 
-  /// Initializes a MovieList for a specific type (to_watch, watched, favorites).
+  /// Initialises a MovieList for a specific type (to_watch, watched, favorites).
 
   Future<String?> initializeMovieList(
     String listType,

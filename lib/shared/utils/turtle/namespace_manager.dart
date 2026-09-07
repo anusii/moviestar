@@ -23,7 +23,7 @@
 
 library;
 
-import 'package:rdflib/rdflib.dart';
+import 'package:rdf/rdf.dart';
 
 /// Manages all RDF/TTL namespaces and predicates used in MovieStar ontology.
 

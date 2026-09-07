@@ -31,7 +31,7 @@ class MovieInfoSectionWithoutTitle extends StatefulWidget {
 
   final Movie movie;
 
-  /// Service for managing favorite movies.
+  /// Service for managing favourite movies.
 
   final FavoritesService favoritesService;
 
@@ -109,7 +109,7 @@ class _MovieInfoSectionWithoutTitleState
       return;
     }
 
-    // For own movies, load from favorites service.
+    // For own movies, load from favourites service.
 
     try {
       final rating =
@@ -170,7 +170,7 @@ class _MovieInfoSectionWithoutTitleState
       return;
     }
 
-    // For own movies, load from favorites service.
+    // For own movies, load from favourites service.
 
     try {
       final comments =

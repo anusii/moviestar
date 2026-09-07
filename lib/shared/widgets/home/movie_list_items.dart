@@ -43,7 +43,7 @@ class HomeMovieListItems extends StatelessWidget {
 
   final bool fromCache;
 
-  /// Service for managing favorite movies.
+  /// Service for managing favourite movies.
 
   final FavoritesService favoritesService;
 

@@ -44,7 +44,7 @@ class QuickActionsDialog extends StatefulWidget {
 
   final Movie movie;
 
-  /// The favorites service to use for actions.
+  /// The favourites service to use for actions.
 
   final FavoritesService favoritesService;
 

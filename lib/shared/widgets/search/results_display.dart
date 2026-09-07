@@ -20,7 +20,7 @@ import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/screens/movie_details_screen.dart';
 import 'package:moviestar/utils/movie_display_utils.dart';
 
-/// Widget that displays search results organized by category.
+/// Widget that displays search results organised by category.
 
 class SearchResultsDisplay extends StatelessWidget {
   final Map<String, List<ContentItem>> searchResults;

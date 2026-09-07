@@ -1,4 +1,4 @@
-/// Cache management for POD favorites service.
+/// Cache management for POD favourites service.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -27,7 +27,7 @@ import 'package:moviestar/core/services/pod/favorites_file_manager.dart';
 import 'package:moviestar/core/services/pod/favorites_stream_manager.dart';
 import 'package:moviestar/models/movie.dart';
 
-/// Handles caching operations for POD favorites service.
+/// Handles caching operations for POD favourites service.
 
 class PodFavoritesCacheManager {
   final Map<int, Movie> _movieCache;

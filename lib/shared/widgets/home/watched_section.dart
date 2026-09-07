@@ -42,7 +42,7 @@ import 'package:moviestar/widgets/movie_card.dart';
 /// This section shows movies from the user's watched list.
 
 class HomeWatchedSection extends ConsumerWidget {
-  /// Service for managing favorite movies.
+  /// Service for managing favourite movies.
 
   final FavoritesService favoritesService;
 

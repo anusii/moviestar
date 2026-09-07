@@ -68,7 +68,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   String? _webId;
   String? _name;
 
-  /// Service for managing favorite movies.
+  /// Service for managing favourite movies.
 
   late final FavoritesServiceManager _favoritesServiceManager;
   late final FavoritesService _favoritesService;
@@ -89,7 +89,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   late final ApiKeyService _apiKeyService;
 
-  /// Flag to track if apiKeyProvider has been initialized with the service.
+  /// Flag to track if apiKeyProvider has been initialised with the service.
 
   bool _apiKeyProviderInitialized = false;
 
@@ -251,7 +251,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         hasApiKey = apiKey != null && apiKey.trim().isNotEmpty;
 
         if (!hasApiKey) {
-          // Show API key dialog immediately but continue with POD initialization.
+          // Show API key dialog immediately but continue with POD initialisation.
 
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             if (mounted) {
@@ -260,7 +260,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 _apiKeyService,
                 ref: ref,
                 onApiKeySet: () {
-                  // Reinitialize after API key is set.
+                  // Reinitialise after API key is set.
 
                   reinitializeAfterApiKey();
                 },
@@ -272,10 +272,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           });
         }
       } catch (e) {
-        // Failed to initialize API services.
+        // Failed to initialise API services.
       }
 
-      // Always initialize POD folders regardless of API key status.
+      // Always initialise POD folders regardless of API key status.
 
       if (mounted) {
         setState(() {
@@ -418,7 +418,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     }
   }
 
-  /// Reinitializes the app after API key is set.
+  /// Reinitialises the app after API key is set.
 
   Future<void> reinitializeAfterApiKey() async {
     if (!mounted) return;
@@ -453,7 +453,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     ref.invalidate(upcomingMoviesWithCacheInfoProvider);
     ref.invalidate(configuredCachedMovieServiceProvider);
 
-    // Re-initialize app data.
+    // Re-initialise app data.
 
     await _initialiseAppData();
   }

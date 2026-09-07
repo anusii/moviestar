@@ -80,7 +80,7 @@ class ListsEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Create your first custom list to organize\nyour movies the way you want!\n\nCustom lists are stored in your personal POD\nand require you to be logged in.',
+              'Create your first custom list to organise\nyour movies the way you want!\n\nCustom lists are stored in your personal POD\nand require you to be logged in.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,

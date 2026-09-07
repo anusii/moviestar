@@ -33,7 +33,7 @@ import 'package:moviestar/providers/cached_movie_service_provider.dart';
 /// Saves an API key and properly invalidates all dependent providers.
 ///
 /// This function should be used by both the API key dialog and the settings
-/// panel to ensure consistent behavior when saving API keys.
+/// panel to ensure consistent behaviour when saving API keys.
 ///
 /// Parameters:
 /// - [apiKeyService]: The API key service to save the key to

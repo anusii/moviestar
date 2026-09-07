@@ -109,13 +109,13 @@ class SharedListNavigationHandler {
         Navigator.pop(context);
       }
 
-      // Use provided favorites service or create a minimal one for shared context.
+      // Use provided favourites service or create a minimal one for shared context.
 
       FavoritesService finalFavoritesService;
       if (favoritesService != null) {
         finalFavoritesService = favoritesService!;
       } else {
-        // Create a minimal favorites service for shared viewing context.
+        // Create a minimal favourites service for shared viewing context.
 
         final prefs = await SharedPreferences.getInstance();
         if (!context.mounted) return;

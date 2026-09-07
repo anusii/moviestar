@@ -1,5 +1,5 @@
 /// Item builders for shared movies list.
-/// Extracted to reduce file size and improve organization.
+/// Extracted to reduce file size and improve organisation.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 

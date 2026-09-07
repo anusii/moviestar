@@ -29,7 +29,7 @@ import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 
 /// Manages stream controllers for PodFavoritesService.
-/// Extracted to reduce main service file size while preserving exact behavior.
+/// Extracted to reduce main service file size while preserving exact behaviour.
 
 class PodFavoritesStreamManager {
   /// Stream controller for to-watch movies.

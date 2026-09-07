@@ -43,7 +43,7 @@ import 'package:moviestar/widgets/base_screen.dart';
 /// A screen that displays all custom movie lists.
 
 class MyListsScreen extends ConsumerStatefulWidget {
-  /// Service for managing favorite movies and lists.
+  /// Service for managing favourite movies and lists.
 
   final FavoritesService favoritesService;
 

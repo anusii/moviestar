@@ -49,7 +49,7 @@ class CustomListDetailScreen extends ConsumerStatefulWidget {
 
   final CustomList customList;
 
-  /// Service for managing favorite movies and lists.
+  /// Service for managing favourite movies and lists.
 
   final FavoritesService favoritesService;
 
@@ -133,7 +133,7 @@ class _CustomListDetailScreenState extends ConsumerState<CustomListDetailScreen>
       }
     }
 
-    // Fallback to loading from API (original behavior).
+    // Fallback to loading from API (original behaviour).
 
     await _loadMoviesFromAPI(_currentList.movieIds);
   }

@@ -143,7 +143,7 @@ class HiveMovieCacheService {
 
   Box<DateTime>? _timestampBox;
 
-  /// Whether the service has been initialized.
+  /// Whether the service has been initialised.
 
   bool _isInitialized = false;
 

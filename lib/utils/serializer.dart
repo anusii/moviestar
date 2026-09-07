@@ -34,7 +34,7 @@ import 'package:moviestar/shared/utils/turtle/user_profile_serializer.dart';
 
 /// Facade class maintaining complete backward compatibility with original TurtleSerializer.
 ///
-/// All method signatures and behavior remain identical to ensure zero breaking changes.
+/// All method signatures and behaviour remain identical to ensure zero breaking changes.
 /// This class delegates operations to specialized serializers for better maintainability.
 
 class TurtleSerializer {

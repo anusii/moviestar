@@ -13,7 +13,7 @@ import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/network_client.dart';
 
-/// A MovieService that initializes with a direct API key instead of using ApiKeyService.
+/// A MovieService that initialises with a direct API key instead of using ApiKeyService.
 /// This bypasses the complex POD/secure storage chain when we already have the key.
 
 class DirectMovieService extends MovieService {
@@ -26,7 +26,7 @@ class DirectMovieService extends MovieService {
     _initializeWithDirectApiKey();
   }
 
-  /// Initializes the service with the provided API key directly.
+  /// Initialises the service with the provided API key directly.
 
   void _initializeWithDirectApiKey() {
     // Create NetworkClient directly without ContentService to avoid type compatibility issues.
@@ -34,7 +34,7 @@ class DirectMovieService extends MovieService {
     _directClient = NetworkClient(baseUrl: _baseUrl, apiKey: _apiKey ?? '');
   }
 
-  /// Ensures our direct client is initialized.
+  /// Ensures our direct client is initialised.
 
   Future<void> _ensureDirectClientInitialized() async {
     if (_directClient == null) {

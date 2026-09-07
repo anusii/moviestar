@@ -31,11 +31,11 @@ dependencies:
   intl: any
   internet_connection_checker_plus: ^2.5.2
   markdown_tooltip: ^0.0.8
-  rdflib: ^0.2.12
+  rdf: ^1.0.0
   rxdart: ^0.28.0
   shared_preferences: ^2.2.2
-  solidpod: ^1.0.13
-  solidui: ^1.0.18
+  solidpod: ^1.0.20
+  solidui: ^1.0.39
   universal_io: ^2.2.2
   url_launcher: ^6.3.1
   window_manager: ^0.5.0

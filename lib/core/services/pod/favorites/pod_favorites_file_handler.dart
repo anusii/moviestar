@@ -1,4 +1,4 @@
-/// File handling operations for POD favorites service.
+/// File handling operations for POD favourites service.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -28,7 +28,7 @@ import 'dart:async';
 import 'package:moviestar/core/services/pod/favorites_file_manager.dart';
 import 'package:moviestar/models/movie.dart';
 
-/// Handles file operations for POD favorites service.
+/// Handles file operations for POD favourites service.
 
 class PodFavoritesFileHandler {
   final PodFavoritesFileManager _fileManager;
@@ -66,7 +66,7 @@ class PodFavoritesFileHandler {
     return movieListData ?? [];
   }
 
-  /// Loads favorites data from POD files.
+  /// Loads favourites data from POD files.
 
   Future<Map<String, List<Movie>>> loadFavoritesData() async {
     final toWatchData =

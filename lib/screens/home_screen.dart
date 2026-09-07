@@ -44,7 +44,7 @@ import 'package:moviestar/widgets/cache_feedback_widget.dart';
 /// trending movies.
 
 class HomeScreen extends ConsumerStatefulWidget {
-  /// Service for managing favorite movies.
+  /// Service for managing favourite movies.
 
   final FavoritesService favoritesService;
 

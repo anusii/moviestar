@@ -35,7 +35,7 @@ import 'package:moviestar/utils/is_logged_in.dart';
 import 'package:moviestar/utils/serializer.dart';
 
 /// Manages movie file operations for PodFavoritesService.
-/// Extracted to reduce main service file size while preserving exact behavior.
+/// Extracted to reduce main service file size while preserving exact behaviour.
 
 class PodFavoritesFileManager with PodOperationsMixin {
   final BuildContext _context;

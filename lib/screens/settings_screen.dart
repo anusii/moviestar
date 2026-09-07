@@ -43,7 +43,7 @@ import 'package:moviestar/widgets/base_screen.dart';
 /// A screen that displays and manages user settings.
 
 class SettingsScreen extends ConsumerStatefulWidget {
-  /// Service for managing favorite movies.
+  /// Service for managing favourite movies.
 
   final FavoritesService favoritesService;
   final FavoritesServiceManager favoritesServiceManager;

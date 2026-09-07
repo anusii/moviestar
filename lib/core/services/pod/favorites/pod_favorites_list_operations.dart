@@ -1,4 +1,4 @@
-/// List operations for POD favorites service.
+/// List operations for POD favourites service.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -30,7 +30,7 @@ import 'package:moviestar/core/services/pod/favorites_stream_manager.dart';
 import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 
-/// Handles custom list operations for POD favorites service.
+/// Handles custom list operations for POD favourites service.
 
 class PodFavoritesListOperations {
   final PodFavoritesStreamManager _streamManager;

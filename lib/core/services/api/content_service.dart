@@ -65,7 +65,7 @@ class ContentService {
     _initializeClientWithApiKey(apiKey);
   }
 
-  // Initializes the network client with the API key from secure storage.
+  // Initialises the network client with the API key from secure storage.
 
   Future<void> _initializeClient() async {
     if (_apiKeyService == null) {
@@ -85,7 +85,7 @@ class ContentService {
     }
   }
 
-  // Initializes the network client with a direct API key.
+  // Initialises the network client with a direct API key.
 
   Future<void> _initializeClientWithApiKey(String? apiKey) async {
     _client = NetworkClient(baseUrl: _baseUrl, apiKey: apiKey ?? '');
@@ -109,7 +109,7 @@ class ContentService {
     await _initializeClient();
   }
 
-  // Ensures the client is initialized before making requests.
+  // Ensures the client is initialised before making requests.
 
   Future<void> _ensureClientInitialized() async {
     if (_client == null || _searchService == null) {
@@ -346,7 +346,7 @@ class ContentService {
   ) async {
     await _ensureClientInitialized();
     if (_searchService == null) {
-      // Fallback: reinitialize if still null.
+      // Fallback: reinitialise if still null.
 
       await _initializeClient();
     }

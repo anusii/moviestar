@@ -37,7 +37,7 @@ import 'package:moviestar/shared/widgets/home/custom_list_states.dart';
 /// This component handles both grid view (horizontal scroll) and list view layouts.
 
 class HomeCustomListBuilder extends ConsumerWidget {
-  /// Service for managing favorite movies.
+  /// Service for managing favourite movies.
 
   final FavoritesService favoritesService;
 

@@ -34,7 +34,7 @@ import 'package:moviestar/screens/movie_details_screen.dart';
 /// Navigates to the movie details screen with the specified movie.
 ///
 /// This centralizes the navigation logic for movie details, ensuring.
-/// consistent behavior across the app.
+/// consistent behaviour across the app.
 
 Future<void> navigateToMovieDetails(
   BuildContext context,

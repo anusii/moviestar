@@ -119,13 +119,13 @@ class DropOperations {
 
       if (!hasFile) {
         // For new movies (typically from Recommended), we might need to create basic metadata.
-        // The favorites service should handle this automatically when adding to lists,
+        // The favourites service should handle this automatically when adding to lists,
         // but we can add a small delay to ensure the movie data is properly cached.
 
         await Future.delayed(TimingConstants.movieCardHoverHideDelay);
       }
     } catch (e) {
-      // If checking fails, continue anyway - the favorites service should handle creation.
+      // If checking fails, continue anyway - the favourites service should handle creation.
     }
   }
 

@@ -1,4 +1,4 @@
-/// Movie operations for POD favorites service.
+/// Movie operations for POD favourites service.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -32,7 +32,7 @@ import 'package:moviestar/models/content_item.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/utils/serializer.dart';
 
-/// Handles movie-specific operations for POD favorites service.
+/// Handles movie-specific operations for POD favourites service.
 
 class PodFavoritesMovieOperations {
   final PodFavoritesStreamManager _streamManager;

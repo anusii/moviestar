@@ -48,7 +48,7 @@ import 'package:moviestar/widgets/sort_controls.dart';
 /// A screen that displays movies the user has rated and reviewed.
 
 class MyMoviesScreen extends StatefulWidget {
-  /// Service for managing favorite movies.
+  /// Service for managing favourite movies.
 
   final FavoritesService favoritesService;
 
@@ -373,7 +373,7 @@ Recipients will be able to:
         // File doesn't exist, we'll create it.
       }
 
-      // Get current rating and comments from favorites service.
+      // Get current rating and comments from favourites service.
 
       final adapter = widget.favoritesService as FavoritesServiceAdapter;
       final currentRating = await adapter.getPersonalRating(movie);

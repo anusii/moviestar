@@ -400,7 +400,7 @@ class UserProfileService {
     }
   }
 
-  /// Initializes the user profile if it doesn't exist.
+  /// Initialises the user profile if it doesn't exist.
 
   Future<bool> initializeProfileIfNeeded() async {
     try {

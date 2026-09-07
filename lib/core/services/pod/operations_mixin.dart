@@ -34,7 +34,7 @@ import 'package:moviestar/utils/is_logged_in.dart';
 
 mixin PodOperationsMixin {
   /// Retries an operation with exponential backoff.
-  /// Matches exact retry behavior from existing services.
+  /// Matches exact retry behaviour from existing services.
 
   Future<T?> retryOperation<T>({
     required Future<T?> Function() operation,

@@ -63,7 +63,7 @@ class BatchSharingState extends ChangeNotifier {
     super.dispose();
   }
 
-  /// Initialize the list of files to be shared.
+  /// Initialise the list of files to be shared.
   /// Movie files are automatically set to read-only permissions.
 
   void initializeShareableFiles(
@@ -166,7 +166,7 @@ class BatchSharingState extends ChangeNotifier {
     isSharing = true;
     sharingProgress.clear();
     sharingResults.clear();
-    currentOperation = 'Initializing...';
+    currentOperation = 'Initialising...';
     notifyListeners();
 
     try {

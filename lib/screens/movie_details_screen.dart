@@ -48,7 +48,7 @@ class MovieDetailsScreen extends StatefulWidget {
 
   final Movie movie;
 
-  /// Service for managing favorite movies.
+  /// Service for managing favourite movies.
 
   final FavoritesService favoritesService;
 

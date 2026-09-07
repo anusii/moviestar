@@ -44,7 +44,7 @@ class CustomListRow extends ConsumerWidget {
 
   final CustomList customList;
 
-  /// Service for managing favorites.
+  /// Service for managing favourites.
 
   final FavoritesService favoritesService;
 

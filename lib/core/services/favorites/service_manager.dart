@@ -1,4 +1,4 @@
-/// Service manager that switches between local and POD storage for favorites.
+/// Service manager that switches between local and POD storage for favourites.
 ///
 // Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
 ///
@@ -65,7 +65,7 @@ class FavoritesServiceManager extends ChangeNotifier {
       await _enablePodService();
     } else {}
 
-    // Initialize custom lists stream immediately for better UX - POD service now loads concurrently.
+    // Initialise custom lists stream immediately for better UX - POD service now loads concurrently.
 
     await _updateCustomListsStream();
 

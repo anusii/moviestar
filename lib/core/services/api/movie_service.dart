@@ -55,7 +55,7 @@ class MovieService {
     _initializeClient();
   }
 
-  /// Initializes the network client with the API key from secure storage.
+  /// Initialises the network client with the API key from secure storage.
 
   Future<void> _initializeClient() async {
     if (_apiKeyService == null) {
@@ -81,7 +81,7 @@ class MovieService {
     await _initializeClient();
   }
 
-  /// Ensures the client is initialized before making requests.
+  /// Ensures the client is initialised before making requests.
 
   Future<void> _ensureClientInitialized() async {
     if (_client == null) {

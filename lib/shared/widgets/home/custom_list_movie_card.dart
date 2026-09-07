@@ -49,7 +49,7 @@ class CustomListMovieCard extends ConsumerWidget {
 
   final String contentType;
 
-  /// Service for managing favorites.
+  /// Service for managing favourites.
 
   final FavoritesService favoritesService;
 
@@ -175,7 +175,7 @@ class CustomListDirectMovieCard extends StatelessWidget {
 
   final Movie movie;
 
-  /// Service for managing favorites.
+  /// Service for managing favourites.
 
   final FavoritesService favoritesService;
 

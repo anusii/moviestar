@@ -42,7 +42,7 @@ import 'package:moviestar/widgets/base_screen.dart';
 /// Enhanced search screen that supports both movies and TV shows.
 
 class EnhancedSearchScreen extends StatefulWidget {
-  /// Service for managing favorite movies.
+  /// Service for managing favourite movies.
 
   final FavoritesService favoritesService;
   final ContentService contentService;

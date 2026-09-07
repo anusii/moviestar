@@ -1,4 +1,4 @@
-/// Service for managing favorite movies in the Movie Star application.
+/// Service for managing favourite movies in the Movie Star application.
 ///
 // Time-stamp: <Thursday 2025-04-10 11:47:48 +1000 Graham Williams>
 ///

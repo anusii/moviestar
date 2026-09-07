@@ -46,7 +46,7 @@ class MovieListWidget extends StatefulWidget {
 
   final List<Movie> movies;
 
-  /// The favorites service for quick actions and navigation.
+  /// The favourites service for quick actions and navigation.
 
   final FavoritesService favoritesService;
 

@@ -48,7 +48,7 @@ class AddMoviesToListScreen extends ConsumerStatefulWidget {
 
   final CustomList customList;
 
-  /// Service for managing favorite movies and lists.
+  /// Service for managing favourite movies and lists.
 
   final FavoritesService favoritesService;
 

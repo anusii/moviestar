@@ -80,7 +80,7 @@ class _SharedMovieListDetailScreenState
     _loadMovieTitles();
   }
 
-  /// Initialize decomposed components.
+  /// Initialise decomposed components.
 
   void _initializeComponents() {
     _dataLoader = SharedListDataLoader(

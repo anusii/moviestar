@@ -18,7 +18,7 @@ import 'package:moviestar/models/movie.dart';
 /// Static helper class for custom list operations.
 
 class ListOperations {
-  /// Loads all custom lists from the favorites service.
+  /// Loads all custom lists from the favourites service.
 
   static Future<List<CustomList>> loadCustomLists(
     FavoritesService favoritesService,

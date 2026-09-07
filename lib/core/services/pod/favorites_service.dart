@@ -1,4 +1,4 @@
-/// POD-based service for managing favorite movies using decomposed operations.
+/// POD-based service for managing favourite movies using decomposed operations.
 ///
 /// Copyright (C) 2025, Software Innovation Institute, ANU.
 ///
@@ -39,7 +39,7 @@ import 'package:moviestar/models/custom_list.dart';
 import 'package:moviestar/models/movie.dart';
 import 'package:moviestar/services/user_profile_service.dart';
 
-/// POD-based service for managing favorite movies using decomposed operations.
+/// POD-based service for managing favourite movies using decomposed operations.
 /// Uses specialized operation classes for different concerns.
 
 class PodFavoritesService extends BasePodService {
@@ -72,7 +72,7 @@ class PodFavoritesService extends BasePodService {
     _userProfileService = UserProfileService(context, child);
     _movieListService = MovieListService(context, child, _userProfileService);
 
-    // Initialize decomposed operation classes.
+    // Initialise decomposed operation classes.
 
     _movieOperations = PodFavoritesMovieOperations(
       _streamManager,
@@ -98,7 +98,7 @@ class PodFavoritesService extends BasePodService {
       safeReadFile,
     );
 
-    // Initialize by loading favorites and custom lists concurrently.
+    // Initialise by loading favourites and custom lists concurrently.
 
     _initializeConcurrently().then((_) {
       // Notify manager that initial loading is complete.
@@ -142,7 +142,7 @@ class PodFavoritesService extends BasePodService {
 
   List<Movie> get watched => _streamManager.watched;
 
-  /// Initialize favorites and custom lists concurrently for better performance.
+  /// Initialise favourites and custom lists concurrently for better performance.
 
   Future<void> _initializeConcurrently() async {
     await Future.wait([
@@ -151,7 +151,7 @@ class PodFavoritesService extends BasePodService {
     ]);
   }
 
-  /// Loads the user's favorites from POD.
+  /// Loads the user's favourites from POD.
 
   Future<void> loadFavorites() async {
     await executePodOperation(
@@ -223,7 +223,7 @@ class PodFavoritesService extends BasePodService {
     _cacheManager.clearCache();
   }
 
-  /// Reloads data from POD after initialization.
+  /// Reloads data from POD after initialisation.
 
   Future<void> reloadFromPod() async {
     await loadFavorites();

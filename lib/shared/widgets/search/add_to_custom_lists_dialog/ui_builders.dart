@@ -231,7 +231,7 @@ class UiBuilders {
             ),
             const SizedBox(height: 8),
             Text(
-              'Create your first custom list to organize your movies and TV shows!',
+              'Create your first custom list to organise your movies and TV shows!',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,

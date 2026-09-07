@@ -87,7 +87,7 @@ class MovieCard extends StatefulWidget {
 
   final Widget? customSubtitle;
 
-  /// The favorites service for quick actions (optional).
+  /// The favourites service for quick actions (optional).
 
   final FavoritesService? favoritesService;
 

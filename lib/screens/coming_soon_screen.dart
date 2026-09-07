@@ -42,7 +42,7 @@ import 'package:moviestar/widgets/movie_card.dart';
 /// A screen that displays upcoming movies and their release dates with caching.
 
 class ComingSoonScreen extends ConsumerStatefulWidget {
-  /// Service for managing favorite movies.
+  /// Service for managing favourite movies.
 
   final FavoritesService favoritesService;
 
